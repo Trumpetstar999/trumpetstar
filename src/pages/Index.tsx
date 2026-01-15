@@ -1,13 +1,55 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { AppShell } from '@/components/layout/AppShell';
+import { LevelsPage } from './LevelsPage';
+import { PracticePage } from './PracticePage';
+import { RecordingsPage } from './RecordingsPage';
+import { ClassroomPage } from './ClassroomPage';
+import { ProfilePage } from './ProfilePage';
+import { TabId } from '@/types';
+import { mockStats } from '@/data/mockData';
+
+const tabTitles: Record<TabId, string> = {
+  levels: 'Levels',
+  practice: 'Üben',
+  recordings: 'Aufnahmen',
+  classroom: 'Klassenzimmer',
+  profile: 'Profil',
+};
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState<TabId>('levels');
+  const [totalStars, setTotalStars] = useState(mockStats.totalStars);
+
+  const handleStarEarned = () => {
+    setTotalStars(prev => prev + 1);
+  };
+
+  const renderPage = () => {
+    switch (activeTab) {
+      case 'levels':
+        return <LevelsPage onStarEarned={handleStarEarned} />;
+      case 'practice':
+        return <PracticePage />;
+      case 'recordings':
+        return <RecordingsPage />;
+      case 'classroom':
+        return <ClassroomPage />;
+      case 'profile':
+        return <ProfilePage />;
+      default:
+        return <LevelsPage onStarEarned={handleStarEarned} />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <AppShell
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      title={tabTitles[activeTab]}
+      stars={totalStars}
+    >
+      {renderPage()}
+    </AppShell>
   );
 };
 
