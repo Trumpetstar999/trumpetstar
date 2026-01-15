@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Play, MoreVertical, Trash2, Share2, Download } from 'lucide-react';
+import { Play, MoreVertical, Trash2, Download, MessageSquare, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -17,16 +18,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { RecordingShareDialog } from './RecordingShareDialog';
 import type { Recording } from '@/hooks/useRecordings';
 
 interface RecordingCardProps {
   recording: Recording;
   onDelete: (id: string) => void;
   onPlay: (recording: Recording) => void;
+  onOpenChat?: (chatId: string) => void;
 }
 
-export function RecordingCard({ recording, onDelete, onPlay }: RecordingCardProps) {
+export function RecordingCard({ recording, onDelete, onPlay, onOpenChat }: RecordingCardProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareType, setShareType] = useState<'admin' | 'teacher'>('teacher');
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -50,6 +55,16 @@ export function RecordingCard({ recording, onDelete, onPlay }: RecordingCardProp
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const handleShareToTeacher = () => {
+    setShareType('teacher');
+    setShareDialogOpen(true);
+  };
+
+  const handleShareToAdmin = () => {
+    setShareType('admin');
+    setShareDialogOpen(true);
   };
 
   return (
@@ -96,10 +111,20 @@ export function RecordingCard({ recording, onDelete, onPlay }: RecordingCardProp
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleShareToTeacher}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  An meinen Lehrer senden
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareToAdmin}>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Feedback an Admin senden
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDownload}>
                   <Download className="w-4 h-4 mr-2" />
                   Herunterladen
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-destructive">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Löschen
@@ -126,6 +151,15 @@ export function RecordingCard({ recording, onDelete, onPlay }: RecordingCardProp
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <RecordingShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        videoId={recording.id}
+        videoTitle={recording.title}
+        shareType={shareType}
+        onSuccess={(chatId) => onOpenChat?.(chatId)}
+      />
     </>
   );
 }

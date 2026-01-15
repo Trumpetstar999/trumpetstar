@@ -38,6 +38,54 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_feedback_requests: {
+        Row: {
+          chat_id: string | null
+          created_at: string
+          id: string
+          message: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          user_video_id: string
+        }
+        Insert: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          user_video_id: string
+        }
+        Update: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          user_video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_feedback_requests_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "video_chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_feedback_requests_user_video_id_fkey"
+            columns: ["user_video_id"]
+            isOneToOne: false
+            referencedRelation: "user_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_participants: {
         Row: {
           classroom_id: string
@@ -305,6 +353,30 @@ export type Database = {
           },
         ]
       }
+      teacher_assignments: {
+        Row: {
+          assigned_at: string
+          id: string
+          is_active: boolean
+          teacher_id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: string
+          is_active?: boolean
+          teacher_id: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: string
+          is_active?: boolean
+          teacher_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       todos: {
         Row: {
           created_at: string
@@ -435,6 +507,120 @@ export type Database = {
           },
         ]
       }
+      video_chat_messages: {
+        Row: {
+          chat_id: string
+          content: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          message_type: string
+          sender_role: string
+          sender_user_id: string
+          timestamp_seconds: number | null
+          video_storage_path: string | null
+        }
+        Insert: {
+          chat_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_type: string
+          sender_role: string
+          sender_user_id: string
+          timestamp_seconds?: number | null
+          video_storage_path?: string | null
+        }
+        Update: {
+          chat_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message_type?: string
+          sender_role?: string
+          sender_user_id?: string
+          timestamp_seconds?: number | null
+          video_storage_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_chat_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "video_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_chat_participants: {
+        Row: {
+          chat_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          id?: string
+          joined_at?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_chat_participants_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "video_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_chats: {
+        Row: {
+          context_type: string
+          created_at: string
+          created_by: string
+          id: string
+          reference_video_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          context_type: string
+          created_at?: string
+          created_by: string
+          id?: string
+          reference_video_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          context_type?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          reference_video_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_chats_reference_video_id_fkey"
+            columns: ["reference_video_id"]
+            isOneToOne: false
+            referencedRelation: "user_recordings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       video_completions: {
         Row: {
           completed_at: string
@@ -463,6 +649,54 @@ export type Database = {
             columns: ["video_id"]
             isOneToOne: false
             referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      video_shares: {
+        Row: {
+          chat_id: string | null
+          id: string
+          revoked_at: string | null
+          share_type: string
+          shared_at: string
+          shared_by_user_id: string
+          shared_with_user_id: string
+          video_id: string
+        }
+        Insert: {
+          chat_id?: string | null
+          id?: string
+          revoked_at?: string | null
+          share_type: string
+          shared_at?: string
+          shared_by_user_id: string
+          shared_with_user_id: string
+          video_id: string
+        }
+        Update: {
+          chat_id?: string | null
+          id?: string
+          revoked_at?: string | null
+          share_type?: string
+          shared_at?: string
+          shared_by_user_id?: string
+          shared_with_user_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_shares_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "video_chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_shares_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "user_recordings"
             referencedColumns: ["id"]
           },
         ]

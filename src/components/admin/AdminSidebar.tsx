@@ -6,7 +6,8 @@ import {
   Video, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,6 +21,7 @@ const menuItems = [
   { id: 'users', label: 'Nutzer', icon: Users },
   { id: 'levels', label: 'Levels / Showcases', icon: Layers },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
+  { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
   { id: 'system', label: 'Systemstatus', icon: Settings },
 ];
 

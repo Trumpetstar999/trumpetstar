@@ -9,6 +9,7 @@ import { LevelManager } from '@/components/admin/LevelManager';
 import { SectionManager } from '@/components/admin/SectionManager';
 import { VideoManager } from '@/components/admin/VideoManager';
 import { ShowcaseImporter } from '@/components/admin/ShowcaseImporter';
+import { AdminFeedbackPanel } from '@/components/admin/AdminFeedbackPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,7 +18,7 @@ import { ArrowLeft, RefreshCw, Loader2, Download, Settings, CheckCircle, AlertCi
 import { toast } from 'sonner';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'classrooms' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'classrooms' | 'feedback' | 'system';
 
 interface SelectedContext {
   levelId: string;
@@ -241,6 +242,8 @@ export default function AdminPage() {
               </Card>
             </div>
           )}
+
+          {activeTab === 'feedback' && <AdminFeedbackPanel />}
 
           {activeTab === 'system' && (
             <div className="space-y-6">
