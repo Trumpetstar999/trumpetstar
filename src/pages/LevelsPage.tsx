@@ -148,23 +148,23 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         {currentLevel && (
           <>
             {/* Level header */}
-            <div className="sticky top-0 z-10 glass border-b border-border">
-              <div className="flex items-center justify-between px-6 py-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">{currentLevel.title}</h2>
-                  <p className="text-muted-foreground mt-1">
+            <div className="sticky top-0 z-10 bg-blue-900 border-b border-blue-800">
+              <div className="flex items-center justify-between px-6 py-2">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-lg font-semibold text-white">{currentLevel.title}</h2>
+                  <span className="text-blue-200 text-sm">
                     {currentLevel.sections.reduce((acc, s) => acc + s.videos.length, 0)} Videos
-                  </p>
+                  </span>
                 </div>
                 
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" className="gap-2" onClick={fetchLevels}>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-blue-800" onClick={fetchLevels}>
                     <RefreshCw className="w-4 h-4" />
                     Sync
                   </Button>
-                  <Button variant="secondary" className="gap-2">
+                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-blue-800">
                     <Download className="w-4 h-4" />
-                    Inhalte laden
+                    Laden
                   </Button>
                 </div>
               </div>
