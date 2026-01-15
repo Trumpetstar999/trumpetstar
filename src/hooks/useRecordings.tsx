@@ -68,18 +68,26 @@ export function useRecordings() {
     }
 
     try {
-      const fileName = `${Date.now()}.webm`;
+      // Determine file extension based on blob type
+      const blobType = recording.blob.type || 'video/webm';
+      const extension = blobType.includes('mp4') ? 'mp4' : 'webm';
+      const fileName = `${Date.now()}.${extension}`;
       const storagePath = `${user.id}/${fileName}`;
+
+      console.log('Uploading recording:', { storagePath, blobType, size: recording.blob.size });
 
       // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from('recordings')
         .upload(storagePath, recording.blob, {
-          contentType: 'video/webm',
+          contentType: blobType,
           cacheControl: '3600',
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       // Save metadata to database
       const { data, error: dbError } = await supabase
