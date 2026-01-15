@@ -2,95 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Trumpetstar-inspired Design System for Music Learning App */
+/* All colors in HSL format */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    /* Primary Blue - #005BBB */
+    --primary: 210 100% 37%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Accent Red - #E63946 */
+    --accent: 355 77% 56%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Reward Gold - #FFCC00 */
+    --gold: 48 100% 50%;
+    --gold-foreground: 0 0% 10%;
+    
+    /* Background Light - #F8F9FA */
+    --background: 210 17% 98%;
+    --foreground: 210 11% 15%;
+    
+    /* White surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 210 11% 15%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 210 11% 15%;
+    
+    /* Secondary - lighter blue tint */
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 210 100% 37%;
+    
+    /* Muted - Neutral Grey #6C757D */
+    --muted: 210 7% 89%;
+    --muted-foreground: 208 7% 46%;
+    
+    /* Destructive */
+    --destructive: 355 77% 56%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Border & Input */
+    --border: 210 14% 89%;
+    --input: 210 14% 89%;
+    --ring: 210 100% 37%;
+    
+    --radius: 0.75rem;
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 210 100% 37%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 210 100% 37%;
+    --sidebar-border: 210 14% 89%;
+    --sidebar-ring: 210 100% 37%;
+    
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(210 100% 37%) 0%, hsl(210 100% 45%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(48 100% 50%) 0%, hsl(40 100% 55%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 17% 98%) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(210 11% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(210 11% 15% / 0.1), 0 2px 4px -2px hsl(210 11% 15% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(210 11% 15% / 0.1), 0 4px 6px -4px hsl(210 11% 15% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(210 11% 15% / 0.1), 0 8px 10px -6px hsl(210 11% 15% / 0.1);
+    --shadow-gold: 0 4px 14px 0 hsl(48 100% 50% / 0.4);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 210 11% 10%;
+    --foreground: 210 17% 98%;
+    --card: 210 11% 13%;
+    --card-foreground: 210 17% 98%;
+    --popover: 210 11% 13%;
+    --popover-foreground: 210 17% 98%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 11% 18%;
+    --secondary-foreground: 210 17% 98%;
+    --muted: 210 11% 18%;
+    --muted-foreground: 210 7% 60%;
+    --accent: 355 77% 56%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 355 77% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 11% 20%;
+    --input: 210 11% 20%;
+    --ring: 210 100% 50%;
   }
 }
 
@@ -100,6 +101,130 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* iPad optimized touch targets */
+  button, a, [role="button"] {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer components {
+  /* Gold star animation */
+  @keyframes star-pulse {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 0 hsl(48 100% 50% / 0));
+    }
+    50% {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px hsl(48 100% 50% / 0.6));
+    }
+  }
+  
+  .star-earned {
+    animation: star-pulse 0.6s ease-out;
+  }
+  
+  /* Card hover effect */
+  @keyframes card-lift {
+    from {
+      transform: translateY(0) scale(1);
+      box-shadow: var(--shadow-md);
+    }
+    to {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: var(--shadow-xl);
+    }
+  }
+  
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  /* Netflix-style horizontal scroll */
+  .scroll-row {
+    @apply flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scroll-row > * {
+    @apply snap-start flex-shrink-0;
+  }
+  
+  /* Video thumbnail overlay */
+  .video-thumbnail {
+    @apply relative overflow-hidden rounded-lg;
+  }
+  
+  .video-thumbnail::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-200;
+  }
+  
+  .video-thumbnail:hover::after {
+    @apply opacity-100;
+  }
+  
+  /* Tab bar styles */
+  .tab-bar {
+    @apply fixed bottom-0 left-0 right-0 bg-card border-t border-border;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  
+  /* Fullscreen overlay */
+  .fullscreen-overlay {
+    @apply fixed inset-0 z-50 bg-black/95;
+  }
+  
+  /* Speed slider track */
+  .speed-slider {
+    @apply h-2 rounded-full bg-muted;
+  }
+  
+  .speed-slider-fill {
+    @apply h-full rounded-full bg-primary transition-all duration-150;
+  }
+}
+
+@layer utilities {
+  /* Safe area utilities for iPad */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+  
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  /* Gold text gradient */
+  .text-gold-gradient {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glass effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg;
   }
 }
