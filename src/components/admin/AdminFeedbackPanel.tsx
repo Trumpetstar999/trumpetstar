@@ -25,6 +25,7 @@ import { Loader2, MessageSquare, Video, Clock, ExternalLink, GraduationCap } fro
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { TeacherAssignmentManager } from './TeacherAssignmentManager';
+import { AdminTeacherChats } from './AdminTeacherChats';
 
 interface FeedbackRequest {
   id: string;
@@ -169,16 +170,20 @@ export function AdminFeedbackPanel() {
         <TabsList>
           <TabsTrigger value="feedback" className="gap-2">
             <MessageSquare className="w-4 h-4" />
-            Feedback-Anfragen
+            Feedback
             {requests.filter(r => r.status === 'open').length > 0 && (
               <Badge variant="destructive" className="ml-1 h-5 min-w-[20px]">
                 {requests.filter(r => r.status === 'open').length}
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="teacher_chats" className="gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Lehrer-Chats
+          </TabsTrigger>
           <TabsTrigger value="teachers" className="gap-2">
             <GraduationCap className="w-4 h-4" />
-            Lehrer-Zuweisung
+            Zuweisung
           </TabsTrigger>
         </TabsList>
 
@@ -337,6 +342,10 @@ export function AdminFeedbackPanel() {
           )}
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="teacher_chats">
+          <AdminTeacherChats />
         </TabsContent>
 
         <TabsContent value="teachers">

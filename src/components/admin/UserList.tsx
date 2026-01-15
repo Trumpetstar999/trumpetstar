@@ -6,10 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Users, Star, Video, Calendar } from 'lucide-react';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserProfile {
   id: string;
@@ -27,11 +30,13 @@ interface UserDetail extends UserProfile {
 }
 
 export function UserList() {
+  const { toast } = useToast();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [updatingTeacher, setUpdatingTeacher] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -112,6 +117,41 @@ export function UserList() {
     return format(new Date(dateStr), 'dd.MM.yyyy', { locale: de });
   };
 
+  const handleToggleTeacher = async (userId: string, currentValue: boolean) => {
+    setUpdatingTeacher(userId);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_teacher: !currentValue })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setUsers(users.map(u => 
+        u.id === userId ? { ...u, is_teacher: !currentValue } : u
+      ));
+
+      if (selectedUser?.id === userId) {
+        setSelectedUser({ ...selectedUser, is_teacher: !currentValue });
+      }
+
+      toast({
+        title: !currentValue ? 'Lehrer-Status aktiviert' : 'Lehrer-Status entfernt',
+        description: `Der Nutzer ist jetzt ${!currentValue ? 'ein Lehrer' : 'kein Lehrer mehr'}.`
+      });
+    } catch (error) {
+      console.error('Error updating teacher status:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Status konnte nicht aktualisiert werden.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdatingTeacher(null);
+    }
+  };
+
   return (
     <>
       <div className="space-y-6">
@@ -153,31 +193,49 @@ export function UserList() {
                   <TableRow>
                     <TableHead>Nutzer</TableHead>
                     <TableHead>Rolle</TableHead>
-                    <TableHead>Registriert seit</TableHead>
+                    <TableHead>Lehrer</TableHead>
+                    <TableHead>Registriert</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => (
                     <TableRow
                       key={user.id}
-                      className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => fetchUserDetail(user.id)}
+                      className="hover:bg-muted/50"
                     >
                       <TableCell>
-                        <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => fetchUserDetail(user.id)}
+                          className="flex items-center gap-3 hover:underline"
+                        >
                           <Avatar className="w-9 h-9">
                             <AvatarImage src={user.avatar_url || undefined} />
                             <AvatarFallback>{user.display_name?.[0] || '?'}</AvatarFallback>
                           </Avatar>
                           <span className="font-medium">{user.display_name || 'Unbekannt'}</span>
-                        </div>
+                        </button>
                       </TableCell>
                       <TableCell>
                         {user.is_teacher ? (
-                          <Badge variant="secondary">Lehrer</Badge>
+                          <Badge variant="secondary" className="gap-1">
+                            <GraduationCap className="w-3 h-3" />
+                            Lehrer
+                          </Badge>
                         ) : (
                           <Badge variant="outline">Schüler</Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {updatingTeacher === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Switch
+                              checked={user.is_teacher}
+                              onCheckedChange={() => handleToggleTeacher(user.id, user.is_teacher)}
+                            />
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {formatDate(user.created_at)}
@@ -223,11 +281,29 @@ export function UserList() {
                     {selectedUser.display_name?.[0] || '?'}
                   </AvatarFallback>
                 </Avatar>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-semibold text-lg">{selectedUser.display_name || 'Unbekannt'}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedUser.is_teacher ? 'Lehrer' : 'Schüler'}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {selectedUser.is_teacher ? (
+                      <Badge variant="secondary" className="gap-1">
+                        <GraduationCap className="w-3 h-3" />
+                        Lehrer
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline">Schüler</Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-xs text-muted-foreground">Lehrer-Status</span>
+                  {updatingTeacher === selectedUser.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Switch
+                      checked={selectedUser.is_teacher}
+                      onCheckedChange={() => handleToggleTeacher(selectedUser.id, selectedUser.is_teacher)}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -267,7 +343,7 @@ export function UserList() {
               </div>
 
               <p className="text-xs text-muted-foreground text-center">
-                Nur-Lese-Ansicht • Keine Bearbeitung möglich
+                Lehrer-Status kann oben umgeschaltet werden
               </p>
             </div>
           )}
