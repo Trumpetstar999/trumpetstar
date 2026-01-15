@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 interface TabBarProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
+  hidden?: boolean;
 }
 
 const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
@@ -15,9 +16,12 @@ const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
-export function TabBar({ activeTab, onTabChange }: TabBarProps) {
+export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
   return (
-    <nav className="tab-bar z-50">
+    <nav className={cn(
+      "tab-bar z-50 transition-transform duration-300",
+      hidden && "translate-y-full"
+    )}>
       <div className="flex items-center justify-around px-4 py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;

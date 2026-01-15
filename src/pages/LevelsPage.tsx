@@ -6,6 +6,7 @@ import { Video, Level, Section } from '@/types';
 import { Download, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 
 interface LevelsPageProps {
   onStarEarned: () => void;
@@ -16,6 +17,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeLevel, setActiveLevel] = useState<string>('');
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const { setIsVideoPlaying } = useVideoPlayer();
+
+  // Update video playing state when video is selected/closed
+  useEffect(() => {
+    setIsVideoPlaying(selectedVideo !== null);
+  }, [selectedVideo, setIsVideoPlaying]);
   
   useEffect(() => {
     fetchLevels();

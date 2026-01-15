@@ -2,6 +2,8 @@ import { ReactNode } from 'react';
 import { TabBar } from './TabBar';
 import { Header } from './Header';
 import { TabId } from '@/types';
+import { useVideoPlayer } from '@/hooks/useVideoPlayer';
+import { cn } from '@/lib/utils';
 
 interface AppShellProps {
   children: ReactNode;
@@ -28,15 +30,20 @@ export function AppShell({
   stars,
   isOffline 
 }: AppShellProps) {
+  const { isVideoPlaying } = useVideoPlayer();
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header title={title} stars={stars} isOffline={isOffline} />
       
-      <main className="flex-1 overflow-auto pb-24">
+      <main className={cn(
+        "flex-1 overflow-auto transition-all duration-300",
+        isVideoPlaying ? "pb-0" : "pb-24"
+      )}>
         {children}
       </main>
       
-      <TabBar activeTab={activeTab} onTabChange={onTabChange} />
+      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={isVideoPlaying} />
     </div>
   );
 }
