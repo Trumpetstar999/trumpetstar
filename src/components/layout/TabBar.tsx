@@ -17,6 +17,8 @@ const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
 ];
 
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
+  console.log('[TabBar] hidden prop:', hidden);
+  
   return (
     <nav className={cn(
       "tab-bar z-50 transition-transform duration-300",
