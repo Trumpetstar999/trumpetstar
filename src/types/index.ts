@@ -90,4 +90,4 @@ export interface DayActivity {
   minutesPracticed: number;
 }
 
-export type TabId = 'levels' | 'practice' | 'recordings' | 'classroom' | 'profile';
+export type TabId = 'levels' | 'practice' | 'recordings' | 'chats' | 'classroom' | 'profile';

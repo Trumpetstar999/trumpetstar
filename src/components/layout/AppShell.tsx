@@ -18,6 +18,7 @@ const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
   practice: 'Üben',
   recordings: 'Aufnahmen',
+  chats: 'Chats',
   classroom: 'Klassenzimmer',
   profile: 'Profil',
 };
