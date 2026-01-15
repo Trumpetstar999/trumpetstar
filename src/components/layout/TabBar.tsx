@@ -17,13 +17,13 @@ const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
 ];
 
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
-  console.log('[TabBar] hidden prop:', hidden);
-  
+  // Don't render at all when hidden - most reliable for iPad
+  if (hidden) {
+    return null;
+  }
+
   return (
-    <nav className={cn(
-      "tab-bar z-50 transition-transform duration-300",
-      hidden && "translate-y-full"
-    )}>
+    <nav className="tab-bar z-50">
       <div className="flex items-center justify-around px-4 py-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
