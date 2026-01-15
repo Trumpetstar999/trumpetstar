@@ -1,13 +1,16 @@
-import { Star, WifiOff, LogOut, User } from 'lucide-react';
+import { Star, WifiOff, LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
@@ -17,6 +20,8 @@ interface HeaderProps {
 
 export function Header({ title, stars, isOffline = false }: HeaderProps) {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useUserRole();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -60,6 +65,16 @@ export function Header({ title, stars, isOffline = false }: HeaderProps) {
                 <User className="w-4 h-4 mr-2" />
                 {user?.email}
               </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Admin
+                  </DropdownMenuItem>
+                </>
+              )}
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                 <LogOut className="w-4 h-4 mr-2" />
                 Abmelden
