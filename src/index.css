@@ -227,4 +227,9 @@
   .glass {
     @apply bg-white/80 backdrop-blur-lg;
   }
+  
+  /* Mirror video for selfie camera */
+  .mirror {
+    transform: scaleX(-1);
+  }
 }
