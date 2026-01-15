@@ -10,8 +10,6 @@ const VideoPlayerContext = createContext<VideoPlayerContextType | undefined>(und
 export function VideoPlayerProvider({ children }: { children: ReactNode }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-  console.log('[VideoPlayerProvider] isVideoPlaying:', isVideoPlaying);
-
   return (
     <VideoPlayerContext.Provider value={{ isVideoPlaying, setIsVideoPlaying }}>
       {children}

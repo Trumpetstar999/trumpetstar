@@ -21,7 +21,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
 
   // Update video playing state when video is selected/closed
   useEffect(() => {
-    console.log('[LevelsPage] selectedVideo changed:', selectedVideo !== null);
     setIsVideoPlaying(selectedVideo !== null);
   }, [selectedVideo, setIsVideoPlaying]);
   
