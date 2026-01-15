@@ -1,8 +1,65 @@
+import { useState } from 'react';
 import { Users, Calendar, Video, Plus, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CreateRoomDialog } from '@/components/classroom/CreateRoomDialog';
+import { LiveRoom } from '@/components/classroom/LiveRoom';
+import { RoomCard } from '@/components/classroom/RoomCard';
+import { toast } from 'sonner';
+
+interface Room {
+  id: string;
+  title: string;
+  visibility: 'invite-only' | 'friends' | 'link-only';
+  isLive: boolean;
+  isRecording: boolean;
+  participantCount: number;
+  maxParticipants: number;
+  scheduledAt?: string;
+  createdAt: string;
+}
 
 export function ClassroomPage() {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [activeRoom, setActiveRoom] = useState<Room | null>(null);
+
+  const handleCreateRoom = (roomData: {
+    title: string;
+    visibility: 'invite-only' | 'friends' | 'link-only';
+    maxParticipants: number;
+    isRecording: boolean;
+  }) => {
+    const newRoom: Room = {
+      id: `room-${Date.now()}`,
+      ...roomData,
+      isLive: true,
+      participantCount: 1,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setRooms(prev => [newRoom, ...prev]);
+    setActiveRoom(newRoom);
+    toast.success('Raum erstellt!');
+  };
+
+  const handleJoinRoom = (room: Room) => {
+    setActiveRoom(room);
+  };
+
+  const handleLeaveRoom = () => {
+    if (activeRoom) {
+      // Mark room as not live when host leaves
+      setRooms(prev => prev.map(r => 
+        r.id === activeRoom.id ? { ...r, isLive: false } : r
+      ));
+    }
+    setActiveRoom(null);
+  };
+
+  const liveRooms = rooms.filter(r => r.isLive);
+  const myRooms = rooms;
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-6">
       <Tabs defaultValue="live" className="w-full">
@@ -22,26 +79,38 @@ export function ClassroomPage() {
             </TabsTrigger>
           </TabsList>
           
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="w-4 h-4" />
             Raum starten
           </Button>
         </div>
         
         <TabsContent value="live" className="animate-fade-in">
-          <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
-              <Video className="w-10 h-10 text-muted-foreground" />
+          {liveRooms.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {liveRooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onJoin={() => handleJoinRoom(room)}
+                />
+              ))}
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Keine Live-Sessions</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Gerade ist niemand online. Starte einen Raum und lade Freunde ein!
-            </p>
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Jetzt starten
-            </Button>
-          </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+                <Video className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Keine Live-Sessions</h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                Gerade ist niemand online. Starte einen Raum und lade Freunde ein!
+              </p>
+              <Button className="gap-2" onClick={() => setCreateDialogOpen(true)}>
+                <Plus className="w-4 h-4" />
+                Jetzt starten
+              </Button>
+            </div>
+          )}
         </TabsContent>
         
         <TabsContent value="scheduled" className="animate-fade-in">
@@ -61,17 +130,43 @@ export function ClassroomPage() {
         </TabsContent>
         
         <TabsContent value="my" className="animate-fade-in">
-          <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
-              <Users className="w-10 h-10 text-muted-foreground" />
+          {myRooms.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {myRooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onJoin={() => handleJoinRoom(room)}
+                />
+              ))}
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Keine eigenen Räume</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Erstelle deinen ersten Unterrichtsraum für bis zu 6 Teilnehmer.
-            </p>
-          </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+                <Users className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Keine eigenen Räume</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Erstelle deinen ersten Unterrichtsraum für bis zu 6 Teilnehmer.
+              </p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
+
+      <CreateRoomDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onCreateRoom={handleCreateRoom}
+      />
+
+      {activeRoom && (
+        <LiveRoom
+          open={!!activeRoom}
+          onClose={handleLeaveRoom}
+          room={activeRoom}
+        />
+      )}
     </div>
   );
 }
