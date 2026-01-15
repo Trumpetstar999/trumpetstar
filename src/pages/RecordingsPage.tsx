@@ -1,54 +1,54 @@
 import { useState } from 'react';
-import { Video, Users, Plus } from 'lucide-react';
+import { Video, Users, Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RecordingDialog } from '@/components/recordings/RecordingDialog';
 import { RecordingCard } from '@/components/recordings/RecordingCard';
 import { VideoPlayerDialog } from '@/components/recordings/VideoPlayerDialog';
-import { toast } from 'sonner';
-
-interface LocalRecording {
-  id: string;
-  title: string;
-  url: string;
-  thumbnail?: string;
-  createdAt: string;
-  duration: number;
-}
+import { useRecordings, Recording } from '@/hooks/useRecordings';
+import { useAuth } from '@/hooks/useAuth';
 
 export function RecordingsPage() {
-  const [recordings, setRecordings] = useState<LocalRecording[]>([]);
+  const { user } = useAuth();
+  const { recordings, loading, saveRecording, deleteRecording } = useRecordings();
   const [recordingDialogOpen, setRecordingDialogOpen] = useState(false);
-  const [playingVideo, setPlayingVideo] = useState<LocalRecording | null>(null);
+  const [playingVideo, setPlayingVideo] = useState<Recording | null>(null);
 
   const handleSaveRecording = async (recording: { title: string; blob: Blob; duration: number }) => {
-    // Create a local URL for the recording
-    const url = URL.createObjectURL(recording.blob);
-    
-    const newRecording: LocalRecording = {
-      id: `recording-${Date.now()}`,
-      title: recording.title,
-      url,
-      createdAt: new Date().toISOString(),
-      duration: recording.duration,
-    };
-    
-    setRecordings(prev => [newRecording, ...prev]);
-    toast.success('Aufnahme gespeichert!');
+    await saveRecording(recording);
   };
 
   const handleDeleteRecording = (id: string) => {
-    const recording = recordings.find(r => r.id === id);
-    if (recording) {
-      URL.revokeObjectURL(recording.url);
-    }
-    setRecordings(prev => prev.filter(r => r.id !== id));
-    toast.success('Aufnahme gelöscht');
+    deleteRecording(id);
   };
 
-  const handlePlayRecording = (recording: LocalRecording) => {
+  const handlePlayRecording = (recording: Recording) => {
     setPlayingVideo(recording);
   };
+
+  if (!user) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 py-6">
+        <div className="text-center py-16">
+          <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+            <Video className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold text-foreground mb-2">Bitte einloggen</h3>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Du musst eingeloggt sein, um Aufnahmen zu erstellen und anzusehen.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-6">

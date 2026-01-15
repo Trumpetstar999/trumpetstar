@@ -17,15 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-interface Recording {
-  id: string;
-  title: string;
-  url: string;
-  thumbnail?: string;
-  createdAt: string;
-  duration: number;
-}
+import type { Recording } from '@/hooks/useRecordings';
 
 interface RecordingCardProps {
   recording: Recording;
