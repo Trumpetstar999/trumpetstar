@@ -196,10 +196,10 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in">
       {/* Star earned animation */}
       {showCompleted && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 animate-scale-in">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] animate-scale-in">
           <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-black/80 backdrop-blur-lg">
             <Star className="w-20 h-20 text-gold fill-gold animate-pulse" />
             <span className="text-2xl font-bold text-white">+1 Stern!</span>
@@ -210,7 +210,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 z-50 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        className="absolute top-6 right-6 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
       >
         <X className="w-6 h-6" />
       </button>
