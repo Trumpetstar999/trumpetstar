@@ -9,10 +9,6 @@ interface SectionRowProps {
 export function SectionRow({ section, onVideoClick }: SectionRowProps) {
   return (
     <div className="py-4">
-      <div className="px-6 mb-4">
-        <h3 className="text-xl font-semibold text-foreground">{section.title}</h3>
-      </div>
-      
       <div className="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {section.videos.map((video) => (
           <VideoCard
