@@ -34,17 +34,21 @@ export function useRecordings() {
 
       if (error) throw error;
 
-      // Get public URLs for each recording
+      // Get signed URLs for each recording (private access)
       const recordingsWithUrls = await Promise.all(
         (data || []).map(async (rec) => {
-          const { data: urlData } = supabase.storage
+          const { data: urlData, error: urlError } = await supabase.storage
             .from('recordings')
-            .getPublicUrl(rec.storage_path);
+            .createSignedUrl(rec.storage_path, 3600); // 1 hour expiry
+
+          if (urlError) {
+            console.error('Error creating signed URL:', urlError);
+          }
 
           return {
             id: rec.id,
             title: rec.title || 'Unbenannte Aufnahme',
-            url: urlData.publicUrl,
+            url: urlData?.signedUrl || '',
             storage_path: rec.storage_path,
             createdAt: rec.created_at,
             duration: rec.duration_seconds || 0,
@@ -103,15 +107,15 @@ export function useRecordings() {
 
       if (dbError) throw dbError;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // Get signed URL (private access)
+      const { data: urlData } = await supabase.storage
         .from('recordings')
-        .getPublicUrl(storagePath);
+        .createSignedUrl(storagePath, 3600); // 1 hour expiry
 
       const newRecording: Recording = {
         id: data.id,
         title: data.title || 'Unbenannte Aufnahme',
-        url: urlData.publicUrl,
+        url: urlData?.signedUrl || '',
         storage_path: storagePath,
         createdAt: data.created_at,
         duration: data.duration_seconds || 0,
