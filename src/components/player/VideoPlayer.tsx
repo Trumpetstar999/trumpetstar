@@ -26,9 +26,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     const rect = sliderRef.current.getBoundingClientRect();
     const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(1, x / rect.width));
-    const newSpeed = Math.round(40 + percentage * 80); // 40-120%
-    const snappedSpeed = Math.round(newSpeed / 5) * 5; // Snap to 5%
-    setSpeed(snappedSpeed);
+    const newSpeed = Math.round(40 + percentage * 80); // 40-120% in 1% steps
+    setSpeed(newSpeed);
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -114,11 +113,11 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSpeed(prev => Math.min(120, prev + 5));
+          setSpeed(prev => Math.min(120, prev + 1));
           break;
         case 'ArrowDown':
           e.preventDefault();
-          setSpeed(prev => Math.max(40, prev - 5));
+          setSpeed(prev => Math.max(40, prev - 1));
           break;
         case 'm':
           setIsMuted(prev => !prev);
