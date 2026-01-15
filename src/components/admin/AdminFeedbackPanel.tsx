@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Table, 
   TableBody, 
@@ -20,9 +21,10 @@ import {
   DialogHeader, 
   DialogTitle 
 } from '@/components/ui/dialog';
-import { Loader2, MessageSquare, Video, Clock, ExternalLink } from 'lucide-react';
+import { Loader2, MessageSquare, Video, Clock, ExternalLink, GraduationCap } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { TeacherAssignmentManager } from './TeacherAssignmentManager';
 
 interface FeedbackRequest {
   id: string;
@@ -160,11 +162,28 @@ export function AdminFeedbackPanel() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Feedback & Chats</h2>
-        <Badge variant="outline">{requests.filter(r => r.status === 'open').length} offen</Badge>
+        <h2 className="text-xl font-semibold">Feedback & Lehrer</h2>
       </div>
 
-      {requests.length === 0 ? (
+      <Tabs defaultValue="feedback" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="feedback" className="gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Feedback-Anfragen
+            {requests.filter(r => r.status === 'open').length > 0 && (
+              <Badge variant="destructive" className="ml-1 h-5 min-w-[20px]">
+                {requests.filter(r => r.status === 'open').length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="teachers" className="gap-2">
+            <GraduationCap className="w-4 h-4" />
+            Lehrer-Zuweisung
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="feedback">
+          {requests.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
           <p>Keine Feedback-Anfragen vorhanden</p>
@@ -318,6 +337,12 @@ export function AdminFeedbackPanel() {
           )}
         </DialogContent>
       </Dialog>
+        </TabsContent>
+
+        <TabsContent value="teachers">
+          <TeacherAssignmentManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

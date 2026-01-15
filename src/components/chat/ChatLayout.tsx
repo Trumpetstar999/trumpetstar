@@ -15,7 +15,7 @@ export type ChatFilter = 'teacher' | 'admin' | 'teacher_internal';
 export function ChatLayout() {
   const { user } = useAuth();
   const { isAdmin, isTeacher } = useUserRole();
-  const { chats, loading, teacherAssignment } = useVideoChat();
+  const { chats, loading, teacherAssignment, fetchChats } = useVideoChat();
   const [selectedChat, setSelectedChat] = useState<VideoChat | null>(null);
   const [filter, setFilter] = useState<ChatFilter>('teacher');
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
@@ -71,6 +71,7 @@ export function ChatLayout() {
       filter={filter}
       onFilterChange={setFilter}
       showTeacherInternal={showTeacherInternal}
+      onChatCreated={fetchChats}
     />
   );
 
