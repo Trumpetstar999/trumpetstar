@@ -4,6 +4,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { LevelsPage } from './LevelsPage';
 import { PracticePage } from './PracticePage';
 import { RecordingsPage } from './RecordingsPage';
+import { ChatsPage } from './ChatsPage';
 import { ClassroomPage } from './ClassroomPage';
 import { ProfilePage } from './ProfilePage';
 import { TabId } from '@/types';
@@ -73,6 +74,8 @@ const Index = () => {
         return <PracticePage />;
       case 'recordings':
         return <RecordingsPage />;
+      case 'chats':
+        return <ChatsPage />;
       case 'classroom':
         return <ClassroomPage />;
       case 'profile':

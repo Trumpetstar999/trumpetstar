@@ -1,9 +1,11 @@
 import { VideoChat } from '@/hooks/useVideoChat';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { CreateTeacherChatDialog } from './CreateTeacherChatDialog';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -16,6 +18,7 @@ interface ChatThreadListProps {
   filter: ChatFilter;
   onFilterChange: (filter: ChatFilter) => void;
   showTeacherInternal: boolean;
+  onChatCreated?: () => void;
 }
 
 export function ChatThreadList({
@@ -24,9 +27,11 @@ export function ChatThreadList({
   onSelectChat,
   filter,
   onFilterChange,
-  showTeacherInternal
+  showTeacherInternal,
+  onChatCreated
 }: ChatThreadListProps) {
   const { user } = useAuth();
+  const { isTeacher } = useUserRole();
 
   const getChatPartner = (chat: VideoChat) => {
     const partner = chat.participants?.find(p => p.user_id !== user?.id);
@@ -54,7 +59,12 @@ export function ChatThreadList({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground mb-3">Chats</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-foreground">Chats</h2>
+          {isTeacher && filter === 'teacher_internal' && (
+            <CreateTeacherChatDialog onChatCreated={onChatCreated} />
+          )}
+        </div>
         <Tabs value={filter} onValueChange={(v) => onFilterChange(v as ChatFilter)}>
           <TabsList className="w-full grid grid-cols-2 lg:grid-cols-3">
             <TabsTrigger value="teacher" className="text-xs">

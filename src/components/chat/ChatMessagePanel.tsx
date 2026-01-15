@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { VideoRecordDialog } from './VideoRecordDialog';
 import { Send, Video, Clock, Play, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -27,6 +28,7 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
   const [messageText, setMessageText] = useState('');
   const [sending, setSending] = useState(false);
   const [markerDialogOpen, setMarkerDialogOpen] = useState(false);
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [markerText, setMarkerText] = useState('');
   const [markerTime, setMarkerTime] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -89,6 +91,26 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
     setMarkerDialogOpen(false);
     setMarkerText('');
     setSending(false);
+  };
+
+  const handleSendVideo = async (data: { blob: Blob; duration: number; title: string }) => {
+    if (!user) return;
+
+    // Upload video to storage
+    const fileName = `${user.id}/response_${Date.now()}.webm`;
+    const { error: uploadError } = await supabase.storage
+      .from('recordings')
+      .upload(fileName, data.blob, {
+        contentType: 'video/webm',
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    // Send message with video path
+    await sendMessage(chat.id, 'video', data.title, fileName, null, getSenderRole());
   };
 
   const formatTime = (seconds: number) => {
@@ -189,6 +211,19 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
       {/* Composer */}
       <div className="border-t border-border p-3 bg-background">
         <div className="flex items-center gap-2">
+          {/* Video button - only for teachers and admins */}
+          {(isTeacher || isAdmin) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="flex-shrink-0"
+              onClick={() => setVideoDialogOpen(true)}
+              title="Antwort-Video aufnehmen"
+            >
+              <Video className="w-5 h-5" />
+            </Button>
+          )}
+
           <Button
             variant="ghost"
             size="icon"
@@ -259,6 +294,13 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Video Record Dialog */}
+      <VideoRecordDialog
+        open={videoDialogOpen}
+        onOpenChange={setVideoDialogOpen}
+        onSave={handleSendVideo}
+      />
     </div>
   );
 }
