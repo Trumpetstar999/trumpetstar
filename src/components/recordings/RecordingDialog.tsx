@@ -62,31 +62,59 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     chunksRef.current = [];
     setDuration(0);
     
-    const mediaRecorder = new MediaRecorder(streamRef.current, {
-      mimeType: 'video/webm;codecs=vp9,opus',
-    });
+    // Check for supported mimeTypes
+    const mimeTypes = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      'video/mp4',
+    ];
     
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        chunksRef.current.push(e.data);
+    let selectedMimeType = '';
+    for (const mimeType of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(mimeType)) {
+        selectedMimeType = mimeType;
+        break;
       }
-    };
+    }
     
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-      setRecordedBlob(blob);
-      setRecordedUrl(URL.createObjectURL(blob));
-      setRecordingState('recorded');
-      stopStream();
-    };
+    if (!selectedMimeType) {
+      setError('Dein Browser unterstützt keine Videoaufnahme.');
+      return;
+    }
     
-    mediaRecorderRef.current = mediaRecorder;
-    mediaRecorder.start(1000);
-    setRecordingState('recording');
-    
-    timerRef.current = setInterval(() => {
-      setDuration(prev => prev + 1);
-    }, 1000);
+    try {
+      const mediaRecorder = new MediaRecorder(streamRef.current, {
+        mimeType: selectedMimeType,
+      });
+      
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: selectedMimeType.split(';')[0] });
+        setRecordedBlob(blob);
+        setRecordedUrl(URL.createObjectURL(blob));
+        setRecordingState('recorded');
+        stopStream();
+      };
+      
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start(1000);
+      setRecordingState('recording');
+      
+      timerRef.current = setInterval(() => {
+        setDuration(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.error('MediaRecorder error:', err);
+      setError('Fehler beim Starten der Aufnahme.');
+    }
   }, [stopStream]);
 
   const stopRecording = useCallback(() => {
