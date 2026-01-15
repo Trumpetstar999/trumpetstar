@@ -7,6 +7,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="theme-color" content="#005BBB" />
     
+    <!-- Content Security Policy for Vimeo -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://player.vimeo.com https://f.vimeocdn.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: blob: https: http: https://i.vimeocdn.com https://*.vimeocdn.com;
+      media-src 'self' blob: https://*.vimeocdn.com;
+      frame-src https://player.vimeo.com;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.vimeo.com https://*.vimeocdn.com https://fonts.googleapis.com https://fonts.gstatic.com;
+      worker-src 'self' blob:;
+    " />
+    
     <title>Musikstudio - Lerne Musik mit Videos</title>
     <meta name="description" content="Musikbasiertes Lernen mit Videos, Übungen und Online-Klassenzimmer. Dein persönliches digitales Musik-Studio." />
     <meta name="author" content="Musikstudio" />

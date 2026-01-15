@@ -2,6 +2,7 @@ import { DashboardStats } from './DashboardStats';
 import { TopUsersTable } from './TopUsersTable';
 import { RecentActivityList } from './RecentActivityList';
 import { ActivityCharts } from './ActivityCharts';
+import { VimeoErrorsList } from './VimeoErrorsList';
 
 export function AdminDashboard() {
   return (
@@ -16,6 +17,9 @@ export function AdminDashboard() {
 
       {/* Charts */}
       <ActivityCharts />
+
+      {/* Vimeo Errors - Admin visibility */}
+      <VimeoErrorsList />
 
       {/* Top Users Tables */}
       <TopUsersTable />
