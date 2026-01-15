@@ -594,6 +594,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_recording_owner: { Args: { recording_id: string }; Returns: boolean }
+      is_recording_shared_with_me: {
+        Args: { recording_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
