@@ -26,6 +26,9 @@ export function ShowcaseImporter({ onImportComplete }: ShowcaseImporterProps) {
   const [isFetched, setIsFetched] = useState(false);
   const [importingIds, setImportingIds] = useState<Set<string>>(new Set());
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+  const [isImportingAll, setIsImportingAll] = useState(false);
+
+  const notImportedShowcases = showcases.filter((s) => !s.is_imported);
 
   async function fetchShowcases() {
     setIsLoading(true);
@@ -74,12 +77,41 @@ export function ShowcaseImporter({ onImportComplete }: ShowcaseImporterProps) {
     } catch (error) {
       console.error('Error importing showcase:', error);
       toast.error(`Fehler beim Importieren von "${showcase.name}"`);
+      throw error; // Re-throw for importAll to catch
     } finally {
       setImportingIds((prev) => {
         const next = new Set(prev);
         next.delete(showcase.id);
         return next;
       });
+    }
+  }
+
+  async function handleImportAll() {
+    if (notImportedShowcases.length === 0) {
+      toast.info('Alle Showcases sind bereits importiert');
+      return;
+    }
+
+    setIsImportingAll(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const showcase of notImportedShowcases) {
+      try {
+        await handleImport(showcase);
+        successCount++;
+      } catch {
+        errorCount++;
+      }
+    }
+
+    setIsImportingAll(false);
+    
+    if (errorCount === 0) {
+      toast.success(`Alle ${successCount} Showcases erfolgreich importiert`);
+    } else {
+      toast.warning(`${successCount} importiert, ${errorCount} fehlgeschlagen`);
     }
   }
 
@@ -139,14 +171,30 @@ export function ShowcaseImporter({ onImportComplete }: ShowcaseImporterProps) {
             Alle Showcases aus deinem Vimeo-Konto laden und als Levels importieren
           </p>
         </div>
-        <Button onClick={fetchShowcases} disabled={isLoading} className="gap-2">
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4" />
+        <div className="flex items-center gap-2">
+          {isFetched && notImportedShowcases.length > 0 && (
+            <Button
+              onClick={handleImportAll}
+              disabled={isImportingAll || isLoading}
+              className="gap-2"
+            >
+              {isImportingAll ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              Alle importieren ({notImportedShowcases.length})
+            </Button>
           )}
-          {isFetched ? 'Aktualisieren' : 'Showcases laden'}
-        </Button>
+          <Button onClick={fetchShowcases} disabled={isLoading || isImportingAll} variant="outline" className="gap-2">
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
+            {isFetched ? 'Aktualisieren' : 'Showcases laden'}
+          </Button>
+        </div>
       </div>
 
       {isFetched && (
