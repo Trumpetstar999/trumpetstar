@@ -68,6 +68,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                   thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
                   duration: video.duration_seconds || 0,
                   vimeoId: video.vimeo_video_id,
+                  vimeoPlayerUrl: video.vimeo_player_url || undefined,
                   completions: 0, // TODO: Fetch from video_completions
                 })),
             }))
@@ -80,6 +81,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
                 duration: video.duration_seconds || 0,
                 vimeoId: video.vimeo_video_id,
+                vimeoPlayerUrl: video.vimeo_player_url || undefined,
                 completions: 0,
               })),
             }];

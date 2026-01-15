@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Pause, Play, Volume2, VolumeX, RotateCcw, Star, Maximize, Minimize } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Star } from 'lucide-react';
 import { Video } from '@/types';
-import { cn } from '@/lib/utils';
 
 interface VideoPlayerProps {
   video: Video;
@@ -10,140 +9,86 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [speed, setSpeed] = useState(100);
-  const [progress, setProgress] = useState(0);
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const hasCompletedRef = useRef(false);
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Speed control with drag
-  const handleSpeedChange = useCallback((clientX: number) => {
-    if (!sliderRef.current) return;
-    
-    const rect = sliderRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, x / rect.width));
-    const newSpeed = Math.round(40 + percentage * 80); // 40-120% in 1% steps
-    setSpeed(newSpeed);
-  }, []);
+  // Build Vimeo player URL
+  const vimeoUrl = video.vimeoPlayerUrl 
+    ? `${video.vimeoPlayerUrl}?autoplay=1&title=0&byline=0&portrait=0`
+    : `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`;
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    handleSpeedChange(e.clientX);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    handleSpeedChange(e.touches[0].clientX);
-  };
-
+  // Listen for Vimeo player events
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handleSpeedChange(e.clientX);
+    const handleMessage = (event: MessageEvent) => {
+      // Check if message is from Vimeo
+      if (event.origin !== 'https://player.vimeo.com') return;
+      
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        
+        // Check for progress event (80% completion)
+        if (data.event === 'playProgress' && data.data) {
+          const percent = data.data.percent || 0;
+          if (percent >= 0.8 && !hasCompletedRef.current) {
+            hasCompletedRef.current = true;
+            setShowCompleted(true);
+            onComplete();
+            setTimeout(() => setShowCompleted(false), 2000);
+          }
+        }
+        
+        // Alternative: timeupdate event
+        if (data.method === 'timeupdate' && data.value) {
+          const { seconds, duration } = data.value;
+          if (duration > 0 && seconds / duration >= 0.8 && !hasCompletedRef.current) {
+            hasCompletedRef.current = true;
+            setShowCompleted(true);
+            onComplete();
+            setTimeout(() => setShowCompleted(false), 2000);
+          }
+        }
+      } catch (e) {
+        // Ignore non-JSON messages
       }
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging) {
-        handleSpeedChange(e.touches[0].clientX);
+    window.addEventListener('message', handleMessage);
+    
+    // Enable Vimeo API events after iframe loads
+    const enableVimeoApi = () => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ method: 'addEventListener', value: 'playProgress' }),
+          '*'
+        );
       }
     };
-
-    const handleEnd = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleEnd);
-      document.addEventListener('touchmove', handleTouchMove);
-      document.addEventListener('touchend', handleEnd);
+    
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener('load', enableVimeoApi);
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleEnd);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleEnd);
+      window.removeEventListener('message', handleMessage);
+      if (iframe) {
+        iframe.removeEventListener('load', enableVimeoApi);
+      }
     };
-  }, [isDragging, handleSpeedChange]);
-
-  // Simulate video progress for demo
-  useEffect(() => {
-    if (!isPlaying) return;
-    
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev + (0.5 * (speed / 100));
-        
-        // Check for 80% completion
-        if (newProgress >= 80 && !hasCompletedRef.current) {
-          hasCompletedRef.current = true;
-          setShowCompleted(true);
-          onComplete();
-          setTimeout(() => setShowCompleted(false), 2000);
-        }
-        
-        if (newProgress >= 100) {
-          setIsPlaying(false);
-          return 100;
-        }
-        return newProgress;
-      });
-    }, 100);
-    
-    return () => clearInterval(interval);
-  }, [isPlaying, speed, onComplete]);
+  }, [onComplete]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case ' ':
-        case 'k':
-          e.preventDefault();
-          setIsPlaying(prev => !prev);
-          break;
-        case 'Escape':
-          onClose();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSpeed(prev => Math.min(120, prev + 1));
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          setSpeed(prev => Math.max(40, prev - 1));
-          break;
-        case 'm':
-          setIsMuted(prev => !prev);
-          break;
+      if (e.key === 'Escape') {
+        onClose();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
-
-  const formatTime = (percent: number) => {
-    const totalSeconds = video.duration;
-    const currentSeconds = Math.floor((percent / 100) * totalSeconds);
-    const mins = Math.floor(currentSeconds / 60);
-    const secs = currentSeconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatTotal = () => {
-    const mins = Math.floor(video.duration / 60);
-    const secs = video.duration % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const speedPercentage = ((speed - 40) / 80) * 100;
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center animate-fade-in">
@@ -166,160 +111,25 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       </button>
       
       {/* Video container */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        <div className="relative w-full max-w-6xl aspect-video mx-4 rounded-2xl overflow-hidden bg-black/50">
-          <img
-            src={video.thumbnail}
-            alt={video.title}
-            className="w-full h-full object-cover"
+      <div className="relative w-full h-full flex items-center justify-center p-4">
+        <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden bg-black">
+          <iframe
+            ref={iframeRef}
+            src={vimeoUrl}
+            className="w-full h-full"
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title={video.title}
           />
-          
-          {/* Play/Pause overlay */}
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="absolute inset-0 flex items-center justify-center group"
-          >
-            <div className={cn(
-              'w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all',
-              isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
-            )}>
-              {isPlaying ? (
-                <Pause className="w-12 h-12 text-white fill-white" />
-              ) : (
-                <Play className="w-12 h-12 text-white fill-white ml-1" />
-              )}
-            </div>
-          </button>
-          
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
-            <div 
-              className="h-full bg-primary transition-all duration-100"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
         </div>
       </div>
       
-      {/* Controls bar */}
+      {/* Video title */}
       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
         <div className="max-w-6xl mx-auto">
-          {/* Video title */}
-          <h2 className="text-xl font-semibold text-white mb-4">{video.title}</h2>
-          
-          <div className="flex items-center justify-between gap-8">
-            {/* Playback controls */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                {isPlaying ? (
-                  <Pause className="w-6 h-6 fill-current" />
-                ) : (
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
-                )}
-              </button>
-              
-              <button
-                onClick={() => {
-                  setProgress(0);
-                  hasCompletedRef.current = false;
-                }}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                <RotateCcw className="w-5 h-5" />
-              </button>
-              
-              <button
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                {isMuted ? (
-                  <VolumeX className="w-5 h-5" />
-                ) : (
-                  <Volume2 className="w-5 h-5" />
-                )}
-              </button>
-              
-              <span className="text-white/80 text-sm font-medium ml-2">
-                {formatTime(progress)} / {formatTotal()}
-              </span>
-            </div>
-            
-            {/* Speed control - Custom draggable slider */}
-            <div className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white/10 backdrop-blur-sm">
-              <span className="text-white/80 text-sm font-medium whitespace-nowrap">
-                Tempo
-              </span>
-              
-              {/* Speed labels */}
-              <div className="flex items-center gap-2">
-                <span className="text-white/50 text-xs">40%</span>
-                
-                {/* Custom Slider */}
-                <div
-                  ref={sliderRef}
-                  className="relative w-48 h-10 cursor-pointer select-none"
-                  onMouseDown={handleMouseDown}
-                  onTouchStart={handleTouchStart}
-                >
-                  {/* Track background */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 rounded-full bg-white/30" />
-                  
-                  {/* Track fill */}
-                  <div 
-                    className="absolute top-1/2 -translate-y-1/2 left-0 h-2 rounded-full bg-white transition-all"
-                    style={{ width: `${speedPercentage}%` }}
-                  />
-                  
-                  {/* Speed markers */}
-                  <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-between px-0.5">
-                    {[40, 60, 80, 100, 120].map((mark) => (
-                      <div
-                        key={mark}
-                        className={cn(
-                          'w-1 h-1 rounded-full transition-colors',
-                          speed >= mark ? 'bg-white' : 'bg-white/30'
-                        )}
-                      />
-                    ))}
-                  </div>
-                  
-                  {/* Thumb */}
-                  <div
-                    className={cn(
-                      'absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white shadow-lg transition-transform',
-                      isDragging && 'scale-110'
-                    )}
-                    style={{ left: `${speedPercentage}%` }}
-                  />
-                </div>
-                
-                <span className="text-white/50 text-xs">120%</span>
-              </div>
-              
-              {/* Current speed display */}
-              <div className="min-w-[60px] text-right">
-                <span className={cn(
-                  'font-bold text-xl transition-colors',
-                  speed < 60 ? 'text-blue-400' : 
-                  speed > 100 ? 'text-orange-400' : 
-                  'text-white'
-                )}>
-                  {speed}%
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Keyboard hints */}
-          <div className="flex items-center gap-4 mt-4 text-white/40 text-xs">
-            <span>Leertaste: Play/Pause</span>
-            <span>↑↓: Tempo</span>
-            <span>M: Stumm</span>
-            <span>ESC: Schließen</span>
-          </div>
+          <h2 className="text-xl font-semibold text-white">{video.title}</h2>
+          <p className="text-white/60 text-sm mt-1">ESC zum Schließen</p>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ export interface Video {
   thumbnail: string;
   duration: number; // in seconds
   vimeoId: string;
+  vimeoPlayerUrl?: string;
   completions: number;
 }
 
