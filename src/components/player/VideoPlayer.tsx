@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { X, Star } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Star, AlertTriangle, WifiOff, RefreshCw } from 'lucide-react';
 import { Video } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface VideoPlayerProps {
   video: Video;
@@ -8,17 +10,62 @@ interface VideoPlayerProps {
   onComplete: () => void;
 }
 
+type VimeoError = 'embed_blocked' | 'csp_blocked' | 'network_error' | 'unknown';
+
+interface VimeoErrorLog {
+  videoId: string;
+  vimeoId: string;
+  errorType: VimeoError;
+  message: string;
+  timestamp: string;
+}
+
 export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const [showCompleted, setShowCompleted] = useState(false);
+  const [error, setError] = useState<VimeoErrorLog | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [playerReady, setPlayerReady] = useState(false);
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Build Vimeo player URL
-  const vimeoUrl = video.vimeoPlayerUrl 
-    ? `${video.vimeoPlayerUrl}?autoplay=1&title=0&byline=0&portrait=0`
-    : `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`;
+  // Build Vimeo player URL - ONLY use official iframe embed
+  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0`;
 
-  // Listen for Vimeo player events
+  // Log Vimeo errors to database for admin visibility
+  const logVimeoError = useCallback(async (errorType: VimeoError, message: string) => {
+    const errorLog: VimeoErrorLog = {
+      videoId: video.id,
+      vimeoId: video.vimeoId,
+      errorType,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+    
+    setError(errorLog);
+    console.error('[Vimeo Error]', errorLog);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('activity_logs').insert([{
+          user_id: user.id,
+          action: 'vimeo_error',
+          metadata: {
+            videoId: errorLog.videoId,
+            vimeoId: errorLog.vimeoId,
+            errorType: errorLog.errorType,
+            message: errorLog.message,
+            timestamp: errorLog.timestamp,
+          },
+        }]);
+      }
+    } catch (e) {
+      console.error('Failed to log Vimeo error:', e);
+    }
+  }, [video.id, video.vimeoId]);
+
+  // Listen for Vimeo player events via postMessage
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       // Check if message is from Vimeo
@@ -26,6 +73,15 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        
+        // Player is ready
+        if (data.event === 'ready') {
+          setPlayerReady(true);
+          setIsLoading(false);
+          if (loadTimeoutRef.current) {
+            clearTimeout(loadTimeoutRef.current);
+          }
+        }
         
         // Check for progress event (80% completion)
         if (data.event === 'playProgress' && data.data) {
@@ -48,6 +104,16 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
             setTimeout(() => setShowCompleted(false), 2000);
           }
         }
+
+        // Handle Vimeo error events
+        if (data.event === 'error') {
+          const errorMsg = data.data?.message || 'Unknown Vimeo error';
+          if (errorMsg.includes('privacy') || errorMsg.includes('embed') || errorMsg.includes('domain')) {
+            logVimeoError('embed_blocked', errorMsg);
+          } else {
+            logVimeoError('unknown', errorMsg);
+          }
+        }
       } catch (e) {
         // Ignore non-JSON messages
       }
@@ -58,10 +124,14 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     // Enable Vimeo API events after iframe loads
     const enableVimeoApi = () => {
       if (iframeRef.current?.contentWindow) {
-        iframeRef.current.contentWindow.postMessage(
-          JSON.stringify({ method: 'addEventListener', value: 'playProgress' }),
-          '*'
-        );
+        // Subscribe to player events
+        const methods = ['ready', 'playProgress', 'timeupdate', 'error'];
+        methods.forEach(method => {
+          iframeRef.current?.contentWindow?.postMessage(
+            JSON.stringify({ method: 'addEventListener', value: method }),
+            '*'
+          );
+        });
       }
     };
     
@@ -70,13 +140,24 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       iframe.addEventListener('load', enableVimeoApi);
     }
 
+    // Set timeout for loading - if iframe doesn't respond in 15s, show error
+    loadTimeoutRef.current = setTimeout(() => {
+      if (!playerReady) {
+        setIsLoading(false);
+        logVimeoError('network_error', 'Video konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung.');
+      }
+    }, 15000);
+
     return () => {
       window.removeEventListener('message', handleMessage);
       if (iframe) {
         iframe.removeEventListener('load', enableVimeoApi);
       }
+      if (loadTimeoutRef.current) {
+        clearTimeout(loadTimeoutRef.current);
+      }
     };
-  }, [onComplete]);
+  }, [onComplete, playerReady, logVimeoError]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -89,6 +170,30 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
+
+  // Handle iframe load error
+  const handleIframeError = () => {
+    logVimeoError('csp_blocked', 'iFrame konnte nicht geladen werden. Mögliches CSP-Problem.');
+  };
+
+  // Retry loading
+  const handleRetry = () => {
+    setError(null);
+    setIsLoading(true);
+    setPlayerReady(false);
+    hasCompletedRef.current = false;
+    
+    // Force iframe reload
+    if (iframeRef.current) {
+      const currentSrc = iframeRef.current.src;
+      iframeRef.current.src = '';
+      setTimeout(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = currentSrc;
+        }
+      }, 100);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center animate-fade-in">
@@ -113,14 +218,67 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       {/* Video container */}
       <div className="relative w-full h-full flex items-center justify-center p-4">
         <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden bg-black">
+          {/* Loading indicator */}
+          {isLoading && !error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                <span className="text-white/60">Video wird geladen...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Error display */}
+          {error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+              <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
+                {error.errorType === 'network_error' ? (
+                  <WifiOff className="w-16 h-16 text-destructive" />
+                ) : (
+                  <AlertTriangle className="w-16 h-16 text-destructive" />
+                )}
+                <h3 className="text-xl font-semibold text-white">
+                  {error.errorType === 'embed_blocked' 
+                    ? 'Video nicht freigegeben'
+                    : error.errorType === 'network_error'
+                    ? 'Verbindungsproblem'
+                    : 'Video-Fehler'}
+                </h3>
+                <p className="text-white/60">
+                  {error.errorType === 'embed_blocked' 
+                    ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
+                    : error.message}
+                </p>
+                <div className="flex gap-3 mt-4">
+                  <Button variant="outline" onClick={handleRetry} className="gap-2">
+                    <RefreshCw className="w-4 h-4" />
+                    Erneut versuchen
+                  </Button>
+                  <Button variant="secondary" onClick={onClose}>
+                    Schließen
+                  </Button>
+                </div>
+                <p className="text-white/40 text-xs mt-4">
+                  Video-ID: {video.vimeoId}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Vimeo iFrame Player - OFFICIAL EMBED ONLY */}
           <iframe
             ref={iframeRef}
             src={vimeoUrl}
             className="w-full h-full"
             frameBorder="0"
-            allow="autoplay; fullscreen; picture-in-picture"
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
             allowFullScreen
             title={video.title}
+            onError={handleIframeError}
+            style={{ 
+              // Ensure iframe is visible on iPad
+              WebkitOverflowScrolling: 'touch',
+            }}
           />
         </div>
       </div>
