@@ -61,7 +61,73 @@ Deno.serve(async (req) => {
     const { action, showcaseUrl, levelId } = await req.json();
     console.log(`Vimeo sync action: ${action}`, { showcaseUrl, levelId });
 
-    if (action === 'import') {
+    if (action === 'list-showcases') {
+      // Fetch all showcases from Vimeo
+      console.log('Fetching all showcases from Vimeo...');
+      let allShowcases: VimeoShowcase[] = [];
+      let page = 1;
+      const perPage = 100;
+
+      while (true) {
+        const response = await fetch(
+          `https://api.vimeo.com/me/albums?page=${page}&per_page=${perPage}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${VIMEO_TOKEN}`,
+              'Accept': 'application/vnd.vimeo.*+json;version=3.4',
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Vimeo API error:', errorText);
+          return new Response(
+            JSON.stringify({ error: 'Failed to fetch showcases from Vimeo', details: errorText }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        allShowcases = allShowcases.concat(data.data || []);
+
+        if (!data.paging?.next) break;
+        page++;
+      }
+
+      console.log(`Found ${allShowcases.length} showcases`);
+
+      // Get existing levels to mark which showcases are already imported
+      const { data: existingLevels } = await supabase
+        .from('levels')
+        .select('vimeo_showcase_id, is_active');
+
+      const existingMap = new Map(
+        (existingLevels || []).map((l) => [l.vimeo_showcase_id, l.is_active])
+      );
+
+      const showcases = allShowcases.map((showcase) => {
+        const showcaseIdMatch = showcase.uri.match(/\/albums\/(\d+)/);
+        const showcaseId = showcaseIdMatch ? showcaseIdMatch[1] : '';
+        const thumbnailUrl = showcase.pictures?.sizes
+          ?.sort((a, b) => b.width - a.width)[0]?.link || null;
+
+        return {
+          id: showcaseId,
+          name: showcase.name,
+          description: showcase.description,
+          thumbnail_url: thumbnailUrl,
+          is_imported: existingMap.has(showcaseId),
+          is_active: existingMap.get(showcaseId) ?? false,
+        };
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, showcases }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+
+    } else if (action === 'import') {
       // Import a new showcase
       if (!showcaseUrl) {
         return new Response(

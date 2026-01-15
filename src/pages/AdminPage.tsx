@@ -5,9 +5,11 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { LevelManager } from '@/components/admin/LevelManager';
 import { SectionManager } from '@/components/admin/SectionManager';
 import { VideoManager } from '@/components/admin/VideoManager';
+import { ShowcaseImporter } from '@/components/admin/ShowcaseImporter';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, RefreshCw, Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 type View = 'levels' | 'sections' | 'videos';
@@ -27,6 +29,8 @@ export default function AdminPage() {
   const [view, setView] = useState<View>('levels');
   const [context, setContext] = useState<SelectedContext | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'import' | 'manage'>('import');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -116,63 +120,85 @@ export default function AdminPage() {
       </header>
 
       <main className="container mx-auto px-6 py-8">
-        {view === 'levels' && (
-          <LevelManager
-            onSelectLevel={(levelId) => {
-              supabase
-                .from('levels')
-                .select('id, title')
-                .eq('id', levelId)
-                .single()
-                .then(({ data }) => {
-                  if (data) {
-                    setContext({ levelId: data.id, levelTitle: data.title });
-                    setView('sections');
-                  }
-                });
-            }}
-          />
-        )}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'import' | 'manage')} className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="import" className="gap-2">
+              <Download className="w-4 h-4" />
+              Showcases importieren
+            </TabsTrigger>
+            <TabsTrigger value="manage" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Levels verwalten
+            </TabsTrigger>
+          </TabsList>
 
-        {view === 'sections' && context && (
-          <SectionManager
-            levelId={context.levelId}
-            levelTitle={context.levelTitle}
-            onBack={() => {
-              setView('levels');
-              setContext(null);
-            }}
-            onSelectSection={(sectionId) => {
-              supabase
-                .from('sections')
-                .select('id, title')
-                .eq('id', sectionId)
-                .single()
-                .then(({ data }) => {
-                  if (data) {
-                    setContext({
-                      ...context,
-                      sectionId: data.id,
-                      sectionTitle: data.title,
+          <TabsContent value="import">
+            <ShowcaseImporter 
+              onImportComplete={() => setRefreshKey((k) => k + 1)} 
+            />
+          </TabsContent>
+
+          <TabsContent value="manage">
+            {view === 'levels' && (
+              <LevelManager
+                key={refreshKey}
+                onSelectLevel={(levelId) => {
+                  supabase
+                    .from('levels')
+                    .select('id, title')
+                    .eq('id', levelId)
+                    .single()
+                    .then(({ data }) => {
+                      if (data) {
+                        setContext({ levelId: data.id, levelTitle: data.title });
+                        setView('sections');
+                      }
                     });
-                    setView('videos');
-                  }
-                });
-            }}
-          />
-        )}
+                }}
+              />
+            )}
 
-        {view === 'videos' && context?.sectionId && (
-          <VideoManager
-            sectionId={context.sectionId}
-            sectionTitle={context.sectionTitle || ''}
-            levelId={context.levelId}
-            onBack={() => {
-              setContext({ levelId: context.levelId, levelTitle: context.levelTitle });
-              setView('sections');
-            }}
-          />
-        )}
+            {view === 'sections' && context && (
+              <SectionManager
+                levelId={context.levelId}
+                levelTitle={context.levelTitle}
+                onBack={() => {
+                  setView('levels');
+                  setContext(null);
+                }}
+                onSelectSection={(sectionId) => {
+                  supabase
+                    .from('sections')
+                    .select('id, title')
+                    .eq('id', sectionId)
+                    .single()
+                    .then(({ data }) => {
+                      if (data) {
+                        setContext({
+                          ...context,
+                          sectionId: data.id,
+                          sectionTitle: data.title,
+                        });
+                        setView('videos');
+                      }
+                    });
+                }}
+              />
+            )}
+
+            {view === 'videos' && context?.sectionId && (
+              <VideoManager
+                sectionId={context.sectionId}
+                sectionTitle={context.sectionTitle || ''}
+                levelId={context.levelId}
+                onBack={() => {
+                  setContext({ levelId: context.levelId, levelTitle: context.levelTitle });
+                  setView('sections');
+                }}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
