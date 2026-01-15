@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { JournalEntryCard } from '@/components/practice/JournalEntry';
 import { TodoItem } from '@/components/practice/TodoItem';
+import { JournalEntryDialog } from '@/components/practice/JournalEntryDialog';
+import { TodoDialog } from '@/components/practice/TodoDialog';
 import { mockJournalEntries, mockTodos } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus, BookOpen, CheckSquare } from 'lucide-react';
+import { JournalEntry, Todo } from '@/types';
 
 export function PracticePage() {
+  const [activeTab, setActiveTab] = useState('journal');
+  const [journalEntries, setJournalEntries] = useState(mockJournalEntries);
   const [todos, setTodos] = useState(mockTodos);
+  const [journalDialogOpen, setJournalDialogOpen] = useState(false);
+  const [todoDialogOpen, setTodoDialogOpen] = useState(false);
   
   const toggleTodo = (id: string) => {
     setTodos(prev => prev.map(t => 
@@ -15,12 +22,37 @@ export function PracticePage() {
     ));
   };
 
+  const handleAddJournalEntry = (entry: Omit<JournalEntry, 'id'>) => {
+    const newEntry: JournalEntry = {
+      ...entry,
+      id: `journal-${Date.now()}`,
+    };
+    setJournalEntries(prev => [newEntry, ...prev]);
+  };
+
+  const handleAddTodo = (todo: Omit<Todo, 'id' | 'completed'>) => {
+    const newTodo: Todo = {
+      ...todo,
+      id: `todo-${Date.now()}`,
+      completed: false,
+    };
+    setTodos(prev => [newTodo, ...prev]);
+  };
+
+  const handleNewEntry = () => {
+    if (activeTab === 'journal') {
+      setJournalDialogOpen(true);
+    } else {
+      setTodoDialogOpen(true);
+    }
+  };
+
   const activeTodos = todos.filter(t => !t.completed);
   const completedTodos = todos.filter(t => t.completed);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-6">
-      <Tabs defaultValue="journal" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex items-center justify-between mb-6">
           <TabsList className="bg-muted p-1">
             <TabsTrigger value="journal" className="gap-2 px-6">
@@ -33,18 +65,18 @@ export function PracticePage() {
             </TabsTrigger>
           </TabsList>
           
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleNewEntry}>
             <Plus className="w-4 h-4" />
-            Neuer Eintrag
+            {activeTab === 'journal' ? 'Neuer Eintrag' : 'Neue Aufgabe'}
           </Button>
         </div>
         
         <TabsContent value="journal" className="space-y-4 animate-fade-in">
-          {mockJournalEntries.map((entry) => (
+          {journalEntries.map((entry) => (
             <JournalEntryCard key={entry.id} entry={entry} />
           ))}
           
-          {mockJournalEntries.length === 0 && (
+          {journalEntries.length === 0 && (
             <div className="text-center py-12">
               <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground mb-2">Noch keine Einträge</h3>
@@ -97,6 +129,18 @@ export function PracticePage() {
           )}
         </TabsContent>
       </Tabs>
+
+      <JournalEntryDialog
+        open={journalDialogOpen}
+        onOpenChange={setJournalDialogOpen}
+        onSave={handleAddJournalEntry}
+      />
+
+      <TodoDialog
+        open={todoDialogOpen}
+        onOpenChange={setTodoDialogOpen}
+        onSave={handleAddTodo}
+      />
     </div>
   );
 }
