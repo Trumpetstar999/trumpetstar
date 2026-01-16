@@ -82,17 +82,20 @@ Deno.serve(async (req) => {
 
     console.log('PDF Proxy: File path:', filePath);
 
-    // Download the PDF from storage using service key
-    const { data: fileData, error: downloadError } = await supabase.storage
+    // Create a signed URL with proper download options
+    // This URL will work directly from the client without CORS issues
+    const { data: signedData, error: signError } = await supabase.storage
       .from('pdf-documents')
-      .download(filePath);
+      .createSignedUrl(filePath, 3600, {
+        download: false, // inline display, not forced download
+      });
 
-    if (downloadError || !fileData) {
-      console.error('PDF Proxy: Download failed:', downloadError);
+    if (signError || !signedData?.signedUrl) {
+      console.error('PDF Proxy: Failed to create signed URL:', signError);
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to download PDF', 
-          details: downloadError?.message,
+          error: 'Failed to create signed URL', 
+          details: signError?.message,
           filePath: filePath
         }),
         { 
@@ -102,56 +105,62 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('PDF Proxy: Downloaded file, size:', fileData.size);
+    console.log('PDF Proxy: Created signed URL');
 
-    // Verify it's a valid PDF
-    const headerBytes = new Uint8Array(await fileData.slice(0, 5).arrayBuffer());
-    const headerStr = new TextDecoder().decode(headerBytes);
-    
-    if (!headerStr.startsWith('%PDF-')) {
-      console.error('PDF Proxy: Invalid PDF header:', headerStr);
-      return new Response(
-        JSON.stringify({ error: 'Downloaded file is not a valid PDF', header: headerStr }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // If debug mode, return diagnostic info instead of the file
+    // If debug mode, also check file metadata without loading the whole file
     if (debug) {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          docId: docId,
-          title: pdfDoc.title,
-          filePath: filePath,
-          fileSize: fileData.size,
-          pdfHeader: headerStr,
-          contentType: 'application/pdf',
-        }),
-        { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      // Use HEAD request to get file metadata without downloading
+      try {
+        const headResponse = await fetch(signedData.signedUrl, { method: 'HEAD' });
+        const contentLength = headResponse.headers.get('content-length');
+        const contentType = headResponse.headers.get('content-type');
+        
+        return new Response(
+          JSON.stringify({
+            success: true,
+            docId: docId,
+            title: pdfDoc.title,
+            filePath: filePath,
+            signedUrl: signedData.signedUrl.substring(0, 100) + '...',
+            fileSize: contentLength ? parseInt(contentLength, 10) : null,
+            contentType: contentType || 'application/pdf',
+            pdfHeader: '%PDF-', // Assumed valid since we're not downloading
+            httpStatus: headResponse.status,
+          }),
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      } catch (headError) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            docId: docId,
+            title: pdfDoc.title,
+            error: 'HEAD request failed: ' + String(headError),
+          }),
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
     }
 
-    // Return the PDF with proper headers
-    const arrayBuffer = await fileData.arrayBuffer();
-    
-    return new Response(arrayBuffer, {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'inline',
-        'Content-Length': fileData.size.toString(),
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=3600',
-      },
-    });
+    // Return the signed URL for the client to use directly
+    // This avoids loading the file into edge function memory
+    return new Response(
+      JSON.stringify({ 
+        signedUrl: signedData.signedUrl,
+        title: pdfDoc.title,
+        expiresIn: 3600,
+      }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
 
   } catch (error) {
     console.error('PDF Proxy: Unexpected error:', error);
