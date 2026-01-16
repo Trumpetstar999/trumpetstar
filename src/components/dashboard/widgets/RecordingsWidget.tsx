@@ -27,23 +27,23 @@ export function RecordingsWidget() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Video className="w-5 h-5 text-brand-blue-start" />
+          <Video className="w-5 h-5 text-blue-400" />
           <h3 className="text-white font-semibold">Meine Aufnahmen</h3>
         </div>
-        <span className="text-white/60 text-sm">{recordingsCount} Videos</span>
+        <span className="text-white/70 text-sm">{recordingsCount} Videos</span>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-2 border-brand-blue-start border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : latestRecording ? (
         <div className="mb-4">
-          <div className="relative aspect-video rounded-xl overflow-hidden bg-white/5 mb-2">
+          <div className="relative aspect-video rounded-xl overflow-hidden bg-white/10 mb-2">
             {/* Thumbnail placeholder */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                <Mic className="w-6 h-6 text-white/50" />
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Mic className="w-6 h-6 text-white/70" />
               </div>
             </div>
             {/* Duration badge */}
@@ -52,14 +52,14 @@ export function RecordingsWidget() {
             </div>
           </div>
           <p className="text-white text-sm truncate">{latestRecording.title}</p>
-          <p className="text-white/50 text-xs">{formatDate(latestRecording.createdAt)}</p>
+          <p className="text-white/70 text-xs">{formatDate(latestRecording.createdAt)}</p>
         </div>
       ) : (
         <div className="py-6 text-center">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/5 flex items-center justify-center">
-            <Mic className="w-6 h-6 text-white/30" />
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/10 flex items-center justify-center">
+            <Mic className="w-6 h-6 text-white/50" />
           </div>
-          <p className="text-white/50 text-sm">Noch keine Aufnahmen</p>
+          <p className="text-white/70 text-sm">Noch keine Aufnahmen</p>
         </div>
       )}
 
@@ -68,7 +68,7 @@ export function RecordingsWidget() {
           onClick={() => navigate('/recordings')}
           variant="ghost"
           size="sm"
-          className="flex-1 text-white/80 hover:text-white hover:bg-white/10"
+          className="flex-1 text-white hover:text-white hover:bg-white/20 bg-white/10"
         >
           <Plus className="w-4 h-4 mr-2" />
           Neue Aufnahme
@@ -78,7 +78,7 @@ export function RecordingsWidget() {
             onClick={() => navigate('/recordings')}
             variant="ghost"
             size="sm"
-            className="text-white/60 hover:text-white hover:bg-white/10"
+            className="text-white hover:text-white hover:bg-white/20 bg-white/10"
           >
             <Eye className="w-4 h-4" />
           </Button>

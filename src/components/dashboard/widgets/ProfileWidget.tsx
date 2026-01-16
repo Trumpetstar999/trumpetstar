@@ -51,9 +51,9 @@ export function ProfileWidget() {
 
   return (
     <div className="flex flex-col items-center text-center">
-      <Avatar className="w-24 h-24 mb-4 ring-4 ring-white/20">
+      <Avatar className="w-24 h-24 mb-4 ring-4 ring-white/30">
         <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || 'Profil'} />
-        <AvatarFallback className="text-2xl bg-brand-blue-mid text-white font-bold">
+        <AvatarFallback className="text-2xl bg-blue-500 text-white font-bold">
           {getInitials(profile?.display_name)}
         </AvatarFallback>
       </Avatar>
@@ -61,7 +61,7 @@ export function ProfileWidget() {
       <h2 className="text-xl font-bold text-white mb-1">
         {profile?.display_name || 'Mein Profil'}
       </h2>
-      <p className="text-white/60 text-sm mb-3">{user?.email}</p>
+      <p className="text-white/70 text-sm mb-3">{user?.email}</p>
       
       <MembershipStatusBadge />
       
@@ -70,7 +70,7 @@ export function ProfileWidget() {
           variant="ghost"
           size="sm"
           onClick={() => setEditDialogOpen(true)}
-          className="flex-1 text-white/80 hover:text-white hover:bg-white/10"
+          className="flex-1 text-white hover:text-white hover:bg-white/20 bg-white/10"
         >
           <Edit2 className="w-4 h-4 mr-2" />
           Bearbeiten
@@ -79,7 +79,7 @@ export function ProfileWidget() {
           variant="ghost"
           size="sm"
           onClick={() => setPasswordDialogOpen(true)}
-          className="text-white/80 hover:text-white hover:bg-white/10"
+          className="text-white hover:text-white hover:bg-white/20 bg-white/10"
         >
           <Settings className="w-4 h-4" />
         </Button>
@@ -87,7 +87,7 @@ export function ProfileWidget() {
           variant="ghost"
           size="sm"
           onClick={handleSignOut}
-          className="text-accent-red hover:text-accent-red hover:bg-accent-red/10"
+          className="text-red-400 hover:text-red-300 hover:bg-red-500/20 bg-red-500/10"
         >
           <LogOut className="w-4 h-4" />
         </Button>

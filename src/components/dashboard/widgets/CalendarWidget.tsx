@@ -64,7 +64,7 @@ export function CalendarWidget() {
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => navigateMonth('prev')}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -73,7 +73,7 @@ export function CalendarWidget() {
         </h3>
         <button
           onClick={() => navigateMonth('next')}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="p-1.5 rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -82,7 +82,7 @@ export function CalendarWidget() {
       {/* Weekdays */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {WEEKDAYS.map(day => (
-          <div key={day} className="text-center text-xs font-medium text-white/40 py-1">
+          <div key={day} className="text-center text-xs font-medium text-white/60 py-1">
             {day}
           </div>
         ))}
@@ -110,8 +110,8 @@ export function CalendarWidget() {
               className={`
                 aspect-square rounded-lg flex flex-col items-center justify-center text-sm transition-all
                 ${isToday ? 'ring-2 ring-reward-gold' : ''}
-                ${isSelected ? 'bg-white/20' : 'hover:bg-white/10'}
-                ${activity ? 'text-white' : 'text-white/40'}
+                ${isSelected ? 'bg-white/30' : 'hover:bg-white/20'}
+                ${activity ? 'text-white font-medium' : 'text-white/60'}
               `}
             >
               <span className={`${isToday ? 'font-bold text-reward-gold' : ''}`}>
@@ -127,18 +127,18 @@ export function CalendarWidget() {
 
       {/* Selected Day Details */}
       {selectedActivity && (
-        <div className="mt-4 p-3 bg-white/5 rounded-xl animate-fade-in">
+        <div className="mt-4 p-3 bg-white/15 rounded-xl animate-fade-in">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-reward-gold fill-reward-gold" />
               <span className="text-white font-medium">{selectedActivity.stars} Sterne</span>
             </div>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-brand-blue-start" />
-              <span className="text-white/60 text-sm">{selectedActivity.minutesPracticed} Min</span>
+              <TrendingUp className="w-4 h-4 text-blue-400" />
+              <span className="text-white/80 text-sm">{selectedActivity.minutesPracticed} Min</span>
             </div>
           </div>
-          <p className="text-white/50 text-xs mt-2">
+          <p className="text-white/70 text-xs mt-2">
             {selectedActivity.videosWatched.length} Videos geschaut
           </p>
         </div>

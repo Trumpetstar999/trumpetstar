@@ -15,18 +15,18 @@ export function FeedbackChatWidget() {
   if (!hasPremium) {
     return (
       <div className="text-center">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
-          <Lock className="w-7 h-7 text-white/30" />
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
+          <Lock className="w-7 h-7 text-white/50" />
         </div>
         
         <h3 className="text-white font-semibold mb-2">Feedback & Chat</h3>
-        <p className="text-white/50 text-sm mb-4">
+        <p className="text-white/70 text-sm mb-4">
           Persönliches Feedback ist Teil von Premium
         </p>
         
         <Button
           onClick={() => setUpgradeOpen(true)}
-          className="w-full bg-accent-red hover:bg-accent-red/90 text-white"
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
           Premium freischalten
         </Button>
@@ -46,12 +46,12 @@ export function FeedbackChatWidget() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="w-5 h-5 text-brand-blue-start" />
+        <MessageSquare className="w-5 h-5 text-blue-400" />
         <h3 className="text-white font-semibold">Feedback & Chat</h3>
       </div>
 
-      <div className="p-4 bg-white/5 rounded-xl mb-4">
-        <p className="text-white/50 text-sm mb-2">Letztes Feedback</p>
+      <div className="p-4 bg-white/10 rounded-xl mb-4">
+        <p className="text-white/70 text-sm mb-2">Letztes Feedback</p>
         <p className="text-white text-sm">
           Keine neuen Nachrichten
         </p>
@@ -60,7 +60,7 @@ export function FeedbackChatWidget() {
       <Button
         onClick={() => navigate('/chats')}
         variant="ghost"
-        className="w-full text-white/80 hover:text-white hover:bg-white/10"
+        className="w-full text-white hover:text-white hover:bg-white/20 bg-white/10"
       >
         Chat öffnen
         <ArrowRight className="w-4 h-4 ml-2" />
