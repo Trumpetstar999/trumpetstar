@@ -39,23 +39,10 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
 
   // Save completion to database
   const saveCompletion = useCallback(async () => {
-    if (!user) return;
+    if (!user) return false;
     
     try {
-      // Check if already completed
-      const { data: existing } = await supabase
-        .from('video_completions')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('video_id', video.id)
-        .maybeSingle();
-      
-      if (existing) {
-        // Already completed before, don't add again
-        return false;
-      }
-      
-      // Insert new completion
+      // Insert new completion (allow multiple completions per video)
       const { error } = await supabase
         .from('video_completions')
         .insert({
