@@ -6,6 +6,7 @@ interface MidiNote {
   startTime: number; // in seconds
   duration: number; // in seconds
   velocity: number; // 0-127
+  measureIndex: number; // which measure this note is in
 }
 
 interface MidiPlayerState {
@@ -24,25 +25,7 @@ interface MidiPlayerOptions {
   loopStart?: number; // bar number
   loopEnd?: number; // bar number
   onBarChange?: (bar: number) => void;
-}
-
-interface OSMDSheet {
-  SourceMeasures?: Array<{
-    AbsoluteTimestamp?: { RealValue: number };
-    Duration?: { RealValue: number };
-    VerticalSourceStaffEntryContainers?: Array<{
-      StaffEntries?: Array<{
-        VoiceEntries?: Array<{
-          Notes?: Array<{
-            Pitch?: {
-              getHalfTone: () => number;
-            };
-            Length?: { RealValue: number };
-          }>;
-        }>;
-      }>;
-    }>;
-  }>;
+  onTimeUpdate?: (time: number) => void;
 }
 
 export function useMidiPlayer(options: MidiPlayerOptions = {}) {
@@ -53,6 +36,7 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     loopStart = 1,
     loopEnd = 1,
     onBarChange,
+    onTimeUpdate,
   } = options;
 
   const [state, setState] = useState<MidiPlayerState>({
@@ -73,6 +57,8 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
   const startTimeRef = useRef<number>(0);
   const pauseTimeRef = useRef<number>(0);
   const barTimingsRef = useRef<{ bar: number; startTime: number; endTime: number }[]>([]);
+  const lastReportedBarRef = useRef<number>(0);
+  const baseBpmRef = useRef<number>(120);
 
   // Initialize audio context and load trumpet soundfont
   const initialize = useCallback(async () => {
@@ -91,7 +77,6 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
       gainNodeRef.current = gainNode;
 
       // Load trumpet soundfont
-      // Using "trumpet" from the default soundfont (MusyngKite)
       const instrument = await Soundfont.instrument(audioContext, 'trumpet' as any, {
         gain: 2,
         destination: gainNode,
@@ -99,6 +84,7 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
 
       instrumentRef.current = instrument;
       setState(prev => ({ ...prev, isLoading: false, isReady: true }));
+      console.log('[MIDI] Trumpet soundfont loaded successfully');
     } catch (error) {
       console.error('Failed to load soundfont:', error);
       setState(prev => ({
@@ -109,61 +95,80 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     }
   }, []);
 
-  // Parse OSMD sheet to extract MIDI notes
-  const parseOSMDSheet = useCallback((osmd: { Sheet?: OSMDSheet }, bpm: number = 120) => {
-    if (!osmd?.Sheet?.SourceMeasures) {
-      console.warn('No source measures found in OSMD');
+  // Parse OSMD sheet using the cursor/iterator for accurate note extraction
+  const parseOSMDSheet = useCallback((osmd: any, bpm: number = 120) => {
+    if (!osmd?.Sheet) {
+      console.warn('[MIDI] No sheet found in OSMD');
       return;
     }
 
+    baseBpmRef.current = bpm;
     const notes: MidiNote[] = [];
     const barTimings: { bar: number; startTime: number; endTime: number }[] = [];
     
-    // Calculate seconds per beat based on BPM
+    // Calculate timing from tempo
     const secondsPerBeat = 60 / bpm;
-    
-    osmd.Sheet.SourceMeasures.forEach((measure, measureIndex) => {
-      const measureStartTime = (measure.AbsoluteTimestamp?.RealValue || 0) * 4 * secondsPerBeat;
-      const measureDuration = (measure.Duration?.RealValue || 1) * 4 * secondsPerBeat;
+    const secondsPerWholeNote = secondsPerBeat * 4;
+
+    // Get measures from sheet
+    const sourceMeasures = osmd.Sheet.SourceMeasures || [];
+    console.log(`[MIDI] Found ${sourceMeasures.length} measures`);
+
+    // Build bar timings first
+    let currentTime = 0;
+    sourceMeasures.forEach((measure: any, measureIndex: number) => {
+      const measureDuration = (measure.Duration?.RealValue || 1) * secondsPerWholeNote;
       
       barTimings.push({
         bar: measureIndex + 1,
-        startTime: measureStartTime,
-        endTime: measureStartTime + measureDuration,
+        startTime: currentTime,
+        endTime: currentTime + measureDuration,
       });
 
-      // Extract notes from this measure
-      measure.VerticalSourceStaffEntryContainers?.forEach(container => {
-        container.StaffEntries?.forEach(staffEntry => {
-          staffEntry.VoiceEntries?.forEach(voiceEntry => {
-            voiceEntry.Notes?.forEach(note => {
+      // Extract notes using the vertical containers
+      measure.VerticalSourceStaffEntryContainers?.forEach((container: any) => {
+        container.StaffEntries?.forEach((staffEntry: any) => {
+          // Get the relative position within the measure
+          const relativeTimestamp = staffEntry.Timestamp?.RealValue || 0;
+          const noteStartTime = currentTime + (relativeTimestamp * secondsPerWholeNote);
+
+          staffEntry.VoiceEntries?.forEach((voiceEntry: any) => {
+            voiceEntry.Notes?.forEach((note: any) => {
+              // Skip rests
+              if (note.isRest?.()) return;
+              
               if (note.Pitch) {
                 const halfTone = note.Pitch.getHalfTone();
-                // Convert OSMD halftone to MIDI pitch (OSMD uses 0 = C0, MIDI uses 0 = C-1)
-                // Adjust by adding 12 to get correct octave
+                // OSMD halfTone: C4 = 48, MIDI: C4 = 60
+                // So we need to add 12 to convert
                 const midiPitch = halfTone + 12;
                 
-                const noteDuration = (note.Length?.RealValue || 0.25) * 4 * secondsPerBeat;
+                const noteDuration = (note.Length?.RealValue || 0.25) * secondsPerWholeNote;
 
                 notes.push({
                   pitch: Math.max(0, Math.min(127, midiPitch)),
-                  startTime: measureStartTime,
-                  duration: noteDuration,
+                  startTime: noteStartTime,
+                  duration: Math.max(0.1, noteDuration * 0.9), // Slightly shorter for articulation
                   velocity: 80,
+                  measureIndex: measureIndex,
                 });
               }
             });
           });
         });
       });
+
+      currentTime += measureDuration;
     });
+
+    // Sort notes by start time
+    notes.sort((a, b) => a.startTime - b.startTime);
 
     notesRef.current = notes;
     barTimingsRef.current = barTimings;
 
-    const totalDuration = barTimings.length > 0 
-      ? barTimings[barTimings.length - 1].endTime 
-      : 0;
+    const totalDuration = currentTime;
+    console.log(`[MIDI] Parsed ${notes.length} notes, duration: ${totalDuration.toFixed(2)}s`);
 
     setState(prev => ({ ...prev, duration: totalDuration }));
   }, []);
@@ -187,10 +192,20 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     scheduledNotesRef.current = [];
   }, []);
 
+  // Get current bar from time
+  const getBarFromTime = useCallback((time: number): number => {
+    for (let i = barTimingsRef.current.length - 1; i >= 0; i--) {
+      if (time >= barTimingsRef.current[i].startTime) {
+        return barTimingsRef.current[i].bar;
+      }
+    }
+    return 1;
+  }, []);
+
   // Play function
   const play = useCallback(() => {
     if (!instrumentRef.current || !audioContextRef.current) {
-      console.warn('Instrument not loaded');
+      console.warn('[MIDI] Instrument not loaded');
       return;
     }
 
@@ -209,35 +224,44 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     startTimeRef.current = now - offset / tempoFactor;
 
     // Calculate effective time range
-    let startOffset = offset;
-    let endTime = state.duration / tempoFactor;
+    let effectiveStartTime = offset;
+    let effectiveEndTime = state.duration;
 
     // Apply loop if enabled
     if (loopEnabled && barTimingsRef.current.length > 0) {
       const loopStartTime = barTimingsRef.current[loopStart - 1]?.startTime || 0;
       const loopEndTime = barTimingsRef.current[Math.min(loopEnd, barTimingsRef.current.length) - 1]?.endTime || state.duration;
       
-      if (offset < loopStartTime / tempoFactor) {
-        startOffset = loopStartTime / tempoFactor;
-        startTimeRef.current = now - startOffset;
+      if (offset < loopStartTime) {
+        effectiveStartTime = loopStartTime;
+        startTimeRef.current = now - effectiveStartTime / tempoFactor;
+        pauseTimeRef.current = loopStartTime;
       }
-      endTime = loopEndTime / tempoFactor;
+      effectiveEndTime = loopEndTime;
     }
 
+    console.log(`[MIDI] Playing from ${effectiveStartTime.toFixed(2)}s to ${effectiveEndTime.toFixed(2)}s at ${tempo}%`);
+
     // Schedule notes
+    let scheduledCount = 0;
     notesRef.current.forEach(note => {
       const noteStartTime = note.startTime / tempoFactor;
       const noteDuration = note.duration / tempoFactor;
 
-      // Skip notes that have already passed or are before loop start
-      if (noteStartTime + noteDuration < startOffset) return;
+      // Skip notes that have already passed
+      if (noteStartTime + noteDuration < effectiveStartTime / tempoFactor) return;
+      
+      // Skip notes outside loop range
       if (loopEnabled) {
         const loopStartTime = (barTimingsRef.current[loopStart - 1]?.startTime || 0) / tempoFactor;
         const loopEndTime = (barTimingsRef.current[Math.min(loopEnd, barTimingsRef.current.length) - 1]?.endTime || state.duration) / tempoFactor;
         if (noteStartTime < loopStartTime || noteStartTime >= loopEndTime) return;
       }
 
-      const when = now + Math.max(0, noteStartTime - startOffset);
+      // Skip notes after the end
+      if (noteStartTime >= effectiveEndTime / tempoFactor) return;
+
+      const when = now + Math.max(0, noteStartTime - effectiveStartTime / tempoFactor);
       
       try {
         const playedNote = instrument.play(note.pitch.toString(), when, {
@@ -245,18 +269,20 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
           gain: note.velocity / 127,
         });
         scheduledNotesRef.current.push(playedNote as any);
+        scheduledCount++;
       } catch (e) {
-        console.warn('Failed to schedule note:', e);
+        console.warn('[MIDI] Failed to schedule note:', e);
       }
     });
 
+    console.log(`[MIDI] Scheduled ${scheduledCount} notes`);
     setState(prev => ({ ...prev, isPlaying: true }));
 
-    // Animation loop for current time
+    // Animation loop for current time and bar updates
     const updateTime = () => {
       if (!audioContextRef.current) return;
       
-      const elapsed = (audioContextRef.current.currentTime - startTimeRef.current) * (tempo / 100);
+      const elapsed = (audioContextRef.current.currentTime - startTimeRef.current) * tempoFactor;
       
       // Check if we've reached the end or loop point
       if (loopEnabled && barTimingsRef.current.length > 0) {
@@ -265,6 +291,7 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
           // Restart from loop start
           stopAllNotes();
           pauseTimeRef.current = barTimingsRef.current[loopStart - 1]?.startTime || 0;
+          lastReportedBarRef.current = 0;
           play();
           return;
         }
@@ -274,22 +301,20 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
       }
 
       setState(prev => ({ ...prev, currentTime: elapsed }));
+      onTimeUpdate?.(elapsed);
 
       // Update current bar
-      if (onBarChange) {
-        const currentBar = barTimingsRef.current.findIndex(
-          bar => elapsed >= bar.startTime && elapsed < bar.endTime
-        );
-        if (currentBar >= 0) {
-          onBarChange(currentBar + 1);
-        }
+      const currentBar = getBarFromTime(elapsed);
+      if (currentBar !== lastReportedBarRef.current) {
+        lastReportedBarRef.current = currentBar;
+        onBarChange?.(currentBar);
       }
 
       animationFrameRef.current = requestAnimationFrame(updateTime);
     };
 
     animationFrameRef.current = requestAnimationFrame(updateTime);
-  }, [tempo, loopEnabled, loopStart, loopEnd, state.duration, onBarChange, stopAllNotes]);
+  }, [tempo, loopEnabled, loopStart, loopEnd, state.duration, onBarChange, onTimeUpdate, stopAllNotes, getBarFromTime]);
 
   // Pause function
   const pause = useCallback(() => {
@@ -314,8 +339,10 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     }
 
     pauseTimeRef.current = 0;
+    lastReportedBarRef.current = 0;
     setState(prev => ({ ...prev, isPlaying: false, currentTime: 0 }));
-  }, [stopAllNotes]);
+    onBarChange?.(1);
+  }, [stopAllNotes, onBarChange]);
 
   // Seek to specific time
   const seekTo = useCallback((time: number) => {
@@ -328,13 +355,18 @@ export function useMidiPlayer(options: MidiPlayerOptions = {}) {
     }
 
     pauseTimeRef.current = time;
+    lastReportedBarRef.current = 0;
     setState(prev => ({ ...prev, currentTime: time }));
+
+    // Update bar
+    const bar = getBarFromTime(time);
+    onBarChange?.(bar);
 
     if (wasPlaying) {
       // Small delay to allow state update
       setTimeout(() => play(), 50);
     }
-  }, [state.isPlaying, stopAllNotes, play]);
+  }, [state.isPlaying, stopAllNotes, play, getBarFromTime, onBarChange]);
 
   // Seek to specific bar
   const seekToBar = useCallback((bar: number) => {
