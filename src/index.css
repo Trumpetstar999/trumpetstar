@@ -298,3 +298,34 @@
   .space-grid-md { @apply gap-4; } /* 16px */
   .space-grid-lg { @apply gap-6; } /* 24px */
 }
+
+/* OSMD Cursor Styling */
+.opensheetmusicdisplay .cursor {
+  background-color: rgba(255, 204, 0, 0.35) !important;
+  box-shadow: 0 0 15px rgba(255, 204, 0, 0.5), 0 0 30px rgba(255, 204, 0, 0.3) !important;
+  border-radius: 4px !important;
+  transition: left 0.15s ease-out, top 0.1s ease-out !important;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* OSMD Container styling for dark background */
+.osmd-container {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: var(--radius);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Animate cursor glow when playing */
+@keyframes cursor-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5), 0 0 30px rgba(255, 204, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7), 0 0 40px rgba(255, 204, 0, 0.5);
+  }
+}
+
+.cursor-playing .opensheetmusicdisplay .cursor {
+  animation: cursor-pulse 1s ease-in-out infinite;
+}

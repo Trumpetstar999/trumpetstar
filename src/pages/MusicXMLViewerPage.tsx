@@ -66,6 +66,7 @@ export function MusicXMLViewerPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [osmd, setOsmd] = useState<any>(null);
+  const [cursor, setCursor] = useState<any>(null);
   const [zoom, setZoom] = useState(1);
   const [isConcertPitch, setIsConcertPitch] = useState(false);
   
@@ -88,6 +89,70 @@ export function MusicXMLViewerPage() {
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const lastBarRef = useRef<number>(0);
+
+  // Update cursor position when bar changes
+  const handleBarChange = useCallback((bar: number) => {
+    setCurrentBar(bar);
+    
+    // Only update cursor if bar actually changed
+    if (bar === lastBarRef.current) return;
+    
+    // Move OSMD cursor to current bar
+    if (cursor && osmd) {
+      try {
+        const direction = bar > lastBarRef.current ? 1 : -1;
+        const steps = Math.abs(bar - lastBarRef.current);
+        
+        // If we need to go backwards or jump too far, reset and go from start
+        if (direction < 0 || steps > 5) {
+          cursor.reset();
+          // Advance to the target bar
+          for (let i = 0; i < bar - 1 && !cursor.iterator.EndReached; i++) {
+            // Move through all notes in the measure
+            while (!cursor.iterator.EndReached && 
+                   cursor.iterator.CurrentMeasureIndex < i + 1) {
+              cursor.next();
+            }
+          }
+        } else {
+          // Move forward incrementally
+          for (let i = 0; i < steps && !cursor.iterator.EndReached; i++) {
+            // Advance to next measure
+            const targetMeasure = cursor.iterator.CurrentMeasureIndex + 1;
+            while (!cursor.iterator.EndReached && 
+                   cursor.iterator.CurrentMeasureIndex < targetMeasure) {
+              cursor.next();
+            }
+          }
+        }
+        
+        cursor.show();
+        lastBarRef.current = bar;
+        
+        // Auto-scroll to cursor if follow mode is enabled
+        if (followMode && cursor.cursorElement) {
+          const container = containerRef.current?.parentElement;
+          if (container) {
+            const cursorRect = cursor.cursorElement.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Check if cursor is outside visible area
+            if (cursorRect.left < containerRect.left + 100 || 
+                cursorRect.right > containerRect.right - 100) {
+              cursor.cursorElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest',
+                inline: 'center'
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Cursor update error:', e);
+      }
+    }
+  }, [cursor, osmd, followMode]);
 
   // MIDI Player hook
   const midiPlayer = useMidiPlayer({
@@ -96,7 +161,7 @@ export function MusicXMLViewerPage() {
     loopEnabled,
     loopStart,
     loopEnd,
-    onBarChange: (bar) => setCurrentBar(bar),
+    onBarChange: handleBarChange,
   });
 
   const showDebug = searchParams.get('debug') === '1' || isAdmin;
@@ -160,7 +225,7 @@ export function MusicXMLViewerPage() {
           throw new Error('Ungültiges MusicXML Format');
         }
 
-        // Create OSMD instance
+        // Create OSMD instance with cursor enabled
         const osmdInstance = new OpenSheetMusicDisplay(containerRef.current!, {
           autoResize: true,
           drawTitle: true,
@@ -169,10 +234,32 @@ export function MusicXMLViewerPage() {
           drawPartNames: true,
           drawMeasureNumbers: true,
           drawingParameters: 'default',
+          followCursor: true,
+          cursorsOptions: [{
+            type: 0, // Standard cursor
+            color: '#FFCC00', // Gold color matching Trumpetstar theme
+            alpha: 0.6,
+            follow: true,
+          }],
         });
 
         await osmdInstance.load(xmlContent);
         osmdInstance.render();
+
+        // Initialize cursor
+        if (osmdInstance.cursor) {
+          osmdInstance.cursor.show();
+          osmdInstance.cursor.reset();
+          setCursor(osmdInstance.cursor);
+          
+          // Style the cursor element with gold glow
+          if (osmdInstance.cursor.cursorElement) {
+            osmdInstance.cursor.cursorElement.style.backgroundColor = 'rgba(255, 204, 0, 0.4)';
+            osmdInstance.cursor.cursorElement.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.6)';
+            osmdInstance.cursor.cursorElement.style.borderRadius = '4px';
+            osmdInstance.cursor.cursorElement.style.transition = 'left 0.1s ease-out';
+          }
+        }
 
         // Get total bars
         const measures = osmdInstance.Sheet?.SourceMeasures?.length || 1;
@@ -223,6 +310,9 @@ export function MusicXMLViewerPage() {
   // Handle close
   const handleClose = () => {
     midiPlayer.stop();
+    if (cursor) {
+      cursor.hide();
+    }
     navigate('/musicxml');
   };
 
@@ -274,7 +364,13 @@ export function MusicXMLViewerPage() {
       midiPlayer.stop();
     }
     setCurrentBar(1);
-  }, [playbackMode, midiPlayer]);
+    
+    // Reset cursor to start
+    if (cursor) {
+      cursor.reset();
+      cursor.show();
+    }
+  }, [playbackMode, midiPlayer, cursor]);
 
   // Audio track selection
   const handleSelectAudioTrack = useCallback((track: AudioTrack) => {
@@ -439,7 +535,10 @@ export function MusicXMLViewerPage() {
       </div>
 
       {/* Score Container */}
-      <div className="flex-1 min-h-0 overflow-auto relative">
+      <div className={cn(
+        "flex-1 min-h-0 overflow-auto relative",
+        isPlaying && "cursor-playing"
+      )}>
         {/* Loading overlay */}
         {isLoading && (
           <div 
@@ -489,17 +588,13 @@ export function MusicXMLViewerPage() {
           </div>
         )}
 
-        {/* OSMD Container - White card */}
+        {/* OSMD Container - White card with cursor styling */}
         <div 
           ref={containerRef} 
           className={cn(
-            "m-4 p-6 rounded-2xl shadow-2xl min-h-[calc(100%-2rem)]",
+            "osmd-container m-4 p-6 rounded-2xl min-h-[calc(100%-2rem)] opensheetmusicdisplay",
             (isLoading || loadError) && "invisible"
           )}
-          style={{ 
-            background: 'rgba(255, 255, 255, 0.98)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-          }}
         />
       </div>
 
