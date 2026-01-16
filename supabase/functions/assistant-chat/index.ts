@@ -59,12 +59,13 @@ Erkenne das Thema der Frage und antworte entsprechend. Sei präzise und hilfreic
 // Base instructions for all modes
 const BASE_INSTRUCTIONS = `
 WICHTIGE REGELN:
-1. Antworte NUR auf Basis der bereitgestellten Wissensbasis-Inhalte.
-2. Wenn keine passenden Inhalte gefunden wurden, sage ehrlich: "Dazu habe ich in der Trumpetstar-Wissensbasis noch keine Information. Soll ich diese Frage für das Team speichern?"
-3. Keine Quellenangaben im Text - antworte clean und direkt.
-4. Halte Antworten kurz und strukturiert (max. 3-4 kurze Absätze).
-5. Kein Marketing-Sprech, keine Emojis, erwachsener Ton.
-6. Wenn eine Frage PREMIUM-Features betrifft und der User kein PREMIUM hat, erkläre freundlich, dass dieses Feature Premium-Mitgliedern vorbehalten ist.
+1. Beginne JEDE Antwort mit einer persönlichen Begrüßung: "Hallo [Name]!" wenn ein Name bekannt ist, sonst nur "Hallo!".
+2. Antworte NUR auf Basis der bereitgestellten Wissensbasis-Inhalte.
+3. Wenn keine passenden Inhalte gefunden wurden, sage ehrlich: "Dazu habe ich in der Trumpetstar-Wissensbasis noch keine Information. Soll ich diese Frage für das Team speichern?"
+4. Keine Quellenangaben im Text - antworte clean und direkt.
+5. Halte Antworten kurz und strukturiert (max. 3-4 kurze Absätze).
+6. Kein Marketing-Sprech, keine Emojis, erwachsener Ton.
+7. Wenn eine Frage PREMIUM-Features betrifft und der User kein PREMIUM hat, erkläre freundlich, dass dieses Feature Premium-Mitgliedern vorbehalten ist.
 
 SPRACHE: Antworte in der Sprache der Frage (Deutsch oder Englisch).
 `;
@@ -88,7 +89,7 @@ serve(async (req) => {
       messages = [{ role: 'user', content: body.message }];
     }
     
-    const { mode = "mixed", language = "de", userPlanKey = "FREE", includeRecording = false, recordingContext = null } = body;
+    const { mode = "mixed", language = "de", userPlanKey = "FREE", userName = "", includeRecording = false, recordingContext = null } = body;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -216,8 +217,11 @@ Basierend auf diesen Metadaten, gib:
 `;
     }
 
+    // Build user context
+    const userContext = userName ? `\n\nDer Benutzer heißt: ${userName}\n` : "\n\nDer Benutzername ist nicht bekannt.\n";
+
     // Build system prompt
-    const systemPrompt = `${MODE_PROMPTS[mode] || MODE_PROMPTS.mixed}${BASE_INSTRUCTIONS}${contextString}${recordingInfo}`;
+    const systemPrompt = `${MODE_PROMPTS[mode] || MODE_PROMPTS.mixed}${BASE_INSTRUCTIONS}${userContext}${contextString}${recordingInfo}`;
 
     // Prepare messages for API
     const apiMessages: Message[] = [
