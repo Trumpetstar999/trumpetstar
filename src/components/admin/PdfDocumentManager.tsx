@@ -414,14 +414,14 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
             <div>
               <Label>Level zuordnen</Label>
               <Select
-                value={formData.level_id}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, level_id: value }))}
+                value={formData.level_id || 'none'}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, level_id: value === 'none' ? '' : value }))}
               >
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Level auswählen (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Kein Level</SelectItem>
+                  <SelectItem value="none">Kein Level</SelectItem>
                   {levels?.map(level => (
                     <SelectItem key={level.id} value={level.id}>{level.title}</SelectItem>
                   ))}
