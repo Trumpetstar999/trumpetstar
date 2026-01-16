@@ -272,6 +272,7 @@ export type Database = {
           id: string
           is_active: boolean
           required_plan: string | null
+          required_plan_key: string | null
           sort_order: number
           thumbnail_url: string | null
           title: string
@@ -284,6 +285,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           required_plan?: string | null
+          required_plan_key?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title: string
@@ -296,11 +298,72 @@ export type Database = {
           id?: string
           is_active?: boolean
           required_plan?: string | null
+          required_plan_key?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
           vimeo_showcase_id?: string
+        }
+        Relationships: []
+      }
+      plans: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          is_default_free: boolean
+          key: string
+          rank: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          is_default_free?: boolean
+          key: string
+          rank?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_default_free?: boolean
+          key?: string
+          rank?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_plan_mapping: {
+        Row: {
+          checkout_url: string | null
+          created_at: string
+          digimember_product_id: string
+          id: string
+          is_enabled: boolean
+          plan_key: string
+          updated_at: string
+        }
+        Insert: {
+          checkout_url?: string | null
+          created_at?: string
+          digimember_product_id: string
+          id?: string
+          is_enabled?: boolean
+          plan_key?: string
+          updated_at?: string
+        }
+        Update: {
+          checkout_url?: string | null
+          created_at?: string
+          digimember_product_id?: string
+          id?: string
+          is_enabled?: boolean
+          plan_key?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -466,6 +529,39 @@ export type Database = {
           },
         ]
       }
+      user_membership_cache: {
+        Row: {
+          active_product_ids: Json | null
+          created_at: string
+          id: string
+          last_checked_at: string
+          plan_key: string
+          plan_rank: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_product_ids?: Json | null
+          created_at?: string
+          id?: string
+          last_checked_at?: string
+          plan_key?: string
+          plan_rank?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_product_ids?: Json | null
+          created_at?: string
+          id?: string
+          last_checked_at?: string
+          plan_key?: string
+          plan_rank?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_memberships: {
         Row: {
           active_product_ids: string[] | null
@@ -473,6 +569,8 @@ export type Database = {
           current_plan: string
           id: string
           last_synced_at: string
+          plan_key: string | null
+          plan_rank: number | null
           updated_at: string
           user_id: string
           wp_user_id: string | null
@@ -483,6 +581,8 @@ export type Database = {
           current_plan?: string
           id?: string
           last_synced_at?: string
+          plan_key?: string | null
+          plan_rank?: number | null
           updated_at?: string
           user_id: string
           wp_user_id?: string | null
@@ -493,6 +593,8 @@ export type Database = {
           current_plan?: string
           id?: string
           last_synced_at?: string
+          plan_key?: string | null
+          plan_rank?: number | null
           updated_at?: string
           user_id?: string
           wp_user_id?: string | null
@@ -891,6 +993,15 @@ export type Database = {
           active_today: number | null
           total_stars: number | null
           total_users: number | null
+        }
+        Relationships: []
+      }
+      admin_plan_stats: {
+        Row: {
+          display_name: string | null
+          plan_key: string | null
+          rank: number | null
+          user_count: number | null
         }
         Relationships: []
       }
