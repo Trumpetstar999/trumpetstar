@@ -8,9 +8,11 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Package
+  Package,
+  Music
 } from 'lucide-react';
 import { useState } from 'react';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 interface AdminSidebarProps {
   activeTab: string;
@@ -33,32 +35,39 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   return (
     <aside 
       className={cn(
-        "h-screen sticky top-0 flex flex-col transition-all duration-200",
-        "bg-white border-r border-[#E5E7EB]",
-        collapsed ? "w-16" : "w-56"
+        "h-screen sticky top-0 flex flex-col transition-all duration-300 ease-out",
+        collapsed ? "w-[72px]" : "w-64"
       )}
+      style={{
+        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)',
+      }}
     >
-      {/* Header */}
-      <div className="h-14 px-4 border-b border-[#E5E7EB] flex items-center justify-between">
+      {/* Logo & Brand */}
+      <div className={cn(
+        "flex items-center gap-3 border-b border-white/[0.08] transition-all duration-300",
+        collapsed ? "h-16 px-4 justify-center" : "h-16 px-5"
+      )}>
+        <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+          <img 
+            src={trumpetstarLogo} 
+            alt="Trumpetstar" 
+            className="w-7 h-7 object-contain"
+          />
+        </div>
         {!collapsed && (
-          <span className="font-semibold text-sm text-[#111827] tracking-tight">
-            Admin
-          </span>
+          <div className="flex flex-col">
+            <span className="text-white font-semibold text-sm tracking-tight">
+              Trumpetstar
+            </span>
+            <span className="text-white/40 text-[10px] font-medium uppercase tracking-wider">
+              Admin
+            </span>
+          </div>
         )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#111827] transition-colors"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <ChevronLeft className="w-4 h-4" />
-          )}
-        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -68,31 +77,56 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
               key={item.id}
               onClick={() => onTabChange(item.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all relative",
+                "w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 relative group",
+                collapsed ? "px-3 py-3 justify-center" : "px-3 py-2.5",
                 isActive 
-                  ? "bg-[#EFF6FF] text-[#3B82F6]" 
-                  : "text-[#6B7280] hover:bg-[#F5F7FA] hover:text-[#111827]"
+                  ? "bg-blue-500/15 text-white" 
+                  : "text-white/60 hover:bg-white/[0.06] hover:text-white/90"
               )}
             >
+              {/* Active indicator */}
               {isActive && (
-                <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#3B82F6] rounded-r" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-blue-500 rounded-r-full" />
               )}
-              <Icon className="w-5 h-5 flex-shrink-0" />
+              
+              <Icon className={cn(
+                "w-5 h-5 flex-shrink-0 transition-colors",
+                isActive ? "text-blue-400" : "text-white/50 group-hover:text-white/70"
+              )} />
+              
               {!collapsed && (
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
+              )}
+              
+              {/* Tooltip for collapsed state */}
+              {collapsed && (
+                <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-lg">
+                  {item.label}
+                </div>
               )}
             </button>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-[#E5E7EB]">
-        {!collapsed && (
-          <p className="text-[10px] text-[#9CA3AF] text-center">
-            Trumpetstar Admin
-          </p>
-        )}
+      {/* Collapse Toggle */}
+      <div className="p-3 border-t border-white/[0.08]">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            "w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all",
+            collapsed && "justify-center"
+          )}
+        >
+          {collapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <>
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-xs font-medium">Einklappen</span>
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );
