@@ -59,30 +59,26 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     if (!user) return;
     
     try {
-      // Get last 20 video completions
-      const { data: completions, error } = await supabase
-        .from('video_completions')
-        .select('video_id, completed_at')
+      // Get recently watched videos from progress table (includes partially watched)
+      const { data: progressData, error } = await supabase
+        .from('user_video_progress')
+        .select('video_id, updated_at, progress_percent')
         .eq('user_id', user.id)
-        .order('completed_at', { ascending: false })
+        .order('updated_at', { ascending: false })
         .limit(20);
 
       if (error) throw error;
 
-      // Get unique video IDs (most recent first)
-      const uniqueVideoIds = [...new Set((completions || []).map(c => c.video_id))];
-      
       // Map to videos from levels data
       const recentVids: RecentVideo[] = [];
-      uniqueVideoIds.forEach(videoId => {
-        const completion = completions?.find(c => c.video_id === videoId);
+      (progressData || []).forEach(progress => {
         levels.forEach(level => {
           level.sections.forEach(section => {
-            const video = section.videos.find(v => v.id === videoId);
-            if (video && completion) {
+            const video = section.videos.find(v => v.id === progress.video_id);
+            if (video) {
               recentVids.push({
                 ...video,
-                watchedAt: completion.completed_at,
+                watchedAt: progress.updated_at,
                 levelTitle: level.title,
               });
             }
