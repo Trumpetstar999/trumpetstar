@@ -24,6 +24,7 @@ const menuItems = [
   { id: 'users', label: 'Nutzer', icon: Users },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'products', label: 'Produkte & Pläne', icon: Package },
+  { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
   { id: 'system', label: 'Einstellungen', icon: Settings },
