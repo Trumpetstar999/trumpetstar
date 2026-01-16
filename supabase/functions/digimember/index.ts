@@ -293,13 +293,50 @@ Deno.serve(async (req) => {
         });
       }
       
-      const { activeProductIds, products } = await getUserMembership(email);
-      const { planKey, planRank } = await determinePlan(activeProductIds, supabaseClient);
+      // First check if user has a manually set plan in user_memberships
+      let manualPlanKey: PlanKey | null = null;
+      let manualPlanRank: number | null = null;
+      
+      if (userId) {
+        const { data: existingMembership } = await supabaseClient
+          .from('user_memberships')
+          .select('plan_key, plan_rank, updated_at')
+          .eq('user_id', userId)
+          .single();
+        
+        if (existingMembership?.plan_key && existingMembership.plan_key !== 'FREE') {
+          // User has a manually set plan that's not FREE - respect it
+          manualPlanKey = existingMembership.plan_key as PlanKey;
+          manualPlanRank = existingMembership.plan_rank || 0;
+          console.log(`User ${userId} has manually set plan: ${manualPlanKey} (rank: ${manualPlanRank})`);
+        }
+      }
+      
+      // If no manual plan, check DigiMember
+      let activeProductIds: string[] = [];
+      let products: DigiMemberUserProduct[] = [];
+      let planKey: PlanKey = 'FREE';
+      let planRank = 0;
+      
+      if (manualPlanKey) {
+        // Use the manually set plan
+        planKey = manualPlanKey;
+        planRank = manualPlanRank || 0;
+      } else {
+        // Fetch from DigiMember
+        const membershipResult = await getUserMembership(email);
+        activeProductIds = membershipResult.activeProductIds;
+        products = membershipResult.products;
+        const determinedPlan = await determinePlan(activeProductIds, supabaseClient);
+        planKey = determinedPlan.planKey;
+        planRank = determinedPlan.planRank;
+      }
+      
       const upgradeLinks = await getUpgradeLinks(supabaseClient);
       const plans = await getPlans(supabaseClient);
       
-      // Update user_membership_cache if userId provided
-      if (userId) {
+      // Update caches (but don't overwrite manually set plans)
+      if (userId && !manualPlanKey) {
         const { error: cacheError } = await supabaseClient
           .from('user_membership_cache')
           .upsert({

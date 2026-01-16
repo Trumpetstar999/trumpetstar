@@ -39,7 +39,7 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [state, setState] = useState<MembershipState>(defaultState);
 
-  // Load cached state
+  // Load cached state (or force refresh if cache is empty/expired)
   useEffect(() => {
     if (user) {
       const cached = sessionStorage.getItem(`${CACHE_KEY}_${user.id}`);
@@ -48,8 +48,9 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
           const parsed = JSON.parse(cached);
           const lastSync = parsed.lastSync ? new Date(parsed.lastSync) : null;
           
-          // Check if cache is still valid
-          if (lastSync && Date.now() - lastSync.getTime() < CACHE_TTL) {
+          // Check if cache is still valid (max 5 minutes for better responsiveness)
+          const cacheTtl = 5 * 60 * 1000; // 5 minutes
+          if (lastSync && Date.now() - lastSync.getTime() < cacheTtl) {
             setState({
               ...parsed,
               lastSync,
@@ -59,6 +60,8 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
           }
         } catch (e) {
           console.error('Failed to parse membership cache:', e);
+          // Clear invalid cache
+          sessionStorage.removeItem(`${CACHE_KEY}_${user.id}`);
         }
       }
       // Load fresh data
