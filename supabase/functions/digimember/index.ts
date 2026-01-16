@@ -32,9 +32,11 @@ async function callDigiMemberAPI(endpoint: string, method = 'GET', body?: any): 
   
   console.log(`Calling DigiMember API: ${method} ${url}`);
   
+  // DigiMember uses X-Digi-Key header for authentication (not Bearer token)
   const headers: Record<string, string> = {
-    'Authorization': `Bearer ${DIGIMEMBER_API_KEY}`,
+    'X-Digi-Key': DIGIMEMBER_API_KEY,
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   };
   
   try {
