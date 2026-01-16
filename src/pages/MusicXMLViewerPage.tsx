@@ -599,252 +599,304 @@ export function MusicXMLViewerPage() {
       </div>
 
       {/* Bottom Player Bar - Glass style with gold accents */}
-      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
-        <div className="max-w-6xl mx-auto flex items-center gap-4">
-          {/* Playback Mode Switch */}
-          <div className="flex items-center glass rounded-full p-1">
-            <button
-              className={cn(
-                "px-4 py-2 text-sm rounded-full transition-all font-medium",
-                playbackMode === 'midi' 
-                  ? 'bg-reward-gold text-black glow-gold' 
-                  : 'text-white/70 hover:text-white'
-              )}
-              onClick={handleSwitchToMidi}
-            >
-              <Music className="w-4 h-4 inline-block mr-1.5" />
-              MIDI
-            </button>
-            {audioTracks.length > 0 && (
-              <button
-                className={cn(
-                  "px-4 py-2 text-sm rounded-full transition-all font-medium",
-                  playbackMode === 'audio' 
-                    ? 'bg-reward-gold text-black glow-gold' 
-                    : 'text-white/70 hover:text-white'
-                )}
-                onClick={() => setPlaybackMode('audio')}
-              >
-                <Headphones className="w-4 h-4 inline-block mr-1.5" />
-                Audio
-              </button>
-            )}
-          </div>
-
-          {/* Play/Pause - Gold accent */}
-          <button
-            onClick={togglePlayPause}
-            disabled={playbackMode === 'midi' && midiPlayer.isLoading}
-            className="w-12 h-12 rounded-full bg-reward-gold hover:bg-reward-gold/90 text-black transition-all shrink-0 flex items-center justify-center glow-gold disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-          </button>
-
-          {/* Stop */}
-          <button
-            onClick={handleStop}
-            className="w-10 h-10 rounded-full glass hover:bg-white/20 text-white transition-all shrink-0 flex items-center justify-center"
-          >
-            <Square className="w-4 h-4" />
-          </button>
-
-          {/* Bar indicator */}
-          <div className="px-4 py-2 glass rounded-full">
-            <span className="text-sm font-mono">
-              <span className="text-reward-gold font-bold">{currentBar}</span>
-              <span className="text-white/50 mx-1">/</span>
-              <span className="text-white/70">{totalBars}</span>
+      <div className="shrink-0 z-[105] glass px-6 py-3 safe-bottom">
+        <div className="max-w-6xl mx-auto space-y-3">
+          {/* Top Row: Timeline */}
+          <div className="flex items-center gap-4">
+            {/* Current time */}
+            <span className="text-white/80 text-sm font-mono w-14 text-right shrink-0">
+              {formatTime(midiPlayer.currentTime)}
             </span>
-          </div>
-
-          {/* Tempo Slider */}
-          <div className="flex items-center gap-3 flex-1 max-w-xs pl-4 border-l border-white/20">
-            <span className="text-white/60 text-sm">Tempo</span>
-            <Slider
-              value={[tempo]}
-              min={40}
-              max={120}
-              step={1}
-              onValueChange={([v]) => setTempo(v)}
-              variant="player"
-              className="flex-1"
-            />
-            <span className="text-reward-gold font-bold text-sm w-12 text-center bg-white/10 rounded-full px-2 py-1">
-              {tempo}%
-            </span>
-          </div>
-
-          {/* Volume */}
-          <div className="flex items-center gap-2 pl-4 border-l border-white/20">
-            <Volume2 className="w-4 h-4 text-white/60" />
-            <Slider
-              value={[volume]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={([v]) => setVolume(v)}
-              variant="player"
-              className="w-20"
-            />
-          </div>
-
-          {/* Loop Toggle */}
-          <button
-            onClick={() => setLoopEnabled(!loopEnabled)}
-            className={cn(
-              "px-4 py-2 rounded-full transition-all flex items-center gap-1.5 text-sm font-medium",
-              loopEnabled 
-                ? 'bg-reward-gold text-black glow-gold' 
-                : 'glass text-white/70 hover:text-white'
-            )}
-          >
-            <Repeat className="w-4 h-4" />
-            Loop
-          </button>
-
-          {/* Settings Sheet */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <button className="w-10 h-10 rounded-full glass hover:bg-white/20 text-white transition-all flex items-center justify-center">
-                <Settings className="w-4 h-4" />
-              </button>
-            </SheetTrigger>
-            <SheetContent className="bg-card border-l-0">
-              <SheetHeader>
-                <SheetTitle className="text-card-foreground">Player-Einstellungen</SheetTitle>
-              </SheetHeader>
-              <div className="space-y-6 py-6">
-                {/* Metronome */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-card-foreground">Metronom</Label>
-                    <Switch
-                      checked={metronomeEnabled}
-                      onCheckedChange={setMetronomeEnabled}
+            
+            {/* Progress slider - Gold themed */}
+            <div className="flex-1 relative">
+              <Slider
+                value={[midiPlayer.currentTime]}
+                min={0}
+                max={midiPlayer.duration || 1}
+                step={0.1}
+                onValueChange={([v]) => {
+                  midiPlayer.seekTo(v);
+                }}
+                variant="gold"
+                className="flex-1"
+              />
+              {/* Bar markers (visual indicator) */}
+              {midiPlayer.duration > 0 && (
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none h-1 flex">
+                  {Array.from({ length: Math.min(totalBars, 50) }).map((_, i) => (
+                    <div 
+                      key={i}
+                      className="h-full border-r border-white/10"
+                      style={{ width: `${100 / totalBars}%` }}
                     />
-                  </div>
-                  {metronomeEnabled && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Lautstärke</span>
-                      <Slider
-                        value={[metronomeVolume]}
-                        min={0}
-                        max={100}
-                        onValueChange={([v]) => setMetronomeVolume(v)}
-                        variant="gold"
-                        className="flex-1"
-                      />
-                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Duration */}
+            <span className="text-white/60 text-sm font-mono w-14 shrink-0">
+              {formatTime(midiPlayer.duration)}
+            </span>
+            
+            {/* Bar indicator */}
+            <div className="px-4 py-1.5 glass rounded-full shrink-0">
+              <span className="text-sm font-mono">
+                <span className="text-white/60 text-xs mr-1">Takt</span>
+                <span className="text-reward-gold font-bold">{currentBar}</span>
+                <span className="text-white/40 mx-1">/</span>
+                <span className="text-white/60">{totalBars}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Row: Controls */}
+          <div className="flex items-center gap-3 justify-between">
+            {/* Left: Mode + Play Controls */}
+            <div className="flex items-center gap-3">
+              {/* Playback Mode Switch */}
+              <div className="flex items-center glass rounded-full p-0.5">
+                <button
+                  className={cn(
+                    "px-3 py-1.5 text-sm rounded-full transition-all font-medium",
+                    playbackMode === 'midi' 
+                      ? 'bg-reward-gold text-black' 
+                      : 'text-white/70 hover:text-white'
                   )}
-                </div>
-
-                {/* Count-in */}
-                <div className="space-y-2">
-                  <Label className="text-card-foreground">Count-in (Takte)</Label>
-                  <div className="flex items-center gap-2">
-                    {[0, 1, 2].map(n => (
-                      <Button
-                        key={n}
-                        variant={countIn === n ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setCountIn(n)}
-                        className={cn(
-                          "rounded-full",
-                          countIn === n && "bg-reward-gold text-black hover:bg-reward-gold/90"
-                        )}
-                      >
-                        {n}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Loop Range */}
-                <div className="space-y-3">
-                  <Label className="text-card-foreground">Loop-Bereich</Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <span className="text-xs text-muted-foreground">Von Takt</span>
-                      <Input
-                        type="number"
-                        min={1}
-                        max={loopEnd}
-                        value={loopStart}
-                        onChange={(e) => setLoopStart(Math.max(1, Math.min(loopEnd, parseInt(e.target.value) || 1)))}
-                        className="rounded-lg"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-xs text-muted-foreground">Bis Takt</span>
-                      <Input
-                        type="number"
-                        min={loopStart}
-                        max={totalBars}
-                        value={loopEnd}
-                        onChange={(e) => setLoopEnd(Math.max(loopStart, Math.min(totalBars, parseInt(e.target.value) || totalBars)))}
-                        className="rounded-lg"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Follow Mode */}
-                <div className="flex items-center justify-between">
-                  <Label className="text-card-foreground">Auto-Scroll (Follow)</Label>
-                  <Switch
-                    checked={followMode}
-                    onCheckedChange={setFollowMode}
-                  />
-                </div>
-
-                {/* Audio Tracks */}
+                  onClick={handleSwitchToMidi}
+                >
+                  <Music className="w-3.5 h-3.5 inline-block mr-1" />
+                  MIDI
+                </button>
                 {audioTracks.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-card-foreground">Audio-Tracks</Label>
-                    <div className="space-y-2">
-                      {audioTracks.map(track => (
-                        <button
-                          key={track.id}
-                          className={cn(
-                            "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all",
-                            selectedAudioTrack?.id === track.id 
-                              ? 'bg-reward-gold/20 border-2 border-reward-gold' 
-                              : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
-                          )}
-                          onClick={() => handleSelectAudioTrack(track)}
-                        >
-                          <Headphones className={cn(
-                            "w-4 h-4",
-                            selectedAudioTrack?.id === track.id ? 'text-reward-gold' : 'text-muted-foreground'
-                          )} />
-                          <span className="flex-1 truncate text-card-foreground">{track.title}</span>
-                          {track.duration && (
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {formatTime(track.duration)}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Debug Info */}
-                {showDebug && (
-                  <div className="space-y-2 pt-4 border-t">
-                    <Label className="text-xs text-muted-foreground">Debug Info</Label>
-                    <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded-lg text-card-foreground">
-                      <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
-                      <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
-                      <div>MIDI Error: {midiPlayer.error || 'None'}</div>
-                      <div>Playback Mode: {playbackMode}</div>
-                      <div>Total Bars: {totalBars}</div>
-                    </div>
-                  </div>
+                  <button
+                    className={cn(
+                      "px-3 py-1.5 text-sm rounded-full transition-all font-medium",
+                      playbackMode === 'audio' 
+                        ? 'bg-reward-gold text-black' 
+                        : 'text-white/70 hover:text-white'
+                    )}
+                    onClick={() => setPlaybackMode('audio')}
+                  >
+                    <Headphones className="w-3.5 h-3.5 inline-block mr-1" />
+                    Audio
+                  </button>
                 )}
               </div>
-            </SheetContent>
-          </Sheet>
+
+              {/* Play/Pause - Gold accent */}
+              <button
+                onClick={togglePlayPause}
+                disabled={playbackMode === 'midi' && midiPlayer.isLoading}
+                className="w-11 h-11 rounded-full bg-reward-gold hover:bg-reward-gold/90 text-black transition-all shrink-0 flex items-center justify-center glow-gold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+              </button>
+
+              {/* Stop */}
+              <button
+                onClick={handleStop}
+                className="w-9 h-9 rounded-full glass hover:bg-white/20 text-white transition-all shrink-0 flex items-center justify-center"
+              >
+                <Square className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Center: Tempo */}
+            <div className="flex items-center gap-3 flex-1 max-w-xs px-4 border-l border-r border-white/10">
+              <span className="text-white/60 text-sm">Tempo</span>
+              <Slider
+                value={[tempo]}
+                min={40}
+                max={120}
+                step={1}
+                onValueChange={([v]) => setTempo(v)}
+                variant="player"
+                className="flex-1"
+              />
+              <span className="text-reward-gold font-bold text-sm w-10 text-center bg-white/10 rounded-full px-2 py-0.5">
+                {tempo}%
+              </span>
+            </div>
+
+            {/* Right: Volume, Loop, Settings */}
+            <div className="flex items-center gap-3">
+              {/* Volume */}
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-white/60" />
+                <Slider
+                  value={[volume]}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onValueChange={([v]) => setVolume(v)}
+                  variant="player"
+                  className="w-20"
+                />
+              </div>
+
+              {/* Loop Toggle */}
+              <button
+                onClick={() => setLoopEnabled(!loopEnabled)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full transition-all flex items-center gap-1 text-sm font-medium",
+                  loopEnabled 
+                    ? 'bg-reward-gold text-black' 
+                    : 'glass text-white/70 hover:text-white'
+                )}
+              >
+                <Repeat className="w-3.5 h-3.5" />
+                Loop
+              </button>
+
+              {/* Settings Sheet */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="w-9 h-9 rounded-full glass hover:bg-white/20 text-white transition-all flex items-center justify-center">
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </SheetTrigger>
+                <SheetContent className="bg-card border-l-0">
+                  <SheetHeader>
+                    <SheetTitle className="text-card-foreground">Player-Einstellungen</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-6 py-6">
+                    {/* Metronome */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-card-foreground">Metronom</Label>
+                        <Switch
+                          checked={metronomeEnabled}
+                          onCheckedChange={setMetronomeEnabled}
+                        />
+                      </div>
+                      {metronomeEnabled && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Lautstärke</span>
+                          <Slider
+                            value={[metronomeVolume]}
+                            min={0}
+                            max={100}
+                            onValueChange={([v]) => setMetronomeVolume(v)}
+                            variant="gold"
+                            className="flex-1"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Count-in */}
+                    <div className="space-y-2">
+                      <Label className="text-card-foreground">Count-in (Takte)</Label>
+                      <div className="flex items-center gap-2">
+                        {[0, 1, 2].map(n => (
+                          <Button
+                            key={n}
+                            variant={countIn === n ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setCountIn(n)}
+                            className={cn(
+                              "rounded-full",
+                              countIn === n && "bg-reward-gold text-black hover:bg-reward-gold/90"
+                            )}
+                          >
+                            {n}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Loop Range */}
+                    <div className="space-y-3">
+                      <Label className="text-card-foreground">Loop-Bereich</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <span className="text-xs text-muted-foreground">Von Takt</span>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={loopEnd}
+                            value={loopStart}
+                            onChange={(e) => setLoopStart(Math.max(1, Math.min(loopEnd, parseInt(e.target.value) || 1)))}
+                            className="rounded-lg"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-xs text-muted-foreground">Bis Takt</span>
+                          <Input
+                            type="number"
+                            min={loopStart}
+                            max={totalBars}
+                            value={loopEnd}
+                            onChange={(e) => setLoopEnd(Math.max(loopStart, Math.min(totalBars, parseInt(e.target.value) || totalBars)))}
+                            className="rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Follow Mode */}
+                    <div className="flex items-center justify-between">
+                      <Label className="text-card-foreground">Auto-Scroll (Follow)</Label>
+                      <Switch
+                        checked={followMode}
+                        onCheckedChange={setFollowMode}
+                      />
+                    </div>
+
+                    {/* Audio Tracks */}
+                    {audioTracks.length > 0 && (
+                      <div className="space-y-2">
+                        <Label className="text-card-foreground">Audio-Tracks</Label>
+                        <div className="space-y-2">
+                          {audioTracks.map(track => (
+                            <button
+                              key={track.id}
+                              className={cn(
+                                "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all",
+                                selectedAudioTrack?.id === track.id 
+                                  ? 'bg-reward-gold/20 border-2 border-reward-gold' 
+                                  : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
+                              )}
+                              onClick={() => handleSelectAudioTrack(track)}
+                            >
+                              <Headphones className={cn(
+                                "w-4 h-4",
+                                selectedAudioTrack?.id === track.id ? 'text-reward-gold' : 'text-muted-foreground'
+                              )} />
+                              <span className="flex-1 truncate text-card-foreground">{track.title}</span>
+                              {track.duration && (
+                                <span className="text-xs text-muted-foreground font-mono">
+                                  {formatTime(track.duration)}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Debug Info */}
+                    {showDebug && (
+                      <div className="space-y-2 pt-4 border-t">
+                        <Label className="text-xs text-muted-foreground">Debug Info</Label>
+                        <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded-lg text-card-foreground">
+                          <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
+                          <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
+                          <div>MIDI Error: {midiPlayer.error || 'None'}</div>
+                          <div>Playback Mode: {playbackMode}</div>
+                          <div>Total Bars: {totalBars}</div>
+                          <div>Current Time: {formatTime(midiPlayer.currentTime)}</div>
+                          <div>Duration: {formatTime(midiPlayer.duration)}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
         </div>
       </div>
 
