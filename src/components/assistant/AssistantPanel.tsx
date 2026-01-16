@@ -93,7 +93,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             <Bot className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="font-semibold text-[15px]">Trumpetstar Assistent</h2>
+            <h2 className="font-semibold text-[15px]">Toni dein Trompeten-Coach</h2>
             <p className="text-[11px] text-white/70">
               {isLoading ? 'tippt...' : 'online'}
             </p>
