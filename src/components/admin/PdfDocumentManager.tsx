@@ -114,20 +114,6 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     return new Promise(async (resolve, reject) => {
       const fileName = `${Date.now()}-${file.name}`;
       
-      // Get page count first
-      setUploadState({ progress: 0, status: 'processing', message: 'PDF wird analysiert...' });
-      let pageCount = 1;
-      try {
-        const pdfjsLib = await import('pdfjs-dist');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
-        
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        pageCount = pdf.numPages;
-      } catch (e) {
-        console.error('Error getting page count:', e);
-      }
-
       setUploadState({ progress: 0, status: 'uploading', message: 'Upload wird gestartet...' });
 
       // Get upload URL from Supabase
@@ -135,6 +121,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
       const token = session?.session?.access_token;
       
       if (!token) {
+        setUploadState({ progress: 0, status: 'error', message: 'Nicht authentifiziert' });
         reject(new Error('Nicht authentifiziert'));
         return;
       }
@@ -157,28 +144,63 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         }
       });
 
-      xhr.addEventListener('load', () => {
+      xhr.addEventListener('load', async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           const { data: urlData } = supabase.storage
             .from('pdf-documents')
             .getPublicUrl(fileName);
           
+          // Get page count AFTER upload completes
+          setUploadState({ progress: 100, status: 'processing', message: 'Seitenzahl wird ermittelt...' });
+          let pageCount = 1;
+          try {
+            const pdfjsLib = await import('pdfjs-dist');
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
+            
+            // Load from the uploaded URL instead of re-reading the file
+            const pdf = await pdfjsLib.getDocument(urlData.publicUrl).promise;
+            pageCount = pdf.numPages;
+          } catch (e) {
+            console.error('Error getting page count:', e);
+            // Try alternative method with file slice (first 100KB is enough for page count)
+            try {
+              const pdfjsLib = await import('pdfjs-dist');
+              const smallBuffer = await file.slice(0, Math.min(file.size, 1024 * 1024)).arrayBuffer();
+              const pdf = await pdfjsLib.getDocument({ data: smallBuffer }).promise;
+              pageCount = pdf.numPages;
+            } catch (e2) {
+              console.error('Fallback page count also failed:', e2);
+            }
+          }
+          
           setUploadState({ progress: 100, status: 'complete', message: 'Upload abgeschlossen!' });
           resolve({ url: urlData.publicUrl, pageCount });
         } else {
-          setUploadState({ progress: 0, status: 'error', message: 'Upload fehlgeschlagen' });
-          reject(new Error(`Upload fehlgeschlagen: ${xhr.statusText}`));
+          let errorMessage = 'Upload fehlgeschlagen';
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMessage = response.message || response.error || errorMessage;
+          } catch {}
+          setUploadState({ progress: 0, status: 'error', message: errorMessage });
+          reject(new Error(errorMessage));
         }
       });
 
       xhr.addEventListener('error', () => {
-        setUploadState({ progress: 0, status: 'error', message: 'Netzwerkfehler' });
+        setUploadState({ progress: 0, status: 'error', message: 'Netzwerkfehler beim Upload' });
         reject(new Error('Netzwerkfehler beim Upload'));
+      });
+
+      xhr.addEventListener('timeout', () => {
+        setUploadState({ progress: 0, status: 'error', message: 'Upload-Timeout' });
+        reject(new Error('Upload-Timeout'));
       });
 
       xhr.open('POST', uploadUrl, true);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('Content-Type', 'application/pdf');
       xhr.setRequestHeader('x-upsert', 'true');
+      xhr.timeout = 600000; // 10 minutes timeout for large files
       xhr.send(file);
     });
   }, []);
