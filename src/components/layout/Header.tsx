@@ -1,4 +1,5 @@
-import { Star, WifiOff, LogOut, User, Settings, RefreshCw, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Star, WifiOff, LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
@@ -9,29 +10,50 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HeaderProps {
   title: string;
   stars: number;
   isOffline?: boolean;
-  onSync?: () => void;
   videoCount?: number;
 }
 
-export function Header({ title, stars, isOffline = false, onSync, videoCount }: HeaderProps) {
+interface Profile {
+  avatar_url: string | null;
+  display_name: string | null;
+}
+
+export function Header({ title, stars, isOffline = false, videoCount }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        const { data } = await supabase
+          .from('profiles')
+          .select('avatar_url, display_name')
+          .eq('id', user.id)
+          .single();
+        if (data) setProfile(data);
+      };
+      fetchProfile();
+    }
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
   };
 
-  const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
+  const userInitials = profile?.display_name?.slice(0, 2).toUpperCase() || 
+    user?.email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
     <header className="sticky top-0 z-40 glass safe-top">
@@ -64,27 +86,6 @@ export function Header({ title, stars, isOffline = false, onSync, videoCount }: 
         
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
-          {/* Sync & Download buttons */}
-          {onSync && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
-              onClick={onSync}
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Sync</span>
-            </Button>
-          )}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
-          >
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Laden</span>
-          </Button>
-          
           {/* Membership Badge */}
           <MembershipStatusBadge />
           
@@ -106,6 +107,7 @@ export function Header({ title, stars, isOffline = false, onSync, videoCount }: 
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10">
                 <Avatar className="w-9 h-9">
+                  <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || 'Profil'} />
                   <AvatarFallback className="bg-white/20 text-white">
                     {userInitials}
                   </AvatarFallback>

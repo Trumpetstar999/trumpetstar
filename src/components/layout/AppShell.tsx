@@ -13,7 +13,6 @@ interface AppShellProps {
   title: string;
   stars: number;
   isOffline?: boolean;
-  onSync?: () => void;
   videoCount?: number;
 }
 
@@ -24,7 +23,6 @@ export function AppShell({
   title,
   stars,
   isOffline,
-  onSync,
   videoCount
 }: AppShellProps) {
   const { isVideoPlaying } = useVideoPlayer();
@@ -38,7 +36,6 @@ export function AppShell({
         title={title} 
         stars={stars} 
         isOffline={isOffline} 
-        onSync={onSync}
         videoCount={videoCount}
       />
       
