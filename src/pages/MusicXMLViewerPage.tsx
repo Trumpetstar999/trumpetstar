@@ -90,6 +90,56 @@ export function MusicXMLViewerPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const lastBarRef = useRef<number>(0);
+  const customCursorRef = useRef<HTMLDivElement | null>(null);
+
+  // Create and update custom cursor overlay (since OSMD's cursor img is transparent)
+  const updateCustomCursor = useCallback(() => {
+    if (!containerRef.current) return;
+    
+    // Get the OSMD cursor element (hidden img)
+    const osmdCursorImg = containerRef.current.querySelector('img[id^="cursorImg"]') as HTMLImageElement;
+    if (!osmdCursorImg) {
+      console.log('[Cursor] No OSMD cursor img found');
+      return;
+    }
+    
+    // Create custom cursor if it doesn't exist
+    if (!customCursorRef.current) {
+      const cursorDiv = globalThis.document.createElement('div');
+      cursorDiv.id = 'custom-cursor-overlay';
+      cursorDiv.style.cssText = `
+        position: absolute;
+        background: linear-gradient(180deg, rgba(255, 204, 0, 0.85) 0%, rgba(255, 170, 0, 0.65) 100%);
+        border-radius: 4px;
+        box-shadow: 0 0 30px rgba(255, 204, 0, 0.9), 0 0 60px rgba(255, 204, 0, 0.5);
+        pointer-events: none;
+        z-index: 50;
+        transition: left 0.1s ease-out, top 0.08s ease-out;
+        min-width: 10px;
+      `;
+      containerRef.current.appendChild(cursorDiv);
+      customCursorRef.current = cursorDiv;
+      console.log('[Cursor] Custom cursor overlay created');
+    }
+    
+    // Get positions - use offsetParent for accurate positioning
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const cursorRect = osmdCursorImg.getBoundingClientRect();
+    
+    // Calculate position relative to container
+    const left = cursorRect.left - containerRect.left + containerRef.current.scrollLeft;
+    const top = cursorRect.top - containerRect.top + containerRef.current.scrollTop;
+    const width = Math.max(cursorRect.width, 10);
+    const height = cursorRect.height;
+    
+    customCursorRef.current.style.left = `${left}px`;
+    customCursorRef.current.style.top = `${top}px`;
+    customCursorRef.current.style.width = `${width}px`;
+    customCursorRef.current.style.height = `${height}px`;
+    customCursorRef.current.style.display = 'block';
+    
+    console.log('[Cursor] Updated position:', { left, top, width, height });
+  }, []);
 
   // Update cursor position when bar changes
   const handleBarChange = useCallback((bar: number) => {
@@ -103,9 +153,8 @@ export function MusicXMLViewerPage() {
       cursor.reset();
       
       // Advance cursor to the start of the target bar
-      // cursor.next() moves by voice entry, so we loop until we reach the desired measure
       let iterations = 0;
-      const maxIterations = 1000; // Safety limit
+      const maxIterations = 1000;
       
       while (!cursor.iterator.EndReached && 
              cursor.iterator.CurrentMeasureIndex < bar - 1 &&
@@ -117,47 +166,37 @@ export function MusicXMLViewerPage() {
       cursor.show();
       lastBarRef.current = bar;
       
-      // Auto-scroll to cursor if follow mode is enabled - both horizontally AND vertically
-      if (followMode) {
-        // Try to find the cursor element - OSMD creates it with specific id pattern
-        const cursorElement = cursor.cursorElement || 
-          containerRef.current?.querySelector('img[id^="cursorImg"]') ||
-          containerRef.current?.querySelector('[class*="cursor"]');
+      // Update our custom cursor overlay
+      requestAnimationFrame(() => {
+        updateCustomCursor();
         
-        const scrollContainer = containerRef.current?.parentElement;
-        
-        if (scrollContainer && cursorElement) {
-          const cursorRect = cursorElement.getBoundingClientRect();
-          const containerRect = scrollContainer.getBoundingClientRect();
+        // Auto-scroll to cursor if follow mode is enabled
+        if (followMode && customCursorRef.current) {
+          const scrollContainer = containerRef.current?.parentElement;
           
-          // Calculate margins for triggering scroll
-          const marginX = 100;
-          const marginY = 100;
-          
-          // Check horizontal bounds
-          const needsHorizontalScroll = 
-            cursorRect.left < containerRect.left + marginX || 
-            cursorRect.right > containerRect.right - marginX;
-          
-          // Check vertical bounds - important for multi-line scores
-          const needsVerticalScroll = 
-            cursorRect.top < containerRect.top + marginY || 
-            cursorRect.bottom > containerRect.bottom - marginY;
-          
-          if (needsHorizontalScroll || needsVerticalScroll) {
-            // Scroll the cursor into view with both axes
-            cursorElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center',  // Center vertically
-              inline: 'center'  // Center horizontally
-            });
+          if (scrollContainer && customCursorRef.current) {
+            const cursorRect = customCursorRef.current.getBoundingClientRect();
+            const containerRect = scrollContainer.getBoundingClientRect();
+            
+            const marginY = 120;
+            const needsVerticalScroll = 
+              cursorRect.top < containerRect.top + marginY || 
+              cursorRect.bottom > containerRect.bottom - marginY;
+            
+            if (needsVerticalScroll) {
+              customCursorRef.current.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center',
+                inline: 'nearest'
+              });
+            }
           }
         }
-      }
+      });
     } catch (e) {
       console.warn('Cursor update error:', e);
     }
-  }, [cursor, osmd, followMode]);
+  }, [cursor, osmd, followMode, updateCustomCursor]);
 
   // MIDI Player hook
   const midiPlayer = useMidiPlayer({
@@ -264,43 +303,44 @@ export function MusicXMLViewerPage() {
           osmdInstance.cursor.reset();
           osmdInstance.cursor.show();
           setCursor(osmdInstance.cursor);
-          console.log('[OSMD] Cursor initialized and shown');
+          console.log('[OSMD] Cursor initialized');
           
-          // Force cursor visibility with multiple approaches
+          // Create our custom visible cursor overlay after a short delay
           setTimeout(() => {
-            // Approach 1: Direct cursor element from OSMD
-            const cursorEl = osmdInstance.cursor?.cursorElement;
-            if (cursorEl) {
-              cursorEl.style.backgroundColor = 'rgba(255, 204, 0, 0.6)';
-              cursorEl.style.boxShadow = '0 0 25px rgba(255, 204, 0, 0.8)';
-              cursorEl.style.borderRadius = '4px';
-              cursorEl.style.transition = 'transform 0.15s ease-out';
-              cursorEl.style.zIndex = '100';
-              cursorEl.style.opacity = '1';
-              cursorEl.style.visibility = 'visible';
-              console.log('[OSMD] Cursor element styled directly:', cursorEl);
+            if (containerRef.current) {
+              // Remove any existing custom cursor
+              const existingCursor = containerRef.current.querySelector('#custom-cursor-overlay');
+              if (existingCursor) existingCursor.remove();
+              
+              // Create new custom cursor
+              const cursorDiv = globalThis.document.createElement('div');
+              cursorDiv.id = 'custom-cursor-overlay';
+              cursorDiv.style.cssText = `
+                position: absolute;
+                background: linear-gradient(180deg, rgba(255, 204, 0, 0.8) 0%, rgba(255, 170, 0, 0.6) 100%);
+                border-radius: 4px;
+                box-shadow: 0 0 30px rgba(255, 204, 0, 0.9), 0 0 60px rgba(255, 204, 0, 0.5);
+                pointer-events: none;
+                z-index: 50;
+                transition: left 0.1s ease-out, top 0.08s ease-out;
+                min-width: 8px;
+              `;
+              containerRef.current.appendChild(cursorDiv);
+              customCursorRef.current = cursorDiv;
+              
+              // Position initial cursor
+              const osmdCursorImg = containerRef.current.querySelector('img[id^="cursorImg"]') as HTMLImageElement;
+              if (osmdCursorImg) {
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const cursorRect = osmdCursorImg.getBoundingClientRect();
+                cursorDiv.style.left = `${cursorRect.left - containerRect.left}px`;
+                cursorDiv.style.top = `${cursorRect.top - containerRect.top}px`;
+                cursorDiv.style.width = `${Math.max(cursorRect.width, 8)}px`;
+                cursorDiv.style.height = `${cursorRect.height}px`;
+                console.log('[OSMD] Custom cursor created at:', cursorRect.left, cursorRect.top);
+              }
             }
-            
-            // Approach 2: Find by ID pattern (OSMD uses cursorImg-0, cursorImg-1, etc.)
-            const cursorImgs = containerRef.current?.querySelectorAll('img[id^="cursorImg"]');
-            if (cursorImgs && cursorImgs.length > 0) {
-              cursorImgs.forEach((img: Element) => {
-                const imgEl = img as HTMLImageElement;
-                imgEl.style.backgroundColor = 'rgba(255, 204, 0, 0.6)';
-                imgEl.style.boxShadow = '0 0 25px rgba(255, 204, 0, 0.8)';
-                imgEl.style.borderRadius = '4px';
-                imgEl.style.zIndex = '100';
-                imgEl.style.opacity = '1';
-                imgEl.style.visibility = 'visible';
-                console.log('[OSMD] Cursor img styled:', imgEl.id);
-              });
-            }
-            
-            // Log what we found for debugging
-            const allImgs = containerRef.current?.querySelectorAll('img');
-            console.log('[OSMD] All images in container:', allImgs?.length, 
-              Array.from(allImgs || []).map(i => i.id || i.className).filter(Boolean));
-          }, 200);
+          }, 300);
         } else {
           console.warn('[OSMD] No cursor available');
         }
@@ -383,13 +423,17 @@ export function MusicXMLViewerPage() {
               midiPlayer.parseOSMDSheet(osmd, 120);
             }
             midiPlayer.play();
+            // Ensure cursor is visible when starting playback
+            requestAnimationFrame(() => updateCustomCursor());
           });
         } else {
           midiPlayer.play();
+          // Ensure cursor is visible when starting playback
+          requestAnimationFrame(() => updateCustomCursor());
         }
       }
     }
-  }, [playbackMode, audioIsPlaying, midiPlayer, osmd]);
+  }, [playbackMode, audioIsPlaying, midiPlayer, osmd, updateCustomCursor]);
 
   // Stop playback
   const handleStop = useCallback(() => {
@@ -401,13 +445,16 @@ export function MusicXMLViewerPage() {
       midiPlayer.stop();
     }
     setCurrentBar(1);
+    lastBarRef.current = 0;
     
     // Reset cursor to start
     if (cursor) {
       cursor.reset();
       cursor.show();
+      // Update custom cursor position
+      requestAnimationFrame(() => updateCustomCursor());
     }
-  }, [playbackMode, midiPlayer, cursor]);
+  }, [playbackMode, midiPlayer, cursor, updateCustomCursor]);
 
   // Audio track selection
   const handleSelectAudioTrack = useCallback((track: AudioTrack) => {

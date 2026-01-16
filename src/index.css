@@ -299,24 +299,15 @@
   .space-grid-lg { @apply gap-6; } /* 24px */
 }
 
-/* OSMD Cursor Styling - OSMD creates cursor as img element with id="cursorImg-0" */
-.opensheetmusicdisplay img[id^="cursorImg"] {
-  background-color: rgba(255, 204, 0, 0.5) !important;
-  box-shadow: 0 0 20px rgba(255, 204, 0, 0.7), 0 0 40px rgba(255, 204, 0, 0.4) !important;
-  border-radius: 4px !important;
-  transition: transform 0.15s ease-out !important;
-  pointer-events: none;
-  z-index: 100 !important;
-  filter: none !important;
-  opacity: 1 !important;
+/* Custom Cursor Overlay Styling */
+#custom-cursor-overlay {
+  background: linear-gradient(180deg, rgba(255, 204, 0, 0.8) 0%, rgba(255, 170, 0, 0.6) 100%) !important;
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.9), 0 0 60px rgba(255, 204, 0, 0.5) !important;
 }
 
-/* Ensure cursor image is visible (OSMD uses transparent rect by default) */
-.opensheetmusicdisplay .vf-cursorImg,
-.opensheetmusicdisplay [class*="cursor"] {
-  background-color: rgba(255, 204, 0, 0.5) !important;
-  box-shadow: 0 0 20px rgba(255, 204, 0, 0.7) !important;
-  z-index: 100 !important;
+/* Hide OSMD's default cursor since we use custom overlay */
+.opensheetmusicdisplay img[id^="cursorImg"] {
+  opacity: 0 !important;
 }
 
 /* OSMD Container styling for dark background */
@@ -327,28 +318,16 @@
   position: relative;
 }
 
-/* SVG cursor rect fallback (some OSMD versions use SVG) */
-.opensheetmusicdisplay svg rect[fill*="cursor"],
-.opensheetmusicdisplay svg rect.cursor {
-  fill: rgba(255, 204, 0, 0.5) !important;
-  stroke: rgba(255, 204, 0, 0.8) !important;
-  stroke-width: 2 !important;
-}
-
 /* Animate cursor glow when playing */
 @keyframes cursor-pulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 204, 0, 0.6), 0 0 40px rgba(255, 204, 0, 0.3);
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.8), 0 0 60px rgba(255, 204, 0, 0.4);
   }
   50% {
-    box-shadow: 0 0 30px rgba(255, 204, 0, 0.9), 0 0 60px rgba(255, 204, 0, 0.5);
+    box-shadow: 0 0 45px rgba(255, 204, 0, 1), 0 0 90px rgba(255, 204, 0, 0.7);
   }
 }
 
-.cursor-playing .opensheetmusicdisplay img[id^="cursorImg"] {
-  animation: cursor-pulse 1s ease-in-out infinite;
-}
-
-.cursor-playing .opensheetmusicdisplay [class*="cursor"] {
-  animation: cursor-pulse 1s ease-in-out infinite;
+.cursor-playing #custom-cursor-overlay {
+  animation: cursor-pulse 0.8s ease-in-out infinite;
 }
