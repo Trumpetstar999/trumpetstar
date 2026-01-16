@@ -103,6 +103,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           showcaseId: level.vimeo_showcase_id,
           totalStars: 0, // TODO: Calculate from completions
           sections,
+          requiredPlan: (level.required_plan as MembershipPlan) || 'FREE',
         };
       });
 
