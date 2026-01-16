@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 interface HeaderProps {
   title: string;
@@ -33,6 +34,18 @@ export function Header({ title, stars, isOffline = false }: HeaderProps) {
     <header className="sticky top-0 z-40 glass border-b border-border safe-top">
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-4">
+          <a 
+            href="https://trumpetstar.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex-shrink-0"
+          >
+            <img 
+              src={trumpetstarLogo} 
+              alt="Trumpetstar" 
+              className="h-10 w-auto"
+            />
+          </a>
           <h1 className="text-2xl font-bold text-foreground">{title}</h1>
           {isOffline && (
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm">
