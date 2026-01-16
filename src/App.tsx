@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
-import { WordPressMembershipProvider } from "@/hooks/useWordPressMembership";
+import { MembershipProvider } from "@/hooks/useMembership";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
@@ -19,7 +19,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <WordPressMembershipProvider>
+        <MembershipProvider>
           <VideoPlayerProvider>
             <Toaster />
             <Sonner />
@@ -35,7 +35,7 @@ const App = () => (
               </Routes>
             </BrowserRouter>
           </VideoPlayerProvider>
-        </WordPressMembershipProvider>
+        </MembershipProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

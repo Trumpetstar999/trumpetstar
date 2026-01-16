@@ -10,12 +10,13 @@ import { SectionManager } from '@/components/admin/SectionManager';
 import { VideoManager } from '@/components/admin/VideoManager';
 import { ShowcaseImporter } from '@/components/admin/ShowcaseImporter';
 import { AdminFeedbackPanel } from '@/components/admin/AdminFeedbackPanel';
-import { DigiMemberProductManager } from '@/components/admin/DigiMemberProductManager';
+import { ProductPlanManager } from '@/components/admin/ProductPlanManager';
+import { MembershipDebugPanel } from '@/components/admin/MembershipDebugPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, CheckCircle, AlertCircle, Server, Package } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, CheckCircle, Server, Package, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 type View = 'levels' | 'sections' | 'videos';
@@ -233,10 +234,30 @@ export default function AdminPage() {
           {activeTab === 'products' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-bold text-foreground">DigiMember Produkte</h1>
-                <p className="text-muted-foreground mt-1">Produkte synchronisieren und App-Plänen zuweisen</p>
+                <h1 className="text-2xl font-bold text-foreground">Produkte & Pläne</h1>
+                <p className="text-muted-foreground mt-1">DigiMember-Produkte den App-Plänen zuweisen</p>
               </div>
-              <DigiMemberProductManager />
+              
+              <Tabs defaultValue="products" className="space-y-6">
+                <TabsList className="grid w-full max-w-md grid-cols-2">
+                  <TabsTrigger value="products" className="gap-2">
+                    <Package className="w-4 h-4" />
+                    Produkte
+                  </TabsTrigger>
+                  <TabsTrigger value="debug" className="gap-2">
+                    <Users className="w-4 h-4" />
+                    Membership Debug
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="products">
+                  <ProductPlanManager />
+                </TabsContent>
+
+                <TabsContent value="debug">
+                  <MembershipDebugPanel />
+                </TabsContent>
+              </Tabs>
             </div>
           )}
 
