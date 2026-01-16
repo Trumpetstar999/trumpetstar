@@ -1,53 +1,38 @@
 import { useState } from 'react';
 import { Play, MoreVertical, Trash2, Download, MessageSquare, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RecordingShareDialog } from './RecordingShareDialog';
 import type { Recording } from '@/hooks/useRecordings';
-
 interface RecordingCardProps {
   recording: Recording;
   onDelete: (id: string) => void;
   onPlay: (recording: Recording) => void;
   onOpenChat?: (chatId: string) => void;
 }
-
-export function RecordingCard({ recording, onDelete, onPlay, onOpenChat }: RecordingCardProps) {
+export function RecordingCard({
+  recording,
+  onDelete,
+  onPlay,
+  onOpenChat
+}: RecordingCardProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareType, setShareType] = useState<'admin' | 'teacher'>('teacher');
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric',
+      year: 'numeric'
     });
   };
-
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
   const handleDownload = () => {
     const a = document.createElement('a');
     a.href = recording.url;
@@ -56,35 +41,20 @@ export function RecordingCard({ recording, onDelete, onPlay, onOpenChat }: Recor
     a.click();
     document.body.removeChild(a);
   };
-
   const handleShareToTeacher = () => {
     setShareType('teacher');
     setShareDialogOpen(true);
   };
-
   const handleShareToAdmin = () => {
     setShareType('admin');
     setShareDialogOpen(true);
   };
-
-  return (
-    <>
+  return <>
       <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all">
-        <div 
-          className="aspect-video bg-muted relative cursor-pointer"
-          onClick={() => onPlay(recording)}
-        >
-          {recording.thumbnail ? (
-            <img 
-              src={recording.thumbnail} 
-              alt={recording.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+        <div className="aspect-video bg-muted relative cursor-pointer" onClick={() => onPlay(recording)}>
+          {recording.thumbnail ? <img src={recording.thumbnail} alt={recording.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
               <Play className="w-12 h-12 text-muted-foreground" />
-            </div>
-          )}
+            </div>}
           
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
             <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -100,8 +70,8 @@ export function RecordingCard({ recording, onDelete, onPlay, onOpenChat }: Recor
         <div className="p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h3 className="font-medium text-foreground truncate">{recording.title}</h3>
-              <p className="text-sm text-muted-foreground">{formatDate(recording.createdAt)}</p>
+              <h3 className="font-medium truncate text-gray-800">{recording.title}</h3>
+              <p className="text-sm text-gray-600">{formatDate(recording.createdAt)}</p>
             </div>
             
             <DropdownMenu>
@@ -152,14 +122,6 @@ export function RecordingCard({ recording, onDelete, onPlay, onOpenChat }: Recor
         </AlertDialogContent>
       </AlertDialog>
 
-      <RecordingShareDialog
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-        videoId={recording.id}
-        videoTitle={recording.title}
-        shareType={shareType}
-        onSuccess={(chatId) => onOpenChat?.(chatId)}
-      />
-    </>
-  );
+      <RecordingShareDialog open={shareDialogOpen} onOpenChange={setShareDialogOpen} videoId={recording.id} videoTitle={recording.title} shareType={shareType} onSuccess={chatId => onOpenChat?.(chatId)} />
+    </>;
 }
