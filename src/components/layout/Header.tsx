@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Star, WifiOff, LogOut, User, Settings } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -31,6 +32,7 @@ interface Profile {
 export function Header({ title, stars, isOffline = false, videoCount }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useUserRole();
+  const { navigateToTab } = useTabNavigation();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
 
@@ -96,11 +98,14 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
             </div>
           )}
           
-          {/* Stars display */}
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-reward-gold/20 border border-reward-gold/40">
+          {/* Stars display - clickable to profile */}
+          <button 
+            onClick={() => navigateToTab('profile')}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-reward-gold/20 border border-reward-gold/40 hover:bg-reward-gold/30 transition-colors cursor-pointer"
+          >
             <Star className="w-5 h-5 text-reward-gold fill-reward-gold" />
             <span className="font-semibold text-white">{stars}</span>
-          </div>
+          </button>
 
           {/* User menu */}
           <DropdownMenu>
