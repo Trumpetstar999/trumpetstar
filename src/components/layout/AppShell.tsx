@@ -12,16 +12,9 @@ interface AppShellProps {
   title: string;
   stars: number;
   isOffline?: boolean;
+  onSync?: () => void;
+  videoCount?: number;
 }
-
-const tabTitles: Record<TabId, string> = {
-  levels: 'Levels',
-  practice: 'Üben',
-  recordings: 'Aufnahmen',
-  chats: 'Chats',
-  classroom: 'Klassenzimmer',
-  profile: 'Profil',
-};
 
 export function AppShell({ 
   children, 
@@ -29,13 +22,21 @@ export function AppShell({
   onTabChange, 
   title,
   stars,
-  isOffline 
+  isOffline,
+  onSync,
+  videoCount
 }: AppShellProps) {
   const { isVideoPlaying } = useVideoPlayer();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header title={title} stars={stars} isOffline={isOffline} />
+    <div className="min-h-screen flex flex-col">
+      <Header 
+        title={title} 
+        stars={stars} 
+        isOffline={isOffline} 
+        onSync={onSync}
+        videoCount={videoCount}
+      />
       
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300",

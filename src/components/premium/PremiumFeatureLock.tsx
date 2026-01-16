@@ -1,4 +1,4 @@
-import { Lock, ExternalLink, Sparkles } from 'lucide-react';
+import { Lock, ExternalLink, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMembership } from '@/hooks/useMembership';
 
@@ -7,12 +7,21 @@ type FeatureType = 'classroom' | 'feedback' | 'teacher';
 interface FeatureContent {
   title: string;
   description: string;
+  bullets?: string[];
+  hint?: string;
 }
 
 const FEATURE_CONTENT: Record<FeatureType, FeatureContent> = {
   classroom: {
     title: 'Live-Unterricht & gemeinsames Musizieren',
-    description: 'Im Klassenzimmer triffst du deinen Lehrer und andere Musiker live. Ihr könnt gemeinsam spielen, Fragen klären und gezielt an deinem Fortschritt arbeiten.',
+    description: 'Im Klassenzimmer triffst du deinen Lehrer und andere Musiker live. Ihr könnt gemeinsam spielen, Fragen klären und gezielt an deinem Fortschritt arbeiten. Diese Funktion ist Teil von Premium.',
+    bullets: [
+      'Live-Sessions wie im echten Unterricht',
+      'Gemeinsames Spielen & Zuhören',
+      'Geplante Termine oder spontan starten',
+      'Persönlicher Austausch in ruhiger Lernatmosphäre',
+    ],
+    hint: 'Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten.',
   },
   feedback: {
     title: 'Persönliches Feedback zu deinen Aufnahmen',
@@ -20,7 +29,7 @@ const FEATURE_CONTENT: Record<FeatureType, FeatureContent> = {
   },
   teacher: {
     title: 'Unterrichten & Feedback geben',
-    description: 'Der Lehrer-Modus ermöglicht dir, Schüler zu begleiten, Videos zu kommentieren und Unterricht im Klassenzimmer zu geben.',
+    description: 'Der Lehrer-Modus ermöglicht dir, Schüler zu begleiten, Videos zu kommentieren und Unterricht im Klassenzimmer zu geben. Diese Funktion ist Teil von Premium.',
   },
 };
 
@@ -41,28 +50,39 @@ export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLo
   };
 
   return (
-    <div className={`flex items-center justify-center min-h-[60vh] p-4 ${className}`}>
-      <div className="bg-card border border-border rounded-2xl p-8 max-w-lg text-center shadow-xl">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/30 dark:to-amber-800/30 flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-10 h-10 text-amber-600 dark:text-amber-400" />
+    <div className={`flex items-center justify-center min-h-[60vh] p-6 ${className}`}>
+      <div className="card-glass rounded-lg p-8 max-w-lg text-center">
+        {/* Lock icon */}
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-reward-gold/20 to-reward-gold/10 flex items-center justify-center mx-auto mb-6 glow-gold">
+          <Lock className="w-10 h-10 text-reward-gold" />
         </div>
         
-        <h2 className="text-2xl font-bold mb-3 text-foreground">
+        <h2 className="text-2xl font-bold mb-3 text-gray-900">
           {content.title}
         </h2>
         
-        <p className="text-muted-foreground mb-4 leading-relaxed">
+        <p className="text-gray-600 mb-6 leading-relaxed">
           {content.description}
         </p>
         
-        <p className="text-sm text-muted-foreground mb-6 font-medium">
-          Diese Funktion ist Teil von <span className="text-amber-600 dark:text-amber-400">Premium</span>.
-        </p>
+        {/* Bullet points for classroom */}
+        {content.bullets && (
+          <ul className="text-left space-y-3 mb-6">
+            {content.bullets.map((bullet, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-brand-blue-mid/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-brand-blue-mid" />
+                </div>
+                <span className="text-gray-700">{bullet}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <Button
           onClick={handleUpgrade}
           disabled={isLoading || !premiumLink}
-          className="w-full gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-lg"
+          className="w-full gap-2 bg-accent-red hover:bg-accent-red/90 text-white shadow-lg rounded-full text-lg py-6"
           size="lg"
         >
           <Sparkles className="w-5 h-5" />
@@ -70,8 +90,14 @@ export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLo
           <ExternalLink className="w-4 h-4 ml-1" />
         </Button>
         
+        {content.hint && (
+          <p className="text-xs text-gray-500 mt-4">
+            {content.hint}
+          </p>
+        )}
+        
         {!premiumLink && !isLoading && (
-          <p className="text-xs text-muted-foreground mt-4">
+          <p className="text-xs text-gray-500 mt-4">
             Upgrade-Link nicht verfügbar. Bitte kontaktiere den Support.
           </p>
         )}

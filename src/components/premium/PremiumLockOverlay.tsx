@@ -21,40 +21,44 @@ export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverla
   };
 
   return (
-    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10">
-      <div className="bg-card border border-border rounded-2xl p-8 max-w-md mx-4 text-center shadow-xl">
-        <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-4">
-          <Lock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
+    <div className="absolute inset-0 flex items-center justify-center z-10 p-6"
+         style={{ 
+           background: 'linear-gradient(180deg, rgba(30, 134, 255, 0.95) 0%, rgba(15, 94, 219, 0.95) 40%, rgba(11, 46, 138, 0.95) 100%)'
+         }}>
+      <div className="card-glass rounded-lg p-8 max-w-md text-center">
+        {/* Lock icon with gold glow */}
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-reward-gold/30 to-reward-gold/10 flex items-center justify-center mx-auto mb-4 glow-gold animate-glow-pulse">
+          <Lock className="w-8 h-8 text-reward-gold" />
         </div>
         
-        <h3 className="text-xl font-semibold mb-2">
+        <h3 className="text-xl font-bold mb-2 text-gray-900">
           Level gesperrt
         </h3>
         
-        <p className="text-muted-foreground mb-6">
+        <p className="text-gray-600 mb-6">
           {title ? (
-            <>Um <strong>"{title}"</strong> freizuschalten, benötigst du den <strong>{PLAN_DISPLAY_NAMES[requiredPlanKey]}</strong> Plan.</>
+            <>Um <strong className="text-gray-900">"{title}"</strong> freizuschalten, benötigst du den <strong className="text-brand-blue-mid">{PLAN_DISPLAY_NAMES[requiredPlanKey]}</strong> Plan.</>
           ) : (
-            <>Diese Inhalte sind ab <strong>{PLAN_DISPLAY_NAMES[requiredPlanKey]}</strong> verfügbar.</>
+            <>Diese Inhalte sind ab <strong className="text-brand-blue-mid">{PLAN_DISPLAY_NAMES[requiredPlanKey]}</strong> verfügbar.</>
           )}
         </p>
 
         <div className="space-y-3">
           {upgradePlans.map((plan) => {
             const link = getUpgradeLink(plan);
+            const isPremium = plan === 'PREMIUM';
             return (
               <Button
                 key={plan}
                 onClick={() => handleUpgrade(plan)}
                 disabled={isLoading || !link}
-                className={`w-full gap-2 ${
-                  plan === 'PREMIUM' 
-                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white' 
-                    : ''
+                className={`w-full gap-2 rounded-full text-base py-5 ${
+                  isPremium 
+                    ? 'bg-accent-red hover:bg-accent-red/90 text-white shadow-lg' 
+                    : 'bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white'
                 }`}
-                variant={plan === 'PREMIUM' ? 'default' : 'outline'}
               >
-                {plan === 'PREMIUM' && <Sparkles className="w-4 h-4" />}
+                {isPremium && <Sparkles className="w-4 h-4" />}
                 <ExternalLink className="w-4 h-4" />
                 {PLAN_DISPLAY_NAMES[plan]} freischalten
               </Button>
@@ -62,11 +66,15 @@ export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverla
           })}
           
           {upgradePlans.length === 0 && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-500">
               Kontaktiere den Support für Upgrade-Optionen.
             </p>
           )}
         </div>
+        
+        <p className="text-xs text-gray-500 mt-4">
+          Du kannst jederzeit upgraden – dein Fortschritt bleibt erhalten.
+        </p>
       </div>
     </div>
   );

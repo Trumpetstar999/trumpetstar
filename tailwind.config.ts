@@ -51,6 +51,14 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
         },
+        // Trumpetstar Brand Colors
+        brand: {
+          "blue-start": "hsl(var(--brand-blue-start))",
+          "blue-mid": "hsl(var(--brand-blue-mid))",
+          "blue-end": "hsl(var(--brand-blue-end))",
+        },
+        "accent-red": "hsl(var(--accent-red))",
+        "reward-gold": "hsl(var(--reward-gold))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -64,8 +72,14 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+        pill: "var(--radius-pill)",
+      },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        "glow-blue": "var(--shadow-glow-blue)",
+        "glow-gold": "var(--shadow-glow-gold)",
       },
       keyframes: {
         "accordion-down": {
@@ -92,6 +106,10 @@ export default {
           "0%, 100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
           "50%": { transform: "scale(1.2) rotate(10deg)", opacity: "0.9" },
         },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(255, 204, 0, 0.35)" },
+          "50%": { boxShadow: "0 0 35px rgba(255, 204, 0, 0.55)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -100,6 +118,7 @@ export default {
         "scale-in": "scale-in 0.2s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
         "star-shine": "star-shine 0.6s ease-in-out",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],

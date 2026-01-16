@@ -3,11 +3,9 @@ import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
-import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { Video, Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Download, RefreshCw, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -131,11 +129,15 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }
 
   const currentLevel = levels.find(l => l.id === activeLevel);
+  const videoCount = currentLevel?.sections.reduce((acc, s) => acc + s.videos.length, 0) || 0;
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-140px)]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-white" />
+          <p className="text-white/70">Lade Levels...</p>
+        </div>
       </div>
     );
   }
@@ -143,10 +145,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   if (levels.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] text-center">
-        <p className="text-muted-foreground mb-4">Keine Levels verfügbar.</p>
-        <p className="text-sm text-muted-foreground">
-          Importiere zuerst Showcases im Admin-Bereich.
-        </p>
+        <div className="glass-strong rounded-lg p-8 max-w-md">
+          <p className="text-white mb-4">Keine Levels verfügbar.</p>
+          <p className="text-sm text-white/60">
+            Importiere zuerst Showcases im Admin-Bereich.
+          </p>
+        </div>
       </div>
     );
   }
@@ -161,33 +165,9 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       />
       
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative">
         {currentLevel && (
           <>
-            {/* Level header */}
-            <div className="sticky top-0 z-10 bg-blue-900 border-b border-blue-800">
-              <div className="flex items-center justify-between px-6 py-2">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-lg font-semibold text-white">{currentLevel.title}</h2>
-                  <span className="text-blue-200 text-sm">
-                    {currentLevel.sections.reduce((acc, s) => acc + s.videos.length, 0)} Videos
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <MembershipStatusBadge />
-                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-blue-800" onClick={fetchLevels}>
-                    <RefreshCw className="w-4 h-4" />
-                    Sync
-                  </Button>
-                  <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-blue-800">
-                    <Download className="w-4 h-4" />
-                    Laden
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
             {/* Lock Overlay if user can't access */}
             {currentLevel.requiredPlanKey && currentLevel.requiredPlanKey !== 'FREE' && !canAccessLevel(currentLevel.requiredPlanKey) && (
               <PremiumLockOverlay 
@@ -196,8 +176,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               />
             )}
             
-            {/* Sections */}
-            <div className="py-4">
+            {/* Sections - 3 column grid for iPad Landscape */}
+            <div className="p-6">
               {currentLevel.sections.map((section) => (
                 <SectionRow
                   key={section.id}

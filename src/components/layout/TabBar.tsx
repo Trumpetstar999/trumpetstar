@@ -18,14 +18,13 @@ const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
 ];
 
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
-  // Don't render at all when hidden - most reliable for iPad
   if (hidden) {
     return null;
   }
 
   return (
     <nav className="tab-bar z-50">
-      <div className="flex items-center justify-around px-4 py-2">
+      <div className="flex items-center justify-around px-4 py-3">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -35,10 +34,10 @@ export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) 
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'flex flex-col items-center justify-center gap-1 px-6 py-2 rounded-xl transition-all duration-200',
+                'flex flex-col items-center justify-center gap-1.5 px-6 py-2 rounded-xl transition-all duration-200',
                 isActive 
-                  ? 'text-primary bg-secondary' 
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  ? 'text-white bg-white/15 glow-blue' 
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
               )}
             >
               <Icon 
@@ -49,7 +48,7 @@ export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) 
               />
               <span className={cn(
                 'text-xs font-medium',
-                isActive && 'text-primary'
+                isActive && 'text-white'
               )}>
                 {tab.label}
               </span>

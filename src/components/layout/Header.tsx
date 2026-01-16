@@ -1,4 +1,4 @@
-import { Star, WifiOff, LogOut, User, Settings } from 'lucide-react';
+import { Star, WifiOff, LogOut, User, Settings, RefreshCw, Download } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
@@ -12,14 +12,17 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 
 interface HeaderProps {
   title: string;
   stars: number;
   isOffline?: boolean;
+  onSync?: () => void;
+  videoCount?: number;
 }
 
-export function Header({ title, stars, isOffline = false }: HeaderProps) {
+export function Header({ title, stars, isOffline = false, onSync, videoCount }: HeaderProps) {
   const { user, signOut } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
@@ -31,14 +34,15 @@ export function Header({ title, stars, isOffline = false }: HeaderProps) {
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <header className="sticky top-0 z-40 glass border-b border-border safe-top">
-      <div className="flex items-center justify-between px-6 py-4">
+    <header className="sticky top-0 z-40 glass safe-top">
+      <div className="flex items-center justify-between px-6 py-3">
+        {/* Left: Logo */}
         <div className="flex items-center gap-4">
           <a 
             href="https://trumpetstar.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex-shrink-0"
+            className="flex-shrink-0 hover:opacity-90 transition-opacity"
           >
             <img 
               src={trumpetstarLogo} 
@@ -46,35 +50,70 @@ export function Header({ title, stars, isOffline = false }: HeaderProps) {
               className="h-10 w-auto"
             />
           </a>
-          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+        </div>
+        
+        {/* Center: Title + Video Count */}
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-white">{title}</h1>
+          {videoCount !== undefined && (
+            <span className="text-sm text-white/75">
+              {videoCount} Videos
+            </span>
+          )}
+        </div>
+        
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3">
+          {/* Sync & Download buttons */}
+          {onSync && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
+              onClick={onSync}
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden sm:inline">Sync</span>
+            </Button>
+          )}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="gap-2 text-white/80 hover:text-white hover:bg-white/10"
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">Laden</span>
+          </Button>
+          
+          {/* Membership Badge */}
+          <MembershipStatusBadge />
+          
           {isOffline && (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/80 text-sm">
               <WifiOff className="w-4 h-4" />
               <span>Offline</span>
             </div>
           )}
-        </div>
-        
-        <div className="flex items-center gap-4">
+          
           {/* Stars display */}
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20">
-            <Star className="w-5 h-5 text-gold fill-gold" />
-            <span className="font-semibold text-foreground">{stars}</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-reward-gold/20 border border-reward-gold/40">
+            <Star className="w-5 h-5 text-reward-gold fill-reward-gold" />
+            <span className="font-semibold text-white">{stars}</span>
           </div>
 
           {/* User menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10">
                 <Avatar className="w-9 h-9">
-                  <AvatarFallback className="bg-primary/10 text-primary">
+                  <AvatarFallback className="bg-white/20 text-white">
                     {userInitials}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem disabled className="text-muted-foreground">
+            <DropdownMenuContent align="end" className="w-48 bg-white">
+              <DropdownMenuItem disabled className="text-gray-500">
                 <User className="w-4 h-4 mr-2" />
                 {user?.email}
               </DropdownMenuItem>
@@ -88,7 +127,7 @@ export function Header({ title, stars, isOffline = false }: HeaderProps) {
                 </>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+              <DropdownMenuItem onClick={handleSignOut} className="text-accent-red">
                 <LogOut className="w-4 h-4 mr-2" />
                 Abmelden
               </DropdownMenuItem>

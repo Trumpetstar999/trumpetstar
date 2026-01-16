@@ -1,7 +1,7 @@
 import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
-import { Star, ChevronRight, Lock, Crown } from 'lucide-react';
+import { Star, Lock, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Extended interface for levels with new plan key
@@ -19,79 +19,77 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSideba
   const { canAccessLevel } = useMembership();
 
   return (
-    <aside className="w-64 bg-card border-r border-border h-full overflow-y-auto">
+    <aside className="w-[260px] glass-strong h-full overflow-y-auto flex-shrink-0">
       <div className="p-4">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+        <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 px-2">
           Alle Levels
         </h2>
         
-        <nav className="space-y-1">
+        <nav className="space-y-2">
           {levels.map((level, index) => {
             const isActive = activeLevel === level.id;
             const isLocked = level.requiredPlanKey !== 'FREE' && !canAccessLevel(level.requiredPlanKey);
             const isPremiumLevel = level.requiredPlanKey === 'PREMIUM';
-            const isBasicLevel = level.requiredPlanKey === 'BASIC';
             
             return (
               <button
                 key={level.id}
                 onClick={() => onLevelSelect(level.id)}
                 className={cn(
-                  'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200',
+                  'w-full flex items-center gap-3 px-3 py-3 rounded-full transition-all duration-200',
                   isActive 
-                    ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'text-foreground hover:bg-secondary',
-                  isLocked && !isActive && 'opacity-75'
+                    ? 'bg-white/18 glow-blue' 
+                    : 'hover:bg-white/10',
+                  isLocked && !isActive && 'opacity-70'
                 )}
               >
-                <div className="flex items-center gap-3">
+                {/* Number badge */}
+                <span className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0',
+                  isActive 
+                    ? 'bg-white text-brand-blue-mid' 
+                    : isLocked
+                      ? 'bg-white/10 text-white/60'
+                      : 'bg-white/15 text-white'
+                )}>
+                  {isLocked ? (
+                    <Lock className="w-4 h-4" />
+                  ) : (
+                    index + 1
+                  )}
+                </span>
+                
+                {/* Title and plan indicator */}
+                <div className="flex-1 min-w-0 text-left">
                   <span className={cn(
-                    'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
-                    isActive 
-                      ? 'bg-primary-foreground/20 text-primary-foreground' 
-                      : isLocked
-                        ? 'bg-muted text-muted-foreground'
-                        : 'bg-muted text-muted-foreground'
+                    'block font-medium truncate',
+                    isActive ? 'text-white' : 'text-white/90'
                   )}>
-                    {isLocked ? (
-                      <Lock className="w-4 h-4" />
-                    ) : (
-                      index + 1
-                    )}
+                    {level.title}
                   </span>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium truncate max-w-[120px]">
-                      {level.title}
+                  {isLocked && (
+                    <span className={cn(
+                      'text-xs flex items-center gap-1',
+                      isPremiumLevel 
+                        ? 'text-reward-gold' 
+                        : 'text-brand-blue-start'
+                    )}>
+                      {isPremiumLevel && <Crown className="w-3 h-3" />}
+                      {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
                     </span>
-                    {isLocked && (
-                      <span className={cn(
-                        'text-xs flex items-center gap-1',
-                        isPremiumLevel 
-                          ? 'text-amber-500' 
-                          : 'text-blue-500'
-                      )}>
-                        {isPremiumLevel && <Crown className="w-3 h-3" />}
-                        {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  {level.totalStars > 0 && (
-                    <div className={cn(
-                      'flex items-center gap-1 text-sm',
-                      isActive ? 'text-primary-foreground/80' : 'text-gold'
-                    )}>
-                      <Star className="w-4 h-4 fill-current" />
-                      {level.totalStars}
-                    </div>
-                  )}
-                  <ChevronRight className={cn(
-                    'w-4 h-4',
-                    isActive ? 'text-primary-foreground/60' : 'text-muted-foreground'
-                  )} />
-                </div>
+                {/* Stars earned */}
+                {level.totalStars > 0 && (
+                  <div className={cn(
+                    'flex items-center gap-1 text-sm flex-shrink-0',
+                    isActive ? 'text-reward-gold' : 'text-reward-gold/80'
+                  )}>
+                    <Star className="w-4 h-4 fill-current" />
+                    {level.totalStars}
+                  </div>
+                )}
               </button>
             );
           })}
