@@ -38,7 +38,7 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
   const mood = moodConfig[entry.mood];
 
   return (
-    <div className="group bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-200">
+    <div className="group bg-white rounded-xl p-4 border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -51,19 +51,19 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
           </div>
           
           <div>
-            <p className="text-sm text-muted-foreground">{formatDate(entry.date)}</p>
-            <p className="font-medium text-foreground">{mood.label}</p>
+            <p className="text-sm text-gray-500">{formatDate(entry.date)}</p>
+            <p className="font-medium text-gray-900">{mood.label}</p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
           {/* Duration Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600">
             <Clock className="w-4 h-4" />
             <span className="font-semibold text-sm">{entry.minutes} Min.</span>
           </div>
           
-          <button className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-muted text-muted-foreground transition-all">
+          <button className="p-2 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-gray-100 text-gray-400 transition-all">
             <MoreVertical className="w-4 h-4" />
           </button>
         </div>
@@ -71,7 +71,7 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
       
       {/* Notes */}
       {entry.notes && (
-        <p className="text-foreground/90 text-sm leading-relaxed mb-3 line-clamp-2">
+        <p className="text-gray-700 text-sm leading-relaxed mb-3 line-clamp-2">
           {entry.notes}
         </p>
       )}
@@ -85,13 +85,13 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
               {entry.tags.slice(0, 3).map((tag) => (
                 <span 
                   key={tag}
-                  className="px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-medium"
+                  className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium"
                 >
                   {tag}
                 </span>
               ))}
               {entry.tags.length > 3 && (
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-gray-400">
                   +{entry.tags.length - 3}
                 </span>
               )}
@@ -100,7 +100,7 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
           
           {/* Linked Videos */}
           {entry.linkedVideos.length > 0 && (
-            <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+            <div className="flex items-center gap-1.5 text-gray-400 text-xs">
               <Video className="w-3.5 h-3.5" />
               <span>{entry.linkedVideos.length} Videos</span>
             </div>
@@ -108,7 +108,7 @@ export function JournalEntryCard({ entry, onCreateTodo }: JournalEntryProps) {
         </div>
         
         {/* View Details Arrow */}
-        <button className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100">
+        <button className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all opacity-0 group-hover:opacity-100">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
