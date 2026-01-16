@@ -73,6 +73,7 @@ export function RecordingsWidget() {
             <video
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
+              crossOrigin="anonymous"
               muted
               playsInline
               preload="auto"
