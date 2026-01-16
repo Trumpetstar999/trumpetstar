@@ -34,6 +34,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(100);
   const hasCompletedRef = useRef(false);
+  const currentTimeRef = useRef(0);
+  const durationRef = useRef(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,6 +84,24 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         });
     }
   }, [user, video.id]);
+
+  // Save progress to database
+  const saveProgress = useCallback(async (seconds: number, dur: number) => {
+    if (!user || dur <= 0) return;
+    const progressPercent = (seconds / dur) * 100;
+    
+    await supabase
+      .from('user_video_progress')
+      .upsert({
+        user_id: user.id,
+        video_id: video.id,
+        playback_speed: playbackSpeed / 100,
+        progress_percent: progressPercent,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id,video_id'
+      });
+  }, [user, video.id, playbackSpeed]);
 
   // Save playback speed when changed
   const savePlaybackSpeed = useCallback(async (speedPercent: number) => {
@@ -198,13 +218,16 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
 
         if (data.method === 'getDuration' && data.value) {
           setDuration(data.value);
+          durationRef.current = data.value;
         }
         
         if (data.event === 'timeupdate' || data.method === 'getCurrentTime') {
           if (data.data?.seconds !== undefined) {
             setCurrentTime(data.data.seconds);
+            currentTimeRef.current = data.data.seconds;
           } else if (data.value !== undefined) {
             setCurrentTime(data.value);
+            currentTimeRef.current = data.value;
           }
         }
 
@@ -213,12 +236,25 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         }
         if (data.event === 'pause') {
           setIsPlaying(false);
+          // Save progress when user pauses
+          if (duration > 0) {
+            saveProgress(currentTime, duration);
+          }
         }
         
         if (data.event === 'playProgress' && data.data) {
           const percent = data.data.percent || 0;
-          setCurrentTime(data.data.seconds || 0);
-          setDuration(data.data.duration || duration);
+          const seconds = data.data.seconds || 0;
+          const dur = data.data.duration || duration;
+          setCurrentTime(seconds);
+          setDuration(dur);
+          currentTimeRef.current = seconds;
+          durationRef.current = dur;
+          
+          // Save progress periodically (every ~10 seconds based on playProgress events)
+          if (dur > 0 && Math.floor(seconds) % 10 === 0 && seconds > 0) {
+            saveProgress(seconds, dur);
+          }
           
           if (percent >= 0.8 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
@@ -310,13 +346,22 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         clearTimeout(loadTimeoutRef.current);
       }
     };
-  }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion]);
+  }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion, saveProgress, currentTime]);
+
+  // Handle close with progress save
+  const handleClose = useCallback(() => {
+    // Save progress when closing the video player
+    if (currentTimeRef.current > 0 && durationRef.current > 0) {
+      saveProgress(currentTimeRef.current, durationRef.current);
+    }
+    onClose();
+  }, [onClose, saveProgress]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
       if (e.key === ' ') {
         e.preventDefault();
@@ -326,7 +371,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, togglePlayPause]);
+  }, [handleClose, togglePlayPause]);
 
   const handleIframeError = () => {
     logVimeoError('csp_blocked', 'iFrame konnte nicht geladen werden. Mögliches CSP-Problem.');
@@ -394,7 +439,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       
       {/* Close button - Glass style */}
       <button
-        onClick={onClose}
+        onClick={handleClose}
         className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
       >
         <X className="w-6 h-6" />
@@ -454,7 +499,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
                       <RefreshCw className="w-4 h-4" />
                       Erneut versuchen
                     </Button>
-                    <Button variant="outline" onClick={onClose} className="rounded-full">
+                    <Button variant="outline" onClick={handleClose} className="rounded-full">
                       Schließen
                     </Button>
                   </div>
