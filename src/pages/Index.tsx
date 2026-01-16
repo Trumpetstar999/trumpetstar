@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
+import { AssistantButton } from '@/components/assistant/AssistantButton';
 
 const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
@@ -96,6 +97,7 @@ const Index = () => {
       >
         {renderPage()}
       </AppShell>
+      <AssistantButton />
     </TabNavigationProvider>
   );
 };

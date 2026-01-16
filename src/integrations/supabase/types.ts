@@ -86,6 +86,107 @@ export type Database = {
           },
         ]
       }
+      assistant_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assistant_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string
+          feedback: string | null
+          id: string
+          language: string | null
+          mode: string | null
+          role: string
+          used_source_ids: string[] | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          language?: string | null
+          mode?: string | null
+          role: string
+          used_source_ids?: string[] | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          language?: string | null
+          mode?: string | null
+          role?: string
+          used_source_ids?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assistant_unanswered_questions: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          detected_intent: string | null
+          id: string
+          language: string | null
+          question: string
+          resolved_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          detected_intent?: string | null
+          id?: string
+          language?: string | null
+          question: string
+          resolved_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          detected_intent?: string | null
+          id?: string
+          language?: string | null
+          question?: string
+          resolved_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       classroom_participants: {
         Row: {
           classroom_id: string
@@ -265,6 +366,83 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_chunks: {
+        Row: {
+          chunk_text: string
+          created_at: string
+          embedding_json: Json | null
+          id: string
+          plan_required: string
+          source_id: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          chunk_text: string
+          created_at?: string
+          embedding_json?: Json | null
+          id?: string
+          plan_required?: string
+          source_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          chunk_text?: string
+          created_at?: string
+          embedding_json?: Json | null
+          id?: string
+          plan_required?: string
+          source_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_chunks_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_sources: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          language: string
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          language?: string
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          language?: string
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       levels: {
         Row: {
           created_at: string
@@ -425,6 +603,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      repertoire_items: {
+        Row: {
+          common_pitfalls: string | null
+          composer: string | null
+          created_at: string
+          difficulty: string | null
+          goal: string | null
+          id: string
+          key: string | null
+          language: string
+          notes: string | null
+          plan_required: string
+          practice_steps: string | null
+          target_minutes: number | null
+          techniques_tags: string[] | null
+          tempo_bpm: number | null
+          title: string
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          common_pitfalls?: string | null
+          composer?: string | null
+          created_at?: string
+          difficulty?: string | null
+          goal?: string | null
+          id?: string
+          key?: string | null
+          language?: string
+          notes?: string | null
+          plan_required?: string
+          practice_steps?: string | null
+          target_minutes?: number | null
+          techniques_tags?: string[] | null
+          tempo_bpm?: number | null
+          title: string
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          common_pitfalls?: string | null
+          composer?: string | null
+          created_at?: string
+          difficulty?: string | null
+          goal?: string | null
+          id?: string
+          key?: string | null
+          language?: string
+          notes?: string | null
+          plan_required?: string
+          practice_steps?: string | null
+          target_minutes?: number | null
+          techniques_tags?: string[] | null
+          tempo_bpm?: number | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       sections: {
         Row: {
