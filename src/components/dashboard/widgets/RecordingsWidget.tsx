@@ -2,57 +2,35 @@ import { useRecordings } from '@/hooks/useRecordings';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import { Video, Plus, Eye, Play } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 export function RecordingsWidget() {
   const { recordings, loading } = useRecordings();
   const { navigateToTab } = useTabNavigation();
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const latestRecording = recordings[0];
   const recordingsCount = recordings.length;
 
-  // Generate thumbnail from video
+  // Pause video at a specific time to show as thumbnail
   useEffect(() => {
-    if (!latestRecording?.url) {
-      setThumbnailUrl(null);
-      return;
-    }
+    const video = videoRef.current;
+    if (!video || !latestRecording?.url) return;
 
-    const video = document.createElement('video');
-    video.crossOrigin = 'anonymous';
-    video.muted = true;
-    video.preload = 'metadata';
-
-    const handleLoadedData = () => {
-      video.currentTime = 0.5; // Seek to 0.5 seconds for thumbnail
+    const handleLoadedMetadata = () => {
+      video.currentTime = 0.5; // Seek to 0.5 seconds for preview frame
     };
 
     const handleSeeked = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth || 320;
-        canvas.height = video.videoHeight || 180;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          setThumbnailUrl(dataUrl);
-        }
-      } catch (e) {
-        console.error('Error generating thumbnail:', e);
-        setThumbnailUrl(null);
-      }
+      video.pause();
     };
 
-    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('seeked', handleSeeked);
-    video.src = latestRecording.url;
 
     return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('seeked', handleSeeked);
-      video.src = '';
     };
   }, [latestRecording?.url]);
 
@@ -86,22 +64,15 @@ export function RecordingsWidget() {
       ) : latestRecording ? (
         <div className="mb-4">
           <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-800 mb-3">
-            {/* Video Thumbnail */}
-            {thumbnailUrl ? (
-              <img 
-                src={thumbnailUrl} 
-                alt={latestRecording.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <video
-                src={latestRecording.url}
-                className="absolute inset-0 w-full h-full object-cover"
-                muted
-                playsInline
-                preload="metadata"
-              />
-            )}
+            {/* Video as thumbnail - paused at 0.5s */}
+            <video
+              ref={videoRef}
+              src={latestRecording.url}
+              className="absolute inset-0 w-full h-full object-cover"
+              muted
+              playsInline
+              preload="metadata"
+            />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
               <div className="w-10 h-10 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
