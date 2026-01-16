@@ -120,47 +120,6 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
         </div>
       </div>
 
-      {/* Mode & Settings Bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#128C7E] text-white text-xs">
-        {/* Mode Pills */}
-        <div className="flex gap-1 overflow-x-auto">
-          {(Object.keys(MODE_LABELS) as AssistantMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={cn(
-                'px-2 py-1 rounded-full whitespace-nowrap transition-colors',
-                mode === m 
-                  ? 'bg-white text-[#128C7E] font-medium' 
-                  : 'bg-white/20 hover:bg-white/30'
-              )}
-            >
-              {MODE_LABELS[m]}
-            </button>
-          ))}
-        </div>
-
-        {/* Language & Voice Toggle */}
-        <div className="flex items-center gap-2 ml-2 shrink-0">
-          <button
-            onClick={() => setLanguage(language === 'de' ? 'en' : 'de')}
-            className="px-2 py-1 rounded bg-white/20 hover:bg-white/30"
-          >
-            {language === 'de' ? '🇩🇪' : language === 'en' ? '🇬🇧' : '🌐'}
-          </button>
-          <button
-            onClick={() => setReadAloud(!readAloud)}
-            className={cn(
-              'px-2 py-1 rounded',
-              readAloud ? 'bg-white text-[#128C7E]' : 'bg-white/20 hover:bg-white/30'
-            )}
-            title="Vorlesen"
-          >
-            🔊
-          </button>
-        </div>
-      </div>
-
       {/* Chat Area - WhatsApp wallpaper style */}
       <div 
         className="flex-1 overflow-hidden"
