@@ -16,8 +16,8 @@ interface WPUser {
 }
 
 interface UpgradeLinks {
-  planA: string;
-  planB: string;
+  planA: string | null;
+  planB: string | null;
 }
 
 interface WordPressMembershipState {
@@ -93,18 +93,61 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
     }
   }, [user]);
 
+  // Check membership via DigiMember API on initial load
+  const checkDigiMemberMembership = useCallback(async () => {
+    if (!user?.email) return;
+    
+    console.log('Checking DigiMember membership for:', user.email);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/digimember?action=check-membership`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: user.email,
+            userId: user.id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error('DigiMember check failed:', await response.text());
+        return;
+      }
+
+      const data = await response.json();
+      console.log('DigiMember membership response:', data);
+      
+      if (data.success) {
+        setState(prev => ({
+          ...prev,
+          plan: data.plan || 'FREE',
+          upgradeLinks: data.upgradeLinks || null,
+          lastSync: new Date(),
+        }));
+      }
+    } catch (error) {
+      console.error('DigiMember membership check error:', error);
+    }
+  }, [user?.email, user?.id]);
+
+  // Auto-check DigiMember membership when user logs in
+  useEffect(() => {
+    if (user?.email) {
+      checkDigiMemberMembership();
+    }
+  }, [user?.email, checkDigiMemberMembership]);
+
   const startOAuthFlow = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
       const redirectUri = `${window.location.origin}/auth/wordpress/callback`;
       
-      const { data, error } = await supabase.functions.invoke('wp-oauth', {
-        body: null,
-        headers: {},
-      });
-
-      // Use query params for authorize action
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wp-oauth?action=authorize&redirect_uri=${encodeURIComponent(redirectUri)}`,
         {
@@ -150,15 +193,6 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
       const redirectUri = `${window.location.origin}/auth/wordpress/callback`;
 
       // Exchange code for token
-      const { data, error } = await supabase.functions.invoke('wp-oauth', {
-        body: { 
-          code, 
-          redirect_uri: redirectUri 
-        },
-        headers: {},
-      });
-
-      // Manual fetch for token exchange
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wp-oauth?action=token`,
         {
@@ -180,13 +214,46 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
 
       const tokenData = await response.json();
 
+      // Now check DigiMember for the actual membership
+      const wpEmail = tokenData.user?.email;
+      let plan: MembershipPlan = 'FREE';
+      let upgradeLinks: UpgradeLinks | null = null;
+
+      if (wpEmail && user?.id) {
+        try {
+          const membershipResponse = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/digimember?action=check-membership`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: wpEmail,
+                userId: user.id,
+              }),
+            }
+          );
+
+          if (membershipResponse.ok) {
+            const membershipData = await membershipResponse.json();
+            if (membershipData.success) {
+              plan = membershipData.plan || 'FREE';
+              upgradeLinks = membershipData.upgradeLinks || null;
+            }
+          }
+        } catch (membershipError) {
+          console.error('Membership check error:', membershipError);
+        }
+      }
+
       const newState: WordPressMembershipState = {
         isLoading: false,
         isLinked: true,
         wpUser: tokenData.user,
-        plan: tokenData.plan || 'FREE',
+        plan,
         products: tokenData.products || [],
-        upgradeLinks: tokenData.upgradeLinks || null,
+        upgradeLinks,
         wpAccessToken: tokenData.access_token,
         lastSync: new Date(),
         error: null,
@@ -205,31 +272,36 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
       }));
       return false;
     }
-  }, [persistState]);
+  }, [persistState, user?.id]);
 
   const refreshMembership = useCallback(async () => {
-    if (!state.wpAccessToken) {
-      setState(prev => ({ ...prev, error: 'Nicht mit WordPress verbunden' }));
+    if (!user?.email) {
+      setState(prev => ({ ...prev, error: 'Nicht eingeloggt' }));
       return;
     }
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
+      // Use the linked WP email if available, otherwise use Supabase user email
+      const emailToCheck = state.wpUser?.email || user.email;
+      
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/wp-oauth?action=refresh`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/digimember?action=check-membership`,
         {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${state.wpAccessToken}`,
           },
+          body: JSON.stringify({
+            email: emailToCheck,
+            userId: user.id,
+          }),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Refresh failed');
+        throw new Error('Membership check failed');
       }
 
       const data = await response.json();
@@ -237,9 +309,7 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
       const newState: WordPressMembershipState = {
         ...state,
         isLoading: false,
-        wpUser: data.user,
         plan: data.plan || 'FREE',
-        products: data.products || [],
         upgradeLinks: data.upgradeLinks || null,
         lastSync: new Date(),
         error: null,
@@ -255,7 +325,7 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
         error: error instanceof Error ? error.message : 'Aktualisierung fehlgeschlagen' 
       }));
     }
-  }, [state.wpAccessToken, persistState]);
+  }, [user?.email, user?.id, state.wpUser?.email, persistState]);
 
   const disconnect = useCallback(() => {
     if (user) {
@@ -287,7 +357,7 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
   // Auto-refresh on window focus
   useEffect(() => {
     const handleFocus = () => {
-      if (state.isLinked && state.wpAccessToken) {
+      if (user?.email) {
         // Only refresh if last sync was more than 5 minutes ago
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         if (!state.lastSync || state.lastSync < fiveMinutesAgo) {
@@ -298,7 +368,7 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [state.isLinked, state.wpAccessToken, state.lastSync, refreshMembership]);
+  }, [user?.email, state.lastSync, refreshMembership]);
 
   return (
     <WordPressMembershipContext.Provider

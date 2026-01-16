@@ -10,15 +10,16 @@ import { SectionManager } from '@/components/admin/SectionManager';
 import { VideoManager } from '@/components/admin/VideoManager';
 import { ShowcaseImporter } from '@/components/admin/ShowcaseImporter';
 import { AdminFeedbackPanel } from '@/components/admin/AdminFeedbackPanel';
+import { DigiMemberProductManager } from '@/components/admin/DigiMemberProductManager';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, CheckCircle, AlertCircle, Server } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, CheckCircle, AlertCircle, Server, Package } from 'lucide-react';
 import { toast } from 'sonner';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'classrooms' | 'feedback' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'products' | 'classrooms' | 'feedback' | 'system';
 
 interface SelectedContext {
   levelId: string;
@@ -226,6 +227,16 @@ export default function AdminPage() {
                   )}
                 </TabsContent>
               </Tabs>
+            </div>
+          )}
+
+          {activeTab === 'products' && (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">DigiMember Produkte</h1>
+                <p className="text-muted-foreground mt-1">Produkte synchronisieren und App-Plänen zuweisen</p>
+              </div>
+              <DigiMemberProductManager />
             </div>
           )}
 

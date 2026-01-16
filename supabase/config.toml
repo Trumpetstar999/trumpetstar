@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.wp-oauth]
 verify_jwt = false
+
+[functions.digimember]
+verify_jwt = false

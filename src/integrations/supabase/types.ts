@@ -160,6 +160,45 @@ export type Database = {
         }
         Relationships: []
       }
+      digimember_products: {
+        Row: {
+          app_plan: string | null
+          checkout_url: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          last_synced_at: string
+          name: string
+          product_id: string
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          app_plan?: string | null
+          checkout_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string
+          name: string
+          product_id: string
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          app_plan?: string | null
+          checkout_url?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string
+          name?: string
+          product_id?: string
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           addressee_id: string
@@ -232,6 +271,7 @@ export type Database = {
           description: string | null
           id: string
           is_active: boolean
+          required_plan: string | null
           sort_order: number
           thumbnail_url: string | null
           title: string
@@ -243,6 +283,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          required_plan?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title: string
@@ -254,6 +295,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_active?: boolean
+          required_plan?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
@@ -423,6 +465,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_memberships: {
+        Row: {
+          active_product_ids: string[] | null
+          created_at: string
+          current_plan: string
+          id: string
+          last_synced_at: string
+          updated_at: string
+          user_id: string
+          wp_user_id: string | null
+        }
+        Insert: {
+          active_product_ids?: string[] | null
+          created_at?: string
+          current_plan?: string
+          id?: string
+          last_synced_at?: string
+          updated_at?: string
+          user_id: string
+          wp_user_id?: string | null
+        }
+        Update: {
+          active_product_ids?: string[] | null
+          created_at?: string
+          current_plan?: string
+          id?: string
+          last_synced_at?: string
+          updated_at?: string
+          user_id?: string
+          wp_user_id?: string | null
+        }
+        Relationships: []
       }
       user_recordings: {
         Row: {
