@@ -33,7 +33,8 @@ import {
   AlertTriangle,
   RefreshCw,
   Headphones,
-  Settings
+  Settings,
+  Lock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -301,78 +302,136 @@ export function MusicXMLViewerPage() {
   // Get current playing state
   const isPlaying = playbackMode === 'midi' ? midiPlayer.isPlaying : audioIsPlaying;
 
+  // Loading state - Trumpetstar style
   if (docLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!document) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-        <div className="text-center">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-destructive" />
-          <h2 className="text-xl font-semibold mb-2">Dokument nicht gefunden</h2>
-          <Button onClick={handleClose}>Zurück</Button>
+      <div 
+        className="fixed inset-0 z-[100] flex items-center justify-center"
+        style={{ 
+          background: 'linear-gradient(180deg, hsl(212 100% 56%) 0%, hsl(218 88% 46%) 40%, hsl(222 86% 29%) 100%)'
+        }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
+          <span className="text-white/70">Noten werden geladen...</span>
         </div>
       </div>
     );
   }
 
+  // Not found state
+  if (!document) {
+    return (
+      <div 
+        className="fixed inset-0 z-[100] flex items-center justify-center"
+        style={{ 
+          background: 'linear-gradient(180deg, hsl(212 100% 56%) 0%, hsl(218 88% 46%) 40%, hsl(222 86% 29%) 100%)'
+        }}
+      >
+        <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-2xl">
+          <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-accent" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900">Dokument nicht gefunden</h2>
+          <p className="text-gray-600">Das angeforderte Stück konnte nicht gefunden werden.</p>
+          <Button onClick={handleClose} className="gap-2 bg-primary hover:bg-primary/90 text-white rounded-full mt-2">
+            Zurück zur Übersicht
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // No access state
   if (!hasAccess) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-        <div className="text-center max-w-sm">
-          <Music className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <h2 className="text-xl font-semibold mb-2">{document.title}</h2>
-          <p className="text-muted-foreground mb-4">
-            Dieses Stück erfordert den {document.plan_required}-Plan.
+      <div 
+        className="fixed inset-0 z-[100] flex items-center justify-center"
+        style={{ 
+          background: 'linear-gradient(180deg, hsl(212 100% 56%) 0%, hsl(218 88% 46%) 40%, hsl(222 86% 29%) 100%)'
+        }}
+      >
+        <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-2xl">
+          <div className="w-20 h-20 rounded-full bg-reward-gold/20 flex items-center justify-center">
+            <Lock className="w-10 h-10 text-reward-gold" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900">{document.title}</h2>
+          <p className="text-gray-600">
+            Dieses Stück erfordert den <span className="font-semibold text-primary">{document.plan_required}</span>-Plan.
           </p>
-          <Button onClick={handleClose}>Zurück</Button>
+          <div className="flex gap-3 mt-2">
+            <Button className="gap-2 bg-reward-gold hover:bg-reward-gold/90 text-black rounded-full glow-gold">
+              Jetzt upgraden
+            </Button>
+            <Button variant="outline" onClick={handleClose} className="rounded-full">
+              Zurück
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-background">
-      {/* Header */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b bg-card">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={handleClose}>
-            <X className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-semibold truncate max-w-xs md:max-w-md">
-            {document.title}
-          </h1>
-        </div>
+    <div 
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
+      style={{ 
+        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
+      }}
+    >
+      {/* Close button - Glass style */}
+      <button
+        onClick={handleClose}
+        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
+      >
+        <X className="w-6 h-6" />
+      </button>
 
-        <div className="flex items-center gap-2">
+      {/* Header - Glass style */}
+      <div className="shrink-0 glass px-6 py-3 safe-top flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-white truncate max-w-md">
+          {document.title}
+        </h2>
+        
+        <div className="flex items-center gap-3">
           {/* Concert Pitch Toggle */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
-            <Label htmlFor="concert-pitch" className="text-xs cursor-pointer">
+          <div className="flex items-center gap-2 px-4 py-2 glass rounded-full">
+            <span className="text-sm text-white/80">
               {isConcertPitch ? 'Konzertton' : 'B♭ Trompete'}
-            </Label>
+            </span>
             <Switch
               id="concert-pitch"
               checked={isConcertPitch}
               onCheckedChange={setIsConcertPitch}
-              className="scale-75"
+              className="data-[state=checked]:bg-reward-gold"
             />
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex items-center gap-1 px-2 py-1 bg-muted rounded-full">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}>
+          <div className="flex items-center gap-1 px-3 py-1.5 glass rounded-full">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-white hover:bg-white/20" 
+              onClick={() => setZoom(z => Math.max(0.5, z - 0.1))}
+            >
               <ZoomOut className="w-4 h-4" />
             </Button>
-            <span className="text-xs w-10 text-center">{Math.round(zoom * 100)}%</span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(z => Math.min(2, z + 0.1))}>
+            <span className="text-sm text-white/80 w-12 text-center font-mono">{Math.round(zoom * 100)}%</span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-white hover:bg-white/20" 
+              onClick={() => setZoom(z => Math.min(2, z + 0.1))}
+            >
               <ZoomIn className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setZoom(1)}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 text-white hover:bg-white/20" 
+              onClick={() => setZoom(1)}
+            >
               <RotateCcw className="w-4 h-4" />
             </Button>
           </div>
@@ -380,15 +439,18 @@ export function MusicXMLViewerPage() {
       </div>
 
       {/* Score Container */}
-      <div className="flex-1 overflow-auto relative">
+      <div className="flex-1 min-h-0 overflow-auto relative">
         {/* Loading overlay */}
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
+          <div 
+            className="absolute inset-0 flex items-center justify-center z-10"
+            style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}
+          >
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-primary" />
-              <span className="text-muted-foreground">Noten werden geladen...</span>
+              <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
+              <span className="text-white/70">Noten werden gerendert...</span>
               {midiPlayer.isLoading && (
-                <span className="text-xs text-muted-foreground">Trompeten-Sound wird geladen...</span>
+                <span className="text-sm text-white/50">Trompeten-Sound wird geladen...</span>
               )}
             </div>
           </div>
@@ -396,17 +458,22 @@ export function MusicXMLViewerPage() {
 
         {/* Error overlay */}
         {loadError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
-            <div className="flex flex-col items-center gap-4 max-w-md text-center">
-              <AlertTriangle className="w-12 h-12 text-destructive" />
-              <h3 className="text-lg font-semibold">Fehler beim Laden</h3>
-              <p className="text-muted-foreground">{loadError}</p>
-              <div className="flex gap-2">
-                <Button onClick={handleRetry}>
-                  <RefreshCw className="w-4 h-4 mr-2" />
+          <div 
+            className="absolute inset-0 flex items-center justify-center z-10"
+            style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}
+          >
+            <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-2xl">
+              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-accent" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">Fehler beim Laden</h3>
+              <p className="text-gray-600">{loadError}</p>
+              <div className="flex gap-3 mt-2">
+                <Button onClick={handleRetry} className="gap-2 bg-primary hover:bg-primary/90 text-white rounded-full">
+                  <RefreshCw className="w-4 h-4" />
                   Erneut versuchen
                 </Button>
-                <Button variant="outline" onClick={handleClose}>
+                <Button variant="outline" onClick={handleClose} className="rounded-full">
                   Schließen
                 </Button>
               </div>
@@ -416,246 +483,273 @@ export function MusicXMLViewerPage() {
 
         {/* MIDI Error indicator */}
         {midiPlayer.error && !isLoading && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 bg-amber-100 text-amber-800 rounded-lg text-sm flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4" />
-            {midiPlayer.error}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 glass rounded-full text-sm flex items-center gap-2 text-white">
+            <AlertTriangle className="w-4 h-4 text-reward-gold" />
+            <span className="text-white/80">{midiPlayer.error}</span>
           </div>
         )}
 
-        {/* OSMD Container */}
+        {/* OSMD Container - White card */}
         <div 
           ref={containerRef} 
           className={cn(
-            "p-4 min-h-full",
+            "m-4 p-6 rounded-2xl shadow-2xl min-h-[calc(100%-2rem)]",
             (isLoading || loadError) && "invisible"
           )}
+          style={{ 
+            background: 'rgba(255, 255, 255, 0.98)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}
         />
       </div>
 
-      {/* Bottom Player Bar */}
-      <div className="shrink-0 border-t bg-card px-4 py-3">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-4">
-            {/* Playback Mode Switch */}
-            <div className="flex items-center bg-muted rounded-full p-1">
+      {/* Bottom Player Bar - Glass style with gold accents */}
+      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
+        <div className="max-w-6xl mx-auto flex items-center gap-4">
+          {/* Playback Mode Switch */}
+          <div className="flex items-center glass rounded-full p-1">
+            <button
+              className={cn(
+                "px-4 py-2 text-sm rounded-full transition-all font-medium",
+                playbackMode === 'midi' 
+                  ? 'bg-reward-gold text-black glow-gold' 
+                  : 'text-white/70 hover:text-white'
+              )}
+              onClick={handleSwitchToMidi}
+            >
+              <Music className="w-4 h-4 inline-block mr-1.5" />
+              MIDI
+            </button>
+            {audioTracks.length > 0 && (
               <button
                 className={cn(
-                  "px-3 py-1 text-sm rounded-full transition-colors",
-                  playbackMode === 'midi' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+                  "px-4 py-2 text-sm rounded-full transition-all font-medium",
+                  playbackMode === 'audio' 
+                    ? 'bg-reward-gold text-black glow-gold' 
+                    : 'text-white/70 hover:text-white'
                 )}
-                onClick={handleSwitchToMidi}
+                onClick={() => setPlaybackMode('audio')}
               >
-                MIDI
+                <Headphones className="w-4 h-4 inline-block mr-1.5" />
+                Audio
               </button>
-              {audioTracks.length > 0 && (
-                <button
-                  className={cn(
-                    "px-3 py-1 text-sm rounded-full transition-colors",
-                    playbackMode === 'audio' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-                  )}
-                  onClick={() => setPlaybackMode('audio')}
-                >
-                  Audio
-                </button>
-              )}
-            </div>
+            )}
+          </div>
 
-            {/* Play/Pause */}
-            <Button
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              onClick={togglePlayPause}
-              disabled={playbackMode === 'midi' && midiPlayer.isLoading}
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </Button>
+          {/* Play/Pause - Gold accent */}
+          <button
+            onClick={togglePlayPause}
+            disabled={playbackMode === 'midi' && midiPlayer.isLoading}
+            className="w-12 h-12 rounded-full bg-reward-gold hover:bg-reward-gold/90 text-black transition-all shrink-0 flex items-center justify-center glow-gold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+          </button>
 
-            {/* Stop */}
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              onClick={handleStop}
-            >
-              <Square className="w-4 h-4" />
-            </Button>
+          {/* Stop */}
+          <button
+            onClick={handleStop}
+            className="w-10 h-10 rounded-full glass hover:bg-white/20 text-white transition-all shrink-0 flex items-center justify-center"
+          >
+            <Square className="w-4 h-4" />
+          </button>
 
-            {/* Bar indicator */}
-            <div className="text-sm text-muted-foreground min-w-[80px]">
-              Takt {currentBar} / {totalBars}
-            </div>
+          {/* Bar indicator */}
+          <div className="px-4 py-2 glass rounded-full">
+            <span className="text-sm font-mono">
+              <span className="text-reward-gold font-bold">{currentBar}</span>
+              <span className="text-white/50 mx-1">/</span>
+              <span className="text-white/70">{totalBars}</span>
+            </span>
+          </div>
 
-            {/* Tempo Slider */}
-            <div className="flex items-center gap-2 flex-1 max-w-xs">
-              <span className="text-sm text-muted-foreground w-14">Tempo</span>
-              <Slider
-                value={[tempo]}
-                min={40}
-                max={120}
-                step={1}
-                onValueChange={([v]) => setTempo(v)}
-                className="flex-1"
-              />
-              <span className="text-sm font-medium w-12 text-right">{tempo}%</span>
-            </div>
+          {/* Tempo Slider */}
+          <div className="flex items-center gap-3 flex-1 max-w-xs pl-4 border-l border-white/20">
+            <span className="text-white/60 text-sm">Tempo</span>
+            <Slider
+              value={[tempo]}
+              min={40}
+              max={120}
+              step={1}
+              onValueChange={([v]) => setTempo(v)}
+              variant="player"
+              className="flex-1"
+            />
+            <span className="text-reward-gold font-bold text-sm w-12 text-center bg-white/10 rounded-full px-2 py-1">
+              {tempo}%
+            </span>
+          </div>
 
-            {/* Volume */}
-            <div className="flex items-center gap-2">
-              <Volume2 className="w-4 h-4 text-muted-foreground" />
-              <Slider
-                value={[volume]}
-                min={0}
-                max={100}
-                step={1}
-                onValueChange={([v]) => setVolume(v)}
-                className="w-20"
-              />
-            </div>
+          {/* Volume */}
+          <div className="flex items-center gap-2 pl-4 border-l border-white/20">
+            <Volume2 className="w-4 h-4 text-white/60" />
+            <Slider
+              value={[volume]}
+              min={0}
+              max={100}
+              step={1}
+              onValueChange={([v]) => setVolume(v)}
+              variant="player"
+              className="w-20"
+            />
+          </div>
 
-            {/* Loop Toggle */}
-            <Button
-              variant={loopEnabled ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setLoopEnabled(!loopEnabled)}
-            >
-              <Repeat className="w-4 h-4 mr-1" />
-              Loop
-            </Button>
+          {/* Loop Toggle */}
+          <button
+            onClick={() => setLoopEnabled(!loopEnabled)}
+            className={cn(
+              "px-4 py-2 rounded-full transition-all flex items-center gap-1.5 text-sm font-medium",
+              loopEnabled 
+                ? 'bg-reward-gold text-black glow-gold' 
+                : 'glass text-white/70 hover:text-white'
+            )}
+          >
+            <Repeat className="w-4 h-4" />
+            Loop
+          </button>
 
-            {/* Settings Sheet */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Settings className="w-4 h-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Player-Einstellungen</SheetTitle>
-                </SheetHeader>
-                <div className="space-y-6 py-6">
-                  {/* Metronome */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label>Metronom</Label>
-                      <Switch
-                        checked={metronomeEnabled}
-                        onCheckedChange={setMetronomeEnabled}
-                      />
-                    </div>
-                    {metronomeEnabled && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Lautstärke</span>
-                        <Slider
-                          value={[metronomeVolume]}
-                          min={0}
-                          max={100}
-                          onValueChange={([v]) => setMetronomeVolume(v)}
-                          className="flex-1"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Count-in */}
-                  <div className="space-y-2">
-                    <Label>Count-in (Takte)</Label>
-                    <div className="flex items-center gap-2">
-                      {[0, 1, 2].map(n => (
-                        <Button
-                          key={n}
-                          variant={countIn === n ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setCountIn(n)}
-                        >
-                          {n}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Loop Range */}
-                  <div className="space-y-3">
-                    <Label>Loop-Bereich</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Von Takt</span>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={loopEnd}
-                          value={loopStart}
-                          onChange={(e) => setLoopStart(Math.max(1, Math.min(loopEnd, parseInt(e.target.value) || 1)))}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-xs text-muted-foreground">Bis Takt</span>
-                        <Input
-                          type="number"
-                          min={loopStart}
-                          max={totalBars}
-                          value={loopEnd}
-                          onChange={(e) => setLoopEnd(Math.max(loopStart, Math.min(totalBars, parseInt(e.target.value) || totalBars)))}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Follow Mode */}
+          {/* Settings Sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="w-10 h-10 rounded-full glass hover:bg-white/20 text-white transition-all flex items-center justify-center">
+                <Settings className="w-4 h-4" />
+              </button>
+            </SheetTrigger>
+            <SheetContent className="bg-card border-l-0">
+              <SheetHeader>
+                <SheetTitle className="text-card-foreground">Player-Einstellungen</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-6 py-6">
+                {/* Metronome */}
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label>Auto-Scroll (Follow)</Label>
+                    <Label className="text-card-foreground">Metronom</Label>
                     <Switch
-                      checked={followMode}
-                      onCheckedChange={setFollowMode}
+                      checked={metronomeEnabled}
+                      onCheckedChange={setMetronomeEnabled}
                     />
                   </div>
-
-                  {/* Audio Tracks */}
-                  {audioTracks.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>Audio-Tracks</Label>
-                      <div className="space-y-2">
-                        {audioTracks.map(track => (
-                          <button
-                            key={track.id}
-                            className={cn(
-                              "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
-                              selectedAudioTrack?.id === track.id 
-                                ? 'bg-primary/10 border border-primary' 
-                                : 'bg-muted hover:bg-muted/80'
-                            )}
-                            onClick={() => handleSelectAudioTrack(track)}
-                          >
-                            <Headphones className="w-4 h-4" />
-                            <span className="flex-1 truncate">{track.title}</span>
-                            {track.duration && (
-                              <span className="text-xs text-muted-foreground">
-                                {formatTime(track.duration)}
-                              </span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Debug Info */}
-                  {showDebug && (
-                    <div className="space-y-2 pt-4 border-t">
-                      <Label className="text-xs text-muted-foreground">Debug Info</Label>
-                      <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded">
-                        <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
-                        <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
-                        <div>MIDI Error: {midiPlayer.error || 'None'}</div>
-                        <div>Playback Mode: {playbackMode}</div>
-                        <div>Total Bars: {totalBars}</div>
-                      </div>
+                  {metronomeEnabled && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Lautstärke</span>
+                      <Slider
+                        value={[metronomeVolume]}
+                        min={0}
+                        max={100}
+                        onValueChange={([v]) => setMetronomeVolume(v)}
+                        variant="gold"
+                        className="flex-1"
+                      />
                     </div>
                   )}
                 </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+
+                {/* Count-in */}
+                <div className="space-y-2">
+                  <Label className="text-card-foreground">Count-in (Takte)</Label>
+                  <div className="flex items-center gap-2">
+                    {[0, 1, 2].map(n => (
+                      <Button
+                        key={n}
+                        variant={countIn === n ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setCountIn(n)}
+                        className={cn(
+                          "rounded-full",
+                          countIn === n && "bg-reward-gold text-black hover:bg-reward-gold/90"
+                        )}
+                      >
+                        {n}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Loop Range */}
+                <div className="space-y-3">
+                  <Label className="text-card-foreground">Loop-Bereich</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <span className="text-xs text-muted-foreground">Von Takt</span>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={loopEnd}
+                        value={loopStart}
+                        onChange={(e) => setLoopStart(Math.max(1, Math.min(loopEnd, parseInt(e.target.value) || 1)))}
+                        className="rounded-lg"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-xs text-muted-foreground">Bis Takt</span>
+                      <Input
+                        type="number"
+                        min={loopStart}
+                        max={totalBars}
+                        value={loopEnd}
+                        onChange={(e) => setLoopEnd(Math.max(loopStart, Math.min(totalBars, parseInt(e.target.value) || totalBars)))}
+                        className="rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Follow Mode */}
+                <div className="flex items-center justify-between">
+                  <Label className="text-card-foreground">Auto-Scroll (Follow)</Label>
+                  <Switch
+                    checked={followMode}
+                    onCheckedChange={setFollowMode}
+                  />
+                </div>
+
+                {/* Audio Tracks */}
+                {audioTracks.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-card-foreground">Audio-Tracks</Label>
+                    <div className="space-y-2">
+                      {audioTracks.map(track => (
+                        <button
+                          key={track.id}
+                          className={cn(
+                            "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all",
+                            selectedAudioTrack?.id === track.id 
+                              ? 'bg-reward-gold/20 border-2 border-reward-gold' 
+                              : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
+                          )}
+                          onClick={() => handleSelectAudioTrack(track)}
+                        >
+                          <Headphones className={cn(
+                            "w-4 h-4",
+                            selectedAudioTrack?.id === track.id ? 'text-reward-gold' : 'text-muted-foreground'
+                          )} />
+                          <span className="flex-1 truncate text-card-foreground">{track.title}</span>
+                          {track.duration && (
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {formatTime(track.duration)}
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Debug Info */}
+                {showDebug && (
+                  <div className="space-y-2 pt-4 border-t">
+                    <Label className="text-xs text-muted-foreground">Debug Info</Label>
+                    <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded-lg text-card-foreground">
+                      <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
+                      <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
+                      <div>MIDI Error: {midiPlayer.error || 'None'}</div>
+                      <div>Playback Mode: {playbackMode}</div>
+                      <div>Total Bars: {totalBars}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
