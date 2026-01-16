@@ -485,6 +485,173 @@ export type Database = {
         }
         Relationships: []
       }
+      musicxml_audio_tracks: {
+        Row: {
+          audio_url: string
+          created_at: string
+          duration: number | null
+          id: string
+          musicxml_document_id: string
+          original_filename: string
+          sort_index: number
+          title: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          musicxml_document_id: string
+          original_filename: string
+          sort_index?: number
+          title: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          musicxml_document_id?: string
+          original_filename?: string
+          sort_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musicxml_audio_tracks_musicxml_document_id_fkey"
+            columns: ["musicxml_document_id"]
+            isOneToOne: false
+            referencedRelation: "musicxml_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      musicxml_documents: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          level_id: string | null
+          plan_required: string
+          sort_index: number
+          title: string
+          updated_at: string
+          xml_file_url: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level_id?: string | null
+          plan_required?: string
+          sort_index?: number
+          title: string
+          updated_at?: string
+          xml_file_url: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          level_id?: string | null
+          plan_required?: string
+          sort_index?: number
+          title?: string
+          updated_at?: string
+          xml_file_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musicxml_documents_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      musicxml_user_annotations: {
+        Row: {
+          annotation_type: string
+          bar_number: number
+          color: string | null
+          content: string | null
+          created_at: string
+          id: string
+          musicxml_document_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annotation_type?: string
+          bar_number: number
+          color?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          musicxml_document_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annotation_type?: string
+          bar_number?: number
+          color?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          musicxml_document_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musicxml_user_annotations_musicxml_document_id_fkey"
+            columns: ["musicxml_document_id"]
+            isOneToOne: false
+            referencedRelation: "musicxml_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      musicxml_user_state: {
+        Row: {
+          is_concert_pitch: boolean | null
+          last_bar: number | null
+          last_tempo: number | null
+          musicxml_document_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          is_concert_pitch?: boolean | null
+          last_bar?: number | null
+          last_tempo?: number | null
+          musicxml_document_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          is_concert_pitch?: boolean | null
+          last_bar?: number | null
+          last_tempo?: number | null
+          musicxml_document_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "musicxml_user_state_musicxml_document_id_fkey"
+            columns: ["musicxml_document_id"]
+            isOneToOne: false
+            referencedRelation: "musicxml_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pdf_audio_tracks: {
         Row: {
           audio_url: string

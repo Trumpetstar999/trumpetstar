@@ -12,6 +12,8 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
 import { ChatsPage } from "./pages/ChatsPage";
+import { MusicXMLPage } from "./pages/MusicXMLPage";
+import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
 import WordPressCallbackPage from "./pages/WordPressCallbackPage";
 import NotFound from "./pages/NotFound";
 
@@ -38,6 +40,8 @@ const App = () => {
                     <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route path="/chats" element={<ChatsPage />} />
+                    <Route path="/musicxml" element={<MusicXMLPage />} />
+                    <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
