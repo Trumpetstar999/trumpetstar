@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause, Repeat } from 'lucide-react';
+import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause } from 'lucide-react';
 import { Video } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -32,9 +32,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(100); // 100 = 1.0x
-  const [loopEnabled, setLoopEnabled] = useState(false);
-  const [loopStart, setLoopStart] = useState(0); // A point in seconds
-  const [loopEnd, setLoopEnd] = useState(0); // B point in seconds
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -121,39 +118,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Toggle A-B loop
-  const toggleLoop = useCallback(() => {
-    if (!loopEnabled && duration > 0) {
-      // Enable loop - set A to current position, B to end
-      setLoopStart(currentTime);
-      setLoopEnd(Math.min(currentTime + 10, duration)); // Default 10 second loop
-      setLoopEnabled(true);
-    } else {
-      setLoopEnabled(false);
-    }
-  }, [loopEnabled, duration, currentTime]);
-
-  // Handle loop point changes
-  const handleLoopStartChange = useCallback((value: number[]) => {
-    const newStart = value[0];
-    if (newStart < loopEnd) {
-      setLoopStart(newStart);
-    }
-  }, [loopEnd]);
-
-  const handleLoopEndChange = useCallback((value: number[]) => {
-    const newEnd = value[0];
-    if (newEnd > loopStart) {
-      setLoopEnd(newEnd);
-    }
-  }, [loopStart]);
-
-  // Check if we need to loop back to A point
-  useEffect(() => {
-    if (loopEnabled && loopEnd > loopStart && currentTime >= loopEnd) {
-      sendVimeoCommand('seekTo', loopStart);
-    }
-  }, [loopEnabled, loopStart, loopEnd, currentTime, sendVimeoCommand]);
 
   // Log Vimeo errors to database for admin visibility
   const logVimeoError = useCallback(async (errorType: VimeoError, message: string) => {
@@ -440,113 +404,52 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       </div>
       
       {/* Fixed bottom control bar - always visible */}
-      <div className="shrink-0 z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-3 safe-bottom">
-        <div className="max-w-6xl mx-auto flex flex-col gap-3">
-          {/* Video title - compact on landscape */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white truncate">{video.title}</h2>
-            <span className="text-white/40 text-xs hidden sm:block">ESC • Leertaste</span>
-          </div>
+      <div className="shrink-0 z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-2 safe-bottom">
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
+          {/* Play/Pause */}
+          <button
+            onClick={togglePlayPause}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0 flex items-center justify-center"
+          >
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+          </button>
+          
+          <span className="text-white/70 text-xs font-mono w-10 text-right shrink-0">
+            {formatTime(currentTime)}
+          </span>
+          
+          <Slider
+            value={[currentTime]}
+            min={0}
+            max={duration || 100}
+            step={1}
+            onValueChange={handleSeek}
+            variant="player"
+            className="flex-1 min-w-[100px]"
+          />
+          
+          <span className="text-white/70 text-xs font-mono w-10 shrink-0">
+            {formatTime(duration)}
+          </span>
 
-          {/* Timeline + Speed in one row on landscape */}
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Play/Pause + Timeline */}
-            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-              <button
-                onClick={togglePlayPause}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              </button>
-              
-              <span className="text-white/70 text-xs font-mono w-10 text-right shrink-0">
-                {formatTime(currentTime)}
-              </span>
-              
+          {/* Speed control */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-white/60 text-xs">Tempo:</span>
+            <div className="flex items-center gap-2 w-24">
               <Slider
-                value={[currentTime]}
-                min={0}
-                max={duration || 100}
+                value={[playbackSpeed]}
+                min={40}
+                max={120}
                 step={1}
-                onValueChange={handleSeek}
+                onValueChange={handleSpeedChange}
                 variant="player"
-                className="flex-1 min-w-[100px]"
+                className="flex-1"
               />
-              
-              <span className="text-white/70 text-xs font-mono w-10 shrink-0">
-                {formatTime(duration)}
-              </span>
             </div>
-
-            {/* Speed control */}
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-white/60 text-xs">Tempo:</span>
-              <div className="flex items-center gap-2 w-28">
-                <Slider
-                  value={[playbackSpeed]}
-                  min={40}
-                  max={120}
-                  step={1}
-                  onValueChange={handleSpeedChange}
-                  variant="player"
-                  className="flex-1"
-                />
-              </div>
-              <span className="text-white font-medium text-xs w-10 text-center bg-white/10 rounded px-1.5 py-0.5">
-                {playbackSpeed}%
-              </span>
-            </div>
-
-            {/* A-B Loop toggle */}
-            <button
-              onClick={toggleLoop}
-              className={`p-2 rounded-full transition-colors shrink-0 ${
-                loopEnabled 
-                  ? 'bg-primary text-white' 
-                  : 'bg-white/10 hover:bg-white/20 text-white'
-              }`}
-              title="A-B Loop"
-            >
-              <Repeat className="w-4 h-4" />
-            </button>
+            <span className="text-white font-medium text-xs w-10 text-center bg-white/10 rounded px-1.5 py-0.5">
+              {playbackSpeed}%
+            </span>
           </div>
-
-          {/* A-B Loop controls - only visible when loop is enabled */}
-          {loopEnabled && duration > 0 && (
-            <div className="flex items-center gap-3 bg-white/5 rounded-lg p-2">
-              <span className="text-primary text-xs font-medium shrink-0">A-B Loop:</span>
-              
-              {/* A point */}
-              <div className="flex items-center gap-2 flex-1">
-                <span className="text-white/60 text-xs w-6">A:</span>
-                <Slider
-                  value={[loopStart]}
-                  min={0}
-                  max={duration}
-                  step={0.5}
-                  onValueChange={handleLoopStartChange}
-                  variant="player"
-                  className="flex-1"
-                />
-                <span className="text-white text-xs font-mono w-10">{formatTime(loopStart)}</span>
-              </div>
-
-              {/* B point */}
-              <div className="flex items-center gap-2 flex-1">
-                <span className="text-white/60 text-xs w-6">B:</span>
-                <Slider
-                  value={[loopEnd]}
-                  min={0}
-                  max={duration}
-                  step={0.5}
-                  onValueChange={handleLoopEndChange}
-                  variant="player"
-                  className="flex-1"
-                />
-                <span className="text-white text-xs font-mono w-10">{formatTime(loopEnd)}</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
