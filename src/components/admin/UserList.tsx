@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus, MoreHorizontal, Trash2, KeyRound, Download, Mail } from 'lucide-react';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus, MoreHorizontal, Trash2, KeyRound, Download, Mail, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -112,6 +112,7 @@ export function UserList() {
   }
 
   async function fetchUsers() {
+    console.log('fetchUsers called - loading users from database');
     setIsLoading(true);
     try {
       // Fetch profiles
@@ -121,6 +122,8 @@ export function UserList() {
         .order('created_at', { ascending: false });
 
       if (profilesError) throw profilesError;
+      
+      console.log('Fetched profiles:', profiles?.length);
 
       // Fetch roles for all users
       const { data: roles, error: rolesError } = await supabase
@@ -151,6 +154,7 @@ export function UserList() {
         };
       });
 
+      console.log('Setting users:', usersWithData.length);
       setUsers(usersWithData);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -595,6 +599,15 @@ export function UserList() {
                   className="pl-9 h-9 border-[#E5E7EB] focus:border-[#3B82F6] focus:ring-[#EFF6FF]"
                 />
               </div>
+              <Button
+                onClick={() => fetchUsers()}
+                variant="outline"
+                className="h-9 border-slate-200"
+                disabled={isLoading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                Aktualisieren
+              </Button>
               <Button
                 onClick={handleExportUsers}
                 variant="outline"
