@@ -41,9 +41,41 @@
   --admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 }
 
-/* Override body background for admin */
+/* Override body background and text for admin */
 .admin-layout {
   background: var(--admin-bg) !important;
+  color: var(--admin-text-primary) !important;
+}
+
+/* Force dark text in admin area */
+.admin-layout * {
+  --foreground: 215 28% 7%; /* Dark slate text */
+  --card-foreground: 215 28% 7%;
+  --popover-foreground: 215 28% 7%;
+  --muted-foreground: 215 16% 47%;
+}
+
+/* Override any white text that comes from the main app */
+.admin-layout h1,
+.admin-layout h2,
+.admin-layout h3,
+.admin-layout h4,
+.admin-layout h5,
+.admin-layout h6,
+.admin-layout p,
+.admin-layout span,
+.admin-layout label,
+.admin-layout td,
+.admin-layout th {
+  color: inherit;
+}
+
+.admin-layout .text-foreground {
+  color: var(--admin-text-primary) !important;
+}
+
+.admin-layout .text-muted-foreground {
+  color: var(--admin-text-secondary) !important;
 }
 
 /* Admin Cards */
