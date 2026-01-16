@@ -4,10 +4,20 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2 } from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+
+type AppRole = Database['public']['Enums']['app_role'];
 
 interface UserProfile {
   id: string;
@@ -15,6 +25,7 @@ interface UserProfile {
   avatar_url: string | null;
   created_at: string;
   is_teacher: boolean;
+  role?: AppRole | null;
 }
 
 interface UserDetail extends UserProfile {
@@ -32,6 +43,7 @@ export function UserList() {
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [updatingTeacher, setUpdatingTeacher] = useState<string | null>(null);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -40,13 +52,33 @@ export function UserList() {
   async function fetchUsers() {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch roles for all users
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) {
+        console.error('Error fetching roles:', rolesError);
+      }
+
+      // Merge profiles with roles
+      const usersWithRoles = (profiles || []).map(profile => {
+        const userRole = roles?.find(r => r.user_id === profile.id);
+        return {
+          ...profile,
+          role: userRole?.role || null,
+        };
+      });
+
+      setUsers(usersWithRoles);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -64,6 +96,13 @@ export function UserList() {
         .single();
 
       if (!profile) return;
+
+      // Fetch user role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
 
       const [starsRes, videosRes, recordingsRes, lastLoginRes] = await Promise.all([
         supabase
@@ -89,6 +128,7 @@ export function UserList() {
 
       setSelectedUser({
         ...profile,
+        role: roleData?.role || null,
         total_stars: starsRes.count || 0,
         videos_watched: videosRes.count || 0,
         recordings_count: recordingsRes.count || 0,
@@ -144,6 +184,95 @@ export function UserList() {
     }
   };
 
+  const handleRoleChange = async (userId: string, newRole: AppRole | 'none') => {
+    setUpdatingRole(userId);
+    try {
+      if (newRole === 'none') {
+        // Remove role
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
+
+        if (error) throw error;
+      } else {
+        // Check if role exists
+        const { data: existing } = await supabase
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (existing) {
+          // Update existing role
+          const { error } = await supabase
+            .from('user_roles')
+            .update({ role: newRole })
+            .eq('user_id', userId);
+
+          if (error) throw error;
+        } else {
+          // Insert new role
+          const { error } = await supabase
+            .from('user_roles')
+            .insert({ user_id: userId, role: newRole });
+
+          if (error) throw error;
+        }
+      }
+
+      // Update local state
+      setUsers(users.map(u => 
+        u.id === userId ? { ...u, role: newRole === 'none' ? null : newRole } : u
+      ));
+
+      if (selectedUser?.id === userId) {
+        setSelectedUser({ ...selectedUser, role: newRole === 'none' ? null : newRole });
+      }
+
+      toast({
+        title: 'Berechtigung aktualisiert',
+        description: newRole === 'none' 
+          ? 'Berechtigung wurde entfernt.' 
+          : `Nutzer ist jetzt ${getRoleLabel(newRole)}.`
+      });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Berechtigung konnte nicht aktualisiert werden.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
+  const getRoleLabel = (role: AppRole | null | undefined) => {
+    switch (role) {
+      case 'admin': return 'Admin';
+      case 'moderator': return 'Moderator';
+      case 'user': return 'Nutzer';
+      default: return 'Keine';
+    }
+  };
+
+  const getRoleIcon = (role: AppRole | null | undefined) => {
+    switch (role) {
+      case 'admin': return ShieldCheck;
+      case 'moderator': return Shield;
+      default: return User;
+    }
+  };
+
+  const getRoleBadgeClass = (role: AppRole | null | undefined) => {
+    switch (role) {
+      case 'admin': return 'bg-red-50 text-red-700 border-red-200';
+      case 'moderator': return 'bg-amber-50 text-amber-700 border-amber-200';
+      default: return 'bg-slate-50 text-slate-600 border-slate-200';
+    }
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -186,7 +315,7 @@ export function UserList() {
                       Nutzer
                     </th>
                     <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
-                      Rolle
+                      Berechtigung
                     </th>
                     <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Lehrer
@@ -197,58 +326,92 @@ export function UserList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user, index) => (
-                    <tr
-                      key={user.id}
-                      className={`border-b border-[#E5E7EB] hover:bg-[#EFF6FF] transition-colors ${
-                        index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
-                      }`}
-                    >
-                      <td className="px-5 py-3">
-                        <button
-                          onClick={() => fetchUserDetail(user.id)}
-                          className="flex items-center gap-3 hover:underline text-left"
-                        >
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src={user.avatar_url || undefined} />
-                            <AvatarFallback className="text-xs bg-[#F5F7FA] text-[#6B7280]">
-                              {user.display_name?.[0] || '?'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="text-sm font-medium text-[#111827]">
-                            {user.display_name || 'Unbekannt'}
-                          </span>
-                        </button>
-                      </td>
-                      <td className="px-5 py-3">
-                        {user.is_teacher ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#EFF6FF] text-[#3B82F6] rounded-full">
-                            <GraduationCap className="w-3 h-3" />
-                            Lehrer
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-[#F5F7FA] text-[#6B7280] rounded-full">
-                            Schüler
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
-                          {updatingTeacher === user.id ? (
+                  {filteredUsers.map((user, index) => {
+                    const RoleIcon = getRoleIcon(user.role);
+                    return (
+                      <tr
+                        key={user.id}
+                        className={`border-b border-[#E5E7EB] hover:bg-[#EFF6FF] transition-colors ${
+                          index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
+                        }`}
+                      >
+                        <td className="px-5 py-3">
+                          <button
+                            onClick={() => fetchUserDetail(user.id)}
+                            className="flex items-center gap-3 hover:underline text-left"
+                          >
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage src={user.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs bg-[#F5F7FA] text-[#6B7280]">
+                                {user.display_name?.[0] || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium text-[#111827]">
+                              {user.display_name || 'Unbekannt'}
+                            </span>
+                          </button>
+                        </td>
+                        <td className="px-5 py-3">
+                          {updatingRole === user.id ? (
                             <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                           ) : (
-                            <Switch
-                              checked={user.is_teacher}
-                              onCheckedChange={() => handleToggleTeacher(user.id, user.is_teacher)}
-                            />
+                            <Select
+                              value={user.role || 'none'}
+                              onValueChange={(value) => handleRoleChange(user.id, value as AppRole | 'none')}
+                            >
+                              <SelectTrigger className="w-[140px] h-8 text-xs bg-white border-slate-200 text-slate-700">
+                                <div className="flex items-center gap-2">
+                                  <RoleIcon className="w-3.5 h-3.5" />
+                                  <SelectValue>{getRoleLabel(user.role)}</SelectValue>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border-slate-200 shadow-lg z-50">
+                                <SelectItem value="none" className="text-slate-600">
+                                  <div className="flex items-center gap-2">
+                                    <User className="w-3.5 h-3.5" />
+                                    Keine
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="user" className="text-slate-600">
+                                  <div className="flex items-center gap-2">
+                                    <User className="w-3.5 h-3.5" />
+                                    Nutzer
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="moderator" className="text-amber-700">
+                                  <div className="flex items-center gap-2">
+                                    <Shield className="w-3.5 h-3.5" />
+                                    Moderator
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="admin" className="text-red-700">
+                                  <div className="flex items-center gap-2">
+                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                    Admin
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
                           )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-sm text-[#6B7280]">
-                        {formatDate(user.created_at)}
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-2">
+                            {updatingTeacher === user.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
+                            ) : (
+                              <Switch
+                                checked={user.is_teacher}
+                                onCheckedChange={() => handleToggleTeacher(user.id, user.is_teacher)}
+                              />
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-5 py-3 text-sm text-[#6B7280]">
+                          {formatDate(user.created_at)}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
