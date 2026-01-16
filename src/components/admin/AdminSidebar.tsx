@@ -21,7 +21,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'users', label: 'Nutzer', icon: Users },
   { id: 'levels', label: 'Levels / Showcases', icon: Layers },
-  { id: 'products', label: 'DigiMember', icon: Package },
+  { id: 'products', label: 'Produkte & Pläne', icon: Package },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
   { id: 'system', label: 'Systemstatus', icon: Settings },
