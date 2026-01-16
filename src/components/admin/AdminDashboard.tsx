@@ -8,24 +8,31 @@ import { PlanStatsCards } from './PlanStatsCards';
 export function AdminDashboard() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Übersicht über Nutzeraktivitäten</p>
-      </div>
-
       {/* Plan Stats */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3">Nutzer nach Plan</h2>
+      <section>
+        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
+          Nutzer nach Plan
+        </h2>
         <PlanStatsCards />
-      </div>
+      </section>
 
       {/* KPI Cards */}
-      <DashboardStats />
+      <section>
+        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
+          Übersicht
+        </h2>
+        <DashboardStats />
+      </section>
 
       {/* Charts */}
-      <ActivityCharts />
+      <section>
+        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
+          Aktivität
+        </h2>
+        <ActivityCharts />
+      </section>
 
-      {/* Vimeo Errors - Admin visibility */}
+      {/* Vimeo Errors */}
       <VimeoErrorsList />
 
       {/* Top Users Tables */}
