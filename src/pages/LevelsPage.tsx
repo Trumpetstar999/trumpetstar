@@ -2,26 +2,32 @@ import { useState, useEffect } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { LevelLockOverlay } from '@/components/levels/LevelLockOverlay';
+import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
-import { Video, Level, Section, MembershipPlan } from '@/types';
+import { Video, Level, Section } from '@/types';
+import { PlanKey } from '@/types/plans';
 import { Download, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
-import { useWordPressMembership } from '@/hooks/useWordPressMembership';
+import { useMembership } from '@/hooks/useMembership';
 
 interface LevelsPageProps {
   onStarEarned: () => void;
 }
 
+// Extended Level type with new plan key
+interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
+  requiredPlanKey: PlanKey;
+}
+
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
-  const [levels, setLevels] = useState<Level[]>([]);
+  const [levels, setLevels] = useState<LevelWithPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLevel, setActiveLevel] = useState<string>('');
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const { setIsVideoPlaying } = useVideoPlayer();
-  const { canAccessLevel } = useWordPressMembership();
+  const { canAccessLevel } = useMembership();
 
   // Update video playing state when video is selected/closed
   useEffect(() => {
@@ -62,7 +68,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       if (videosError) throw videosError;
 
       // Transform data to match Level type
-      const transformedLevels: Level[] = (levelsData || []).map((level) => {
+      const transformedLevels: LevelWithPlan[] = (levelsData || []).map((level) => {
         const levelSections = (sectionsData || []).filter(s => s.level_id === level.id);
         const levelVideos = (videosData || []).filter(v => v.level_id === level.id);
 
@@ -80,7 +86,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                   duration: video.duration_seconds || 0,
                   vimeoId: video.vimeo_video_id,
                   vimeoPlayerUrl: video.vimeo_player_url || undefined,
-                  completions: 0, // TODO: Fetch from video_completions
+                  completions: 0,
                 })),
             }))
           : [{
@@ -97,13 +103,19 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               })),
             }];
 
+        // Use new required_plan_key field, fallback to mapping from old field
+        const requiredPlanKey: PlanKey = 
+          (level.required_plan_key as PlanKey) || 
+          (level.required_plan === 'PLAN_A' ? 'BASIC' : 
+           level.required_plan === 'PLAN_B' ? 'PREMIUM' : 'FREE');
+
         return {
           id: level.id,
           title: level.title,
           showcaseId: level.vimeo_showcase_id,
-          totalStars: 0, // TODO: Calculate from completions
+          totalStars: 0,
           sections,
-          requiredPlan: (level.required_plan as MembershipPlan) || 'FREE',
+          requiredPlanKey,
         };
       });
 
@@ -177,10 +189,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
             </div>
             
             {/* Lock Overlay if user can't access */}
-            {currentLevel.requiredPlan && !canAccessLevel(currentLevel.requiredPlan) && (
-              <LevelLockOverlay 
-                requiredPlan={currentLevel.requiredPlan} 
-                levelTitle={currentLevel.title} 
+            {currentLevel.requiredPlanKey && currentLevel.requiredPlanKey !== 'FREE' && !canAccessLevel(currentLevel.requiredPlanKey) && (
+              <PremiumLockOverlay 
+                requiredPlanKey={currentLevel.requiredPlanKey} 
+                title={currentLevel.title} 
               />
             )}
             

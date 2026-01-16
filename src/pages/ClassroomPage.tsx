@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateRoomDialog } from '@/components/classroom/CreateRoomDialog';
 import { LiveRoom } from '@/components/classroom/LiveRoom';
 import { RoomCard } from '@/components/classroom/RoomCard';
+import { PremiumFeatureLock } from '@/components/premium/PremiumFeatureLock';
+import { useMembership } from '@/hooks/useMembership';
 import { toast } from 'sonner';
 
 interface Room {
@@ -20,9 +22,13 @@ interface Room {
 }
 
 export function ClassroomPage() {
+  const { canAccessFeature } = useMembership();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [activeRoom, setActiveRoom] = useState<Room | null>(null);
+
+  // Check if user has PREMIUM access for Classroom
+  const hasPremiumAccess = canAccessFeature('PREMIUM');
 
   const handleCreateRoom = (roomData: {
     title: string;
@@ -49,13 +55,17 @@ export function ClassroomPage() {
 
   const handleLeaveRoom = () => {
     if (activeRoom) {
-      // Mark room as not live when host leaves
       setRooms(prev => prev.map(r => 
         r.id === activeRoom.id ? { ...r, isLive: false } : r
       ));
     }
     setActiveRoom(null);
   };
+
+  // Show Premium Lock if user doesn't have access
+  if (!hasPremiumAccess) {
+    return <PremiumFeatureLock feature="classroom" />;
+  }
 
   const liveRooms = rooms.filter(r => r.isLive);
   const myRooms = rooms;
