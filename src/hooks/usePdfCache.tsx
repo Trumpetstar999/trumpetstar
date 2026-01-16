@@ -84,14 +84,22 @@ export function usePdfCache() {
     setDownloadProgress({ pdfId, progress: 0, isDownloading: true });
 
     try {
-      // Get signed URL from Supabase
-      const urlParts = pdfFileUrl.split('/pdf-documents/');
-      const filePath = urlParts[urlParts.length - 1];
+      // Extract file path from URL - handle both public and signed URL formats
+      let filePath = '';
+      
+      // Format: .../pdf-documents/filename.pdf
+      if (pdfFileUrl.includes('/pdf-documents/')) {
+        const urlParts = pdfFileUrl.split('/pdf-documents/');
+        filePath = urlParts[urlParts.length - 1];
+      }
 
       if (!filePath) {
+        console.error('Could not extract file path from URL:', pdfFileUrl);
         setDownloadProgress(null);
         return null;
       }
+
+      console.log('Getting signed URL for file path:', filePath);
 
       const { data: signedData, error: signError } = await supabase.storage
         .from('pdf-documents')
@@ -102,6 +110,8 @@ export function usePdfCache() {
         setDownloadProgress(null);
         return null;
       }
+
+      console.log('Got signed URL, starting download...');
 
       // Download with progress tracking
       const response = await fetch(signedData.signedUrl);
@@ -138,6 +148,8 @@ export function usePdfCache() {
       // Combine chunks into blob
       const blob = new Blob(chunks as BlobPart[], { type: 'application/pdf' });
       
+      console.log('Download complete, blob size:', blob.size);
+      
       // Cache the PDF
       await savePdfToCache(pdfId, blob);
       
@@ -147,7 +159,10 @@ export function usePdfCache() {
       await new Promise(resolve => setTimeout(resolve, 300));
       setDownloadProgress(null);
       
-      return URL.createObjectURL(blob);
+      const blobUrl = URL.createObjectURL(blob);
+      console.log('Created blob URL:', blobUrl);
+      
+      return blobUrl;
     } catch (error) {
       console.error('Failed to download PDF:', error);
       setDownloadProgress(null);
