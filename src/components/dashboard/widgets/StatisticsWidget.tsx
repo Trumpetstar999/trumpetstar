@@ -19,21 +19,21 @@ export function StatisticsWidget() {
       icon: Clock,
       label: 'Spielzeit gesamt',
       value: `${Math.floor(stats.weekMinutes * 4)} Min`,
-      color: 'text-brand-blue-start',
-      bgColor: 'bg-brand-blue-start/20',
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/20',
     },
     {
       icon: Video,
       label: 'Videos angeschaut',
       value: totalVideosWatched.toString(),
-      color: 'text-reward-gold',
-      bgColor: 'bg-reward-gold/20',
+      color: 'text-yellow-400',
+      bgColor: 'bg-yellow-500/20',
     },
     {
       icon: Calendar,
       label: 'Aktive Tage',
       value: activeDaysThisMonth.toString(),
-      color: 'text-green-500',
+      color: 'text-green-400',
       bgColor: 'bg-green-500/20',
     },
   ];
@@ -41,7 +41,7 @@ export function StatisticsWidget() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <BarChart3 className="w-5 h-5 text-brand-blue-start" />
+        <BarChart3 className="w-5 h-5 text-blue-400" />
         <h3 className="text-white font-semibold">Statistik</h3>
       </div>
 
@@ -49,13 +49,13 @@ export function StatisticsWidget() {
         {statItems.map((item) => (
           <div
             key={item.label}
-            className="flex items-center gap-3 p-3 bg-white/5 rounded-xl"
+            className="flex items-center gap-3 p-3 bg-white/10 rounded-xl"
           >
             <div className={`w-10 h-10 rounded-full ${item.bgColor} flex items-center justify-center`}>
               <item.icon className={`w-5 h-5 ${item.color}`} />
             </div>
             <div className="flex-1">
-              <p className="text-white/50 text-xs">{item.label}</p>
+              <p className="text-white/70 text-xs">{item.label}</p>
               <p className="text-white font-semibold">{item.value}</p>
             </div>
           </div>
