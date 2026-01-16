@@ -36,8 +36,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Build Vimeo player URL - ONLY use official iframe embed
-  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=0`;
+  // Build Vimeo player URL - ONLY use official iframe embed with controls enabled
+  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
   // Load saved playback speed
   useEffect(() => {
