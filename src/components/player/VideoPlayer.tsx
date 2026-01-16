@@ -248,6 +248,20 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           }
         }
 
+        // Handle video end/finish event
+        if (data.event === 'ended' || data.event === 'finish') {
+          if (!hasCompletedRef.current) {
+            hasCompletedRef.current = true;
+            saveCompletion().then((isNew) => {
+              if (isNew) {
+                setShowCompleted(true);
+                onComplete();
+                setTimeout(() => setShowCompleted(false), 3000);
+              }
+            });
+          }
+        }
+
         if (data.event === 'error') {
           const errorMsg = data.data?.message || 'Unknown Vimeo error';
           if (errorMsg.includes('privacy') || errorMsg.includes('embed') || errorMsg.includes('domain')) {
@@ -265,7 +279,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     
     const enableVimeoApi = () => {
       if (iframeRef.current?.contentWindow) {
-        const methods = ['ready', 'playProgress', 'timeupdate', 'play', 'pause', 'error'];
+        const methods = ['ready', 'playProgress', 'timeupdate', 'play', 'pause', 'error', 'ended', 'finish'];
         methods.forEach(method => {
           iframeRef.current?.contentWindow?.postMessage(
             JSON.stringify({ method: 'addEventListener', value: method }),
