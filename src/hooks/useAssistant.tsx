@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMembership } from './useMembership';
 import { useToast } from './use-toast';
-import { useQuery } from '@tanstack/react-query';
 
 export type AssistantMode = 'platform' | 'technique' | 'mental' | 'repertoire' | 'mixed';
 export type AssistantLanguage = 'auto' | 'de' | 'en';
@@ -25,6 +24,7 @@ interface AssistantState {
   language: AssistantLanguage;
   readAloud: boolean;
   conversationId: string | null;
+  userName: string;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-chat`;
@@ -43,21 +43,6 @@ export function useAssistant() {
   const { user } = useAuth();
   const { planKey } = useMembership();
   const { toast } = useToast();
-
-  // Fetch user's display name from profile
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data } = await supabase
-        .from('profiles')
-        .select('display_name')
-        .eq('id', user.id)
-        .single();
-      return data;
-    },
-    enabled: !!user?.id,
-  });
   
   const [state, setState] = useState<AssistantState>({
     messages: [],
@@ -68,7 +53,24 @@ export function useAssistant() {
     language: 'auto',
     readAloud: false,
     conversationId: null,
+    userName: '',
   });
+
+  // Fetch user's display name from profile
+  useEffect(() => {
+    async function fetchUserName() {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+      if (data?.display_name) {
+        setState(prev => ({ ...prev, userName: data.display_name }));
+      }
+    }
+    fetchUserName();
+  }, [user?.id]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -152,7 +154,7 @@ export function useAssistant() {
           mode: state.mode,
           language: detectedLang,
           userPlanKey: planKey || 'FREE',
-          userName: profile?.display_name || '',
+          userName: state.userName,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -237,7 +239,7 @@ export function useAssistant() {
       });
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [state.messages, state.mode, state.language, state.isLoading, state.readAloud, planKey, profile?.display_name, toast]);
+  }, [state.messages, state.mode, state.language, state.isLoading, state.readAloud, state.userName, planKey, toast]);
 
   const speakText = useCallback(async (text: string, language: 'de' | 'en') => {
     try {
