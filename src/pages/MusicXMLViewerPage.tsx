@@ -117,23 +117,39 @@ export function MusicXMLViewerPage() {
       cursor.show();
       lastBarRef.current = bar;
       
-      // Auto-scroll to cursor if follow mode is enabled
-      if (followMode && cursor.cursorElement) {
-        const cursorElement = cursor.cursorElement;
-        const container = containerRef.current?.parentElement;
+      // Auto-scroll to cursor if follow mode is enabled - both horizontally AND vertically
+      if (followMode) {
+        // Try to find the cursor element - OSMD creates it with specific id pattern
+        const cursorElement = cursor.cursorElement || 
+          containerRef.current?.querySelector('img[id^="cursorImg"]') ||
+          containerRef.current?.querySelector('[class*="cursor"]');
         
-        if (container && cursorElement) {
+        const scrollContainer = containerRef.current?.parentElement;
+        
+        if (scrollContainer && cursorElement) {
           const cursorRect = cursorElement.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
+          const containerRect = scrollContainer.getBoundingClientRect();
           
-          // Check if cursor is outside visible area (with margin)
-          const margin = 150;
-          if (cursorRect.left < containerRect.left + margin || 
-              cursorRect.right > containerRect.right - margin) {
+          // Calculate margins for triggering scroll
+          const marginX = 100;
+          const marginY = 100;
+          
+          // Check horizontal bounds
+          const needsHorizontalScroll = 
+            cursorRect.left < containerRect.left + marginX || 
+            cursorRect.right > containerRect.right - marginX;
+          
+          // Check vertical bounds - important for multi-line scores
+          const needsVerticalScroll = 
+            cursorRect.top < containerRect.top + marginY || 
+            cursorRect.bottom > containerRect.bottom - marginY;
+          
+          if (needsHorizontalScroll || needsVerticalScroll) {
+            // Scroll the cursor into view with both axes
             cursorElement.scrollIntoView({ 
               behavior: 'smooth', 
-              block: 'nearest',
-              inline: 'center'
+              block: 'center',  // Center vertically
+              inline: 'center'  // Center horizontally
             });
           }
         }
@@ -250,18 +266,41 @@ export function MusicXMLViewerPage() {
           setCursor(osmdInstance.cursor);
           console.log('[OSMD] Cursor initialized and shown');
           
-          // Style the cursor element with gold glow
+          // Force cursor visibility with multiple approaches
           setTimeout(() => {
-            if (osmdInstance.cursor?.cursorElement) {
-              const el = osmdInstance.cursor.cursorElement;
-              el.style.backgroundColor = 'rgba(255, 204, 0, 0.5)';
-              el.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.6)';
-              el.style.borderRadius = '4px';
-              el.style.transition = 'left 0.15s ease-out, top 0.1s ease-out';
-              el.style.zIndex = '100';
-              console.log('[OSMD] Cursor styled');
+            // Approach 1: Direct cursor element from OSMD
+            const cursorEl = osmdInstance.cursor?.cursorElement;
+            if (cursorEl) {
+              cursorEl.style.backgroundColor = 'rgba(255, 204, 0, 0.6)';
+              cursorEl.style.boxShadow = '0 0 25px rgba(255, 204, 0, 0.8)';
+              cursorEl.style.borderRadius = '4px';
+              cursorEl.style.transition = 'transform 0.15s ease-out';
+              cursorEl.style.zIndex = '100';
+              cursorEl.style.opacity = '1';
+              cursorEl.style.visibility = 'visible';
+              console.log('[OSMD] Cursor element styled directly:', cursorEl);
             }
-          }, 100);
+            
+            // Approach 2: Find by ID pattern (OSMD uses cursorImg-0, cursorImg-1, etc.)
+            const cursorImgs = containerRef.current?.querySelectorAll('img[id^="cursorImg"]');
+            if (cursorImgs && cursorImgs.length > 0) {
+              cursorImgs.forEach((img: Element) => {
+                const imgEl = img as HTMLImageElement;
+                imgEl.style.backgroundColor = 'rgba(255, 204, 0, 0.6)';
+                imgEl.style.boxShadow = '0 0 25px rgba(255, 204, 0, 0.8)';
+                imgEl.style.borderRadius = '4px';
+                imgEl.style.zIndex = '100';
+                imgEl.style.opacity = '1';
+                imgEl.style.visibility = 'visible';
+                console.log('[OSMD] Cursor img styled:', imgEl.id);
+              });
+            }
+            
+            // Log what we found for debugging
+            const allImgs = containerRef.current?.querySelectorAll('img');
+            console.log('[OSMD] All images in container:', allImgs?.length, 
+              Array.from(allImgs || []).map(i => i.id || i.className).filter(Boolean));
+          }, 200);
         } else {
           console.warn('[OSMD] No cursor available');
         }
