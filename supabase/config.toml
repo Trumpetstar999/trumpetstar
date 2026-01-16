@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.elevenlabs-stt]
 verify_jwt = false
+
+[functions.pdf-proxy]
+verify_jwt = false

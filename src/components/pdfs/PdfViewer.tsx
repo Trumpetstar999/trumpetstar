@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
+import { usePdfCache, PdfDiagnostics } from '@/hooks/usePdfCache';
+import { PdfDebugPanel } from './PdfDebugPanel';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { 
@@ -20,7 +24,9 @@ import {
   Highlighter,
   Eraser,
   Undo2,
-  Trash2
+  Trash2,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -56,12 +62,22 @@ interface PdfViewerProps {
 }
 
 export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
+  const [searchParams] = useSearchParams();
+  const { isAdmin } = useUserRole();
+  const { runDiagnostics, diagnostics } = usePdfCache();
+  
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [zoom, setZoom] = useState(1);
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Show debug panel if ?debug=1 or admin
+  const showDebug = searchParams.get('debug') === '1' || isAdmin;
   
   // Audio state
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -94,6 +110,27 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     }
   }, [currentPage, audioTracks]);
 
+  // Handle diagnostics
+  const handleRunDiagnostics = useCallback(async () => {
+    setIsDiagnosing(true);
+    try {
+      await runDiagnostics(pdf.id, pdf.pdf_file_url);
+    } finally {
+      setIsDiagnosing(false);
+    }
+  }, [pdf.id, pdf.pdf_file_url, runDiagnostics]);
+
+  // Handle retry
+  const handleRetry = useCallback(() => {
+    setLoadError(null);
+    setIsLoading(true);
+    setPdfDoc(null);
+    // Trigger reload by resetting
+    const reloadEvent = new CustomEvent('pdf-reload', { detail: pdf.id });
+    window.dispatchEvent(reloadEvent);
+    onClose();
+  }, [pdf.id, onClose]);
+
   // Load PDF document from blob URL
   useEffect(() => {
     console.log('PdfViewer: pdfBlobUrl changed:', pdfBlobUrl ? 'exists' : 'null');
@@ -106,6 +143,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     // Reset state when URL changes
     setPdfDoc(null);
     setIsLoading(true);
+    setLoadError(null);
 
     const loadPdf = async () => {
       console.log('PdfViewer: Starting PDF load from blob URL:', pdfBlobUrl);
@@ -116,14 +154,14 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         const response = await fetch(pdfBlobUrl);
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch blob: ${response.status}`);
+          throw new Error(`Failed to fetch blob: HTTP ${response.status}`);
         }
         
         const arrayBuffer = await response.arrayBuffer();
         console.log('PdfViewer: Got ArrayBuffer, size:', arrayBuffer.byteLength);
         
         if (arrayBuffer.byteLength < 1000) {
-          throw new Error('ArrayBuffer too small to be a valid PDF');
+          throw new Error(`File too small to be a valid PDF (${arrayBuffer.byteLength} bytes)`);
         }
         
         // Verify PDF header
@@ -132,16 +170,24 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         console.log('PdfViewer: PDF header check:', headerStr);
         
         if (!headerStr.startsWith('%PDF-')) {
-          throw new Error('Invalid PDF header: ' + headerStr);
+          throw new Error(`Invalid PDF header: "${headerStr}" - File may be corrupted or not a PDF`);
         }
         
+        // Load PDF.js with explicit worker configuration
         const pdfjsLib = await import('pdfjs-dist');
+        
+        // Set worker source explicitly
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
         console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
         // Use ArrayBuffer directly - more reliable than blob URL
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const loadingTask = pdfjsLib.getDocument({ 
+          data: arrayBuffer,
+          // iPad Safari optimizations
+          disableAutoFetch: false,
+          disableStream: false,
+        });
         
         loadingTask.onProgress = (progress: { loaded: number; total: number }) => {
           if (progress.total > 0) {
@@ -152,9 +198,12 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         const doc = await loadingTask.promise;
         console.log('PdfViewer: PDF document loaded successfully, pages:', doc.numPages);
         setPdfDoc(doc);
+        setLoadError(null);
       } catch (error) {
         console.error('Error loading PDF:', error);
-        toast.error('PDF konnte nicht geladen werden. Bitte schließe und öffne erneut.');
+        const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
+        setLoadError(errorMessage);
+        toast.error('PDF konnte nicht geladen werden');
         setIsLoading(false);
       }
     };
@@ -528,8 +577,50 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         ref={containerRef}
         className="flex-1 min-h-0 flex items-center justify-center p-4 relative"
       >
+        {/* Error overlay */}
+        {loadError && (
+          <div className="absolute inset-0 flex items-center justify-center z-20"
+               style={{ background: 'linear-gradient(180deg, hsl(222 86% 29% / 0.95) 0%, hsl(0 0% 0% / 0.95) 100%)' }}>
+            <div className="flex flex-col items-center gap-6 max-w-md text-center px-4">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-red-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">PDF konnte nicht geladen werden</h3>
+                <p className="text-white/70 text-sm mb-4">{loadError}</p>
+              </div>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleRetry}
+                  className="bg-reward-gold text-black hover:bg-reward-gold/90"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Erneut versuchen
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={onClose}
+                  className="border-white/30 text-white hover:bg-white/10"
+                >
+                  Schließen
+                </Button>
+              </div>
+              {showDebug && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleRunDiagnostics}
+                  className="text-white/60 hover:text-white"
+                >
+                  Diagnose starten
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Loading overlay */}
-        {isLoading && (
+        {isLoading && !loadError && (
           <div className="absolute inset-0 flex items-center justify-center z-10"
                style={{ background: 'linear-gradient(180deg, hsl(222 86% 29% / 0.8) 0%, hsl(0 0% 0% / 0.8) 100%)' }}>
             <div className="flex flex-col items-center gap-4">
@@ -842,6 +933,16 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           )}
         </div>
       </div>
+
+      {/* Debug Panel - only visible to admins or with ?debug=1 */}
+      {showDebug && (
+        <PdfDebugPanel
+          diagnostics={diagnostics}
+          onRunDiagnostics={handleRunDiagnostics}
+          onRetry={handleRetry}
+          isLoading={isDiagnosing}
+        />
+      )}
     </div>
   );
 }
