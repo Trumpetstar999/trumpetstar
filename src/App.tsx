@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
 import { WordPressMembershipProvider } from "@/hooks/useWordPressMembership";
+import { PdfViewerProvider } from "@/hooks/usePdfViewer";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
@@ -27,19 +28,21 @@ const App = () => {
         <WordPressMembershipProvider>
           <MembershipProvider>
             <VideoPlayerProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route path="/chats" element={<ChatsPage />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
+              <PdfViewerProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/chats" element={<ChatsPage />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              </PdfViewerProvider>
             </VideoPlayerProvider>
           </MembershipProvider>
         </WordPressMembershipProvider>
