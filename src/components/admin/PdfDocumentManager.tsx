@@ -110,7 +110,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   });
 
   // Upload file with progress tracking using XMLHttpRequest
-  const uploadFileWithProgress = useCallback(async (file: File): Promise<{ url: string; pageCount: number }> => {
+  const uploadFileWithProgress = useCallback(async (file: File): Promise<{ url: string; pageCount: number; fileName: string }> => {
     return new Promise(async (resolve, reject) => {
       const fileName = `${Date.now()}-${file.name}`;
       
@@ -144,37 +144,15 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         }
       });
 
-      xhr.addEventListener('load', async () => {
+      xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           const { data: urlData } = supabase.storage
             .from('pdf-documents')
             .getPublicUrl(fileName);
           
-          // Get page count AFTER upload completes
-          setUploadState({ progress: 100, status: 'processing', message: 'Seitenzahl wird ermittelt...' });
-          let pageCount = 1;
-          try {
-            const pdfjsLib = await import('pdfjs-dist');
-            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
-            
-            // Load from the uploaded URL instead of re-reading the file
-            const pdf = await pdfjsLib.getDocument(urlData.publicUrl).promise;
-            pageCount = pdf.numPages;
-          } catch (e) {
-            console.error('Error getting page count:', e);
-            // Try alternative method with file slice (first 100KB is enough for page count)
-            try {
-              const pdfjsLib = await import('pdfjs-dist');
-              const smallBuffer = await file.slice(0, Math.min(file.size, 1024 * 1024)).arrayBuffer();
-              const pdf = await pdfjsLib.getDocument({ data: smallBuffer }).promise;
-              pageCount = pdf.numPages;
-            } catch (e2) {
-              console.error('Fallback page count also failed:', e2);
-            }
-          }
-          
+          // Immediately complete - page count will be updated in background
           setUploadState({ progress: 100, status: 'complete', message: 'Upload abgeschlossen!' });
-          resolve({ url: urlData.publicUrl, pageCount });
+          resolve({ url: urlData.publicUrl, pageCount: 0, fileName });
         } else {
           let errorMessage = 'Upload fehlgeschlagen';
           try {
@@ -205,17 +183,39 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     });
   }, []);
 
+  // Background page count updater
+  const updatePageCountInBackground = useCallback(async (pdfUrl: string, docId: string) => {
+    try {
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
+      
+      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      const pageCount = pdf.numPages;
+      
+      await supabase
+        .from('pdf_documents')
+        .update({ page_count: pageCount })
+        .eq('id', docId);
+      
+      // Refresh the list to show updated page count
+      queryClient.invalidateQueries({ queryKey: ['admin-pdfs'] });
+      console.log(`Page count updated to ${pageCount} for document ${docId}`);
+    } catch (e) {
+      console.error('Background page count update failed:', e);
+    }
+  }, [queryClient]);
+
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: typeof formData & { id?: string; pdf_file_url?: string; page_count?: number }) => {
       let pdfUrl = data.pdf_file_url || '';
-      let pageCount = data.page_count || 1;
+      let uploadedFileName = '';
 
       // Upload PDF if new file
       if (data.pdf_file) {
         const result = await uploadFileWithProgress(data.pdf_file);
         pdfUrl = result.url;
-        pageCount = result.pageCount;
+        uploadedFileName = result.fileName;
       }
 
       const payload = {
@@ -225,8 +225,10 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         plan_required: data.plan_required,
         is_active: data.is_active,
         pdf_file_url: pdfUrl,
-        page_count: pageCount,
+        page_count: data.page_count || 0, // Will be updated in background
       };
+
+      let docId = data.id;
 
       if (data.id) {
         const { error } = await supabase
@@ -235,16 +237,27 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
           .eq('id', data.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: insertedDoc, error } = await supabase
           .from('pdf_documents')
-          .insert(payload);
+          .insert(payload)
+          .select('id')
+          .single();
         if (error) throw error;
+        docId = insertedDoc.id;
       }
+
+      // Return info for background processing
+      return { docId, pdfUrl, isNewUpload: !!data.pdf_file };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-pdfs'] });
       toast.success(editingPdf ? 'PDF aktualisiert' : 'PDF erstellt');
       handleCloseDialog();
+      
+      // Start background page count update if new file was uploaded
+      if (result.isNewUpload && result.docId && result.pdfUrl) {
+        updatePageCountInBackground(result.pdfUrl, result.docId);
+      }
     },
     onError: (error) => {
       setUploadState({ progress: 0, status: 'error', message: error.message });
