@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface VideoPlayerProps {
   video: Video;
@@ -35,6 +36,45 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Save completion to database
+  const saveCompletion = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      // Check if already completed
+      const { data: existing } = await supabase
+        .from('video_completions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('video_id', video.id)
+        .maybeSingle();
+      
+      if (existing) {
+        // Already completed before, don't add again
+        return false;
+      }
+      
+      // Insert new completion
+      const { error } = await supabase
+        .from('video_completions')
+        .insert({
+          user_id: user.id,
+          video_id: video.id,
+          playback_speed: playbackSpeed,
+        });
+      
+      if (error) {
+        console.error('Error saving completion:', error);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error saving completion:', err);
+      return false;
+    }
+  }, [user, video.id, playbackSpeed]);
 
   const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
@@ -195,9 +235,13 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           
           if (percent >= 0.8 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
-            setShowCompleted(true);
-            onComplete();
-            setTimeout(() => setShowCompleted(false), 2000);
+            saveCompletion().then((isNew) => {
+              if (isNew) {
+                setShowCompleted(true);
+                onComplete();
+                setTimeout(() => setShowCompleted(false), 3000);
+              }
+            });
           }
         }
         
@@ -207,9 +251,13 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           if (dur) setDuration(dur);
           if (dur > 0 && seconds / dur >= 0.8 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
-            setShowCompleted(true);
-            onComplete();
-            setTimeout(() => setShowCompleted(false), 2000);
+            saveCompletion().then((isNew) => {
+              if (isNew) {
+                setShowCompleted(true);
+                onComplete();
+                setTimeout(() => setShowCompleted(false), 3000);
+              }
+            });
           }
         }
 
@@ -261,7 +309,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         clearTimeout(loadTimeoutRef.current);
       }
     };
-  }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration]);
+  }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -307,12 +355,38 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
       }}
     >
-      {/* Star earned animation - Gold glow effect */}
+      {/* Star earned animation - Enhanced celebration effect */}
       {showCompleted && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] animate-scale-in">
-          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl glass-strong glow-gold">
-            <Star className="w-20 h-20 text-reward-gold fill-reward-gold animate-pulse" />
-            <span className="text-2xl font-bold text-white">+1 Stern!</span>
+        <div className="fixed inset-0 z-[120] pointer-events-none flex items-center justify-center">
+          {/* Background overlay */}
+          <div className="absolute inset-0 bg-black/40 animate-fade-in" />
+          
+          {/* Star burst container */}
+          <div className="relative animate-scale-in">
+            {/* Glow rings */}
+            <div className="absolute inset-0 -m-8 rounded-full bg-reward-gold/20 animate-ping" />
+            <div className="absolute inset-0 -m-4 rounded-full bg-reward-gold/30 animate-pulse" />
+            
+            {/* Main content */}
+            <div className="relative flex flex-col items-center gap-4 p-10 rounded-3xl bg-gradient-to-br from-amber-500/90 to-orange-600/90 shadow-2xl border-2 border-amber-300/50">
+              {/* Sparkle effects */}
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full opacity-80 animate-ping" style={{ animationDelay: '0.1s' }} />
+              <div className="absolute -top-2 -right-4 w-4 h-4 bg-yellow-200 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.3s' }} />
+              <div className="absolute -bottom-2 -left-2 w-5 h-5 bg-amber-200 rounded-full opacity-75 animate-ping" style={{ animationDelay: '0.2s' }} />
+              <div className="absolute -bottom-3 -right-3 w-4 h-4 bg-white rounded-full opacity-80 animate-ping" style={{ animationDelay: '0.4s' }} />
+              
+              {/* Star icon with glow */}
+              <div className="relative">
+                <Star className="w-24 h-24 text-white fill-white drop-shadow-lg" 
+                      style={{ filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.8))' }} />
+              </div>
+              
+              {/* Text */}
+              <div className="text-center">
+                <span className="block text-3xl font-bold text-white drop-shadow-lg">+1 Stern!</span>
+                <span className="block text-sm text-white/80 mt-1">Super gemacht! 🎉</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
