@@ -1,6 +1,10 @@
 // Core types for the music learning app
 
+// Legacy - use PlanKey from types/plans.ts for new code
 export type MembershipPlan = 'FREE' | 'PLAN_A' | 'PLAN_B';
+
+// Re-export new plan types
+export { type PlanKey, PLAN_RANKS, PLAN_DISPLAY_NAMES, canAccessPlan } from './plans';
 
 export interface Video {
   id: string;
