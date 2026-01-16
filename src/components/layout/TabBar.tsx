@@ -1,5 +1,5 @@
 import { TabId } from '@/types';
-import { Layers, Music, Video, Users, User, MessageSquare } from 'lucide-react';
+import { Layers, Music, Video, Users, User, MessageSquare, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TabBarProps {
@@ -10,6 +10,7 @@ interface TabBarProps {
 
 const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
   { id: 'levels', label: 'Levels', icon: Layers },
+  { id: 'pdfs', label: 'Noten', icon: FileText },
   { id: 'practice', label: 'Üben', icon: Music },
   { id: 'recordings', label: 'Aufnahmen', icon: Video },
   { id: 'chats', label: 'Chats', icon: MessageSquare },
