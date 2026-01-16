@@ -96,61 +96,50 @@ export function MusicXMLViewerPage() {
     setCurrentBar(bar);
     
     // Only update cursor if bar actually changed
-    if (bar === lastBarRef.current) return;
+    if (bar === lastBarRef.current || !cursor || !osmd) return;
     
-    // Move OSMD cursor to current bar
-    if (cursor && osmd) {
-      try {
-        const direction = bar > lastBarRef.current ? 1 : -1;
-        const steps = Math.abs(bar - lastBarRef.current);
-        
-        // If we need to go backwards or jump too far, reset and go from start
-        if (direction < 0 || steps > 5) {
-          cursor.reset();
-          // Advance to the target bar
-          for (let i = 0; i < bar - 1 && !cursor.iterator.EndReached; i++) {
-            // Move through all notes in the measure
-            while (!cursor.iterator.EndReached && 
-                   cursor.iterator.CurrentMeasureIndex < i + 1) {
-              cursor.next();
-            }
-          }
-        } else {
-          // Move forward incrementally
-          for (let i = 0; i < steps && !cursor.iterator.EndReached; i++) {
-            // Advance to next measure
-            const targetMeasure = cursor.iterator.CurrentMeasureIndex + 1;
-            while (!cursor.iterator.EndReached && 
-                   cursor.iterator.CurrentMeasureIndex < targetMeasure) {
-              cursor.next();
-            }
-          }
-        }
-        
-        cursor.show();
-        lastBarRef.current = bar;
-        
-        // Auto-scroll to cursor if follow mode is enabled
-        if (followMode && cursor.cursorElement) {
-          const container = containerRef.current?.parentElement;
-          if (container) {
-            const cursorRect = cursor.cursorElement.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            // Check if cursor is outside visible area
-            if (cursorRect.left < containerRect.left + 100 || 
-                cursorRect.right > containerRect.right - 100) {
-              cursor.cursorElement.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'nearest',
-                inline: 'center'
-              });
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('Cursor update error:', e);
+    try {
+      // Always reset and advance to ensure accurate positioning
+      cursor.reset();
+      
+      // Advance cursor to the start of the target bar
+      // cursor.next() moves by voice entry, so we loop until we reach the desired measure
+      let iterations = 0;
+      const maxIterations = 1000; // Safety limit
+      
+      while (!cursor.iterator.EndReached && 
+             cursor.iterator.CurrentMeasureIndex < bar - 1 &&
+             iterations < maxIterations) {
+        cursor.next();
+        iterations++;
       }
+      
+      cursor.show();
+      lastBarRef.current = bar;
+      
+      // Auto-scroll to cursor if follow mode is enabled
+      if (followMode && cursor.cursorElement) {
+        const cursorElement = cursor.cursorElement;
+        const container = containerRef.current?.parentElement;
+        
+        if (container && cursorElement) {
+          const cursorRect = cursorElement.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // Check if cursor is outside visible area (with margin)
+          const margin = 150;
+          if (cursorRect.left < containerRect.left + margin || 
+              cursorRect.right > containerRect.right - margin) {
+            cursorElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'nearest',
+              inline: 'center'
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Cursor update error:', e);
     }
   }, [cursor, osmd, followMode]);
 
@@ -246,32 +235,41 @@ export function MusicXMLViewerPage() {
         await osmdInstance.load(xmlContent);
         osmdInstance.render();
 
-        // Initialize cursor
-        if (osmdInstance.cursor) {
-          osmdInstance.cursor.show();
-          osmdInstance.cursor.reset();
-          setCursor(osmdInstance.cursor);
-          
-          // Style the cursor element with gold glow
-          if (osmdInstance.cursor.cursorElement) {
-            osmdInstance.cursor.cursorElement.style.backgroundColor = 'rgba(255, 204, 0, 0.4)';
-            osmdInstance.cursor.cursorElement.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.6)';
-            osmdInstance.cursor.cursorElement.style.borderRadius = '4px';
-            osmdInstance.cursor.cursorElement.style.transition = 'left 0.1s ease-out';
-          }
-        }
-
         // Get total bars
         const measures = osmdInstance.Sheet?.SourceMeasures?.length || 1;
         setTotalBars(measures);
         setLoopEnd(measures);
+        console.log(`[OSMD] Rendered sheet with ${measures} measures`);
 
         setOsmd(osmdInstance);
+        
+        // Initialize cursor after render
+        if (osmdInstance.cursor) {
+          osmdInstance.cursor.reset();
+          osmdInstance.cursor.show();
+          setCursor(osmdInstance.cursor);
+          console.log('[OSMD] Cursor initialized and shown');
+          
+          // Style the cursor element with gold glow
+          setTimeout(() => {
+            if (osmdInstance.cursor?.cursorElement) {
+              const el = osmdInstance.cursor.cursorElement;
+              el.style.backgroundColor = 'rgba(255, 204, 0, 0.5)';
+              el.style.boxShadow = '0 0 20px rgba(255, 204, 0, 0.6)';
+              el.style.borderRadius = '4px';
+              el.style.transition = 'left 0.15s ease-out, top 0.1s ease-out';
+              el.style.zIndex = '100';
+              console.log('[OSMD] Cursor styled');
+            }
+          }, 100);
+        } else {
+          console.warn('[OSMD] No cursor available');
+        }
         
         // Initialize MIDI player
         await midiPlayer.initialize();
         
-        // Parse sheet for MIDI playback (default 120 BPM)
+        // Parse sheet for MIDI playback (default 120 BPM - will be adjusted by tempo slider)
         midiPlayer.parseOSMDSheet(osmdInstance, 120);
         
         setIsLoading(false);
