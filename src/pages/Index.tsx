@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { LevelsPage } from './LevelsPage';
+import { PdfsPage } from './PdfsPage';
 import { PracticePage } from './PracticePage';
 import { RecordingsPage } from './RecordingsPage';
 import { ChatsPage } from './ChatsPage';
@@ -16,6 +17,7 @@ import { AssistantButton } from '@/components/assistant/AssistantButton';
 
 const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
+  pdfs: 'Notenhefte',
   practice: 'Üben',
   recordings: 'Aufnahmen',
   chats: 'Chats',
@@ -72,6 +74,8 @@ const Index = () => {
     switch (activeTab) {
       case 'levels':
         return <LevelsPage onStarEarned={handleStarEarned} />;
+      case 'pdfs':
+        return <PdfsPage />;
       case 'practice':
         return <PracticePage />;
       case 'recordings':
