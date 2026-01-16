@@ -15,7 +15,12 @@ import {
   SkipForward,
   X,
   ChevronDown,
-  Music
+  Music,
+  Pencil,
+  Highlighter,
+  Eraser,
+  Undo2,
+  Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -55,6 +60,7 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
   const [zoom, setZoom] = useState(1);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Audio state
@@ -65,6 +71,13 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioSignedUrl, setAudioSignedUrl] = useState<string | null>(null);
   const [playbackRate, setPlaybackRate] = useState(100);
+
+  // Drawing state
+  type DrawingTool = 'none' | 'pencil' | 'highlighter' | 'eraser';
+  const [activeTool, setActiveTool] = useState<DrawingTool>('none');
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [drawingHistory, setDrawingHistory] = useState<Map<number, ImageData[]>>(new Map());
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
   // Get audio tracks for current page
   const currentPageTracks = audioTracks.filter(t => t.page_number === currentPage);
@@ -177,6 +190,22 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
           viewport: scaledViewport,
         }).promise;
 
+        // Setup drawing canvas to match PDF canvas
+        const drawingCanvas = drawingCanvasRef.current;
+        if (drawingCanvas) {
+          drawingCanvas.width = canvas.width;
+          drawingCanvas.height = canvas.height;
+          
+          // Restore drawings for this page if any
+          const pageHistory = drawingHistory.get(currentPage);
+          if (pageHistory && pageHistory.length > 0) {
+            const drawCtx = drawingCanvas.getContext('2d');
+            if (drawCtx) {
+              drawCtx.putImageData(pageHistory[pageHistory.length - 1], 0, 0);
+            }
+          }
+        }
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error rendering PDF page:', error);
@@ -186,7 +215,7 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
     };
 
     renderPage();
-  }, [pdfDoc, currentPage, zoom]);
+  }, [pdfDoc, currentPage, zoom, drawingHistory]);
 
   // Get signed URL for selected audio track
   useEffect(() => {
@@ -280,6 +309,145 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
 
+  // Drawing functions
+  const getCanvasCoordinates = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    const canvas = drawingCanvasRef.current;
+    if (!canvas) return null;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    let clientX: number, clientY: number;
+    
+    if ('touches' in e) {
+      if (e.touches.length === 0) return null;
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }, []);
+
+  const startDrawing = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    if (activeTool === 'none') return;
+    e.preventDefault();
+    
+    const point = getCanvasCoordinates(e);
+    if (!point) return;
+    
+    setIsDrawing(true);
+    lastPointRef.current = point;
+  }, [activeTool, getCanvasCoordinates]);
+
+  const draw = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDrawing || activeTool === 'none') return;
+    e.preventDefault();
+    
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx || !lastPointRef.current) return;
+    
+    const point = getCanvasCoordinates(e);
+    if (!point) return;
+    
+    ctx.beginPath();
+    ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+    ctx.lineTo(point.x, point.y);
+    
+    if (activeTool === 'pencil') {
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = 'source-over';
+    } else if (activeTool === 'highlighter') {
+      ctx.strokeStyle = 'rgba(255, 230, 0, 0.4)';
+      ctx.lineWidth = 20;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = 'multiply';
+    } else if (activeTool === 'eraser') {
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.lineWidth = 25;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = 'destination-out';
+    }
+    
+    ctx.stroke();
+    lastPointRef.current = point;
+  }, [isDrawing, activeTool, getCanvasCoordinates]);
+
+  const stopDrawing = useCallback(() => {
+    if (!isDrawing) return;
+    
+    setIsDrawing(false);
+    lastPointRef.current = null;
+    
+    // Save current state to history
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (canvas && ctx) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      setDrawingHistory(prev => {
+        const newHistory = new Map(prev);
+        const pageHistory = newHistory.get(currentPage) || [];
+        newHistory.set(currentPage, [...pageHistory, imageData]);
+        return newHistory;
+      });
+    }
+  }, [isDrawing, currentPage]);
+
+  const undoDrawing = useCallback(() => {
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    
+    const pageHistory = drawingHistory.get(currentPage) || [];
+    if (pageHistory.length <= 1) {
+      // Clear canvas if only one or no history
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setDrawingHistory(prev => {
+        const newHistory = new Map(prev);
+        newHistory.delete(currentPage);
+        return newHistory;
+      });
+      return;
+    }
+    
+    // Remove last state and restore previous
+    const newHistory = pageHistory.slice(0, -1);
+    const previousState = newHistory[newHistory.length - 1];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.putImageData(previousState, 0, 0);
+    
+    setDrawingHistory(prev => {
+      const updated = new Map(prev);
+      updated.set(currentPage, newHistory);
+      return updated;
+    });
+  }, [currentPage, drawingHistory]);
+
+  const clearDrawings = useCallback(() => {
+    const canvas = drawingCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setDrawingHistory(prev => {
+      const newHistory = new Map(prev);
+      newHistory.delete(currentPage);
+      return newHistory;
+    });
+  }, [currentPage]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -337,19 +505,44 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
           </div>
         )}
 
-        {/* Canvas */}
-        <canvas
-          ref={canvasRef}
-          className={cn(
-            "shadow-2xl rounded-lg transition-opacity duration-300 bg-white",
-            isLoading ? "opacity-0" : "opacity-100"
-          )}
-          style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-          }}
-        />
+        {/* Canvas container for both PDF and drawing */}
+        <div className="relative" style={{ maxWidth: '100%', maxHeight: '100%' }}>
+          {/* PDF Canvas */}
+          <canvas
+            ref={canvasRef}
+            className={cn(
+              "shadow-2xl rounded-lg transition-opacity duration-300 bg-white",
+              isLoading ? "opacity-0" : "opacity-100"
+            )}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+            }}
+          />
+          
+          {/* Drawing Canvas (overlay) */}
+          <canvas
+            ref={drawingCanvasRef}
+            className={cn(
+              "absolute inset-0 rounded-lg transition-opacity duration-300",
+              isLoading ? "opacity-0" : "opacity-100",
+              activeTool !== 'none' ? "cursor-crosshair touch-none" : "pointer-events-none"
+            )}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+            }}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+            onTouchCancel={stopDrawing}
+          />
+        </div>
 
         {/* Page Navigation Arrows */}
         <button
@@ -374,7 +567,7 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
           <ChevronRight className="w-6 h-6 text-white" />
         </button>
 
-        {/* Zoom Controls - Top Right */}
+        {/* Zoom Controls - Top Left */}
         <div className="absolute top-4 left-4 flex items-center gap-1 glass rounded-full px-2 py-1">
           <Button 
             variant="ghost" 
@@ -402,6 +595,66 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
             className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
           >
             <RotateCcw className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Drawing Tools - Top Right (next to close button) */}
+        <div className="absolute top-4 right-20 flex items-center gap-1 glass rounded-full px-2 py-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setActiveTool(activeTool === 'pencil' ? 'none' : 'pencil')}
+            className={cn(
+              "h-8 w-8 transition-all",
+              activeTool === 'pencil' 
+                ? "bg-reward-gold text-black hover:bg-reward-gold/90" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            )}
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setActiveTool(activeTool === 'highlighter' ? 'none' : 'highlighter')}
+            className={cn(
+              "h-8 w-8 transition-all",
+              activeTool === 'highlighter' 
+                ? "bg-yellow-400 text-black hover:bg-yellow-400/90" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            )}
+          >
+            <Highlighter className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setActiveTool(activeTool === 'eraser' ? 'none' : 'eraser')}
+            className={cn(
+              "h-8 w-8 transition-all",
+              activeTool === 'eraser' 
+                ? "bg-white text-black hover:bg-white/90" 
+                : "text-white/70 hover:text-white hover:bg-white/10"
+            )}
+          >
+            <Eraser className="w-4 h-4" />
+          </Button>
+          <div className="w-px h-6 bg-white/20 mx-1" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={undoDrawing}
+            className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <Undo2 className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={clearDrawings}
+            className="h-8 w-8 text-white/70 hover:text-red-400 hover:bg-white/10"
+          >
+            <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -501,7 +754,7 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
                       value={[playbackRate]}
                       min={50}
                       max={150}
-                      step={5}
+                      step={1}
                       onValueChange={handleSpeedChange}
                       className="flex-1"
                     />
