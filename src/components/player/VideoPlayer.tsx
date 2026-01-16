@@ -31,12 +31,11 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(100); // 100 = 1.0x
+  const [playbackSpeed, setPlaybackSpeed] = useState(100);
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Build Vimeo player URL - muted=0 tries to start with sound (browser may override)
   const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
   // Load saved playback speed
@@ -118,7 +117,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-
   // Log Vimeo errors to database for admin visibility
   const logVimeoError = useCallback(async (errorType: VimeoError, message: string) => {
     const errorLog: VimeoErrorLog = {
@@ -155,33 +153,26 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   // Listen for Vimeo player events via postMessage
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // Check if message is from Vimeo
       if (event.origin !== 'https://player.vimeo.com') return;
       
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
         
-        // Player is ready
         if (data.event === 'ready') {
           setPlayerReady(true);
           setIsLoading(false);
           if (loadTimeoutRef.current) {
             clearTimeout(loadTimeoutRef.current);
           }
-          // Apply saved playback speed
           sendVimeoCommand('setPlaybackRate', playbackSpeed / 100);
-          // Get duration
           sendVimeoCommand('getDuration');
-          // Try to unmute (browser may block this)
           sendVimeoCommand('setVolume', 1);
         }
 
-        // Duration received
         if (data.method === 'getDuration' && data.value) {
           setDuration(data.value);
         }
         
-        // Time update
         if (data.event === 'timeupdate' || data.method === 'getCurrentTime') {
           if (data.data?.seconds !== undefined) {
             setCurrentTime(data.data.seconds);
@@ -190,7 +181,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           }
         }
 
-        // Play state changes
         if (data.event === 'play') {
           setIsPlaying(true);
         }
@@ -198,7 +188,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           setIsPlaying(false);
         }
         
-        // Check for progress event (80% completion)
         if (data.event === 'playProgress' && data.data) {
           const percent = data.data.percent || 0;
           setCurrentTime(data.data.seconds || 0);
@@ -212,7 +201,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           }
         }
         
-        // Alternative: timeupdate event for completion
         if (data.method === 'timeupdate' && data.value) {
           const { seconds, duration: dur } = data.value;
           setCurrentTime(seconds);
@@ -225,7 +213,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           }
         }
 
-        // Handle Vimeo error events
         if (data.event === 'error') {
           const errorMsg = data.data?.message || 'Unknown Vimeo error';
           if (errorMsg.includes('privacy') || errorMsg.includes('embed') || errorMsg.includes('domain')) {
@@ -241,10 +228,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
 
     window.addEventListener('message', handleMessage);
     
-    // Enable Vimeo API events after iframe loads
     const enableVimeoApi = () => {
       if (iframeRef.current?.contentWindow) {
-        // Subscribe to player events
         const methods = ['ready', 'playProgress', 'timeupdate', 'play', 'pause', 'error'];
         methods.forEach(method => {
           iframeRef.current?.contentWindow?.postMessage(
@@ -260,7 +245,6 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       iframe.addEventListener('load', enableVimeoApi);
     }
 
-    // Set timeout for loading - if iframe doesn't respond in 15s, show error
     loadTimeoutRef.current = setTimeout(() => {
       if (!playerReady) {
         setIsLoading(false);
@@ -295,19 +279,16 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose, togglePlayPause]);
 
-  // Handle iframe load error
   const handleIframeError = () => {
     logVimeoError('csp_blocked', 'iFrame konnte nicht geladen werden. Mögliches CSP-Problem.');
   };
 
-  // Retry loading
   const handleRetry = () => {
     setError(null);
     setIsLoading(true);
     setPlayerReady(false);
     hasCompletedRef.current = false;
     
-    // Force iframe reload
     if (iframeRef.current) {
       const currentSrc = iframeRef.current.src;
       iframeRef.current.src = '';
@@ -320,70 +301,89 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-fade-in">
-      {/* Star earned animation */}
+    <div 
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
+      style={{ 
+        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
+      }}
+    >
+      {/* Star earned animation - Gold glow effect */}
       {showCompleted && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] animate-scale-in">
-          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-black/80 backdrop-blur-lg">
-            <Star className="w-20 h-20 text-gold fill-gold animate-pulse" />
+          <div className="flex flex-col items-center gap-4 p-8 rounded-2xl glass-strong glow-gold">
+            <Star className="w-20 h-20 text-reward-gold fill-reward-gold animate-pulse" />
             <span className="text-2xl font-bold text-white">+1 Stern!</span>
           </div>
         </div>
       )}
       
-      {/* Close button */}
+      {/* Close button - Glass style */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
       >
         <X className="w-6 h-6" />
       </button>
+
+      {/* Video title - Glass header */}
+      <div className="shrink-0 glass px-6 py-3 safe-top">
+        <h2 className="text-lg font-semibold text-white truncate text-center max-w-3xl mx-auto">
+          {video.title}
+        </h2>
+      </div>
       
-      {/* Video container - fills available space, respects control bar */}
+      {/* Video container */}
       <div className="flex-1 min-h-0 flex items-center justify-center p-4">
         <div className="relative w-full h-full max-w-6xl flex items-center justify-center">
-          <div className="relative w-full aspect-video max-h-full rounded-lg overflow-hidden bg-black">
+          <div className="relative w-full aspect-video max-h-full rounded-lg overflow-hidden shadow-2xl" 
+               style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             {/* Loading indicator */}
             {isLoading && !error && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                  <span className="text-white/60">Video wird geladen...</span>
+                  <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
+                  <span className="text-white/70">Video wird geladen...</span>
                 </div>
               </div>
             )}
 
-            {/* Error display */}
+            {/* Error display - Glass card */}
             {error && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-                <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
+                <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-lg">
                   {error.errorType === 'network_error' ? (
-                    <WifiOff className="w-16 h-16 text-destructive" />
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <WifiOff className="w-8 h-8 text-accent-red" />
+                    </div>
                   ) : (
-                    <AlertTriangle className="w-16 h-16 text-destructive" />
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <AlertTriangle className="w-8 h-8 text-accent-red" />
+                    </div>
                   )}
-                  <h3 className="text-xl font-semibold text-white">
+                  <h3 className="text-xl font-semibold text-gray-900">
                     {error.errorType === 'embed_blocked' 
                       ? 'Video nicht freigegeben'
                       : error.errorType === 'network_error'
                       ? 'Verbindungsproblem'
                       : 'Video-Fehler'}
                   </h3>
-                  <p className="text-white/60">
+                  <p className="text-gray-600">
                     {error.errorType === 'embed_blocked' 
                       ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
                       : error.message}
                   </p>
                   <div className="flex gap-3 mt-4">
-                    <Button variant="outline" onClick={handleRetry} className="gap-2">
+                    <Button onClick={handleRetry} className="gap-2 bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white rounded-full">
                       <RefreshCw className="w-4 h-4" />
                       Erneut versuchen
                     </Button>
-                    <Button variant="secondary" onClick={onClose}>
+                    <Button variant="outline" onClick={onClose} className="rounded-full">
                       Schließen
                     </Button>
                   </div>
-                  <p className="text-white/40 text-xs mt-4">
+                  <p className="text-gray-400 text-xs mt-4">
                     Video-ID: {video.vimeoId}
                   </p>
                 </div>
@@ -405,39 +405,42 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         </div>
       </div>
       
-      {/* Fixed bottom control bar - always visible */}
-      <div className="shrink-0 z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-2 safe-bottom">
-        <div className="max-w-6xl mx-auto flex items-center gap-3">
-          {/* Play/Pause */}
+      {/* Fixed bottom control bar - Glass style with gold accents */}
+      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
+        <div className="max-w-6xl mx-auto flex items-center gap-4">
+          {/* Play/Pause - Gold accent */}
           <button
             onClick={togglePlayPause}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-reward-gold hover:bg-reward-gold/90 text-black transition-all shrink-0 flex items-center justify-center glow-gold"
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+            {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
           </button>
           
-          <span className="text-white/70 text-xs font-mono w-10 text-right shrink-0">
+          {/* Current time */}
+          <span className="text-white/80 text-sm font-mono w-12 text-right shrink-0">
             {formatTime(currentTime)}
           </span>
           
+          {/* Timeline slider - Gold */}
           <Slider
             value={[currentTime]}
             min={0}
             max={duration || 100}
             step={1}
             onValueChange={handleSeek}
-            variant="player"
-            className="flex-1 min-w-[100px]"
+            variant="gold"
+            className="flex-1 min-w-[120px]"
           />
           
-          <span className="text-white/70 text-xs font-mono w-10 shrink-0">
+          {/* Duration */}
+          <span className="text-white/80 text-sm font-mono w-12 shrink-0">
             {formatTime(duration)}
           </span>
 
           {/* Speed control */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-white/60 text-xs">Tempo:</span>
-            <div className="flex items-center gap-2 w-24">
+          <div className="flex items-center gap-3 shrink-0 ml-4 pl-4 border-l border-white/20">
+            <span className="text-white/60 text-sm">Tempo</span>
+            <div className="flex items-center gap-2 w-28">
               <Slider
                 value={[playbackSpeed]}
                 min={40}
@@ -448,7 +451,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
                 className="flex-1"
               />
             </div>
-            <span className="text-white font-medium text-xs w-10 text-center bg-white/10 rounded px-1.5 py-0.5">
+            <span className="text-reward-gold font-bold text-sm w-12 text-center bg-white/10 rounded-full px-2 py-1">
               {playbackSpeed}%
             </span>
           </div>
