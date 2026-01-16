@@ -7,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, User, Loader2, Music } from 'lucide-react';
+import { Mail, Lock, User, Loader2, Music, ExternalLink } from 'lucide-react';
+import { useWordPressMembership } from '@/hooks/useWordPressMembership';
+import { Separator } from '@/components/ui/separator';
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +19,7 @@ export default function AuthPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { startOAuthFlow, isLoading: isWpLoading, error: wpError } = useWordPressMembership();
 
   // Check if already logged in
   useEffect(() => {
@@ -211,6 +214,18 @@ export default function AuthPage() {
     );
   }
 
+  const handleWordPressLogin = async () => {
+    try {
+      await startOAuthFlow();
+    } catch (error) {
+      toast({
+        title: 'WordPress Login fehlgeschlagen',
+        description: wpError || 'Ein Fehler ist aufgetreten.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
@@ -218,12 +233,46 @@ export default function AuthPage() {
           <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
             <Music className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">Musik-Lern-App</CardTitle>
+          <CardTitle className="text-2xl">Trumpetstar</CardTitle>
           <CardDescription>
             Melde dich an, um deine Lernreise fortzusetzen
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* WordPress SSO Button */}
+          <div className="space-y-3">
+            <Button 
+              onClick={handleWordPressLogin} 
+              className="w-full gap-2 bg-amber-600 hover:bg-amber-700 text-white"
+              size="lg"
+              disabled={isWpLoading}
+            >
+              {isWpLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verbinde...
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4" />
+                  Mit Trumpetstar anmelden
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Nutze dein bestehendes Trumpetstar-Konto mit allen Mitgliedschaftsvorteilen
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator className="w-full" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Oder</span>
+            </div>
+          </div>
+
           <Tabs defaultValue="magic" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="magic">Magic Link</TabsTrigger>

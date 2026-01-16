@@ -1,1 +1,7 @@
 project_id = "osgrjouxwpnokfvzztji"
+
+[functions.vimeo-sync]
+verify_jwt = false
+
+[functions.wp-oauth]
+verify_jwt = false
