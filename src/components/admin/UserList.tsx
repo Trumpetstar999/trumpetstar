@@ -612,11 +612,11 @@ export function UserList() {
               <Button
                 onClick={handleExportUsers}
                 variant="outline"
-                size="sm"
-                className="h-8 px-3 text-xs font-medium border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                size="icon"
+                className="h-8 w-8 border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                title="Exportieren"
               >
-                <Download className="w-3.5 h-3.5 mr-1.5" />
-                Exportieren
+                <Download className="w-4 h-4" />
               </Button>
               <Button
                 onClick={() => setCreateDialogOpen(true)}
