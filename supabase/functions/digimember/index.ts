@@ -10,20 +10,19 @@ const DIGIMEMBER_BASE_URL = 'https://www.trumpetstar.com/wp-json/digimember/v1';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
+// Plan types: FREE (0), BASIC (10), PREMIUM (20)
+type PlanKey = 'FREE' | 'BASIC' | 'PREMIUM' | 'NONE';
+
 interface DigiMemberUserProduct {
   product_id: string;
   status: string;
   expiry_date?: string;
 }
 
-interface ProductRecord {
-  product_id: string;
-  name: string;
-  type: string | null;
-  checkout_url: string | null;
-  is_active: boolean;
-  app_plan: string | null;
-  last_synced_at: string;
+interface Plan {
+  key: string;
+  display_name: string;
+  rank: number;
 }
 
 // deno-lint-ignore no-explicit-any
@@ -32,7 +31,6 @@ async function callDigiMemberAPI(endpoint: string, method = 'GET', body?: any): 
   
   console.log(`Calling DigiMember API: ${method} ${url}`);
   
-  // DigiMember uses X-Digi-Key header for authentication (not Bearer token)
   const headers: Record<string, string> = {
     'X-Digi-Key': DIGIMEMBER_API_KEY,
     'Content-Type': 'application/json',
@@ -62,24 +60,45 @@ async function callDigiMemberAPI(endpoint: string, method = 'GET', body?: any): 
 }
 
 // deno-lint-ignore no-explicit-any
+async function getPlans(supabaseClient: any): Promise<Plan[]> {
+  const { data, error } = await supabaseClient
+    .from('plans')
+    .select('key, display_name, rank')
+    .order('rank');
+  
+  if (error) {
+    console.error('Error fetching plans:', error);
+    return [
+      { key: 'FREE', display_name: 'Free', rank: 0 },
+      { key: 'BASIC', display_name: 'Basic', rank: 10 },
+      { key: 'PREMIUM', display_name: 'Premium', rank: 20 },
+    ];
+  }
+  
+  return data || [];
+}
+
+// deno-lint-ignore no-explicit-any
 async function syncProducts(supabaseClient: any) {
   console.log('Starting product sync...');
   
   try {
-    // Fetch all products from DigiMember
     const response = await callDigiMemberAPI('/products');
     
-    // Handle various API response formats
     const productList = Array.isArray(response) 
       ? response 
       : (response.data || response.products || []);
     
     let syncedCount = 0;
+    const syncedProductIds: string[] = [];
     
     // deno-lint-ignore no-explicit-any
     for (const product of productList) {
-      const productData: Omit<ProductRecord, 'app_plan'> = {
-        product_id: String(product.id),
+      const productId = String(product.id);
+      syncedProductIds.push(productId);
+      
+      const productData = {
+        product_id: productId,
         name: product.name || `Product ${product.id}`,
         type: product.type || 'membership',
         checkout_url: product.checkout_url || product.buy_url || null,
@@ -98,6 +117,34 @@ async function syncProducts(supabaseClient: any) {
       } else {
         syncedCount++;
       }
+      
+      // Ensure product has a mapping entry
+      const { error: mappingError } = await supabaseClient
+        .from('product_plan_mapping')
+        .upsert({
+          digimember_product_id: productId,
+          plan_key: 'NONE',
+          is_enabled: true,
+        }, { 
+          onConflict: 'digimember_product_id',
+          ignoreDuplicates: true 
+        });
+      
+      if (mappingError) {
+        console.error(`Error creating mapping for ${productId}:`, mappingError);
+      }
+    }
+    
+    // Mark products not in sync as inactive (soft delete)
+    if (syncedProductIds.length > 0) {
+      const { error: deactivateError } = await supabaseClient
+        .from('digimember_products')
+        .update({ is_active: false })
+        .not('product_id', 'in', `(${syncedProductIds.join(',')})`);
+      
+      if (deactivateError) {
+        console.error('Error deactivating old products:', deactivateError);
+      }
     }
     
     return { synced: syncedCount };
@@ -111,7 +158,6 @@ async function getUserMembership(email: string) {
   console.log(`Fetching membership for user: ${email}`);
   
   try {
-    // Try to get user's active products from DigiMember
     const userData = await callDigiMemberAPI(`/user/products?email=${encodeURIComponent(email)}`);
     
     const products: DigiMemberUserProduct[] = userData.products || userData.data || [];
@@ -138,37 +184,75 @@ async function getUserMembership(email: string) {
 async function determinePlan(
   activeProductIds: string[],
   supabaseClient: any
-): Promise<'FREE' | 'PLAN_A' | 'PLAN_B'> {
+): Promise<{ planKey: PlanKey; planRank: number }> {
   if (activeProductIds.length === 0) {
-    return 'FREE';
+    return { planKey: 'FREE', planRank: 0 };
   }
   
-  // Get product mappings from database
-  const { data: products, error } = await supabaseClient
-    .from('digimember_products')
-    .select('product_id, app_plan')
-    .in('product_id', activeProductIds)
-    .not('app_plan', 'is', null);
+  // Get product mappings with plan info
+  const { data: mappings, error } = await supabaseClient
+    .from('product_plan_mapping')
+    .select('digimember_product_id, plan_key')
+    .in('digimember_product_id', activeProductIds)
+    .eq('is_enabled', true)
+    .neq('plan_key', 'NONE');
   
-  if (error || !products || products.length === 0) {
+  if (error || !mappings || mappings.length === 0) {
     console.log('No mapped products found, returning FREE');
-    return 'FREE';
+    return { planKey: 'FREE', planRank: 0 };
   }
   
-  // Return highest plan (PLAN_B > PLAN_A > FREE)
-  const planPriority: Record<string, number> = { 'PLAN_B': 3, 'PLAN_A': 2, 'FREE': 1 };
-  let highestPlan: 'FREE' | 'PLAN_A' | 'PLAN_B' = 'FREE';
+  // Get plans for rank lookup
+  const plans = await getPlans(supabaseClient);
+  const planRanks: Record<string, number> = {};
+  for (const plan of plans) {
+    planRanks[plan.key] = plan.rank;
+  }
+  
+  // Find highest plan
+  let highestPlanKey: PlanKey = 'FREE';
+  let highestRank = 0;
   
   // deno-lint-ignore no-explicit-any
-  for (const product of products as any[]) {
-    const productPlan = product.app_plan as string;
-    if (productPlan && (planPriority[productPlan] || 0) > planPriority[highestPlan]) {
-      highestPlan = productPlan as 'FREE' | 'PLAN_A' | 'PLAN_B';
+  for (const mapping of mappings as any[]) {
+    const planKey = mapping.plan_key as string;
+    const rank = planRanks[planKey] || 0;
+    if (rank > highestRank) {
+      highestRank = rank;
+      highestPlanKey = planKey as PlanKey;
     }
   }
   
-  console.log(`Determined plan: ${highestPlan}`);
-  return highestPlan;
+  console.log(`Determined plan: ${highestPlanKey} (rank: ${highestRank})`);
+  return { planKey: highestPlanKey, planRank: highestRank };
+}
+
+// deno-lint-ignore no-explicit-any
+async function getUpgradeLinks(supabaseClient: any): Promise<Record<string, string | null>> {
+  const { data: mappings } = await supabaseClient
+    .from('product_plan_mapping')
+    .select('plan_key, checkout_url')
+    .eq('is_enabled', true)
+    .neq('plan_key', 'NONE')
+    .not('checkout_url', 'is', null);
+  
+  const links: Record<string, string | null> = {
+    BASIC: null,
+    PREMIUM: null,
+  };
+  
+  if (mappings) {
+    // deno-lint-ignore no-explicit-any
+    for (const m of mappings as any[]) {
+      if (m.plan_key === 'BASIC' && m.checkout_url && !links.BASIC) {
+        links.BASIC = m.checkout_url;
+      } else if (m.plan_key === 'PREMIUM' && m.checkout_url && !links.PREMIUM) {
+        links.PREMIUM = m.checkout_url;
+      }
+    }
+  }
+  
+  return links;
 }
 
 Deno.serve(async (req) => {
@@ -210,38 +294,34 @@ Deno.serve(async (req) => {
       }
       
       const { activeProductIds, products } = await getUserMembership(email);
-      const plan = await determinePlan(activeProductIds, supabaseClient);
+      const { planKey, planRank } = await determinePlan(activeProductIds, supabaseClient);
+      const upgradeLinks = await getUpgradeLinks(supabaseClient);
+      const plans = await getPlans(supabaseClient);
       
-      // Get upgrade links for products
-      const { data: planProducts } = await supabaseClient
-        .from('digimember_products')
-        .select('app_plan, checkout_url')
-        .not('app_plan', 'is', null)
-        .eq('is_active', true);
-      
-      const upgradeLinks: Record<string, string | null> = {
-        planA: null,
-        planB: null,
-      };
-      
-      if (planProducts) {
-        // deno-lint-ignore no-explicit-any
-        for (const p of planProducts as any[]) {
-          if (p.app_plan === 'PLAN_A' && p.checkout_url) {
-            upgradeLinks.planA = p.checkout_url;
-          } else if (p.app_plan === 'PLAN_B' && p.checkout_url) {
-            upgradeLinks.planB = p.checkout_url;
-          }
-        }
-      }
-      
-      // Update user_memberships table if userId provided
+      // Update user_membership_cache if userId provided
       if (userId) {
+        const { error: cacheError } = await supabaseClient
+          .from('user_membership_cache')
+          .upsert({
+            user_id: userId,
+            plan_key: planKey,
+            plan_rank: planRank,
+            active_product_ids: activeProductIds,
+            last_checked_at: new Date().toISOString(),
+          }, { onConflict: 'user_id' });
+        
+        if (cacheError) {
+          console.error('Error upserting membership cache:', cacheError);
+        }
+        
+        // Also update legacy user_memberships table
         const { error: upsertError } = await supabaseClient
           .from('user_memberships')
           .upsert({
             user_id: userId,
-            current_plan: plan,
+            current_plan: planKey,
+            plan_key: planKey,
+            plan_rank: planRank,
             active_product_ids: activeProductIds,
             last_synced_at: new Date().toISOString(),
           }, { onConflict: 'user_id' });
@@ -253,10 +333,14 @@ Deno.serve(async (req) => {
       
       return new Response(JSON.stringify({
         success: true,
-        plan,
+        planKey,
+        planRank,
+        // Legacy support
+        plan: planKey,
         activeProductIds,
         products,
         upgradeLinks,
+        plans,
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -269,13 +353,33 @@ Deno.serve(async (req) => {
         .select('*')
         .order('name');
       
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
+      
+      // Get mappings
+      const { data: mappings } = await supabaseClient
+        .from('product_plan_mapping')
+        .select('*');
+      
+      // Get plans
+      const plans = await getPlans(supabaseClient);
+      
+      // Merge data
+      // deno-lint-ignore no-explicit-any
+      const enrichedProducts = (products || []).map((p: any) => {
+        // deno-lint-ignore no-explicit-any
+        const mapping = (mappings || []).find((m: any) => m.digimember_product_id === p.product_id);
+        return {
+          ...p,
+          plan_key: mapping?.plan_key || 'NONE',
+          checkout_url: mapping?.checkout_url || p.checkout_url,
+          is_enabled: mapping?.is_enabled ?? true,
+        };
+      });
       
       return new Response(JSON.stringify({
         success: true,
-        products,
+        products: enrichedProducts,
+        plans,
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -284,7 +388,7 @@ Deno.serve(async (req) => {
     // Action: Update product mapping
     if (action === 'update-product-mapping') {
       const body = await req.json();
-      const { productId, appPlan } = body;
+      const { productId, planKey, checkoutUrl, isEnabled } = body;
       
       if (!productId) {
         return new Response(JSON.stringify({ error: 'Product ID is required' }), {
@@ -293,14 +397,20 @@ Deno.serve(async (req) => {
         });
       }
       
-      const { error } = await supabaseClient
-        .from('digimember_products')
-        .update({ app_plan: appPlan || null })
-        .eq('product_id', productId);
+      const updateData: Record<string, unknown> = {
+        digimember_product_id: productId,
+        updated_at: new Date().toISOString(),
+      };
       
-      if (error) {
-        throw error;
-      }
+      if (planKey !== undefined) updateData.plan_key = planKey || 'NONE';
+      if (checkoutUrl !== undefined) updateData.checkout_url = checkoutUrl;
+      if (isEnabled !== undefined) updateData.is_enabled = isEnabled;
+      
+      const { error } = await supabaseClient
+        .from('product_plan_mapping')
+        .upsert(updateData, { onConflict: 'digimember_product_id' });
+      
+      if (error) throw error;
       
       return new Response(JSON.stringify({
         success: true,
@@ -310,8 +420,68 @@ Deno.serve(async (req) => {
       });
     }
     
+    // Action: Get plans
+    if (action === 'get-plans') {
+      const plans = await getPlans(supabaseClient);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        plans,
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Action: Get plan stats (admin dashboard)
+    if (action === 'get-plan-stats') {
+      const { data: stats, error } = await supabaseClient
+        .from('admin_plan_stats')
+        .select('*');
+      
+      if (error) throw error;
+      
+      return new Response(JSON.stringify({
+        success: true,
+        stats,
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Action: Debug user membership (admin)
+    if (action === 'debug-membership') {
+      const body = await req.json();
+      const { userId, email } = body;
+      
+      let membershipData = null;
+      let cacheData = null;
+      
+      if (userId) {
+        const { data } = await supabaseClient
+          .from('user_membership_cache')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+        cacheData = data;
+      }
+      
+      if (email) {
+        const { activeProductIds, products } = await getUserMembership(email);
+        const { planKey, planRank } = await determinePlan(activeProductIds, supabaseClient);
+        membershipData = { activeProductIds, products, planKey, planRank };
+      }
+      
+      return new Response(JSON.stringify({
+        success: true,
+        cache: cacheData,
+        live: membershipData,
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
     return new Response(JSON.stringify({ 
-      error: 'Invalid action. Use: sync-products, check-membership, get-products, update-product-mapping' 
+      error: 'Invalid action. Use: sync-products, check-membership, get-products, update-product-mapping, get-plans, get-plan-stats, debug-membership' 
     }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
