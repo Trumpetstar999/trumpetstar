@@ -9,7 +9,8 @@ import {
   ChevronRight,
   MessageSquare,
   Package,
-  Music
+  Music,
+  FileText
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -23,6 +24,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'users', label: 'Nutzer', icon: Users },
   { id: 'levels', label: 'Levels', icon: Layers },
+  { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
   { id: 'products', label: 'Produkte & Pläne', icon: Package },
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
