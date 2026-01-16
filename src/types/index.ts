@@ -1,5 +1,7 @@
 // Core types for the music learning app
 
+export type MembershipPlan = 'FREE' | 'PLAN_A' | 'PLAN_B';
+
 export interface Video {
   id: string;
   title: string;
@@ -22,6 +24,7 @@ export interface Level {
   showcaseId: string;
   sections: Section[];
   totalStars: number;
+  requiredPlan?: MembershipPlan; // Defaults to FREE if not set
 }
 
 export interface JournalEntry {

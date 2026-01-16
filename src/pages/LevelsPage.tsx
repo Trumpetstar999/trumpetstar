@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { Video, Level, Section } from '@/types';
+import { LevelLockOverlay } from '@/components/levels/LevelLockOverlay';
+import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
+import { Video, Level, Section, MembershipPlan } from '@/types';
 import { Download, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
+import { useWordPressMembership } from '@/hooks/useWordPressMembership';
 
 interface LevelsPageProps {
   onStarEarned: () => void;
@@ -18,6 +21,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [activeLevel, setActiveLevel] = useState<string>('');
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const { setIsVideoPlaying } = useVideoPlayer();
+  const { canAccessLevel } = useWordPressMembership();
 
   // Update video playing state when video is selected/closed
   useEffect(() => {
@@ -158,6 +162,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  <MembershipStatusBadge />
                   <Button variant="ghost" size="sm" className="gap-2 text-white hover:bg-blue-800" onClick={fetchLevels}>
                     <RefreshCw className="w-4 h-4" />
                     Sync
@@ -169,6 +174,14 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               </div>
             </div>
+            
+            {/* Lock Overlay if user can't access */}
+            {currentLevel.requiredPlan && !canAccessLevel(currentLevel.requiredPlan) && (
+              <LevelLockOverlay 
+                requiredPlan={currentLevel.requiredPlan} 
+                levelTitle={currentLevel.title} 
+              />
+            )}
             
             {/* Sections */}
             <div className="py-4">
