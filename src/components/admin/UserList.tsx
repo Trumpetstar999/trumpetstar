@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,10 +12,11 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles } from 'lucide-react';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { CreateUserDialog } from './CreateUserDialog';
 import type { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
@@ -53,6 +55,7 @@ export function UserList() {
   const [updatingTeacher, setUpdatingTeacher] = useState<string | null>(null);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [updatingPlan, setUpdatingPlan] = useState<string | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -408,14 +411,23 @@ export function UserList() {
                 Nutzerliste ({filteredUsers.length})
               </span>
             </div>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-              <Input
-                placeholder="Nutzer suchen..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9 border-[#E5E7EB] focus:border-[#3B82F6] focus:ring-[#EFF6FF]"
-              />
+            <div className="flex items-center gap-3">
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+                <Input
+                  placeholder="Nutzer suchen..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9 border-[#E5E7EB] focus:border-[#3B82F6] focus:ring-[#EFF6FF]"
+                />
+              </div>
+              <Button
+                onClick={() => setCreateDialogOpen(true)}
+                className="h-9 bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Nutzer anlegen
+              </Button>
             </div>
           </div>
 
@@ -670,6 +682,14 @@ export function UserList() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Create User Dialog */}
+      <CreateUserDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        plans={plans}
+        onUserCreated={fetchUsers}
+      />
     </>
   );
 }
