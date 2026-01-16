@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useMembership } from '@/hooks/useMembership';
-import { PdfSidebar } from '@/components/pdfs/PdfSidebar';
+import { usePdfCache } from '@/hooks/usePdfCache';
 import { PdfViewer } from '@/components/pdfs/PdfViewer';
+import { PdfBookCard } from '@/components/pdfs/PdfBookCard';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, FileText, Search, Music } from 'lucide-react';
 import { PlanKey } from '@/types/plans';
 import { toast } from 'sonner';
 import { usePdfViewer } from '@/hooks/usePdfViewer';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface PdfDocument {
   id: string;
@@ -36,24 +39,46 @@ export function PdfsPage() {
   const { user } = useAuth();
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
   const { setIsPdfViewerOpen } = usePdfViewer();
+  const { getPdfUrl, downloadProgress, isCached } = usePdfCache();
+  
   const [selectedPdfId, setSelectedPdfId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
+  const [cachedStatus, setCachedStatus] = useState<Map<string, boolean>>(new Map());
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch PDF documents
   const { data: pdfs = [], isLoading: pdfsLoading } = useQuery({
     queryKey: ['user-pdfs'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('pdf_documents')
+      // Using type assertion for pdf_documents table
+      const query = supabase.from('pdf_documents');
+      const { data, error } = await (query as any)
         .select('*')
         .eq('is_active', true)
         .order('sort_index', { ascending: true });
 
       if (error) throw error;
-      return data as PdfDocument[];
+      return (data || []) as PdfDocument[];
     },
     enabled: !!user,
   });
+
+  // Check cached status for all PDFs
+  useEffect(() => {
+    const checkCachedStatus = async () => {
+      const status = new Map<string, boolean>();
+      for (const pdf of pdfs) {
+        const cached = await isCached(pdf.id);
+        status.set(pdf.id, cached);
+      }
+      setCachedStatus(status);
+    };
+    
+    if (pdfs.length > 0) {
+      checkCachedStatus();
+    }
+  }, [pdfs, isCached]);
 
   // Fetch audio tracks for selected PDF
   const { data: audioTracks = [] } = useQuery({
@@ -61,14 +86,15 @@ export function PdfsPage() {
     queryFn: async () => {
       if (!selectedPdfId) return [];
       
-      const { data, error } = await supabase
-        .from('pdf_audio_tracks')
+      // Using type assertion for pdf_audio_tracks table
+      const query = supabase.from('pdf_audio_tracks');
+      const { data, error } = await (query as any)
         .select('*')
         .eq('pdf_document_id', selectedPdfId)
         .order('page_number', { ascending: true });
 
       if (error) throw error;
-      return data as AudioTrack[];
+      return (data || []) as AudioTrack[];
     },
     enabled: !!selectedPdfId,
   });
@@ -80,26 +106,52 @@ export function PdfsPage() {
 
   // Update global state when PDF viewer opens/closes
   useEffect(() => {
-    setIsPdfViewerOpen(!!selectedPdfId && canAccessSelectedPdf);
+    const isOpen = !!pdfBlobUrl && canAccessSelectedPdf;
+    setIsPdfViewerOpen(isOpen);
     return () => setIsPdfViewerOpen(false);
-  }, [selectedPdfId, canAccessSelectedPdf, setIsPdfViewerOpen]);
+  }, [pdfBlobUrl, canAccessSelectedPdf, setIsPdfViewerOpen]);
 
   const isLoading = pdfsLoading || membershipLoading;
 
-  // Handle select with access check
-  const handleSelectPdf = (id: string) => {
+  // Handle select with access check and download
+  const handleSelectPdf = useCallback(async (id: string) => {
     const pdf = pdfs.find(p => p.id === id);
-    if (pdf && canAccessLevel(pdf.plan_required as PlanKey)) {
-      setSelectedPdfId(id);
-      setCurrentPage(1);
-    } else if (pdf) {
+    if (!pdf) return;
+    
+    if (!canAccessLevel(pdf.plan_required as PlanKey)) {
       toast.error(`Upgrade auf ${pdf.plan_required} erforderlich`);
+      return;
     }
-  };
 
-  const handleClosePdf = () => {
+    setSelectedPdfId(id);
+    
+    // Get PDF URL (from cache or download)
+    const url = await getPdfUrl(id, pdf.pdf_file_url);
+    
+    if (url) {
+      setPdfBlobUrl(url);
+      setCurrentPage(1);
+      // Update cached status
+      setCachedStatus(prev => new Map(prev).set(id, true));
+    } else {
+      toast.error('PDF konnte nicht geladen werden');
+      setSelectedPdfId(null);
+    }
+  }, [pdfs, canAccessLevel, getPdfUrl]);
+
+  const handleClosePdf = useCallback(() => {
     setSelectedPdfId(null);
-  };
+    if (pdfBlobUrl) {
+      URL.revokeObjectURL(pdfBlobUrl);
+      setPdfBlobUrl(null);
+    }
+  }, [pdfBlobUrl]);
+
+  // Filter PDFs by search
+  const filteredPdfs = pdfs.filter(pdf =>
+    pdf.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (pdf.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+  );
 
   if (isLoading) {
     return (
@@ -123,31 +175,76 @@ export function PdfsPage() {
 
   return (
     <>
-      <div className="flex h-[calc(100vh-140px)]">
-        {/* Sidebar */}
-        <PdfSidebar
-          pdfs={pdfs}
-          selectedPdfId={selectedPdfId}
-          onSelectPdf={handleSelectPdf}
-          canAccessLevel={canAccessLevel}
-        />
-
-        {/* Main Content - shows selection prompt */}
-        <div className="flex-1 relative overflow-hidden bg-muted/30">
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center text-white/60">
-              <FileText className="w-20 h-20 mx-auto mb-4 opacity-40" />
-              <p className="text-lg font-medium">Wähle ein Notenheft</p>
-              <p className="text-sm opacity-70 mt-1">aus der Liste links</p>
+      <div className="h-[calc(100vh-140px)] flex flex-col">
+        {/* Header */}
+        <div className="shrink-0 px-6 py-4 border-b bg-card/50">
+          <div className="flex items-center justify-between gap-4 max-w-6xl mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Music className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">Notenhefte</h1>
+                <p className="text-sm text-muted-foreground">{pdfs.length} Hefte verfügbar</p>
+              </div>
+            </div>
+            
+            {/* Search */}
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Suchen..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-9"
+              />
             </div>
           </div>
         </div>
+
+        {/* Book Grid */}
+        <ScrollArea className="flex-1">
+          <div className="p-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8 justify-items-center">
+              {filteredPdfs.map((pdf) => {
+                const hasAccess = canAccessLevel(pdf.plan_required as PlanKey);
+                const isDownloading = downloadProgress?.pdfId === pdf.id && downloadProgress.isDownloading;
+                const progress = downloadProgress?.pdfId === pdf.id ? downloadProgress.progress : 0;
+                const cached = cachedStatus.get(pdf.id) || false;
+
+                return (
+                  <PdfBookCard
+                    key={pdf.id}
+                    id={pdf.id}
+                    title={pdf.title}
+                    description={pdf.description}
+                    pageCount={pdf.page_count}
+                    planRequired={pdf.plan_required as PlanKey}
+                    hasAccess={hasAccess}
+                    isDownloading={isDownloading}
+                    downloadProgress={progress}
+                    isCached={cached}
+                    onClick={() => handleSelectPdf(pdf.id)}
+                  />
+                );
+              })}
+            </div>
+
+            {filteredPdfs.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>Keine Notenhefte gefunden</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Fullscreen PDF Viewer */}
-      {selectedPdf && canAccessSelectedPdf && (
+      {selectedPdf && pdfBlobUrl && canAccessSelectedPdf && (
         <PdfViewer
           pdf={selectedPdf}
+          pdfBlobUrl={pdfBlobUrl}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           audioTracks={audioTracks}
