@@ -36,8 +36,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Build Vimeo player URL - enable sound, autoplay works on mute but user can unmute
-  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
+  // Build Vimeo player URL - muted=0 tries to start with sound (browser may override)
+  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
   // Load saved playback speed
   useEffect(() => {
@@ -172,6 +172,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           sendVimeoCommand('setPlaybackRate', playbackSpeed / 100);
           // Get duration
           sendVimeoCommand('getDuration');
+          // Try to unmute (browser may block this)
+          sendVimeoCommand('setVolume', 1);
         }
 
         // Duration received
