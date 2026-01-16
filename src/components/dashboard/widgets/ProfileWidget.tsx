@@ -93,14 +93,12 @@ export function ProfileWidget() {
         </Button>
       </div>
 
-      {profile && (
-        <EditProfileDialog
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          profile={profile}
-          onUpdate={fetchProfile}
-        />
-      )}
+      <EditProfileDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        profile={profile || { id: user?.id || '', display_name: null, avatar_url: null, created_at: '' }}
+        onUpdate={fetchProfile}
+      />
 
       <ChangePasswordDialog
         open={passwordDialogOpen}
