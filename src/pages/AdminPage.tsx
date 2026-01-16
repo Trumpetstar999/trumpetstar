@@ -15,20 +15,29 @@ import { MembershipDebugPanel } from '@/components/admin/MembershipDebugPanel';
 import { AssistantContentManager } from '@/components/admin/AssistantContentManager';
 import { AssistantRepertoireManager } from '@/components/admin/AssistantRepertoireManager';
 import { AssistantFeedbackManager } from '@/components/admin/AssistantFeedbackManager';
+import { PdfDocumentManager } from '@/components/admin/PdfDocumentManager';
+import { PdfAudioManager } from '@/components/admin/PdfAudioManager';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
+type PdfSubTab = 'documents' | 'audio';
 
 interface SelectedContext {
   levelId: string;
   levelTitle: string;
   sectionId?: string;
   sectionTitle?: string;
+}
+
+interface PdfAudioContext {
+  pdfId: string;
+  pdfTitle: string;
+  pageCount: number;
 }
 
 export default function AdminPage() {
@@ -42,6 +51,8 @@ export default function AdminPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [levelsSubTab, setLevelsSubTab] = useState<'import' | 'manage'>('import');
   const [assistantSubTab, setAssistantSubTab] = useState<AssistantSubTab>('content');
+  const [pdfSubTab, setPdfSubTab] = useState<PdfSubTab>('documents');
+  const [pdfAudioContext, setPdfAudioContext] = useState<PdfAudioContext | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -113,6 +124,7 @@ export default function AdminPage() {
       case 'dashboard': return 'Dashboard';
       case 'users': return 'Nutzerverwaltung';
       case 'levels': return 'Levels & Showcases';
+      case 'pdfs': return 'PDFs / Noten';
       case 'products': return 'Produkte & Pläne';
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
@@ -127,6 +139,7 @@ export default function AdminPage() {
       case 'dashboard': return 'Übersicht aller wichtigen Kennzahlen';
       case 'users': return 'Nutzer verwalten und bearbeiten';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
+      case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
@@ -273,6 +286,38 @@ export default function AdminPage() {
                       }}
                     />
                   )}
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'pdfs' && (
+            <div className="space-y-6">
+              {pdfAudioContext ? (
+                <PdfAudioManager
+                  pdfId={pdfAudioContext.pdfId}
+                  pdfTitle={pdfAudioContext.pdfTitle}
+                  pageCount={pdfAudioContext.pageCount}
+                  onBack={() => setPdfAudioContext(null)}
+                />
+              ) : (
+                <>
+                  {/* Sub-tabs */}
+                  <div className="admin-tabs">
+                    <button
+                      onClick={() => setPdfSubTab('documents')}
+                      className={`admin-tab ${pdfSubTab === 'documents' ? 'admin-tab-active' : ''}`}
+                    >
+                      <FileText className="w-4 h-4" />
+                      PDFs verwalten
+                    </button>
+                  </div>
+
+                  <PdfDocumentManager
+                    onManageAudio={(pdfId, pdfTitle, pageCount) => {
+                      setPdfAudioContext({ pdfId, pdfTitle, pageCount });
+                    }}
+                  />
                 </>
               )}
             </div>
