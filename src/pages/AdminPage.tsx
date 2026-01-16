@@ -12,13 +12,17 @@ import { ShowcaseImporter } from '@/components/admin/ShowcaseImporter';
 import { AdminFeedbackPanel } from '@/components/admin/AdminFeedbackPanel';
 import { ProductPlanManager } from '@/components/admin/ProductPlanManager';
 import { MembershipDebugPanel } from '@/components/admin/MembershipDebugPanel';
+import { AssistantContentManager } from '@/components/admin/AssistantContentManager';
+import { AssistantRepertoireManager } from '@/components/admin/AssistantRepertoireManager';
+import { AssistantFeedbackManager } from '@/components/admin/AssistantFeedbackManager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'products' | 'classrooms' | 'feedback' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
+type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 
 interface SelectedContext {
   levelId: string;
@@ -37,6 +41,7 @@ export default function AdminPage() {
   const [context, setContext] = useState<SelectedContext | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [levelsSubTab, setLevelsSubTab] = useState<'import' | 'manage'>('import');
+  const [assistantSubTab, setAssistantSubTab] = useState<AssistantSubTab>('content');
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -109,6 +114,7 @@ export default function AdminPage() {
       case 'users': return 'Nutzerverwaltung';
       case 'levels': return 'Levels & Showcases';
       case 'products': return 'Produkte & Pläne';
+      case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
       case 'system': return 'Systemstatus';
@@ -122,6 +128,7 @@ export default function AdminPage() {
       case 'users': return 'Nutzer verwalten und bearbeiten';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
+      case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
       case 'system': return 'Systemstatus und Einstellungen';
@@ -286,6 +293,35 @@ export default function AdminPage() {
               </div>
 
               <ProductPlanManager />
+            </div>
+          )}
+
+          {activeTab === 'assistant' && (
+            <div className="space-y-6">
+              <div className="admin-tabs">
+                <button
+                  onClick={() => setAssistantSubTab('content')}
+                  className={`admin-tab ${assistantSubTab === 'content' ? 'admin-tab-active' : ''}`}
+                >
+                  Inhalte
+                </button>
+                <button
+                  onClick={() => setAssistantSubTab('repertoire')}
+                  className={`admin-tab ${assistantSubTab === 'repertoire' ? 'admin-tab-active' : ''}`}
+                >
+                  Repertoire
+                </button>
+                <button
+                  onClick={() => setAssistantSubTab('feedback')}
+                  className={`admin-tab ${assistantSubTab === 'feedback' ? 'admin-tab-active' : ''}`}
+                >
+                  Feedback
+                </button>
+              </div>
+
+              {assistantSubTab === 'content' && <AssistantContentManager />}
+              {assistantSubTab === 'repertoire' && <AssistantRepertoireManager />}
+              {assistantSubTab === 'feedback' && <AssistantFeedbackManager />}
             </div>
           )}
 
