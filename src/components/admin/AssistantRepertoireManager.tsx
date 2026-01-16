@@ -180,17 +180,49 @@ export function AssistantRepertoireManager() {
     });
   };
 
+  // Parse a single CSV line respecting quoted fields
+  const parseCSVLine = (line: string, delimiter: string): string[] => {
+    const values: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++; // Skip next quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === delimiter && !inQuotes) {
+        values.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    values.push(current.trim());
+    
+    return values;
+  };
+
   // Parse CSV/TSV content
   const parseSpreadsheet = (content: string): Partial<RepertoireItem>[] => {
-    const lines = content.split('\n').filter(l => l.trim());
+    const lines = content.split(/\r?\n/).filter(l => l.trim());
     if (lines.length < 2) return [];
 
-    // Detect delimiter
+    // Detect delimiter - check if tabs exist, otherwise use comma
     const delimiter = lines[0].includes('\t') ? '\t' : ',';
-    const headers = lines[0].split(delimiter).map(h => h.trim().toLowerCase());
+    const headers = parseCSVLine(lines[0], delimiter).map(h => h.toLowerCase().replace(/^"|"$/g, ''));
 
-    return lines.slice(1).map(line => {
-      const values = line.split(delimiter).map(v => v.trim().replace(/^"|"$/g, ''));
+    console.log('CSV Import - Headers detected:', headers);
+    console.log('CSV Import - Delimiter:', delimiter === '\t' ? 'TAB' : 'COMMA');
+    console.log('CSV Import - Total lines:', lines.length - 1);
+
+    return lines.slice(1).map((line, lineIndex) => {
+      const values = parseCSVLine(line, delimiter);
       const item: any = {};
 
       headers.forEach((header, i) => {
@@ -263,6 +295,10 @@ export function AssistantRepertoireManager() {
             break;
         }
       });
+
+      if (lineIndex < 3) {
+        console.log(`CSV Import - Row ${lineIndex + 1}:`, item);
+      }
 
       return item;
     }).filter(item => item.title);
