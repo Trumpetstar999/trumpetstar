@@ -1,14 +1,23 @@
 import { Level } from '@/types';
-import { Star, ChevronRight } from 'lucide-react';
+import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
+import { useMembership } from '@/hooks/useMembership';
+import { Star, ChevronRight, Lock, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Extended interface for levels with new plan key
+interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
+  requiredPlanKey: PlanKey;
+}
+
 interface LevelSidebarProps {
-  levels: Level[];
+  levels: LevelWithPlan[];
   activeLevel: string | null;
   onLevelSelect: (levelId: string) => void;
 }
 
 export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSidebarProps) {
+  const { canAccessLevel } = useMembership();
+
   return (
     <aside className="w-64 bg-card border-r border-border h-full overflow-y-auto">
       <div className="p-4">
@@ -19,6 +28,9 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSideba
         <nav className="space-y-1">
           {levels.map((level, index) => {
             const isActive = activeLevel === level.id;
+            const isLocked = level.requiredPlanKey !== 'FREE' && !canAccessLevel(level.requiredPlanKey);
+            const isPremiumLevel = level.requiredPlanKey === 'PREMIUM';
+            const isBasicLevel = level.requiredPlanKey === 'BASIC';
             
             return (
               <button
@@ -28,7 +40,8 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSideba
                   'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200',
                   isActive 
                     ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'text-foreground hover:bg-secondary'
+                    : 'text-foreground hover:bg-secondary',
+                  isLocked && !isActive && 'opacity-75'
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -36,13 +49,32 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSideba
                     'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold',
                     isActive 
                       ? 'bg-primary-foreground/20 text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground'
+                      : isLocked
+                        ? 'bg-muted text-muted-foreground'
+                        : 'bg-muted text-muted-foreground'
                   )}>
-                    {index + 1}
+                    {isLocked ? (
+                      <Lock className="w-4 h-4" />
+                    ) : (
+                      index + 1
+                    )}
                   </span>
-                  <span className="font-medium truncate max-w-[120px]">
-                    {level.title}
-                  </span>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium truncate max-w-[120px]">
+                      {level.title}
+                    </span>
+                    {isLocked && (
+                      <span className={cn(
+                        'text-xs flex items-center gap-1',
+                        isPremiumLevel 
+                          ? 'text-amber-500' 
+                          : 'text-blue-500'
+                      )}>
+                        {isPremiumLevel && <Crown className="w-3 h-3" />}
+                        {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
