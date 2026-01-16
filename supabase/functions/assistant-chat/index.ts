@@ -80,7 +80,15 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, mode = "mixed", language = "de", userPlanKey = "FREE", includeRecording = false, recordingContext = null } = await req.json();
+    const body = await req.json();
+    
+    // Support both single message (for testing) and messages array
+    let messages: Message[] = body.messages || [];
+    if (body.message && typeof body.message === 'string') {
+      messages = [{ role: 'user', content: body.message }];
+    }
+    
+    const { mode = "mixed", language = "de", userPlanKey = "FREE", includeRecording = false, recordingContext = null } = body;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -94,6 +102,14 @@ serve(async (req) => {
 
     // Get the last user message for context retrieval
     const lastUserMessage = messages.filter((m: Message) => m.role === "user").pop()?.content || "";
+    // Extract keywords (min 2 chars to catch more, remove common stop words)
+    const stopWords = ['ist', 'der', 'die', 'das', 'ein', 'eine', 'und', 'oder', 'was', 'wie', 'kann', 'ich', 'mir', 'mich', 'bei', 'mit', 'für', 'auf', 'the', 'and', 'for', 'with'];
+    const keywords = lastUserMessage.toLowerCase()
+      .split(/\s+/)
+      .map(w => w.replace(/[?!.,;:]/g, ''))
+      .filter((w: string) => w.length >= 2 && !stopWords.includes(w));
+
+    console.log("[assistant-chat] Search keywords:", keywords);
 
     // RAG: Retrieve relevant knowledge chunks
     let contextChunks: string[] = [];
@@ -107,24 +123,49 @@ serve(async (req) => {
     };
     const allowedPlans = planHierarchy[userPlanKey] || ["FREE"];
 
-    // Search in knowledge_chunks
+    // Search in knowledge_sources directly (since chunks may be empty)
+    const { data: sources } = await supabase
+      .from("knowledge_sources")
+      .select("id, title, content, type, tags")
+      .in("visibility", allowedPlans)
+      .limit(50);
+
+    console.log("[assistant-chat] Knowledge sources found:", sources?.length || 0);
+
+    if (sources && sources.length > 0 && keywords.length > 0) {
+      const scoredSources = sources.map((source: any) => {
+        const searchText = `${source.title} ${source.content || ''} ${source.tags?.join(' ') || ''}`.toLowerCase();
+        // Score based on keyword matches (weighted: title matches are worth more)
+        let score = 0;
+        for (const kw of keywords) {
+          if (source.title.toLowerCase().includes(kw)) score += 3;
+          if (searchText.includes(kw)) score += 1;
+        }
+        return { ...source, score };
+      }).filter((s: any) => s.score > 0).sort((a: any, b: any) => b.score - a.score).slice(0, 5);
+
+      console.log("[assistant-chat] Matched sources:", scoredSources.map((s: any) => ({ title: s.title, score: s.score })));
+
+      contextChunks = scoredSources.map((s: any) => s.content || s.title);
+      usedSourceIds = scoredSources.map((s: any) => s.id);
+    }
+
+    // Also search in knowledge_chunks if available
     const { data: chunks } = await supabase
       .from("knowledge_chunks")
       .select("id, chunk_text, source_id, tags")
       .in("plan_required", allowedPlans)
       .limit(10);
 
-    // Simple keyword matching for now (can be enhanced with embeddings later)
     if (chunks && chunks.length > 0) {
-      const keywords = lastUserMessage.toLowerCase().split(/\s+/).filter((w: string) => w.length > 3);
       const scoredChunks = chunks.map((chunk: any) => {
         const text = chunk.chunk_text.toLowerCase();
         const score = keywords.reduce((acc: number, kw: string) => acc + (text.includes(kw) ? 1 : 0), 0);
         return { ...chunk, score };
       }).filter((c: any) => c.score > 0).sort((a: any, b: any) => b.score - a.score).slice(0, 5);
 
-      contextChunks = scoredChunks.map((c: any) => c.chunk_text);
-      usedSourceIds = scoredChunks.map((c: any) => c.source_id);
+      contextChunks.push(...scoredChunks.map((c: any) => c.chunk_text));
+      usedSourceIds.push(...scoredChunks.map((c: any) => c.source_id).filter(Boolean));
     }
 
     // Search in repertoire_items if mode is repertoire or mixed
