@@ -13,7 +13,9 @@ import {
   Pause,
   Volume2,
   SkipBack,
-  SkipForward
+  SkipForward,
+  X,
+  Minimize2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -38,13 +40,14 @@ interface PdfViewerProps {
   currentPage: number;
   onPageChange: (page: number) => void;
   audioTrack?: AudioTrack;
+  onClose?: () => void;
 }
 
-export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfViewerProps) {
+export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack, onClose }: PdfViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
-  const [canvasUrl, setCanvasUrl] = useState<string | null>(null);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -88,19 +91,36 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
     getSignedUrl();
   }, [pdf.pdf_file_url]);
 
-  // Render PDF page using pdf.js
+  // Load PDF document once
   useEffect(() => {
     if (!signedUrl) return;
 
-    const renderPage = async () => {
-      setIsLoading(true);
-      
+    const loadPdf = async () => {
       try {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
         const loadingTask = pdfjsLib.getDocument(signedUrl);
-        const pdfDoc = await loadingTask.promise;
+        const doc = await loadingTask.promise;
+        setPdfDoc(doc);
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        toast.error('PDF konnte nicht geladen werden');
+        setIsLoading(false);
+      }
+    };
+
+    loadPdf();
+  }, [signedUrl]);
+
+  // Render current page
+  useEffect(() => {
+    if (!pdfDoc) return;
+
+    const renderPage = async () => {
+      setIsLoading(true);
+      
+      try {
         const page = await pdfDoc.getPage(currentPage);
 
         const canvas = canvasRef.current;
@@ -109,10 +129,15 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
         const context = canvas.getContext('2d');
         if (!context) return;
 
-        // Calculate scale based on container width
+        // Calculate scale based on container
         const containerWidth = containerRef.current?.clientWidth || 800;
+        const containerHeight = containerRef.current?.clientHeight || 600;
         const viewport = page.getViewport({ scale: 1 });
-        const baseScale = (containerWidth - 48) / viewport.width;
+        
+        // Fit to container while maintaining aspect ratio
+        const scaleX = (containerWidth - 48) / viewport.width;
+        const scaleY = (containerHeight - 48) / viewport.height;
+        const baseScale = Math.min(scaleX, scaleY);
         const scale = baseScale * zoom;
         
         const scaledViewport = page.getViewport({ scale });
@@ -125,17 +150,16 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
           viewport: scaledViewport,
         }).promise;
 
-        setCanvasUrl(canvas.toDataURL());
         setIsLoading(false);
       } catch (error) {
-        console.error('Error rendering PDF:', error);
+        console.error('Error rendering PDF page:', error);
         toast.error('Seite konnte nicht gerendert werden');
         setIsLoading(false);
       }
     };
 
     renderPage();
-  }, [signedUrl, currentPage, zoom]);
+  }, [pdfDoc, currentPage, zoom]);
 
   // Get signed URL for audio
   useEffect(() => {
@@ -229,78 +253,141 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        goToPreviousPage();
+      } else if (e.key === 'ArrowRight') {
+        goToNextPage();
+      } else if (e.key === 'Escape' && onClose) {
+        onClose();
+      } else if (e.key === ' ' && audioSignedUrl) {
+        e.preventDefault();
+        togglePlayPause();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage, pdf.page_count, audioSignedUrl, togglePlayPause]);
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between p-3 border-b bg-card">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-sm truncate max-w-[200px]">
-            {pdf.title}
-          </h3>
+    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      {/* Header Toolbar */}
+      <div className="flex items-center justify-between px-4 py-3 bg-slate-900/80 backdrop-blur-lg border-b border-white/10">
+        {/* Left: Close & Title */}
+        <div className="flex items-center gap-3">
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          )}
+          <div>
+            <h3 className="font-semibold text-white text-sm md:text-base truncate max-w-[180px] md:max-w-[300px]">
+              {pdf.title}
+            </h3>
+            <p className="text-xs text-white/50">
+              Seite {currentPage} von {pdf.page_count}
+            </p>
+          </div>
         </div>
 
-        {/* Page Navigation */}
-        <div className="flex items-center gap-2">
+        {/* Center: Page Navigation */}
+        <div className="flex items-center gap-1 md:gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={goToPreviousPage}
             disabled={currentPage <= 1}
+            className="text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </Button>
           
-          <span className="text-sm font-medium min-w-[80px] text-center">
-            {currentPage} / {pdf.page_count}
-          </span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10">
+            <span className="text-sm font-medium text-white min-w-[60px] text-center">
+              {currentPage} / {pdf.page_count}
+            </span>
+          </div>
           
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             onClick={goToNextPage}
             disabled={currentPage >= pdf.page_count}
+            className="text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
 
-        {/* Zoom Controls */}
+        {/* Right: Zoom Controls */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={handleZoomOut}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleZoomOut}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
             <ZoomOut className="w-4 h-4" />
           </Button>
-          <span className="text-xs font-medium w-12 text-center">
+          <span className="text-xs font-medium text-white/70 w-10 text-center">
             {Math.round(zoom * 100)}%
           </span>
-          <Button variant="ghost" size="icon" onClick={handleZoomIn}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleZoomIn}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
             <ZoomIn className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={handleResetZoom}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleResetZoom}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
             <RotateCcw className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      {/* PDF Canvas */}
+      {/* PDF Canvas Area */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-auto p-6 flex justify-center bg-muted/50"
+        className="flex-1 overflow-auto flex items-center justify-center p-4 md:p-6"
       >
-        {isLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/50 z-10">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              <span className="text-sm text-white/70">Seite wird geladen...</span>
+            </div>
           </div>
-        ) : (
-          <canvas
-            ref={canvasRef}
-            className="shadow-xl rounded-lg bg-white max-w-full"
-          />
         )}
+        <canvas
+          ref={canvasRef}
+          className={cn(
+            "shadow-2xl rounded-lg transition-opacity duration-300",
+            "bg-white max-w-full",
+            isLoading && "opacity-0"
+          )}
+          style={{
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+          }}
+        />
       </div>
 
-      {/* Audio Player */}
-      {audioSignedUrl && audioTrack && (
-        <div className="border-t bg-card p-4">
+      {/* Audio Player Bar */}
+      {audioSignedUrl && audioTrack ? (
+        <div className="bg-slate-900/90 backdrop-blur-lg border-t border-white/10 px-4 py-3 safe-bottom">
           <audio
             ref={audioRef}
             src={audioSignedUrl}
@@ -309,28 +396,33 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
             onEnded={() => setIsPlaying(false)}
           />
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4 max-w-4xl mx-auto">
             {/* Audio icon */}
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
               <Volume2 className="w-5 h-5 text-primary" />
             </div>
 
-            {/* Track info */}
-            <div className="flex-shrink-0 min-w-0 w-32">
-              <p className="text-sm font-medium truncate">{audioTrack.title}</p>
-              <p className="text-xs text-muted-foreground">Seite {audioTrack.page_number}</p>
+            {/* Track info - hidden on small screens */}
+            <div className="hidden md:block flex-shrink-0 min-w-0 w-32">
+              <p className="text-sm font-medium text-white truncate">{audioTrack.title}</p>
+              <p className="text-xs text-white/50">Seite {audioTrack.page_number}</p>
             </div>
 
             {/* Controls */}
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => skipSeconds(-10)}>
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => skipSeconds(-10)}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
                 <SkipBack className="w-4 h-4" />
               </Button>
               
               <Button 
                 size="icon" 
                 onClick={togglePlayPause}
-                className="w-10 h-10"
+                className="w-11 h-11 rounded-full bg-primary hover:bg-primary/90"
               >
                 {isPlaying ? (
                   <Pause className="w-5 h-5" />
@@ -339,24 +431,29 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
                 )}
               </Button>
               
-              <Button variant="ghost" size="icon" onClick={() => skipSeconds(10)}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => skipSeconds(10)}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
                 <SkipForward className="w-4 h-4" />
               </Button>
             </div>
 
             {/* Progress */}
-            <div className="flex-1 flex items-center gap-3">
-              <span className="text-xs text-muted-foreground w-10 text-right">
+            <div className="flex-1 flex items-center gap-2 md:gap-3">
+              <span className="text-xs text-white/50 w-9 text-right tabular-nums">
                 {formatTime(audioProgress)}
               </span>
               <Slider
                 value={[audioProgress]}
                 max={audioDuration || 100}
-                step={1}
+                step={0.1}
                 onValueChange={handleSeek}
                 className="flex-1"
               />
-              <span className="text-xs text-muted-foreground w-10">
+              <span className="text-xs text-white/50 w-9 tabular-nums">
                 {formatTime(audioDuration)}
               </span>
             </div>
@@ -366,19 +463,16 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTrack }: PdfVie
               variant="outline" 
               size="sm"
               onClick={cyclePlaybackRate}
-              className="w-14 text-xs"
+              className="w-14 text-xs border-white/20 text-white/70 hover:text-white hover:bg-white/10"
             >
               {playbackRate}x
             </Button>
           </div>
         </div>
-      )}
-
-      {/* No audio indicator */}
-      {!audioTrack && (
-        <div className="border-t bg-card/50 p-3 text-center">
-          <p className="text-sm text-muted-foreground">
-            Kein Audio für diese Seite verfügbar
+      ) : (
+        <div className="bg-slate-900/80 backdrop-blur-lg border-t border-white/10 px-4 py-3 text-center safe-bottom">
+          <p className="text-sm text-white/40">
+            Kein Audio für Seite {currentPage} verfügbar
           </p>
         </div>
       )}
