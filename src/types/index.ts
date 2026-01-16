@@ -97,4 +97,4 @@ export interface DayActivity {
   minutesPracticed: number;
 }
 
-export type TabId = 'levels' | 'pdfs' | 'practice' | 'recordings' | 'chats' | 'classroom' | 'profile';
+export type TabId = 'levels' | 'pdfs' | 'musicxml' | 'practice' | 'recordings' | 'chats' | 'classroom' | 'profile';

@@ -5,10 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useMembership } from '@/hooks/useMembership';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useMidiPlayer } from '@/hooks/useMidiPlayer';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -23,13 +23,13 @@ import {
   X, 
   Play, 
   Pause, 
+  Square,
   Volume2,
   Music,
   ZoomIn,
   ZoomOut,
   RotateCcw,
   Repeat,
-  ChevronDown,
   AlertTriangle,
   RefreshCw,
   Headphones,
@@ -70,7 +70,6 @@ export function MusicXMLViewerPage() {
   
   // Playback state
   const [playbackMode, setPlaybackMode] = useState<'midi' | 'audio'>('midi');
-  const [isPlaying, setIsPlaying] = useState(false);
   const [tempo, setTempo] = useState(100);
   const [volume, setVolume] = useState(80);
   const [metronomeEnabled, setMetronomeEnabled] = useState(false);
@@ -83,10 +82,21 @@ export function MusicXMLViewerPage() {
   const [totalBars, setTotalBars] = useState(1);
   const [followMode, setFollowMode] = useState(true);
   const [selectedAudioTrack, setSelectedAudioTrack] = useState<AudioTrack | null>(null);
+  const [audioIsPlaying, setAudioIsPlaying] = useState(false);
   
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // MIDI Player hook
+  const midiPlayer = useMidiPlayer({
+    tempo,
+    volume,
+    loopEnabled,
+    loopStart,
+    loopEnd,
+    onBarChange: (bar) => setCurrentBar(bar),
+  });
 
   const showDebug = searchParams.get('debug') === '1' || isAdmin;
 
@@ -161,10 +171,6 @@ export function MusicXMLViewerPage() {
         });
 
         await osmdInstance.load(xmlContent);
-        
-        // Note: Transposition would require modifying the XML before loading
-        // OSMD doesn't have built-in transpose - we display as-is for now
-
         osmdInstance.render();
 
         // Get total bars
@@ -173,6 +179,13 @@ export function MusicXMLViewerPage() {
         setLoopEnd(measures);
 
         setOsmd(osmdInstance);
+        
+        // Initialize MIDI player
+        await midiPlayer.initialize();
+        
+        // Parse sheet for MIDI playback (default 120 BPM)
+        midiPlayer.parseOSMDSheet(osmdInstance, 120);
+        
         setIsLoading(false);
       } catch (error) {
         console.error('OSMD load error:', error);
@@ -192,8 +205,23 @@ export function MusicXMLViewerPage() {
     }
   }, [zoom, osmd]);
 
+  // Update audio tempo (playbackRate)
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = tempo / 100;
+    }
+  }, [tempo]);
+
+  // Update audio volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
   // Handle close
   const handleClose = () => {
+    midiPlayer.stop();
     navigate('/musicxml');
   };
 
@@ -201,7 +229,6 @@ export function MusicXMLViewerPage() {
   const handleRetry = () => {
     setLoadError(null);
     setIsLoading(true);
-    // Re-trigger by remounting
     if (osmd) {
       osmd.clear();
       setOsmd(null);
@@ -211,23 +238,57 @@ export function MusicXMLViewerPage() {
   // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (playbackMode === 'audio' && audioRef.current) {
-      if (isPlaying) {
+      if (audioIsPlaying) {
         audioRef.current.pause();
       } else {
         audioRef.current.play();
       }
-      setIsPlaying(!isPlaying);
     } else {
-      // MIDI playback - TODO: implement with soundfont
-      toast.info('MIDI Playback wird geladen...');
-      setIsPlaying(!isPlaying);
+      // MIDI playback
+      if (midiPlayer.isPlaying) {
+        midiPlayer.pause();
+      } else {
+        if (!midiPlayer.isReady) {
+          toast.info('MIDI wird initialisiert...');
+          midiPlayer.initialize().then(() => {
+            if (osmd) {
+              midiPlayer.parseOSMDSheet(osmd, 120);
+            }
+            midiPlayer.play();
+          });
+        } else {
+          midiPlayer.play();
+        }
+      }
     }
-  }, [playbackMode, isPlaying]);
+  }, [playbackMode, audioIsPlaying, midiPlayer, osmd]);
+
+  // Stop playback
+  const handleStop = useCallback(() => {
+    if (playbackMode === 'audio' && audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setAudioIsPlaying(false);
+    } else {
+      midiPlayer.stop();
+    }
+    setCurrentBar(1);
+  }, [playbackMode, midiPlayer]);
 
   // Audio track selection
   const handleSelectAudioTrack = useCallback((track: AudioTrack) => {
+    midiPlayer.stop();
     setSelectedAudioTrack(track);
     setPlaybackMode('audio');
+  }, [midiPlayer]);
+
+  // Switch to MIDI mode
+  const handleSwitchToMidi = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setAudioIsPlaying(false);
+    }
+    setPlaybackMode('midi');
   }, []);
 
   // Format time
@@ -236,6 +297,9 @@ export function MusicXMLViewerPage() {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Get current playing state
+  const isPlaying = playbackMode === 'midi' ? midiPlayer.isPlaying : audioIsPlaying;
 
   if (docLoading) {
     return (
@@ -273,9 +337,7 @@ export function MusicXMLViewerPage() {
   }
 
   return (
-    <div 
-      className="fixed inset-0 z-[100] flex flex-col bg-background"
-    >
+    <div className="fixed inset-0 z-[100] flex flex-col bg-background">
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b bg-card">
         <div className="flex items-center gap-4">
@@ -325,6 +387,9 @@ export function MusicXMLViewerPage() {
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-primary" />
               <span className="text-muted-foreground">Noten werden geladen...</span>
+              {midiPlayer.isLoading && (
+                <span className="text-xs text-muted-foreground">Trompeten-Sound wird geladen...</span>
+              )}
             </div>
           </div>
         )}
@@ -349,6 +414,14 @@ export function MusicXMLViewerPage() {
           </div>
         )}
 
+        {/* MIDI Error indicator */}
+        {midiPlayer.error && !isLoading && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 bg-amber-100 text-amber-800 rounded-lg text-sm flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            {midiPlayer.error}
+          </div>
+        )}
+
         {/* OSMD Container */}
         <div 
           ref={containerRef} 
@@ -370,7 +443,7 @@ export function MusicXMLViewerPage() {
                   "px-3 py-1 text-sm rounded-full transition-colors",
                   playbackMode === 'midi' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
                 )}
-                onClick={() => setPlaybackMode('midi')}
+                onClick={handleSwitchToMidi}
               >
                 MIDI
               </button>
@@ -392,12 +465,23 @@ export function MusicXMLViewerPage() {
               size="icon"
               className="h-10 w-10 rounded-full"
               onClick={togglePlayPause}
+              disabled={playbackMode === 'midi' && midiPlayer.isLoading}
             >
               {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
             </Button>
 
+            {/* Stop */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 rounded-full"
+              onClick={handleStop}
+            >
+              <Square className="w-4 h-4" />
+            </Button>
+
             {/* Bar indicator */}
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground min-w-[80px]">
               Takt {currentBar} / {totalBars}
             </div>
 
@@ -554,6 +638,20 @@ export function MusicXMLViewerPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Debug Info */}
+                  {showDebug && (
+                    <div className="space-y-2 pt-4 border-t">
+                      <Label className="text-xs text-muted-foreground">Debug Info</Label>
+                      <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded">
+                        <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
+                        <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
+                        <div>MIDI Error: {midiPlayer.error || 'None'}</div>
+                        <div>Playback Mode: {playbackMode}</div>
+                        <div>Total Bars: {totalBars}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
@@ -566,9 +664,9 @@ export function MusicXMLViewerPage() {
         <audio
           ref={audioRef}
           src={selectedAudioTrack.audio_url}
-          onEnded={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onEnded={() => setAudioIsPlaying(false)}
+          onPlay={() => setAudioIsPlaying(true)}
+          onPause={() => setAudioIsPlaying(false)}
         />
       )}
     </div>

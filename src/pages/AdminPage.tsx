@@ -17,13 +17,15 @@ import { AssistantRepertoireManager } from '@/components/admin/AssistantRepertoi
 import { AssistantFeedbackManager } from '@/components/admin/AssistantFeedbackManager';
 import { PdfDocumentManager } from '@/components/admin/PdfDocumentManager';
 import { PdfAudioManager } from '@/components/admin/PdfAudioManager';
+import { MusicXMLManager } from '@/components/admin/MusicXMLManager';
+import { MusicXMLAudioManager } from '@/components/admin/MusicXMLAudioManager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -40,6 +42,11 @@ interface PdfAudioContext {
   pageCount: number;
 }
 
+interface MusicXMLAudioContext {
+  docId: string;
+  docTitle: string;
+}
+
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
@@ -53,6 +60,7 @@ export default function AdminPage() {
   const [assistantSubTab, setAssistantSubTab] = useState<AssistantSubTab>('content');
   const [pdfSubTab, setPdfSubTab] = useState<PdfSubTab>('documents');
   const [pdfAudioContext, setPdfAudioContext] = useState<PdfAudioContext | null>(null);
+  const [musicxmlAudioContext, setMusicxmlAudioContext] = useState<MusicXMLAudioContext | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -125,6 +133,7 @@ export default function AdminPage() {
       case 'users': return 'Nutzerverwaltung';
       case 'levels': return 'Levels & Showcases';
       case 'pdfs': return 'PDFs / Noten';
+      case 'musicxml': return 'MusicXML';
       case 'products': return 'Produkte & Pläne';
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
@@ -140,6 +149,7 @@ export default function AdminPage() {
       case 'users': return 'Nutzer verwalten und bearbeiten';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
+      case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
@@ -319,6 +329,24 @@ export default function AdminPage() {
                     }}
                   />
                 </>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'musicxml' && (
+            <div className="space-y-6">
+              {musicxmlAudioContext ? (
+                <MusicXMLAudioManager
+                  docId={musicxmlAudioContext.docId}
+                  docTitle={musicxmlAudioContext.docTitle}
+                  onBack={() => setMusicxmlAudioContext(null)}
+                />
+              ) : (
+                <MusicXMLManager
+                  onManageAudio={(docId, docTitle) => {
+                    setMusicxmlAudioContext({ docId, docTitle });
+                  }}
+                />
               )}
             </div>
           )}
