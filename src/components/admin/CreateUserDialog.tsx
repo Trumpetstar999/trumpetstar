@@ -22,7 +22,7 @@ interface CreateUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   plans: Plan[];
-  onUserCreated: () => void;
+  onUserCreated: () => void | Promise<void>;
 }
 
 export function CreateUserDialog({ open, onOpenChange, plans, onUserCreated }: CreateUserDialogProps) {
@@ -118,9 +118,10 @@ export function CreateUserDialog({ open, onOpenChange, plans, onUserCreated }: C
         description: `${displayName} wurde erfolgreich angelegt.`,
       });
 
+      // First refresh the user list, then close the dialog
+      await onUserCreated();
       resetForm();
       onOpenChange(false);
-      onUserCreated();
     } catch (error) {
       console.error('Error creating user:', error);
       toast({
