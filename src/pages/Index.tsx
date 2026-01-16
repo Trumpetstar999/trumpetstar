@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { LevelsPage } from './LevelsPage';
 import { PdfsPage } from './PdfsPage';
+import { MusicXMLPage } from './MusicXMLPage';
 import { PracticePage } from './PracticePage';
 import { RecordingsPage } from './RecordingsPage';
 import { ChatsPage } from './ChatsPage';
@@ -18,6 +19,7 @@ import { AssistantButton } from '@/components/assistant/AssistantButton';
 const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
   pdfs: 'Notenhefte',
+  musicxml: 'MusicXML Noten',
   practice: 'Üben',
   recordings: 'Aufnahmen',
   chats: 'Chats',
@@ -76,6 +78,8 @@ const Index = () => {
         return <LevelsPage onStarEarned={handleStarEarned} />;
       case 'pdfs':
         return <PdfsPage />;
+      case 'musicxml':
+        return <MusicXMLPage />;
       case 'practice':
         return <PracticePage />;
       case 'recordings':

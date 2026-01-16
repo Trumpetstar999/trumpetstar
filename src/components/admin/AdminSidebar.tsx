@@ -25,6 +25,7 @@ const menuItems = [
   { id: 'users', label: 'Nutzer', icon: Users },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
+  { id: 'musicxml', label: 'MusicXML', icon: Music },
   { id: 'products', label: 'Produkte & Pläne', icon: Package },
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
