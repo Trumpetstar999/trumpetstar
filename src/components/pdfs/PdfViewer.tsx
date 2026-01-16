@@ -103,28 +103,58 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       return;
     }
 
+    // Reset state when URL changes
+    setPdfDoc(null);
+    setIsLoading(true);
+
     const loadPdf = async () => {
       console.log('PdfViewer: Starting PDF load from blob URL:', pdfBlobUrl);
-      setIsLoading(true);
+      
       try {
+        // First, fetch the blob to verify it's valid and get ArrayBuffer
+        console.log('PdfViewer: Fetching blob...');
+        const response = await fetch(pdfBlobUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blob: ${response.status}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        console.log('PdfViewer: Got ArrayBuffer, size:', arrayBuffer.byteLength);
+        
+        if (arrayBuffer.byteLength < 1000) {
+          throw new Error('ArrayBuffer too small to be a valid PDF');
+        }
+        
+        // Verify PDF header
+        const header = new Uint8Array(arrayBuffer.slice(0, 5));
+        const headerStr = String.fromCharCode(...header);
+        console.log('PdfViewer: PDF header check:', headerStr);
+        
+        if (!headerStr.startsWith('%PDF-')) {
+          throw new Error('Invalid PDF header: ' + headerStr);
+        }
+        
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
-        console.log('PdfViewer: pdfjs-dist loaded, getting document...');
+        console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
-        // Use URL directly - pdfjs handles blob URLs well
-        const loadingTask = pdfjsLib.getDocument(pdfBlobUrl);
+        // Use ArrayBuffer directly - more reliable than blob URL
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
         
         loadingTask.onProgress = (progress: { loaded: number; total: number }) => {
-          console.log('PdfViewer: Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
+          if (progress.total > 0) {
+            console.log('PdfViewer: Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
+          }
         };
         
         const doc = await loadingTask.promise;
-        console.log('PdfViewer: PDF document loaded, pages:', doc.numPages);
+        console.log('PdfViewer: PDF document loaded successfully, pages:', doc.numPages);
         setPdfDoc(doc);
       } catch (error) {
         console.error('Error loading PDF:', error);
-        toast.error('PDF konnte nicht geladen werden. Bitte versuche es erneut.');
+        toast.error('PDF konnte nicht geladen werden. Bitte schließe und öffne erneut.');
         setIsLoading(false);
       }
     };
