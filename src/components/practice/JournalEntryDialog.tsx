@@ -57,16 +57,16 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-card border-border/50">
+      <DialogContent className="sm:max-w-[480px] bg-white border-0 shadow-2xl rounded-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">Neuer Journal-Eintrag</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900">Neuer Journal-Eintrag</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-5 pt-2">
           {/* Duration */}
           <div className="space-y-3">
-            <Label className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
+            <Label className="flex items-center gap-2 text-gray-700">
+              <Clock className="w-4 h-4 text-gray-500" />
               Übungszeit (Minuten)
             </Label>
             <div className="flex gap-2 flex-wrap">
@@ -76,10 +76,10 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
                   type="button"
                   onClick={() => setMinutes(String(mins))}
                   className={cn(
-                    'px-4 py-2 rounded-xl font-medium text-sm transition-all',
+                    'px-4 py-2 rounded-lg font-medium text-sm transition-all',
                     parseInt(minutes) === mins
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                   )}
                 >
                   {mins}
@@ -91,14 +91,14 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
                 value={minutes}
                 onChange={(e) => setMinutes(e.target.value)}
                 placeholder="Andere"
-                className="w-24 text-center rounded-xl"
+                className="w-24 text-center rounded-lg bg-gray-50 border-gray-200 text-gray-900"
               />
             </div>
           </div>
 
           {/* Mood */}
           <div className="space-y-3">
-            <Label>Wie war deine Übung?</Label>
+            <Label className="text-gray-700">Wie war deine Übung?</Label>
             <div className="grid grid-cols-5 gap-2">
               {moodOptions.map((option) => (
                 <button
@@ -108,12 +108,12 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
                   className={cn(
                     'flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all',
                     mood === option.value
-                      ? 'border-primary bg-primary/10 shadow-lg'
-                      : 'border-border/50 bg-secondary/30 hover:border-primary/50'
+                      ? 'border-blue-500 bg-blue-50 shadow-sm'
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                   )}
                 >
                   <span className="text-2xl">{option.emoji}</span>
-                  <span className="text-xs text-muted-foreground font-medium">{option.label}</span>
+                  <span className="text-xs text-gray-600 font-medium">{option.label}</span>
                 </button>
               ))}
             </div>
@@ -121,27 +121,27 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label>Notizen (optional)</Label>
+            <Label className="text-gray-700">Notizen (optional)</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Was hast du heute geübt? Was lief gut, was nicht?"
               rows={3}
-              className="resize-none rounded-xl bg-secondary/30"
+              className="resize-none rounded-lg bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400"
             />
           </div>
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-muted-foreground" />
+            <Label className="flex items-center gap-2 text-gray-700">
+              <Tag className="w-4 h-4 text-gray-500" />
               Tags (optional, mit Komma trennen)
             </Label>
             <Input
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder="z.B. Tonleitern, Warm-up, Fortschritt"
-              className="rounded-xl bg-secondary/30"
+              className="rounded-lg bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400"
             />
           </div>
 
@@ -151,11 +151,11 @@ export function JournalEntryDialog({ open, onOpenChange, onSave }: JournalEntryD
               type="button" 
               variant="outline" 
               onClick={() => onOpenChange(false)}
-              className="rounded-xl"
+              className="rounded-lg border-gray-300 text-gray-700 hover:bg-gray-100"
             >
               Abbrechen
             </Button>
-            <Button type="submit" className="rounded-xl px-6">
+            <Button type="submit" className="rounded-lg px-6 bg-blue-600 hover:bg-blue-700 text-white">
               Speichern
             </Button>
           </div>
