@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause } from 'lucide-react';
+import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause, Repeat } from 'lucide-react';
 import { Video } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,9 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackSpeed, setPlaybackSpeed] = useState(100); // 100 = 1.0x
+  const [loopEnabled, setLoopEnabled] = useState(false);
+  const [loopStart, setLoopStart] = useState(0); // A point in seconds
+  const [loopEnd, setLoopEnd] = useState(0); // B point in seconds
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -117,6 +120,40 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Toggle A-B loop
+  const toggleLoop = useCallback(() => {
+    if (!loopEnabled && duration > 0) {
+      // Enable loop - set A to current position, B to end
+      setLoopStart(currentTime);
+      setLoopEnd(Math.min(currentTime + 10, duration)); // Default 10 second loop
+      setLoopEnabled(true);
+    } else {
+      setLoopEnabled(false);
+    }
+  }, [loopEnabled, duration, currentTime]);
+
+  // Handle loop point changes
+  const handleLoopStartChange = useCallback((value: number[]) => {
+    const newStart = value[0];
+    if (newStart < loopEnd) {
+      setLoopStart(newStart);
+    }
+  }, [loopEnd]);
+
+  const handleLoopEndChange = useCallback((value: number[]) => {
+    const newEnd = value[0];
+    if (newEnd > loopStart) {
+      setLoopEnd(newEnd);
+    }
+  }, [loopStart]);
+
+  // Check if we need to loop back to A point
+  useEffect(() => {
+    if (loopEnabled && loopEnd > loopStart && currentTime >= loopEnd) {
+      sendVimeoCommand('seekTo', loopStart);
+    }
+  }, [loopEnabled, loopStart, loopEnd, currentTime, sendVimeoCommand]);
 
   // Log Vimeo errors to database for admin visibility
   const logVimeoError = useCallback(async (errorType: VimeoError, message: string) => {
@@ -441,11 +478,11 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
               </span>
             </div>
 
-            {/* Speed control - inline on larger screens */}
+            {/* Speed control */}
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-white/60 text-xs">Tempo:</span>
-              <div className="flex items-center gap-2 w-32">
-              <Slider
+              <div className="flex items-center gap-2 w-28">
+                <Slider
                   value={[playbackSpeed]}
                   min={40}
                   max={120}
@@ -459,7 +496,57 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
                 {playbackSpeed}%
               </span>
             </div>
+
+            {/* A-B Loop toggle */}
+            <button
+              onClick={toggleLoop}
+              className={`p-2 rounded-full transition-colors shrink-0 ${
+                loopEnabled 
+                  ? 'bg-primary text-white' 
+                  : 'bg-white/10 hover:bg-white/20 text-white'
+              }`}
+              title="A-B Loop"
+            >
+              <Repeat className="w-4 h-4" />
+            </button>
           </div>
+
+          {/* A-B Loop controls - only visible when loop is enabled */}
+          {loopEnabled && duration > 0 && (
+            <div className="flex items-center gap-3 bg-white/5 rounded-lg p-2">
+              <span className="text-primary text-xs font-medium shrink-0">A-B Loop:</span>
+              
+              {/* A point */}
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-white/60 text-xs w-6">A:</span>
+                <Slider
+                  value={[loopStart]}
+                  min={0}
+                  max={duration}
+                  step={0.5}
+                  onValueChange={handleLoopStartChange}
+                  variant="player"
+                  className="flex-1"
+                />
+                <span className="text-white text-xs font-mono w-10">{formatTime(loopStart)}</span>
+              </div>
+
+              {/* B point */}
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-white/60 text-xs w-6">B:</span>
+                <Slider
+                  value={[loopEnd]}
+                  min={0}
+                  max={duration}
+                  step={0.5}
+                  onValueChange={handleLoopEndChange}
+                  variant="player"
+                  className="flex-1"
+                />
+                <span className="text-white text-xs font-mono w-10">{formatTime(loopEnd)}</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
