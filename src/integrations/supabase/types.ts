@@ -485,6 +485,190 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_audio_tracks: {
+        Row: {
+          audio_url: string
+          created_at: string
+          duration: number | null
+          id: string
+          level_id: string | null
+          original_filename: string
+          page_number: number
+          pdf_document_id: string
+          sort_index: number
+          title: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          level_id?: string | null
+          original_filename: string
+          page_number: number
+          pdf_document_id: string
+          sort_index?: number
+          title: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          duration?: number | null
+          id?: string
+          level_id?: string | null
+          original_filename?: string
+          page_number?: number
+          pdf_document_id?: string
+          sort_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdf_audio_tracks_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdf_audio_tracks_pdf_document_id_fkey"
+            columns: ["pdf_document_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pdf_documents: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          level_id: string | null
+          page_count: number
+          pdf_file_url: string
+          plan_required: string
+          sort_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          level_id?: string | null
+          page_count?: number
+          pdf_file_url: string
+          plan_required?: string
+          sort_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          level_id?: string | null
+          page_count?: number
+          pdf_file_url?: string
+          plan_required?: string
+          sort_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdf_documents_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pdf_user_annotations: {
+        Row: {
+          annotations_json: Json
+          id: string
+          page_number: number
+          pdf_document_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annotations_json?: Json
+          id?: string
+          page_number: number
+          pdf_document_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annotations_json?: Json
+          id?: string
+          page_number?: number
+          pdf_document_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdf_user_annotations_pdf_document_id_fkey"
+            columns: ["pdf_document_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pdf_user_state: {
+        Row: {
+          last_audio_track_id: string | null
+          last_page: number
+          last_playback_rate: number
+          last_zoom: number
+          pdf_document_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          last_audio_track_id?: string | null
+          last_page?: number
+          last_playback_rate?: number
+          last_zoom?: number
+          pdf_document_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          last_audio_track_id?: string | null
+          last_page?: number
+          last_playback_rate?: number
+          last_zoom?: number
+          pdf_document_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdf_user_state_last_audio_track_id_fkey"
+            columns: ["last_audio_track_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_audio_tracks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdf_user_state_pdf_document_id_fkey"
+            columns: ["pdf_document_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plans: {
         Row: {
           created_at: string
