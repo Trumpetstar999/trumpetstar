@@ -444,7 +444,24 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => window.open(pdf.pdf_file_url, '_blank')}
+                  onClick={async () => {
+                    // Extract file path from full URL
+                    const urlParts = pdf.pdf_file_url.split('/storage/v1/object/public/pdf-documents/');
+                    const filePath = urlParts[1] || pdf.pdf_file_url.split('/storage/v1/object/sign/pdf-documents/')[1] || pdf.pdf_file_url.split('/pdf-documents/').pop();
+                    
+                    if (filePath) {
+                      const { data, error } = await supabase.storage
+                        .from('pdf-documents')
+                        .createSignedUrl(filePath, 3600); // 1 hour validity
+                      
+                      if (data?.signedUrl) {
+                        window.open(data.signedUrl, '_blank');
+                      } else {
+                        console.error('Failed to create signed URL:', error);
+                        toast.error('PDF konnte nicht geöffnet werden');
+                      }
+                    }
+                  }}
                 >
                   <Eye className="w-4 h-4" />
                 </Button>
