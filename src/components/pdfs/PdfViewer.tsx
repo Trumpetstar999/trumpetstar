@@ -96,16 +96,24 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
 
   // Load PDF document from blob URL
   useEffect(() => {
-    if (!pdfBlobUrl) return;
+    console.log('PdfViewer: pdfBlobUrl changed:', pdfBlobUrl ? 'exists' : 'null');
+    
+    if (!pdfBlobUrl) {
+      console.log('PdfViewer: No blob URL provided');
+      return;
+    }
 
     const loadPdf = async () => {
+      console.log('PdfViewer: Starting PDF load from blob URL');
       setIsLoading(true);
       try {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
+        console.log('PdfViewer: pdfjs-dist loaded, getting document...');
         const loadingTask = pdfjsLib.getDocument(pdfBlobUrl);
         const doc = await loadingTask.promise;
+        console.log('PdfViewer: PDF document loaded, pages:', doc.numPages);
         setPdfDoc(doc);
       } catch (error) {
         console.error('Error loading PDF:', error);
@@ -130,19 +138,34 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         const container = containerRef.current;
         
         if (!canvas || !container) {
-          setIsLoading(false);
+          console.log('Canvas or container not ready');
+          // Retry after a short delay
+          setTimeout(() => setIsLoading(true), 100);
+          return;
+        }
+
+        const containerWidth = container.clientWidth - 48;
+        const containerHeight = container.clientHeight - 48;
+        
+        // Wait for container to have dimensions
+        if (containerWidth <= 0 || containerHeight <= 0) {
+          console.log('Container dimensions not ready, retrying...');
+          setTimeout(() => {
+            // Trigger re-render by toggling loading state
+            setIsLoading(false);
+            setTimeout(() => setIsLoading(true), 50);
+          }, 100);
           return;
         }
 
         const context = canvas.getContext('2d');
         if (!context) {
+          console.log('Could not get canvas context');
           setIsLoading(false);
           return;
         }
 
         // Calculate scale to fit container
-        const containerWidth = container.clientWidth - 48;
-        const containerHeight = container.clientHeight - 48;
         const viewport = page.getViewport({ scale: 1 });
         
         const scaleX = containerWidth / viewport.width;
@@ -155,10 +178,14 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         canvas.height = scaledViewport.height;
         canvas.width = scaledViewport.width;
 
+        console.log('Rendering page', currentPage, 'at scale', scale, 'canvas size:', canvas.width, 'x', canvas.height);
+
         await page.render({
           canvasContext: context,
           viewport: scaledViewport,
         }).promise;
+
+        console.log('Page rendered successfully');
 
         // Setup drawing canvas to match PDF canvas
         const drawingCanvas = drawingCanvasRef.current;
