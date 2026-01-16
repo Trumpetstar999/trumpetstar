@@ -445,11 +445,11 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-white/60 text-xs">Tempo:</span>
               <div className="flex items-center gap-2 w-32">
-                <Slider
+              <Slider
                   value={[playbackSpeed]}
                   min={40}
                   max={120}
-                  step={5}
+                  step={1}
                   onValueChange={handleSpeedChange}
                   variant="player"
                   className="flex-1"
