@@ -17,19 +17,24 @@ export function RecordingsWidget() {
     const video = videoRef.current;
     if (!video || !latestRecording?.url) return;
 
-    const handleLoadedMetadata = () => {
-      video.currentTime = 0.5; // Seek to 0.5 seconds for preview frame
+    // Set the source and load video
+    video.src = latestRecording.url;
+    video.load();
+
+    const handleLoadedData = () => {
+      // Seek to 0.1 seconds for preview frame (use small value for short videos)
+      video.currentTime = Math.min(0.1, video.duration / 2);
     };
 
     const handleSeeked = () => {
       video.pause();
     };
 
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('seeked', handleSeeked);
 
     return () => {
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('seeked', handleSeeked);
     };
   }, [latestRecording?.url]);
@@ -64,14 +69,13 @@ export function RecordingsWidget() {
       ) : latestRecording ? (
         <div className="mb-4">
           <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-800 mb-3">
-            {/* Video as thumbnail - paused at 0.5s */}
+            {/* Video as thumbnail - paused at first frame */}
             <video
               ref={videoRef}
-              src={latestRecording.url}
               className="absolute inset-0 w-full h-full object-cover"
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
             />
             {/* Play button overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/20">
