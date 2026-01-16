@@ -17,6 +17,21 @@ interface DownloadProgress {
   isDownloading: boolean;
 }
 
+export interface PdfDiagnostics {
+  pdfId: string;
+  pdfFileUrl: string;
+  proxyUrl: string;
+  httpStatus: number | null;
+  contentType: string | null;
+  contentDisposition: string | null;
+  corsHeader: string | null;
+  fileSize: number | null;
+  pdfHeader: string | null;
+  workerReachable: boolean | null;
+  error: string | null;
+  timestamp: number;
+}
+
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -127,11 +142,75 @@ async function isValidPdfBlob(blob: Blob): Promise<boolean> {
   }
 }
 
+// Check if PDF.js worker is reachable
+async function checkWorkerReachable(): Promise<boolean> {
+  try {
+    const response = await fetch('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js', {
+      method: 'HEAD',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 export function usePdfCache() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+  const [diagnostics, setDiagnostics] = useState<PdfDiagnostics | null>(null);
 
-  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<string | null> => {
-    console.log('getPdfUrl called for:', pdfId);
+  // Run diagnostics for a PDF
+  const runDiagnostics = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<PdfDiagnostics> => {
+    const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
+    
+    const diag: PdfDiagnostics = {
+      pdfId,
+      pdfFileUrl: pdfFileUrl.substring(0, 80) + '...',
+      proxyUrl: proxyUrl.substring(0, 80) + '...',
+      httpStatus: null,
+      contentType: null,
+      contentDisposition: null,
+      corsHeader: null,
+      fileSize: null,
+      pdfHeader: null,
+      workerReachable: null,
+      error: null,
+      timestamp: Date.now(),
+    };
+
+    try {
+      // Check worker
+      diag.workerReachable = await checkWorkerReachable();
+
+      // Test proxy endpoint with debug mode
+      const debugResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}&debug=1`, {
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+
+      diag.httpStatus = debugResponse.status;
+      diag.contentType = debugResponse.headers.get('content-type');
+      diag.corsHeader = debugResponse.headers.get('access-control-allow-origin');
+
+      if (debugResponse.ok) {
+        const debugData = await debugResponse.json();
+        diag.fileSize = debugData.fileSize || null;
+        diag.pdfHeader = debugData.pdfHeader || null;
+        diag.contentType = debugData.contentType || diag.contentType;
+      } else {
+        const errorData = await debugResponse.json().catch(() => ({}));
+        diag.error = errorData.error || `HTTP ${debugResponse.status}`;
+      }
+    } catch (e) {
+      diag.error = String(e);
+    }
+
+    setDiagnostics(diag);
+    return diag;
+  }, []);
+
+  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<string | null> => {
+    console.log('getPdfUrl called for:', pdfId, 'useProxy:', useProxy);
     
     // Check cache first
     const cached = await getCachedPdf(pdfId);
@@ -156,46 +235,68 @@ export function usePdfCache() {
     setDownloadProgress({ pdfId, progress: 0, isDownloading: true });
 
     try {
-      // Extract file path from URL - handle both public and signed URL formats
-      let filePath = '';
+      let downloadUrl: string;
       
-      // Decode the URL first to handle encoded characters
-      const decodedUrl = decodeURIComponent(pdfFileUrl);
-      
-      // Format: .../pdf-documents/filename.pdf
-      if (decodedUrl.includes('/pdf-documents/')) {
-        const urlParts = decodedUrl.split('/pdf-documents/');
-        filePath = urlParts[urlParts.length - 1];
-        // Remove any query params
-        if (filePath.includes('?')) {
-          filePath = filePath.split('?')[0];
+      if (useProxy) {
+        // Use the proxy endpoint for reliable CORS and headers
+        downloadUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
+        console.log('Using proxy URL:', downloadUrl);
+      } else {
+        // Fallback to direct signed URL approach
+        let filePath = '';
+        const decodedUrl = decodeURIComponent(pdfFileUrl);
+        
+        if (decodedUrl.includes('/pdf-documents/')) {
+          const urlParts = decodedUrl.split('/pdf-documents/');
+          filePath = urlParts[urlParts.length - 1];
+          if (filePath.includes('?')) {
+            filePath = filePath.split('?')[0];
+          }
         }
+
+        if (!filePath) {
+          console.error('Could not extract file path from URL:', pdfFileUrl);
+          setDownloadProgress(null);
+          return null;
+        }
+
+        const { data: signedData, error: signError } = await supabase.storage
+          .from('pdf-documents')
+          .createSignedUrl(filePath, 3600);
+
+        if (signError || !signedData?.signedUrl) {
+          console.error('Failed to get signed URL:', signError);
+          setDownloadProgress(null);
+          return null;
+        }
+
+        downloadUrl = signedData.signedUrl;
       }
 
-      if (!filePath) {
-        console.error('Could not extract file path from URL:', pdfFileUrl);
-        setDownloadProgress(null);
-        return null;
-      }
+      console.log('Starting download from:', downloadUrl.substring(0, 80) + '...');
 
-      console.log('Getting signed URL for file path:', filePath);
-
-      const { data: signedData, error: signError } = await supabase.storage
-        .from('pdf-documents')
-        .createSignedUrl(filePath, 3600);
-
-      if (signError || !signedData?.signedUrl) {
-        console.error('Failed to get signed URL:', signError);
-        setDownloadProgress(null);
-        return null;
-      }
-
-      console.log('Got signed URL, starting download...');
+      // Get auth token for proxy requests
+      const session = await supabase.auth.getSession();
+      const authToken = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
       // Download with progress tracking
-      const response = await fetch(signedData.signedUrl);
+      const response = await fetch(downloadUrl, {
+        headers: useProxy ? {
+          'Authorization': `Bearer ${authToken}`,
+        } : {},
+      });
       
       if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error('Download failed:', response.status, errorText);
+        
+        // If proxy failed, try direct URL as fallback
+        if (useProxy) {
+          console.log('Proxy failed, trying direct URL fallback...');
+          setDownloadProgress(null);
+          return getPdfUrl(pdfId, pdfFileUrl, false);
+        }
+        
         throw new Error(`Download failed with status: ${response.status}`);
       }
 
@@ -221,6 +322,9 @@ export function usePdfCache() {
         if (total > 0) {
           const progress = Math.round((received / total) * 100);
           setDownloadProgress({ pdfId, progress, isDownloading: true });
+        } else {
+          // If no content-length, show indeterminate progress
+          setDownloadProgress({ pdfId, progress: Math.min(received / 1000000 * 100, 95), isDownloading: true });
         }
       }
 
@@ -233,6 +337,14 @@ export function usePdfCache() {
       const isValid = await isValidPdfBlob(blob);
       if (!isValid) {
         console.error('Downloaded blob is not a valid PDF');
+        
+        // If proxy failed validation, try direct URL
+        if (useProxy) {
+          console.log('Proxy returned invalid PDF, trying direct URL fallback...');
+          setDownloadProgress(null);
+          return getPdfUrl(pdfId, pdfFileUrl, false);
+        }
+        
         setDownloadProgress(null);
         return null;
       }
@@ -252,6 +364,14 @@ export function usePdfCache() {
       return blobUrl;
     } catch (error) {
       console.error('Failed to download PDF:', error);
+      
+      // If proxy failed, try direct URL as fallback
+      if (useProxy) {
+        console.log('Proxy error, trying direct URL fallback...');
+        setDownloadProgress(null);
+        return getPdfUrl(pdfId, pdfFileUrl, false);
+      }
+      
       setDownloadProgress(null);
       return null;
     }
@@ -286,5 +406,7 @@ export function usePdfCache() {
     downloadProgress,
     clearCache,
     isCached,
+    runDiagnostics,
+    diagnostics,
   };
 }
