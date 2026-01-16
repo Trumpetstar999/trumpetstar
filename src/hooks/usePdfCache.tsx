@@ -41,10 +41,23 @@ async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
       const store = transaction.objectStore(STORE_NAME);
       const request = store.get(pdfId);
       
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => {
+        console.error('IndexedDB get error:', request.error);
+        reject(request.error);
+      };
+      request.onsuccess = () => {
+        const result = request.result as CachedPdf | undefined;
+        if (result && result.blob) {
+          console.log('Cache hit for PDF:', pdfId, 'blob size:', result.blob.size);
+          resolve(result);
+        } else {
+          console.log('Cache miss for PDF:', pdfId);
+          resolve(null);
+        }
+      };
     });
-  } catch {
+  } catch (error) {
+    console.error('getCachedPdf error:', error);
     return null;
   }
 }
@@ -75,9 +88,11 @@ export function usePdfCache() {
   const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<string | null> => {
     // Check cache first
     const cached = await getCachedPdf(pdfId);
-    if (cached) {
-      console.log('PDF loaded from cache:', pdfId);
-      return URL.createObjectURL(cached.blob);
+    if (cached && cached.blob && cached.blob.size > 0) {
+      console.log('PDF loaded from cache:', pdfId, 'blob size:', cached.blob.size, 'type:', cached.blob.type);
+      const blobUrl = URL.createObjectURL(cached.blob);
+      console.log('Created blob URL from cache:', blobUrl);
+      return blobUrl;
     }
 
     // Start download with progress
