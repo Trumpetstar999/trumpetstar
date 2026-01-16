@@ -1,51 +1,43 @@
-import { RefreshCw, Crown, Loader2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Crown, Sparkles } from 'lucide-react';
 import { useMembership } from '@/hooks/useMembership';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { cn } from '@/lib/utils';
 
-const planColors: Record<PlanKey, string> = {
-  FREE: 'bg-muted text-muted-foreground',
-  BASIC: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
-  PREMIUM: 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400',
+const planStyles: Record<PlanKey, { bg: string; text: string; border: string }> = {
+  FREE: { 
+    bg: 'bg-gray-100', 
+    text: 'text-gray-700', 
+    border: 'border-gray-300' 
+  },
+  BASIC: { 
+    bg: 'bg-blue-100', 
+    text: 'text-blue-700', 
+    border: 'border-blue-300' 
+  },
+  PREMIUM: { 
+    bg: 'bg-gradient-to-r from-amber-100 to-orange-100', 
+    text: 'text-amber-700', 
+    border: 'border-amber-300' 
+  },
 };
 
 export function MembershipStatusBadge() {
-  const { planKey, isLoading, refreshMembership, lastSync } = useMembership();
-
-  const handleRefresh = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    await refreshMembership();
-  };
+  const { planKey } = useMembership();
 
   const isPremium = planKey === 'PREMIUM';
   const isBasic = planKey === 'BASIC';
+  const styles = planStyles[planKey];
 
   return (
-    <div className="flex items-center gap-2">
-      <div className={cn(
-        'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium',
-        planColors[planKey]
-      )}>
-        {isPremium && <Crown className="w-4 h-4" />}
-        {isBasic && <Sparkles className="w-4 h-4" />}
-        <span>{PLAN_DISPLAY_NAMES[planKey]}</span>
-      </div>
-      
-      <Button 
-        variant="ghost" 
-        size="icon"
-        className="h-8 w-8"
-        onClick={handleRefresh}
-        disabled={isLoading}
-        title={lastSync ? `Zuletzt aktualisiert: ${lastSync.toLocaleTimeString()}` : 'Mitgliedschaft aktualisieren'}
-      >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <RefreshCw className="w-4 h-4" />
-        )}
-      </Button>
+    <div className={cn(
+      'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border',
+      styles.bg,
+      styles.text,
+      styles.border
+    )}>
+      {isPremium && <Crown className="w-3.5 h-3.5" />}
+      {isBasic && <Sparkles className="w-3.5 h-3.5" />}
+      <span>{PLAN_DISPLAY_NAMES[planKey]}</span>
     </div>
   );
 }
