@@ -176,8 +176,8 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         // Load PDF.js with explicit worker configuration
         const pdfjsLib = await import('pdfjs-dist');
         
-        // Set worker source explicitly
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
+        // Set worker source to locally hosted file for iPad Safari compatibility
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
