@@ -145,7 +145,8 @@ async function isValidPdfBlob(blob: Blob): Promise<boolean> {
 // Check if PDF.js worker is reachable
 async function checkWorkerReachable(): Promise<boolean> {
   try {
-    const response = await fetch('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js', {
+    // Check local worker file
+    const response = await fetch('/pdf.worker.min.mjs', {
       method: 'HEAD',
     });
     return response.ok;
