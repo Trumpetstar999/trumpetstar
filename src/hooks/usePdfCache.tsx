@@ -47,8 +47,8 @@ async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
       };
       request.onsuccess = () => {
         const result = request.result as CachedPdf | undefined;
-        if (result && result.blob) {
-          console.log('Cache hit for PDF:', pdfId, 'blob size:', result.blob.size);
+        if (result && result.blob && result.blob.size > 0) {
+          console.log('Cache entry found for PDF:', pdfId, 'blob size:', result.blob.size);
           resolve(result);
         } else {
           console.log('Cache miss for PDF:', pdfId);
@@ -75,7 +75,10 @@ async function savePdfToCache(pdfId: string, blob: Blob): Promise<void> {
       });
       
       request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        console.log('PDF cached successfully:', pdfId);
+        resolve();
+      };
     });
   } catch (error) {
     console.error('Failed to cache PDF:', error);
@@ -85,12 +88,42 @@ async function savePdfToCache(pdfId: string, blob: Blob): Promise<void> {
 async function clearCacheEntry(pdfId: string): Promise<void> {
   try {
     const db = await openDatabase();
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    store.delete(pdfId);
-    console.log('Cleared cache entry for:', pdfId);
+    return new Promise((resolve) => {
+      const transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.delete(pdfId);
+      request.onsuccess = () => {
+        console.log('Cleared cache entry for:', pdfId);
+        resolve();
+      };
+      request.onerror = () => {
+        console.error('Failed to clear cache:', request.error);
+        resolve();
+      };
+    });
   } catch (error) {
     console.error('Failed to clear cache entry:', error);
+  }
+}
+
+// Validate that a blob is a valid PDF by reading its header bytes
+async function isValidPdfBlob(blob: Blob): Promise<boolean> {
+  if (!blob || blob.size < 1000) {
+    console.log('Blob too small to be valid PDF:', blob?.size);
+    return false;
+  }
+  
+  try {
+    // Read first 5 bytes to check PDF magic number
+    const headerSlice = blob.slice(0, 5);
+    const arrayBuffer = await headerSlice.arrayBuffer();
+    const header = new TextDecoder().decode(arrayBuffer);
+    const isValid = header.startsWith('%PDF-');
+    console.log('PDF validation result:', isValid, 'header:', header);
+    return isValid;
+  } catch (e) {
+    console.error('Error validating PDF blob:', e);
+    return false;
   }
 }
 
@@ -98,42 +131,45 @@ export function usePdfCache() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
 
   const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<string | null> => {
+    console.log('getPdfUrl called for:', pdfId);
+    
     // Check cache first
     const cached = await getCachedPdf(pdfId);
-    if (cached && cached.blob && cached.blob.size > 1000) { // At least 1KB for valid PDF
-      console.log('PDF loaded from cache:', pdfId, 'blob size:', cached.blob.size, 'type:', cached.blob.type);
+    
+    if (cached) {
+      // Validate the cached blob is a real PDF
+      const isValid = await isValidPdfBlob(cached.blob);
       
-      // Verify it's actually a valid PDF by checking magic bytes
-      try {
-        const headerBytes = await cached.blob.slice(0, 5).text();
-        if (headerBytes.startsWith('%PDF-')) {
-          const blobUrl = URL.createObjectURL(cached.blob);
-          console.log('Created blob URL from cache:', blobUrl);
-          return blobUrl;
-        } else {
-          console.log('Cached blob is not a valid PDF, clearing cache for:', pdfId);
-          await clearCacheEntry(pdfId);
-        }
-      } catch (e) {
-        console.error('Error validating cached PDF:', e);
+      if (isValid) {
+        console.log('Valid PDF found in cache:', pdfId);
+        const blobUrl = URL.createObjectURL(cached.blob);
+        console.log('Created blob URL from cache:', blobUrl);
+        return blobUrl;
+      } else {
+        console.log('Cached blob is invalid, clearing cache for:', pdfId);
         await clearCacheEntry(pdfId);
       }
-    } else if (cached) {
-      console.log('Cached blob is too small or invalid, clearing cache for:', pdfId);
-      await clearCacheEntry(pdfId);
     }
 
     // Start download with progress
+    console.log('Starting fresh download for PDF:', pdfId);
     setDownloadProgress({ pdfId, progress: 0, isDownloading: true });
 
     try {
       // Extract file path from URL - handle both public and signed URL formats
       let filePath = '';
       
+      // Decode the URL first to handle encoded characters
+      const decodedUrl = decodeURIComponent(pdfFileUrl);
+      
       // Format: .../pdf-documents/filename.pdf
-      if (pdfFileUrl.includes('/pdf-documents/')) {
-        const urlParts = pdfFileUrl.split('/pdf-documents/');
+      if (decodedUrl.includes('/pdf-documents/')) {
+        const urlParts = decodedUrl.split('/pdf-documents/');
         filePath = urlParts[urlParts.length - 1];
+        // Remove any query params
+        if (filePath.includes('?')) {
+          filePath = filePath.split('?')[0];
+        }
       }
 
       if (!filePath) {
@@ -160,7 +196,7 @@ export function usePdfCache() {
       const response = await fetch(signedData.signedUrl);
       
       if (!response.ok) {
-        throw new Error('Download failed');
+        throw new Error(`Download failed with status: ${response.status}`);
       }
 
       const contentLength = response.headers.get('content-length');
@@ -193,6 +229,14 @@ export function usePdfCache() {
       
       console.log('Download complete, blob size:', blob.size);
       
+      // Validate downloaded blob
+      const isValid = await isValidPdfBlob(blob);
+      if (!isValid) {
+        console.error('Downloaded blob is not a valid PDF');
+        setDownloadProgress(null);
+        return null;
+      }
+      
       // Cache the PDF
       await savePdfToCache(pdfId, blob);
       
@@ -203,7 +247,7 @@ export function usePdfCache() {
       setDownloadProgress(null);
       
       const blobUrl = URL.createObjectURL(blob);
-      console.log('Created blob URL:', blobUrl);
+      console.log('Created blob URL from download:', blobUrl);
       
       return blobUrl;
     } catch (error) {
@@ -221,8 +265,10 @@ export function usePdfCache() {
       
       if (pdfId) {
         store.delete(pdfId);
+        console.log('Cleared cache for:', pdfId);
       } else {
         store.clear();
+        console.log('Cleared entire PDF cache');
       }
     } catch (error) {
       console.error('Failed to clear cache:', error);
@@ -231,7 +277,8 @@ export function usePdfCache() {
 
   const isCached = useCallback(async (pdfId: string): Promise<boolean> => {
     const cached = await getCachedPdf(pdfId);
-    return cached !== null;
+    if (!cached) return false;
+    return await isValidPdfBlob(cached.blob);
   }, []);
 
   return {
