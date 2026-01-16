@@ -6,10 +6,11 @@ import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Video, Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
+import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -22,14 +23,21 @@ interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
   requiredPlanKey: PlanKey;
 }
 
+interface RecentVideo extends Video {
+  watchedAt: string;
+  levelTitle: string;
+}
+
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [levels, setLevels] = useState<LevelWithPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeLevel, setActiveLevel] = useState<string>('');
+  const [activeLevel, setActiveLevel] = useState<string>('recent'); // Default to 'recent'
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
+  const { user } = useAuth();
 
   // Update video playing state when video is selected/closed
   useEffect(() => {
@@ -39,6 +47,54 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   useEffect(() => {
     fetchLevels();
   }, []);
+
+  // Fetch recent videos when levels are loaded
+  useEffect(() => {
+    if (user && levels.length > 0) {
+      fetchRecentVideos();
+    }
+  }, [user, levels]);
+
+  async function fetchRecentVideos() {
+    if (!user) return;
+    
+    try {
+      // Get last 20 video completions
+      const { data: completions, error } = await supabase
+        .from('video_completions')
+        .select('video_id, completed_at')
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      // Get unique video IDs (most recent first)
+      const uniqueVideoIds = [...new Set((completions || []).map(c => c.video_id))];
+      
+      // Map to videos from levels data
+      const recentVids: RecentVideo[] = [];
+      uniqueVideoIds.forEach(videoId => {
+        const completion = completions?.find(c => c.video_id === videoId);
+        levels.forEach(level => {
+          level.sections.forEach(section => {
+            const video = section.videos.find(v => v.id === videoId);
+            if (video && completion) {
+              recentVids.push({
+                ...video,
+                watchedAt: completion.completed_at,
+                levelTitle: level.title,
+              });
+            }
+          });
+        });
+      });
+
+      setRecentVideos(recentVids.slice(0, 12)); // Max 12 recent videos
+    } catch (error) {
+      console.error('Error fetching recent videos:', error);
+    }
+  }
 
   async function fetchLevels() {
     setIsLoading(true);
@@ -122,9 +178,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       });
 
       setLevels(transformedLevels);
-      if (transformedLevels.length > 0 && !activeLevel) {
-        setActiveLevel(transformedLevels[0].id);
-      }
     } catch (error) {
       console.error('Error fetching levels:', error);
     } finally {
@@ -279,6 +332,54 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                     </div>
                   ))}
                 </>
+              )}
+            </div>
+          ) : activeLevel === 'recent' ? (
+            /* Recent Videos View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Zuletzt angesehen</h3>
+                  <p className="text-sm text-white/60">Deine kürzlich geschauten Videos</p>
+                </div>
+              </div>
+              
+              {recentVideos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+                    <Film className="w-7 h-7 text-white/40" />
+                  </div>
+                  <h3 className="text-base font-medium text-white mb-1">Noch keine Videos angesehen</h3>
+                  <p className="text-sm text-white/50 mb-4">
+                    Wähle ein Level aus und starte mit dem Lernen
+                  </p>
+                  <Button 
+                    onClick={() => levels.length > 0 && setActiveLevel(levels[0].id)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/70 hover:text-white hover:bg-white/10 gap-2"
+                  >
+                    Zum ersten Level
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {recentVideos.map((video) => (
+                    <div key={`${video.id}-${video.watchedAt}`} className="relative">
+                      <VideoCard
+                        video={video}
+                        onClick={() => setSelectedVideo(video)}
+                      />
+                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80">
+                        {video.levelTitle}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           ) : currentLevel && (
