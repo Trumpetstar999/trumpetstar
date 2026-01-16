@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, FileText } from 'lucide-react';
 import { PlanKey } from '@/types/plans';
 import { toast } from 'sonner';
+import { usePdfViewer } from '@/hooks/usePdfViewer';
 
 interface PdfDocument {
   id: string;
@@ -34,6 +35,7 @@ interface AudioTrack {
 export function PdfsPage() {
   const { user } = useAuth();
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
+  const { setIsPdfViewerOpen } = usePdfViewer();
   const [selectedPdfId, setSelectedPdfId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -76,10 +78,28 @@ export function PdfsPage() {
     ? canAccessLevel(selectedPdf.plan_required as PlanKey)
     : true;
 
-  // Get audio track for current page
-  const currentAudioTrack = audioTracks.find(t => t.page_number === currentPage);
+  // Update global state when PDF viewer opens/closes
+  useEffect(() => {
+    setIsPdfViewerOpen(!!selectedPdfId && canAccessSelectedPdf);
+    return () => setIsPdfViewerOpen(false);
+  }, [selectedPdfId, canAccessSelectedPdf, setIsPdfViewerOpen]);
 
   const isLoading = pdfsLoading || membershipLoading;
+
+  // Handle select with access check
+  const handleSelectPdf = (id: string) => {
+    const pdf = pdfs.find(p => p.id === id);
+    if (pdf && canAccessLevel(pdf.plan_required as PlanKey)) {
+      setSelectedPdfId(id);
+      setCurrentPage(1);
+    } else if (pdf) {
+      toast.error(`Upgrade auf ${pdf.plan_required} erforderlich`);
+    }
+  };
+
+  const handleClosePdf = () => {
+    setSelectedPdfId(null);
+  };
 
   if (isLoading) {
     return (
@@ -100,17 +120,6 @@ export function PdfsPage() {
       </div>
     );
   }
-
-  // Handle select with access check
-  const handleSelectPdf = (id: string) => {
-    const pdf = pdfs.find(p => p.id === id);
-    if (pdf && canAccessLevel(pdf.plan_required as PlanKey)) {
-      setSelectedPdfId(id);
-      setCurrentPage(1);
-    } else if (pdf) {
-      toast.error(`Upgrade auf ${pdf.plan_required} erforderlich`);
-    }
-  };
 
   return (
     <>
@@ -141,8 +150,8 @@ export function PdfsPage() {
           pdf={selectedPdf}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
-          audioTrack={currentAudioTrack}
-          onClose={() => setSelectedPdfId(null)}
+          audioTracks={audioTracks}
+          onClose={handleClosePdf}
         />
       )}
 
@@ -155,7 +164,7 @@ export function PdfsPage() {
             <p className="text-muted-foreground text-sm mb-4">
               Dieses Notenheft erfordert den {selectedPdf.plan_required}-Plan.
             </p>
-            <Button onClick={() => setSelectedPdfId(null)}>
+            <Button onClick={handleClosePdf}>
               Schließen
             </Button>
           </div>

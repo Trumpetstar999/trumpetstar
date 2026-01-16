@@ -3,6 +3,7 @@ import { TabBar } from './TabBar';
 import { Header } from './Header';
 import { TabId } from '@/types';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
+import { usePdfViewer } from '@/hooks/usePdfViewer';
 import { cn } from '@/lib/utils';
 
 interface AppShellProps {
@@ -27,6 +28,9 @@ export function AppShell({
   videoCount
 }: AppShellProps) {
   const { isVideoPlaying } = useVideoPlayer();
+  const { isPdfViewerOpen } = usePdfViewer();
+  
+  const isFullscreen = isVideoPlaying || isPdfViewerOpen;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -40,12 +44,12 @@ export function AppShell({
       
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300",
-        isVideoPlaying ? "pb-0" : "pb-24"
+        isFullscreen ? "pb-0" : "pb-24"
       )}>
         {children}
       </main>
       
-      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={isVideoPlaying} />
+      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={isFullscreen} />
     </div>
   );
 }
