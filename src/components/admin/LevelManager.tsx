@@ -19,9 +19,11 @@ import { SortableItem } from './SortableItem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Check, X, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
 interface Level {
   id: string;
@@ -30,18 +32,31 @@ interface Level {
   vimeo_showcase_id: string;
   sort_order: number;
   is_active: boolean;
+  required_plan_key: PlanKey;
 }
 
 interface LevelManagerProps {
   onSelectLevel: (levelId: string) => void;
 }
 
+const PLAN_OPTIONS: { value: PlanKey; label: string }[] = [
+  { value: 'FREE', label: 'Free (alle)' },
+  { value: 'BASIC', label: 'Basic' },
+  { value: 'PREMIUM', label: 'Premium' },
+];
+
+const PLAN_BADGE_COLORS: Record<PlanKey, string> = {
+  FREE: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  BASIC: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  PREMIUM: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+};
+
 export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [levels, setLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '' });
-  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '' });
+  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey });
+  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey });
   const [isAdding, setIsAdding] = useState(false);
 
   const sensors = useSensors(
@@ -65,7 +80,12 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       toast.error('Fehler beim Laden der Levels');
       console.error(error);
     } else {
-      setLevels(data || []);
+      // Map data with default plan key
+      const mappedLevels = (data || []).map(level => ({
+        ...level,
+        required_plan_key: (level.required_plan_key as PlanKey) || 'FREE',
+      }));
+      setLevels(mappedLevels);
     }
     setIsLoading(false);
   }
@@ -107,6 +127,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       title: newLevel.title,
       vimeo_showcase_id: newLevel.vimeo_showcase_id,
       sort_order: levels.length,
+      required_plan_key: newLevel.required_plan_key,
     });
 
     if (error) {
@@ -114,7 +135,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       console.error(error);
     } else {
       toast.success('Level erstellt');
-      setNewLevel({ title: '', vimeo_showcase_id: '' });
+      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' });
       setIsAdding(false);
       fetchLevels();
     }
@@ -126,6 +147,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       .update({
         title: editForm.title,
         description: editForm.description || null,
+        required_plan_key: editForm.required_plan_key,
       })
       .eq('id', id);
 
@@ -168,9 +190,31 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     }
   }
 
+  async function handlePlanChange(levelId: string, planKey: PlanKey) {
+    const { error } = await supabase
+      .from('levels')
+      .update({ required_plan_key: planKey })
+      .eq('id', levelId);
+
+    if (error) {
+      toast.error('Fehler beim Aktualisieren des Plans');
+      console.error(error);
+    } else {
+      toast.success('Plan aktualisiert');
+      // Update local state
+      setLevels(prev => prev.map(l => 
+        l.id === levelId ? { ...l, required_plan_key: planKey } : l
+      ));
+    }
+  }
+
   function startEditing(level: Level) {
     setEditingId(level.id);
-    setEditForm({ title: level.title, description: level.description || '' });
+    setEditForm({ 
+      title: level.title, 
+      description: level.description || '',
+      required_plan_key: level.required_plan_key,
+    });
   }
 
   if (isLoading) {
@@ -199,6 +243,24 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
             value={newLevel.vimeo_showcase_id}
             onChange={(e) => setNewLevel({ ...newLevel, vimeo_showcase_id: e.target.value })}
           />
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
+            <Select
+              value={newLevel.required_plan_key}
+              onValueChange={(value) => setNewLevel({ ...newLevel, required_plan_key: value as PlanKey })}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PLAN_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex gap-2">
             <Button onClick={handleAddLevel}>Erstellen</Button>
             <Button variant="outline" onClick={() => setIsAdding(false)}>
@@ -219,7 +281,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
               <SortableItem key={level.id} id={level.id}>
                 <div className="flex-1">
                   {editingId === level.id ? (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <Input
                         value={editForm.title}
                         onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
@@ -229,13 +291,41 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         value={editForm.description}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                       />
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
+                        <Select
+                          value={editForm.required_plan_key}
+                          onValueChange={(value) => setEditForm({ ...editForm, required_plan_key: value as PlanKey })}
+                        >
+                          <SelectTrigger className="w-40">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PLAN_OPTIONS.map(option => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   ) : (
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{level.title}</span>
                         {!level.is_active && (
                           <Badge variant="secondary">Inaktiv</Badge>
+                        )}
+                        {level.required_plan_key !== 'FREE' && (
+                          <Badge className={`${PLAN_BADGE_COLORS[level.required_plan_key]} gap-1`}>
+                            {level.required_plan_key === 'PREMIUM' ? (
+                              <Crown className="w-3 h-3" />
+                            ) : (
+                              <Lock className="w-3 h-3" />
+                            )}
+                            {PLAN_DISPLAY_NAMES[level.required_plan_key]}
+                          </Badge>
                         )}
                       </div>
                       {level.description && (
@@ -248,7 +338,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   {editingId === level.id ? (
                     <>
                       <Button
@@ -268,6 +358,22 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                     </>
                   ) : (
                     <>
+                      {/* Inline Plan Selector */}
+                      <Select
+                        value={level.required_plan_key}
+                        onValueChange={(value) => handlePlanChange(level.id, value as PlanKey)}
+                      >
+                        <SelectTrigger className="w-28 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PLAN_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Button
                         size="icon"
                         variant="ghost"
