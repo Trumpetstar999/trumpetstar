@@ -82,17 +82,45 @@ async function savePdfToCache(pdfId: string, blob: Blob): Promise<void> {
   }
 }
 
+async function clearCacheEntry(pdfId: string): Promise<void> {
+  try {
+    const db = await openDatabase();
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    store.delete(pdfId);
+    console.log('Cleared cache entry for:', pdfId);
+  } catch (error) {
+    console.error('Failed to clear cache entry:', error);
+  }
+}
+
 export function usePdfCache() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
 
   const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<string | null> => {
     // Check cache first
     const cached = await getCachedPdf(pdfId);
-    if (cached && cached.blob && cached.blob.size > 0) {
+    if (cached && cached.blob && cached.blob.size > 1000) { // At least 1KB for valid PDF
       console.log('PDF loaded from cache:', pdfId, 'blob size:', cached.blob.size, 'type:', cached.blob.type);
-      const blobUrl = URL.createObjectURL(cached.blob);
-      console.log('Created blob URL from cache:', blobUrl);
-      return blobUrl;
+      
+      // Verify it's actually a valid PDF by checking magic bytes
+      try {
+        const headerBytes = await cached.blob.slice(0, 5).text();
+        if (headerBytes.startsWith('%PDF-')) {
+          const blobUrl = URL.createObjectURL(cached.blob);
+          console.log('Created blob URL from cache:', blobUrl);
+          return blobUrl;
+        } else {
+          console.log('Cached blob is not a valid PDF, clearing cache for:', pdfId);
+          await clearCacheEntry(pdfId);
+        }
+      } catch (e) {
+        console.error('Error validating cached PDF:', e);
+        await clearCacheEntry(pdfId);
+      }
+    } else if (cached) {
+      console.log('Cached blob is too small or invalid, clearing cache for:', pdfId);
+      await clearCacheEntry(pdfId);
     }
 
     // Start download with progress

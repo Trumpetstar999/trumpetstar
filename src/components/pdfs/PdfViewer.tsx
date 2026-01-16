@@ -107,30 +107,24 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       console.log('PdfViewer: Starting PDF load from blob URL:', pdfBlobUrl);
       setIsLoading(true);
       try {
-        // First, verify the blob URL is valid by fetching it
-        console.log('PdfViewer: Verifying blob URL...');
-        const testResponse = await fetch(pdfBlobUrl);
-        if (!testResponse.ok) {
-          throw new Error(`Blob URL fetch failed: ${testResponse.status}`);
-        }
-        const blob = await testResponse.blob();
-        console.log('PdfViewer: Blob verified, size:', blob.size, 'type:', blob.type);
-        
-        // Convert blob to ArrayBuffer for pdfjs
-        const arrayBuffer = await blob.arrayBuffer();
-        console.log('PdfViewer: ArrayBuffer created, size:', arrayBuffer.byteLength);
-        
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
-        console.log('PdfViewer: pdfjs-dist loaded, getting document from ArrayBuffer...');
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        console.log('PdfViewer: pdfjs-dist loaded, getting document...');
+        
+        // Use URL directly - pdfjs handles blob URLs well
+        const loadingTask = pdfjsLib.getDocument(pdfBlobUrl);
+        
+        loadingTask.onProgress = (progress: { loaded: number; total: number }) => {
+          console.log('PdfViewer: Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
+        };
+        
         const doc = await loadingTask.promise;
         console.log('PdfViewer: PDF document loaded, pages:', doc.numPages);
         setPdfDoc(doc);
       } catch (error) {
         console.error('Error loading PDF:', error);
-        toast.error('PDF konnte nicht geladen werden');
+        toast.error('PDF konnte nicht geladen werden. Bitte versuche es erneut.');
         setIsLoading(false);
       }
     };
