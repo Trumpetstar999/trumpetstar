@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { 
   Select, 
   SelectContent, 
@@ -12,7 +12,24 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus, MoreHorizontal, Trash2, KeyRound, Download, Mail } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +40,7 @@ type AppRole = Database['public']['Enums']['app_role'];
 
 interface UserProfile {
   id: string;
+  email?: string | null;
   display_name: string | null;
   avatar_url: string | null;
   created_at: string;
@@ -56,6 +74,17 @@ export function UserList() {
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [updatingPlan, setUpdatingPlan] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  
+  // Delete user state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Reset password state
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [userToResetPassword, setUserToResetPassword] = useState<UserProfile | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -357,6 +386,151 @@ export function UserList() {
     }
   };
 
+  // Delete user handler
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('Keine gültige Sitzung');
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=delete-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ userId: userToDelete.id }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Fehler beim Löschen');
+      }
+
+      toast({
+        title: 'Nutzer gelöscht',
+        description: `${userToDelete.display_name || 'Nutzer'} wurde erfolgreich gelöscht.`,
+      });
+
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: 'Fehler',
+        description: error instanceof Error ? error.message : 'Nutzer konnte nicht gelöscht werden.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Reset password handler
+  const handleResetPassword = async () => {
+    if (!userToResetPassword || !newPassword) return;
+    
+    if (newPassword.length < 6) {
+      toast({
+        title: 'Fehler',
+        description: 'Passwort muss mindestens 6 Zeichen lang sein.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setIsResettingPassword(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('Keine gültige Sitzung');
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=reset-password`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ 
+            userId: userToResetPassword.id,
+            newPassword,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Fehler beim Zurücksetzen');
+      }
+
+      toast({
+        title: 'Passwort zurückgesetzt',
+        description: `Das Passwort für ${userToResetPassword.display_name || 'Nutzer'} wurde aktualisiert.`,
+      });
+
+      setResetPasswordDialogOpen(false);
+      setUserToResetPassword(null);
+      setNewPassword('');
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      toast({
+        title: 'Fehler',
+        description: error instanceof Error ? error.message : 'Passwort konnte nicht zurückgesetzt werden.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  // Export users to CSV
+  const handleExportUsers = () => {
+    const headers = ['Name', 'E-Mail', 'Plan', 'Berechtigung', 'Lehrer', 'Registriert'];
+    const csvData = filteredUsers.map(user => [
+      user.display_name || 'Unbekannt',
+      user.email || '-',
+      plans.find(p => p.key === user.plan_key)?.display_name || 'Free',
+      getRoleLabel(user.role),
+      user.is_teacher ? 'Ja' : 'Nein',
+      formatDate(user.created_at),
+    ]);
+
+    const csvContent = [
+      headers.join(';'),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(';'))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nutzerliste_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Export erfolgreich',
+      description: `${filteredUsers.length} Nutzer wurden exportiert.`,
+    });
+  };
+
   const getRoleLabel = (role: AppRole | null | undefined) => {
     switch (role) {
       case 'admin': return 'Admin';
@@ -422,6 +596,14 @@ export function UserList() {
                 />
               </div>
               <Button
+                onClick={handleExportUsers}
+                variant="outline"
+                className="h-9 border-slate-200"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Exportieren
+              </Button>
+              <Button
                 onClick={() => setCreateDialogOpen(true)}
                 className="h-9 bg-blue-500 hover:bg-blue-600 text-white"
               >
@@ -459,6 +641,9 @@ export function UserList() {
                     </th>
                     <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Registriert
+                    </th>
+                    <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Aktionen
                     </th>
                   </tr>
                 </thead>
@@ -583,6 +768,45 @@ export function UserList() {
                         <td className="px-5 py-3 text-sm text-[#6B7280]">
                           {formatDate(user.created_at)}
                         </td>
+                        <td className="px-5 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-white">
+                              <DropdownMenuItem
+                                onClick={() => fetchUserDetail(user.id)}
+                                className="cursor-pointer"
+                              >
+                                <User className="w-4 h-4 mr-2" />
+                                Details anzeigen
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setUserToResetPassword(user);
+                                  setResetPasswordDialogOpen(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                <KeyRound className="w-4 h-4 mr-2" />
+                                Passwort zurücksetzen
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setUserToDelete(user);
+                                  setDeleteDialogOpen(true);
+                                }}
+                                className="cursor-pointer text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Nutzer löschen
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
                       </tr>
                     );
                   })}
@@ -690,6 +914,102 @@ export function UserList() {
         plans={plans}
         onUserCreated={fetchUsers}
       />
+
+      {/* Delete User Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Nutzer löschen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Möchtest du <strong>{userToDelete?.display_name || 'diesen Nutzer'}</strong> wirklich löschen? 
+              Diese Aktion kann nicht rückgängig gemacht werden. Alle zugehörigen Daten werden ebenfalls gelöscht.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={isDeleting}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Lösche...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Endgültig löschen
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={resetPasswordDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setResetPasswordDialogOpen(false);
+          setUserToResetPassword(null);
+          setNewPassword('');
+        }
+      }}>
+        <DialogContent className="sm:max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5" />
+              Passwort zurücksetzen
+            </DialogTitle>
+            <DialogDescription>
+              Neues Passwort für <strong>{userToResetPassword?.display_name || 'Nutzer'}</strong> festlegen.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="newPassword" className="text-sm font-medium text-slate-700">
+                Neues Passwort
+              </label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Mindestens 6 Zeichen"
+                disabled={isResettingPassword}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setResetPasswordDialogOpen(false);
+                setUserToResetPassword(null);
+                setNewPassword('');
+              }}
+              disabled={isResettingPassword}
+            >
+              Abbrechen
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={isResettingPassword || newPassword.length < 6}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              {isResettingPassword ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Speichere...
+                </>
+              ) : (
+                'Passwort setzen'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
