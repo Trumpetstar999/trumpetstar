@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Star, AlertTriangle, WifiOff, RefreshCw } from 'lucide-react';
+import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause } from 'lucide-react';
 import { Video } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { useAuth } from '@/hooks/useAuth';
 
 interface VideoPlayerProps {
   video: Video;
@@ -21,16 +23,100 @@ interface VimeoErrorLog {
 }
 
 export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
+  const { user } = useAuth();
   const [showCompleted, setShowCompleted] = useState(false);
   const [error, setError] = useState<VimeoErrorLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(100); // 100 = 1.0x
   const hasCompletedRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Build Vimeo player URL - ONLY use official iframe embed
-  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0`;
+  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=0`;
+
+  // Load saved playback speed
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('user_video_progress')
+        .select('playback_speed')
+        .eq('user_id', user.id)
+        .eq('video_id', video.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data?.playback_speed) {
+            const speedPercent = Math.round(data.playback_speed * 100);
+            setPlaybackSpeed(speedPercent);
+          }
+        });
+    }
+  }, [user, video.id]);
+
+  // Save playback speed when changed
+  const savePlaybackSpeed = useCallback(async (speedPercent: number) => {
+    if (!user) return;
+    const playbackRate = speedPercent / 100;
+    
+    await supabase
+      .from('user_video_progress')
+      .upsert({
+        user_id: user.id,
+        video_id: video.id,
+        playback_speed: playbackRate,
+        progress_percent: duration > 0 ? (currentTime / duration) * 100 : 0,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'user_id,video_id'
+      });
+  }, [user, video.id, currentTime, duration]);
+
+  // Send command to Vimeo player
+  const sendVimeoCommand = useCallback((method: string, value?: unknown) => {
+    if (iframeRef.current?.contentWindow) {
+      const message = value !== undefined 
+        ? JSON.stringify({ method, value })
+        : JSON.stringify({ method });
+      iframeRef.current.contentWindow.postMessage(message, '*');
+    }
+  }, []);
+
+  // Handle playback speed change
+  const handleSpeedChange = useCallback((value: number[]) => {
+    const speedPercent = value[0];
+    setPlaybackSpeed(speedPercent);
+    const playbackRate = speedPercent / 100;
+    sendVimeoCommand('setPlaybackRate', playbackRate);
+    savePlaybackSpeed(speedPercent);
+  }, [sendVimeoCommand, savePlaybackSpeed]);
+
+  // Handle timeline seek
+  const handleSeek = useCallback((value: number[]) => {
+    const time = value[0];
+    setCurrentTime(time);
+    sendVimeoCommand('seekTo', time);
+  }, [sendVimeoCommand]);
+
+  // Toggle play/pause
+  const togglePlayPause = useCallback(() => {
+    if (isPlaying) {
+      sendVimeoCommand('pause');
+    } else {
+      sendVimeoCommand('play');
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying, sendVimeoCommand]);
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Log Vimeo errors to database for admin visibility
   const logVimeoError = useCallback(async (errorType: VimeoError, message: string) => {
@@ -46,10 +132,10 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     console.error('[Vimeo Error]', errorLog);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
         await supabase.from('activity_logs').insert([{
-          user_id: user.id,
+          user_id: authUser.id,
           action: 'vimeo_error',
           metadata: {
             videoId: errorLog.videoId,
@@ -81,11 +167,40 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           if (loadTimeoutRef.current) {
             clearTimeout(loadTimeoutRef.current);
           }
+          // Apply saved playback speed
+          sendVimeoCommand('setPlaybackRate', playbackSpeed / 100);
+          // Get duration
+          sendVimeoCommand('getDuration');
+        }
+
+        // Duration received
+        if (data.method === 'getDuration' && data.value) {
+          setDuration(data.value);
+        }
+        
+        // Time update
+        if (data.event === 'timeupdate' || data.method === 'getCurrentTime') {
+          if (data.data?.seconds !== undefined) {
+            setCurrentTime(data.data.seconds);
+          } else if (data.value !== undefined) {
+            setCurrentTime(data.value);
+          }
+        }
+
+        // Play state changes
+        if (data.event === 'play') {
+          setIsPlaying(true);
+        }
+        if (data.event === 'pause') {
+          setIsPlaying(false);
         }
         
         // Check for progress event (80% completion)
         if (data.event === 'playProgress' && data.data) {
           const percent = data.data.percent || 0;
+          setCurrentTime(data.data.seconds || 0);
+          setDuration(data.data.duration || duration);
+          
           if (percent >= 0.8 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
             setShowCompleted(true);
@@ -94,10 +209,12 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
           }
         }
         
-        // Alternative: timeupdate event
+        // Alternative: timeupdate event for completion
         if (data.method === 'timeupdate' && data.value) {
-          const { seconds, duration } = data.value;
-          if (duration > 0 && seconds / duration >= 0.8 && !hasCompletedRef.current) {
+          const { seconds, duration: dur } = data.value;
+          setCurrentTime(seconds);
+          if (dur) setDuration(dur);
+          if (dur > 0 && seconds / dur >= 0.8 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
             setShowCompleted(true);
             onComplete();
@@ -125,7 +242,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     const enableVimeoApi = () => {
       if (iframeRef.current?.contentWindow) {
         // Subscribe to player events
-        const methods = ['ready', 'playProgress', 'timeupdate', 'error'];
+        const methods = ['ready', 'playProgress', 'timeupdate', 'play', 'pause', 'error'];
         methods.forEach(method => {
           iframeRef.current?.contentWindow?.postMessage(
             JSON.stringify({ method: 'addEventListener', value: method }),
@@ -157,7 +274,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         clearTimeout(loadTimeoutRef.current);
       }
     };
-  }, [onComplete, playerReady, logVimeoError]);
+  }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -165,11 +282,15 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       if (e.key === 'Escape') {
         onClose();
       }
+      if (e.key === ' ') {
+        e.preventDefault();
+        togglePlayPause();
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [onClose, togglePlayPause]);
 
   // Handle iframe load error
   const handleIframeError = () => {
@@ -196,7 +317,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col animate-fade-in">
       {/* Star earned animation */}
       {showCompleted && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] animate-scale-in">
@@ -215,8 +336,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         <X className="w-6 h-6" />
       </button>
       
-      {/* Video container */}
-      <div className="relative w-full h-full flex items-center justify-center p-4">
+      {/* Video container - takes remaining space above control bar */}
+      <div className="flex-1 relative flex items-center justify-center p-4 pb-0">
         <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden bg-black">
           {/* Loading indicator */}
           {isLoading && !error && (
@@ -283,11 +404,65 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         </div>
       </div>
       
-      {/* Video title */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-semibold text-white">{video.title}</h2>
-          <p className="text-white/60 text-sm mt-1">ESC zum Schließen</p>
+      {/* Fixed bottom control bar */}
+      <div className="relative z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-4 safe-bottom">
+        <div className="max-w-6xl mx-auto flex flex-col gap-4">
+          {/* Video title */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">{video.title}</h2>
+              <p className="text-white/50 text-xs">ESC zum Schließen • Leertaste für Play/Pause</p>
+            </div>
+          </div>
+
+          {/* Timeline */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={togglePlayPause}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            >
+              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            </button>
+            
+            <span className="text-white/70 text-sm font-mono w-12 text-right">
+              {formatTime(currentTime)}
+            </span>
+            
+            <Slider
+              value={[currentTime]}
+              min={0}
+              max={duration || 100}
+              step={1}
+              onValueChange={handleSeek}
+              variant="player"
+              className="flex-1"
+            />
+            
+            <span className="text-white/70 text-sm font-mono w-12">
+              {formatTime(duration)}
+            </span>
+          </div>
+
+          {/* Speed control */}
+          <div className="flex items-center gap-4">
+            <span className="text-white/60 text-sm">Geschwindigkeit:</span>
+            <div className="flex items-center gap-3 flex-1 max-w-xs">
+              <span className="text-white/50 text-xs">40%</span>
+              <Slider
+                value={[playbackSpeed]}
+                min={40}
+                max={120}
+                step={5}
+                onValueChange={handleSpeedChange}
+                variant="player"
+                className="flex-1"
+              />
+              <span className="text-white/50 text-xs">120%</span>
+            </div>
+            <span className="text-white font-medium text-sm w-12 text-center bg-white/10 rounded px-2 py-1">
+              {playbackSpeed}%
+            </span>
+          </div>
         </div>
       </div>
     </div>
