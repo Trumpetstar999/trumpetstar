@@ -11,7 +11,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User } from 'lucide-react';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +26,7 @@ interface UserProfile {
   created_at: string;
   is_teacher: boolean;
   role?: AppRole | null;
+  plan_key?: string | null;
 }
 
 interface UserDetail extends UserProfile {
@@ -35,19 +36,48 @@ interface UserDetail extends UserProfile {
   last_login: string | null;
 }
 
+interface Plan {
+  key: string;
+  display_name: string;
+  rank: number;
+}
+
 export function UserList() {
   const { toast } = useToast();
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [updatingTeacher, setUpdatingTeacher] = useState<string | null>(null);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
+  const [updatingPlan, setUpdatingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
+    fetchPlans();
   }, []);
+
+  async function fetchPlans() {
+    try {
+      const { data, error } = await supabase
+        .from('plans')
+        .select('key, display_name, rank')
+        .order('rank', { ascending: true });
+
+      if (error) throw error;
+      setPlans(data || []);
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      // Fallback plans
+      setPlans([
+        { key: 'FREE', display_name: 'Free', rank: 0 },
+        { key: 'BASIC', display_name: 'Basic', rank: 10 },
+        { key: 'PREMIUM', display_name: 'Premium', rank: 20 },
+      ]);
+    }
+  }
 
   async function fetchUsers() {
     setIsLoading(true);
@@ -69,16 +99,27 @@ export function UserList() {
         console.error('Error fetching roles:', rolesError);
       }
 
-      // Merge profiles with roles
-      const usersWithRoles = (profiles || []).map(profile => {
+      // Fetch memberships for all users
+      const { data: memberships, error: membershipsError } = await supabase
+        .from('user_memberships')
+        .select('user_id, plan_key');
+
+      if (membershipsError) {
+        console.error('Error fetching memberships:', membershipsError);
+      }
+
+      // Merge profiles with roles and plans
+      const usersWithData = (profiles || []).map(profile => {
         const userRole = roles?.find(r => r.user_id === profile.id);
+        const userMembership = memberships?.find(m => m.user_id === profile.id);
         return {
           ...profile,
           role: userRole?.role || null,
+          plan_key: userMembership?.plan_key || 'FREE',
         };
       });
 
-      setUsers(usersWithRoles);
+      setUsers(usersWithData);
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
@@ -248,6 +289,71 @@ export function UserList() {
     }
   };
 
+  const handlePlanChange = async (userId: string, newPlanKey: string) => {
+    setUpdatingPlan(userId);
+    try {
+      // Check if membership exists
+      const { data: existing } = await supabase
+        .from('user_memberships')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      const selectedPlan = plans.find(p => p.key === newPlanKey);
+      const planRank = selectedPlan?.rank || 0;
+
+      if (existing) {
+        // Update existing membership
+        const { error } = await supabase
+          .from('user_memberships')
+          .update({ 
+            plan_key: newPlanKey, 
+            plan_rank: planRank,
+            current_plan: selectedPlan?.display_name || newPlanKey,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+
+        if (error) throw error;
+      } else {
+        // Insert new membership
+        const { error } = await supabase
+          .from('user_memberships')
+          .insert({ 
+            user_id: userId, 
+            plan_key: newPlanKey, 
+            plan_rank: planRank,
+            current_plan: selectedPlan?.display_name || newPlanKey
+          });
+
+        if (error) throw error;
+      }
+
+      // Update local state
+      setUsers(users.map(u => 
+        u.id === userId ? { ...u, plan_key: newPlanKey } : u
+      ));
+
+      if (selectedUser?.id === userId) {
+        setSelectedUser({ ...selectedUser, plan_key: newPlanKey });
+      }
+
+      toast({
+        title: 'Plan aktualisiert',
+        description: `Nutzer hat jetzt den ${selectedPlan?.display_name || newPlanKey} Plan.`
+      });
+    } catch (error) {
+      console.error('Error updating plan:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Plan konnte nicht aktualisiert werden.',
+        variant: 'destructive'
+      });
+    } finally {
+      setUpdatingPlan(null);
+    }
+  };
+
   const getRoleLabel = (role: AppRole | null | undefined) => {
     switch (role) {
       case 'admin': return 'Admin';
@@ -270,6 +376,22 @@ export function UserList() {
       case 'admin': return 'bg-red-50 text-red-700 border-red-200';
       case 'moderator': return 'bg-amber-50 text-amber-700 border-amber-200';
       default: return 'bg-slate-50 text-slate-600 border-slate-200';
+    }
+  };
+
+  const getPlanIcon = (planKey: string | null | undefined) => {
+    switch (planKey?.toUpperCase()) {
+      case 'PREMIUM': return Crown;
+      case 'BASIC': return Sparkles;
+      default: return User;
+    }
+  };
+
+  const getPlanColor = (planKey: string | null | undefined) => {
+    switch (planKey?.toUpperCase()) {
+      case 'PREMIUM': return 'text-amber-600';
+      case 'BASIC': return 'text-blue-600';
+      default: return 'text-slate-500';
     }
   };
 
@@ -315,6 +437,9 @@ export function UserList() {
                       Nutzer
                     </th>
                     <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Plan
+                    </th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Berechtigung
                     </th>
                     <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
@@ -328,6 +453,7 @@ export function UserList() {
                 <tbody>
                   {filteredUsers.map((user, index) => {
                     const RoleIcon = getRoleIcon(user.role);
+                    const PlanIcon = getPlanIcon(user.plan_key);
                     return (
                       <tr
                         key={user.id}
@@ -352,6 +478,42 @@ export function UserList() {
                           </button>
                         </td>
                         <td className="px-5 py-3">
+                          {updatingPlan === user.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
+                          ) : (
+                            <Select
+                              value={user.plan_key || 'FREE'}
+                              onValueChange={(value) => handlePlanChange(user.id, value)}
+                            >
+                              <SelectTrigger className={`w-[120px] h-8 text-xs bg-white border-slate-200 ${getPlanColor(user.plan_key)}`}>
+                                <div className="flex items-center gap-2">
+                                  <PlanIcon className="w-3.5 h-3.5" />
+                                  <SelectValue>
+                                    {plans.find(p => p.key === user.plan_key)?.display_name || 'Free'}
+                                  </SelectValue>
+                                </div>
+                              </SelectTrigger>
+                              <SelectContent className="bg-white border-slate-200 shadow-lg z-50">
+                                {plans.map((plan) => {
+                                  const Icon = getPlanIcon(plan.key);
+                                  return (
+                                    <SelectItem 
+                                      key={plan.key} 
+                                      value={plan.key} 
+                                      className={getPlanColor(plan.key)}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <Icon className="w-3.5 h-3.5" />
+                                        {plan.display_name}
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </td>
+                        <td className="px-5 py-3">
                           {updatingRole === user.id ? (
                             <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                           ) : (
@@ -359,7 +521,7 @@ export function UserList() {
                               value={user.role || 'none'}
                               onValueChange={(value) => handleRoleChange(user.id, value as AppRole | 'none')}
                             >
-                              <SelectTrigger className="w-[140px] h-8 text-xs bg-white border-slate-200 text-slate-700">
+                              <SelectTrigger className="w-[130px] h-8 text-xs bg-white border-slate-200 text-slate-700">
                                 <div className="flex items-center gap-2">
                                   <RoleIcon className="w-3.5 h-3.5" />
                                   <SelectValue>{getRoleLabel(user.role)}</SelectValue>
