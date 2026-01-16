@@ -1,7 +1,7 @@
 import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
-import { Star, Lock, Crown } from 'lucide-react';
+import { Star, Lock, Crown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Extended interface for levels with new plan key
@@ -13,14 +13,47 @@ interface LevelSidebarProps {
   levels: LevelWithPlan[];
   activeLevel: string | null;
   onLevelSelect: (levelId: string) => void;
+  showRecent?: boolean;
 }
 
-export function LevelSidebar({ levels, activeLevel, onLevelSelect }: LevelSidebarProps) {
+export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
   const { canAccessLevel } = useMembership();
 
   return (
     <aside className="w-[260px] glass-strong h-full overflow-y-auto flex-shrink-0">
       <div className="p-4">
+        {/* Recent Videos Button */}
+        {showRecent && (
+          <>
+            <button
+              onClick={() => onLevelSelect('recent')}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-3 rounded-full transition-all duration-200 mb-4',
+                activeLevel === 'recent' 
+                  ? 'bg-white/18 glow-blue' 
+                  : 'hover:bg-white/10'
+              )}
+            >
+              <span className={cn(
+                'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
+                activeLevel === 'recent' 
+                  ? 'bg-white text-brand-blue-mid' 
+                  : 'bg-white/15 text-white'
+              )}>
+                <Clock className="w-5 h-5" />
+              </span>
+              <span className={cn(
+                'font-medium',
+                activeLevel === 'recent' ? 'text-white' : 'text-white/90'
+              )}>
+                Zuletzt angesehen
+              </span>
+            </button>
+            
+            <div className="border-t border-white/10 mb-4" />
+          </>
+        )}
+        
         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 px-2">
           Alle Levels
         </h2>
