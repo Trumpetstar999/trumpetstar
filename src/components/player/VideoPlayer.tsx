@@ -36,8 +36,8 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Build Vimeo player URL - ONLY use official iframe embed with controls enabled
-  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&muted=0&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
+  // Build Vimeo player URL - enable sound, autoplay works on mute but user can unmute
+  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
   // Load saved playback speed
   useEffect(() => {
@@ -331,137 +331,134 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+        className="absolute top-4 right-4 z-[110] p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
       >
         <X className="w-6 h-6" />
       </button>
       
-      {/* Video container - takes remaining space above control bar */}
-      <div className="flex-1 relative flex items-center justify-center p-4 pb-0">
-        <div className="relative w-full max-w-6xl aspect-video rounded-2xl overflow-hidden bg-black">
-          {/* Loading indicator */}
-          {isLoading && !error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                <span className="text-white/60">Video wird geladen...</span>
-              </div>
-            </div>
-          )}
-
-          {/* Error display */}
-          {error && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-              <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
-                {error.errorType === 'network_error' ? (
-                  <WifiOff className="w-16 h-16 text-destructive" />
-                ) : (
-                  <AlertTriangle className="w-16 h-16 text-destructive" />
-                )}
-                <h3 className="text-xl font-semibold text-white">
-                  {error.errorType === 'embed_blocked' 
-                    ? 'Video nicht freigegeben'
-                    : error.errorType === 'network_error'
-                    ? 'Verbindungsproblem'
-                    : 'Video-Fehler'}
-                </h3>
-                <p className="text-white/60">
-                  {error.errorType === 'embed_blocked' 
-                    ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
-                    : error.message}
-                </p>
-                <div className="flex gap-3 mt-4">
-                  <Button variant="outline" onClick={handleRetry} className="gap-2">
-                    <RefreshCw className="w-4 h-4" />
-                    Erneut versuchen
-                  </Button>
-                  <Button variant="secondary" onClick={onClose}>
-                    Schließen
-                  </Button>
+      {/* Video container - fills available space, respects control bar */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+        <div className="relative w-full h-full max-w-6xl flex items-center justify-center">
+          <div className="relative w-full aspect-video max-h-full rounded-lg overflow-hidden bg-black">
+            {/* Loading indicator */}
+            {isLoading && !error && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-white/60">Video wird geladen...</span>
                 </div>
-                <p className="text-white/40 text-xs mt-4">
-                  Video-ID: {video.vimeoId}
-                </p>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Vimeo iFrame Player - OFFICIAL EMBED ONLY */}
-          <iframe
-            ref={iframeRef}
-            src={vimeoUrl}
-            className="w-full h-full"
-            frameBorder="0"
-            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-            allowFullScreen
-            title={video.title}
-            onError={handleIframeError}
-            style={{ 
-              // Ensure iframe is visible on iPad
-              WebkitOverflowScrolling: 'touch',
-            }}
-          />
+            {/* Error display */}
+            {error && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+                <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
+                  {error.errorType === 'network_error' ? (
+                    <WifiOff className="w-16 h-16 text-destructive" />
+                  ) : (
+                    <AlertTriangle className="w-16 h-16 text-destructive" />
+                  )}
+                  <h3 className="text-xl font-semibold text-white">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Video nicht freigegeben'
+                      : error.errorType === 'network_error'
+                      ? 'Verbindungsproblem'
+                      : 'Video-Fehler'}
+                  </h3>
+                  <p className="text-white/60">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
+                      : error.message}
+                  </p>
+                  <div className="flex gap-3 mt-4">
+                    <Button variant="outline" onClick={handleRetry} className="gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      Erneut versuchen
+                    </Button>
+                    <Button variant="secondary" onClick={onClose}>
+                      Schließen
+                    </Button>
+                  </div>
+                  <p className="text-white/40 text-xs mt-4">
+                    Video-ID: {video.vimeoId}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Vimeo iFrame Player */}
+            <iframe
+              ref={iframeRef}
+              src={vimeoUrl}
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+              title={video.title}
+              onError={handleIframeError}
+            />
+          </div>
         </div>
       </div>
       
-      {/* Fixed bottom control bar */}
-      <div className="relative z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-4 safe-bottom">
-        <div className="max-w-6xl mx-auto flex flex-col gap-4">
-          {/* Video title */}
+      {/* Fixed bottom control bar - always visible */}
+      <div className="shrink-0 z-[105] bg-gradient-to-t from-black via-black/95 to-black/80 px-4 py-3 safe-bottom">
+        <div className="max-w-6xl mx-auto flex flex-col gap-3">
+          {/* Video title - compact on landscape */}
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white">{video.title}</h2>
-              <p className="text-white/50 text-xs">ESC zum Schließen • Leertaste für Play/Pause</p>
-            </div>
+            <h2 className="text-base font-semibold text-white truncate">{video.title}</h2>
+            <span className="text-white/40 text-xs hidden sm:block">ESC • Leertaste</span>
           </div>
 
-          {/* Timeline */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={togglePlayPause}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            </button>
-            
-            <span className="text-white/70 text-sm font-mono w-12 text-right">
-              {formatTime(currentTime)}
-            </span>
-            
-            <Slider
-              value={[currentTime]}
-              min={0}
-              max={duration || 100}
-              step={1}
-              onValueChange={handleSeek}
-              variant="player"
-              className="flex-1"
-            />
-            
-            <span className="text-white/70 text-sm font-mono w-12">
-              {formatTime(duration)}
-            </span>
-          </div>
-
-          {/* Speed control */}
-          <div className="flex items-center gap-4">
-            <span className="text-white/60 text-sm">Geschwindigkeit:</span>
-            <div className="flex items-center gap-3 flex-1 max-w-xs">
-              <span className="text-white/50 text-xs">40%</span>
+          {/* Timeline + Speed in one row on landscape */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Play/Pause + Timeline */}
+            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+              <button
+                onClick={togglePlayPause}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors shrink-0"
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </button>
+              
+              <span className="text-white/70 text-xs font-mono w-10 text-right shrink-0">
+                {formatTime(currentTime)}
+              </span>
+              
               <Slider
-                value={[playbackSpeed]}
-                min={40}
-                max={120}
-                step={5}
-                onValueChange={handleSpeedChange}
+                value={[currentTime]}
+                min={0}
+                max={duration || 100}
+                step={1}
+                onValueChange={handleSeek}
                 variant="player"
-                className="flex-1"
+                className="flex-1 min-w-[100px]"
               />
-              <span className="text-white/50 text-xs">120%</span>
+              
+              <span className="text-white/70 text-xs font-mono w-10 shrink-0">
+                {formatTime(duration)}
+              </span>
             </div>
-            <span className="text-white font-medium text-sm w-12 text-center bg-white/10 rounded px-2 py-1">
-              {playbackSpeed}%
-            </span>
+
+            {/* Speed control - inline on larger screens */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-white/60 text-xs">Tempo:</span>
+              <div className="flex items-center gap-2 w-32">
+                <Slider
+                  value={[playbackSpeed]}
+                  min={40}
+                  max={120}
+                  step={5}
+                  onValueChange={handleSpeedChange}
+                  variant="player"
+                  className="flex-1"
+                />
+              </div>
+              <span className="text-white font-medium text-xs w-10 text-center bg-white/10 rounded px-1.5 py-0.5">
+                {playbackSpeed}%
+              </span>
+            </div>
           </div>
         </div>
       </div>
