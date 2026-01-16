@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye } from 'lucide-react';
+import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye, X, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PdfDocument {
@@ -35,13 +36,25 @@ interface PdfDocumentManagerProps {
   onManageAudio?: (pdfId: string, pdfTitle: string, pageCount: number) => void;
 }
 
+interface UploadState {
+  progress: number;
+  status: 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
+  message: string;
+}
+
 export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPdf, setEditingPdf] = useState<PdfDocument | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState<string>('all');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [uploadState, setUploadState] = useState<UploadState>({
+    progress: 0,
+    status: 'idle',
+    message: '',
+  });
 
   const [formData, setFormData] = useState({
     title: '',
@@ -96,6 +109,80 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     },
   });
 
+  // Upload file with progress tracking using XMLHttpRequest
+  const uploadFileWithProgress = useCallback(async (file: File): Promise<{ url: string; pageCount: number }> => {
+    return new Promise(async (resolve, reject) => {
+      const fileName = `${Date.now()}-${file.name}`;
+      
+      // Get page count first
+      setUploadState({ progress: 0, status: 'processing', message: 'PDF wird analysiert...' });
+      let pageCount = 1;
+      try {
+        const pdfjsLib = await import('pdfjs-dist');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
+        
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        pageCount = pdf.numPages;
+      } catch (e) {
+        console.error('Error getting page count:', e);
+      }
+
+      setUploadState({ progress: 0, status: 'uploading', message: 'Upload wird gestartet...' });
+
+      // Get upload URL from Supabase
+      const { data: session } = await supabase.auth.getSession();
+      const token = session?.session?.access_token;
+      
+      if (!token) {
+        reject(new Error('Nicht authentifiziert'));
+        return;
+      }
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const uploadUrl = `${supabaseUrl}/storage/v1/object/pdf-documents/${fileName}`;
+
+      const xhr = new XMLHttpRequest();
+      
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          const uploadedMB = (event.loaded / (1024 * 1024)).toFixed(1);
+          const totalMB = (event.total / (1024 * 1024)).toFixed(1);
+          setUploadState({
+            progress: percentComplete,
+            status: 'uploading',
+            message: `${uploadedMB} MB / ${totalMB} MB hochgeladen`,
+          });
+        }
+      });
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const { data: urlData } = supabase.storage
+            .from('pdf-documents')
+            .getPublicUrl(fileName);
+          
+          setUploadState({ progress: 100, status: 'complete', message: 'Upload abgeschlossen!' });
+          resolve({ url: urlData.publicUrl, pageCount });
+        } else {
+          setUploadState({ progress: 0, status: 'error', message: 'Upload fehlgeschlagen' });
+          reject(new Error(`Upload fehlgeschlagen: ${xhr.statusText}`));
+        }
+      });
+
+      xhr.addEventListener('error', () => {
+        setUploadState({ progress: 0, status: 'error', message: 'Netzwerkfehler' });
+        reject(new Error('Netzwerkfehler beim Upload'));
+      });
+
+      xhr.open('POST', uploadUrl, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.setRequestHeader('x-upsert', 'true');
+      xhr.send(file);
+    });
+  }, []);
+
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: typeof formData & { id?: string; pdf_file_url?: string; page_count?: number }) => {
@@ -104,31 +191,9 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
 
       // Upload PDF if new file
       if (data.pdf_file) {
-        setIsUploading(true);
-        const fileName = `${Date.now()}-${data.pdf_file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('pdf-documents')
-          .upload(fileName, data.pdf_file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: urlData } = supabase.storage
-          .from('pdf-documents')
-          .getPublicUrl(fileName);
-        pdfUrl = urlData.publicUrl;
-
-        // Get page count from PDF
-        try {
-          const pdfjsLib = await import('pdfjs-dist');
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
-          
-          const arrayBuffer = await data.pdf_file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          pageCount = pdf.numPages;
-        } catch (e) {
-          console.error('Error getting page count:', e);
-        }
-        setIsUploading(false);
+        const result = await uploadFileWithProgress(data.pdf_file);
+        pdfUrl = result.url;
+        pageCount = result.pageCount;
       }
 
       const payload = {
@@ -160,6 +225,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
       handleCloseDialog();
     },
     onError: (error) => {
+      setUploadState({ progress: 0, status: 'error', message: error.message });
       toast.error(`Fehler: ${error.message}`);
     },
   });
@@ -210,6 +276,24 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setEditingPdf(null);
+    setUploadState({ progress: 0, status: 'idle', message: '' });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFormData(prev => ({ ...prev, pdf_file: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const handleSubmit = () => {
@@ -346,124 +430,210 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         </div>
       )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
+      {/* Create/Edit Dialog - Two Column Layout */}
+      <Dialog open={isDialogOpen} onOpenChange={(open) => !saveMutation.isPending && setIsDialogOpen(open)}>
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>{editingPdf ? 'PDF bearbeiten' : 'Neues PDF hochladen'}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            {/* File Upload */}
-            {!editingPdf && (
-              <div>
-                <Label>PDF-Datei *</Label>
-                <div className="mt-1.5">
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
-                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
-                    <span className="text-sm text-slate-500">
-                      {formData.pdf_file ? formData.pdf_file.name : 'PDF auswählen'}
-                    </span>
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          setFormData(prev => ({ ...prev, pdf_file: file }));
-                          if (!formData.title) {
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+            {/* Left Column - File Upload */}
+            <div className="space-y-4">
+              {!editingPdf && (
+                <div>
+                  <Label className="text-base font-medium">PDF-Datei *</Label>
+                  <p className="text-sm text-muted-foreground mb-3">Unterstützt Dateien bis 150 MB</p>
+                  
+                  {!formData.pdf_file ? (
+                    <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-all">
+                      <Upload className="w-10 h-10 text-slate-400 mb-3" />
+                      <span className="text-sm font-medium text-slate-600">PDF auswählen</span>
+                      <span className="text-xs text-slate-400 mt-1">oder hierher ziehen</span>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            if (file.size > 150 * 1024 * 1024) {
+                              toast.error('Datei ist größer als 150 MB');
+                              return;
+                            }
                             setFormData(prev => ({
                               ...prev,
                               pdf_file: file,
-                              title: file.name.replace('.pdf', ''),
+                              title: prev.title || file.name.replace('.pdf', ''),
                             }));
                           }
-                        }
-                      }}
-                    />
-                  </label>
+                        }}
+                      />
+                    </label>
+                  ) : (
+                    <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                          <FileText className="w-5 h-5 text-red-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-slate-900 truncate">{formData.pdf_file.name}</p>
+                          <p className="text-sm text-slate-500">{formatFileSize(formData.pdf_file.size)}</p>
+                        </div>
+                        {uploadState.status === 'idle' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleRemoveFile}
+                            className="shrink-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Upload Progress */}
+                      {uploadState.status !== 'idle' && (
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className={cn(
+                              "font-medium",
+                              uploadState.status === 'complete' && "text-green-600",
+                              uploadState.status === 'error' && "text-red-600"
+                            )}>
+                              {uploadState.status === 'uploading' && 'Wird hochgeladen...'}
+                              {uploadState.status === 'processing' && 'PDF wird verarbeitet...'}
+                              {uploadState.status === 'complete' && (
+                                <span className="flex items-center gap-1">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  Fertig
+                                </span>
+                              )}
+                              {uploadState.status === 'error' && 'Fehler'}
+                            </span>
+                            <span className="text-slate-500">{uploadState.progress}%</span>
+                          </div>
+                          <Progress value={uploadState.progress} className="h-2" />
+                          <p className="text-xs text-slate-500">{uploadState.message}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
+              )}
+
+              {editingPdf && (
+                <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+                      <FileText className="w-5 h-5 text-red-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-slate-900">Aktuelle Datei</p>
+                      <p className="text-sm text-slate-500">{editingPdf.page_count} Seiten</p>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="p-0 h-auto text-blue-600"
+                        onClick={() => window.open(editingPdf.pdf_file_url, '_blank')}
+                      >
+                        PDF ansehen
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Form Fields */}
+            <div className="space-y-4">
+              {/* Title */}
+              <div>
+                <Label>Titel *</Label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="z.B. Arban Übungen Kapitel 1"
+                  className="mt-1.5"
+                />
               </div>
-            )}
 
-            {/* Title */}
-            <div>
-              <Label>Titel *</Label>
-              <Input
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="z.B. Arban Übungen Kapitel 1"
-                className="mt-1.5"
-              />
-            </div>
+              {/* Description */}
+              <div>
+                <Label>Beschreibung</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Optionale Beschreibung..."
+                  className="mt-1.5"
+                  rows={3}
+                />
+              </div>
 
-            {/* Description */}
-            <div>
-              <Label>Beschreibung</Label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Optionale Beschreibung..."
-                className="mt-1.5"
-                rows={3}
-              />
-            </div>
+              {/* Level */}
+              <div>
+                <Label>Level zuordnen</Label>
+                <Select
+                  value={formData.level_id || 'none'}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, level_id: value === 'none' ? '' : value }))}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue placeholder="Level auswählen (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Kein Level</SelectItem>
+                    {levels?.map(level => (
+                      <SelectItem key={level.id} value={level.id}>{level.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Level */}
-            <div>
-              <Label>Level zuordnen</Label>
-              <Select
-                value={formData.level_id || 'none'}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, level_id: value === 'none' ? '' : value }))}
-              >
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder="Level auswählen (optional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Kein Level</SelectItem>
-                  {levels?.map(level => (
-                    <SelectItem key={level.id} value={level.id}>{level.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+              {/* Plan Required */}
+              <div>
+                <Label>Erforderlicher Plan</Label>
+                <Select
+                  value={formData.plan_required}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, plan_required: value }))}
+                >
+                  <SelectTrigger className="mt-1.5">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FREE">FREE</SelectItem>
+                    <SelectItem value="BASIC">BASIC</SelectItem>
+                    <SelectItem value="PREMIUM">PREMIUM</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Plan Required */}
-            <div>
-              <Label>Erforderlicher Plan</Label>
-              <Select
-                value={formData.plan_required}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, plan_required: value }))}
-              >
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="FREE">FREE</SelectItem>
-                  <SelectItem value="BASIC">BASIC</SelectItem>
-                  <SelectItem value="PREMIUM">PREMIUM</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Active Toggle */}
-            <div className="flex items-center justify-between py-2">
-              <Label>Aktiv (sichtbar für Nutzer)</Label>
-              <Switch
-                checked={formData.is_active}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-              />
+              {/* Active Toggle */}
+              <div className="flex items-center justify-between py-2">
+                <Label>Aktiv (sichtbar für Nutzer)</Label>
+                <Switch
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                />
+              </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleCloseDialog}>Abbrechen</Button>
+            <Button 
+              variant="outline" 
+              onClick={handleCloseDialog}
+              disabled={saveMutation.isPending}
+            >
+              Abbrechen
+            </Button>
             <Button
               onClick={handleSubmit}
-              disabled={saveMutation.isPending || isUploading}
+              disabled={saveMutation.isPending || uploadState.status === 'uploading' || uploadState.status === 'processing'}
             >
-              {(saveMutation.isPending || isUploading) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {(saveMutation.isPending || uploadState.status === 'uploading' || uploadState.status === 'processing') && (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              )}
               {editingPdf ? 'Speichern' : 'Hochladen'}
             </Button>
           </DialogFooter>
