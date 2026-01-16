@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
+import { VideoSearchResults } from '@/components/levels/VideoSearchResults';
 import { Video, Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
+import { Input } from '@/components/ui/input';
 
 interface LevelsPageProps {
   onStarEarned: () => void;
@@ -24,6 +26,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [activeLevel, setActiveLevel] = useState<string>('');
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
 
@@ -128,8 +131,33 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     }
   }
 
+  // Search through all videos across all levels
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    
+    const query = searchQuery.toLowerCase().trim();
+    const results: { video: Video; levelTitle: string; sectionTitle: string; levelId: string }[] = [];
+    
+    levels.forEach(level => {
+      level.sections.forEach(section => {
+        section.videos.forEach(video => {
+          if (video.title.toLowerCase().includes(query)) {
+            results.push({
+              video,
+              levelTitle: level.title,
+              sectionTitle: section.title,
+              levelId: level.id,
+            });
+          }
+        });
+      });
+    });
+    
+    return results;
+  }, [searchQuery, levels]);
+
   const currentLevel = levels.find(l => l.id === activeLevel);
-  const videoCount = currentLevel?.sections.reduce((acc, s) => acc + s.videos.length, 0) || 0;
+  const isSearching = searchQuery.trim().length > 0;
 
   if (isLoading) {
     return (
@@ -156,38 +184,71 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-140px)]">
-      {/* Sidebar */}
-      <LevelSidebar
-        levels={levels}
-        activeLevel={activeLevel}
-        onLevelSelect={setActiveLevel}
-      />
-      
-      {/* Main content */}
-      <div className="flex-1 overflow-y-auto relative">
-        {currentLevel && (
-          <>
-            {/* Lock Overlay if user can't access */}
-            {currentLevel.requiredPlanKey && currentLevel.requiredPlanKey !== 'FREE' && !canAccessLevel(currentLevel.requiredPlanKey) && (
-              <PremiumLockOverlay 
-                requiredPlanKey={currentLevel.requiredPlanKey} 
-                title={currentLevel.title} 
-              />
-            )}
-            
-            {/* Sections - 3 column grid for iPad Landscape */}
-            <div className="p-6">
-              {currentLevel.sections.map((section) => (
-                <SectionRow
-                  key={section.id}
-                  section={section}
-                  onVideoClick={setSelectedVideo}
-                />
-              ))}
-            </div>
-          </>
+    <div className="flex flex-col h-[calc(100vh-140px)]">
+      {/* Search Bar */}
+      <div className="px-4 py-3 border-b border-white/10">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+          <Input
+            type="text"
+            placeholder="Videos suchen..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-xl focus:bg-white/15 focus:border-white/30"
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - hidden when searching */}
+        {!isSearching && (
+          <LevelSidebar
+            levels={levels}
+            activeLevel={activeLevel}
+            onLevelSelect={setActiveLevel}
+          />
         )}
+        
+        {/* Main content */}
+        <div className="flex-1 overflow-y-auto relative">
+          {isSearching ? (
+            <VideoSearchResults
+              results={searchResults}
+              query={searchQuery}
+              onVideoClick={setSelectedVideo}
+              onClearSearch={() => setSearchQuery('')}
+            />
+          ) : currentLevel && (
+            <>
+              {/* Lock Overlay if user can't access */}
+              {currentLevel.requiredPlanKey && currentLevel.requiredPlanKey !== 'FREE' && !canAccessLevel(currentLevel.requiredPlanKey) && (
+                <PremiumLockOverlay 
+                  requiredPlanKey={currentLevel.requiredPlanKey} 
+                  title={currentLevel.title} 
+                />
+              )}
+              
+              {/* Sections - 3 column grid for iPad Landscape */}
+              <div className="p-6">
+                {currentLevel.sections.map((section) => (
+                  <SectionRow
+                    key={section.id}
+                    section={section}
+                    onVideoClick={setSelectedVideo}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
       
       {/* Video Player Overlay */}
