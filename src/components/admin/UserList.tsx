@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2 } from 'lucide-react';
@@ -62,7 +57,6 @@ export function UserList() {
   async function fetchUserDetail(userId: string) {
     setIsLoadingDetail(true);
     try {
-      // Fetch profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -71,7 +65,6 @@ export function UserList() {
 
       if (!profile) return;
 
-      // Fetch stats in parallel
       const [starsRes, videosRes, recordingsRes, lastLoginRes] = await Promise.all([
         supabase
           .from('video_completions')
@@ -127,7 +120,6 @@ export function UserList() {
 
       if (error) throw error;
 
-      // Update local state
       setUsers(users.map(u => 
         u.id === userId ? { ...u, is_teacher: !currentValue } : u
       ));
@@ -154,81 +146,96 @@ export function UserList() {
 
   return (
     <>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Nutzer</h1>
-          <p className="text-muted-foreground mt-1">Alle registrierten Nutzer</p>
-        </div>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Nutzerliste ({filteredUsers.length})
-            </CardTitle>
+      <div className="space-y-4">
+        {/* Card Container */}
+        <div className="bg-white border border-[#E5E7EB] rounded-lg">
+          {/* Card Header */}
+          <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#6B7280]" />
+              <span className="font-medium text-[#111827]">
+                Nutzerliste ({filteredUsers.length})
+              </span>
+            </div>
             <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
               <Input
                 placeholder="Nutzer suchen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-9 border-[#E5E7EB] focus:border-[#3B82F6] focus:ring-[#EFF6FF]"
               />
             </div>
-          </CardHeader>
-          <CardContent>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
             {isLoading ? (
-              <div className="space-y-3">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                  <Skeleton key={i} className="h-14 w-full" />
-                ))}
+              <div className="p-8 text-center">
+                <Loader2 className="w-6 h-6 animate-spin text-[#6B7280] mx-auto" />
               </div>
             ) : filteredUsers.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
+              <p className="text-[#6B7280] text-center py-8">
                 {searchQuery ? 'Keine Nutzer gefunden' : 'Noch keine Nutzer registriert'}
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nutzer</TableHead>
-                    <TableHead>Rolle</TableHead>
-                    <TableHead>Lehrer</TableHead>
-                    <TableHead>Registriert</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user) => (
-                    <TableRow
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-[#F5F7FA]">
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Nutzer
+                    </th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Rolle
+                    </th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Lehrer
+                    </th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Registriert
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user, index) => (
+                    <tr
                       key={user.id}
-                      className="hover:bg-muted/50"
+                      className={`border-b border-[#E5E7EB] hover:bg-[#EFF6FF] transition-colors ${
+                        index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
+                      }`}
                     >
-                      <TableCell>
+                      <td className="px-5 py-3">
                         <button
                           onClick={() => fetchUserDetail(user.id)}
-                          className="flex items-center gap-3 hover:underline"
+                          className="flex items-center gap-3 hover:underline text-left"
                         >
-                          <Avatar className="w-9 h-9">
+                          <Avatar className="w-8 h-8">
                             <AvatarImage src={user.avatar_url || undefined} />
-                            <AvatarFallback>{user.display_name?.[0] || '?'}</AvatarFallback>
+                            <AvatarFallback className="text-xs bg-[#F5F7FA] text-[#6B7280]">
+                              {user.display_name?.[0] || '?'}
+                            </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium">{user.display_name || 'Unbekannt'}</span>
+                          <span className="text-sm font-medium text-[#111827]">
+                            {user.display_name || 'Unbekannt'}
+                          </span>
                         </button>
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="px-5 py-3">
                         {user.is_teacher ? (
-                          <Badge variant="secondary" className="gap-1">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#EFF6FF] text-[#3B82F6] rounded-full">
                             <GraduationCap className="w-3 h-3" />
                             Lehrer
-                          </Badge>
+                          </span>
                         ) : (
-                          <Badge variant="outline">Schüler</Badge>
+                          <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-[#F5F7FA] text-[#6B7280] rounded-full">
+                            Schüler
+                          </span>
                         )}
-                      </TableCell>
-                      <TableCell>
+                      </td>
+                      <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
                           {updatingTeacher === user.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                           ) : (
                             <Switch
                               checked={user.is_teacher}
@@ -236,68 +243,61 @@ export function UserList() {
                             />
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      </td>
+                      <td className="px-5 py-3 text-sm text-[#6B7280]">
                         {formatDate(user.created_at)}
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* User Detail Dialog */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white border-[#E5E7EB]">
           <DialogHeader>
-            <DialogTitle>Nutzerprofil</DialogTitle>
+            <DialogTitle className="text-[#111827]">Nutzerprofil</DialogTitle>
           </DialogHeader>
           
           {isLoadingDetail ? (
-            <div className="space-y-4 py-4">
-              <div className="flex items-center gap-4">
-                <Skeleton className="w-16 h-16 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-20 w-full" />
-                ))}
-              </div>
+            <div className="py-8 text-center">
+              <Loader2 className="w-6 h-6 animate-spin text-[#6B7280] mx-auto" />
             </div>
           ) : selectedUser && (
             <div className="space-y-6 py-4">
               {/* Profile Header */}
               <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16">
+                <Avatar className="w-14 h-14">
                   <AvatarImage src={selectedUser.avatar_url || undefined} />
-                  <AvatarFallback className="text-xl">
+                  <AvatarFallback className="text-lg bg-[#F5F7FA] text-[#6B7280]">
                     {selectedUser.display_name?.[0] || '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{selectedUser.display_name || 'Unbekannt'}</h3>
+                  <h3 className="font-semibold text-[#111827]">
+                    {selectedUser.display_name || 'Unbekannt'}
+                  </h3>
                   <div className="flex items-center gap-2 mt-1">
                     {selectedUser.is_teacher ? (
-                      <Badge variant="secondary" className="gap-1">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-[#EFF6FF] text-[#3B82F6] rounded-full">
                         <GraduationCap className="w-3 h-3" />
                         Lehrer
-                      </Badge>
+                      </span>
                     ) : (
-                      <Badge variant="outline">Schüler</Badge>
+                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-[#F5F7FA] text-[#6B7280] rounded-full">
+                        Schüler
+                      </span>
                     )}
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-xs text-muted-foreground">Lehrer-Status</span>
+                  <span className="text-[10px] text-[#9CA3AF] uppercase tracking-wide">Lehrer</span>
                   {updatingTeacher === selectedUser.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                   ) : (
                     <Switch
                       checked={selectedUser.is_teacher}
@@ -308,43 +308,39 @@ export function UserList() {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
-                    <Calendar className="w-4 h-4" />
-                    Registriert seit
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-lg bg-[#F5F7FA]">
+                  <div className="flex items-center gap-2 text-[#6B7280] text-xs mb-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    Registriert
                   </div>
-                  <p className="font-medium">{formatDate(selectedUser.created_at)}</p>
+                  <p className="font-medium text-[#111827]">{formatDate(selectedUser.created_at)}</p>
                 </div>
 
-                <div className="p-4 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
-                    <Calendar className="w-4 h-4" />
+                <div className="p-4 rounded-lg bg-[#F5F7FA]">
+                  <div className="flex items-center gap-2 text-[#6B7280] text-xs mb-1">
+                    <Calendar className="w-3.5 h-3.5" />
                     Letzter Login
                   </div>
-                  <p className="font-medium">{formatDate(selectedUser.last_login)}</p>
+                  <p className="font-medium text-[#111827]">{formatDate(selectedUser.last_login)}</p>
                 </div>
 
-                <div className="p-4 rounded-lg bg-[#FFCC00]/10">
-                  <div className="flex items-center gap-2 text-[#FFCC00] text-sm mb-1">
-                    <Star className="w-4 h-4" />
+                <div className="p-4 rounded-lg bg-[#F5F7FA]">
+                  <div className="flex items-center gap-2 text-[#6B7280] text-xs mb-1">
+                    <Star className="w-3.5 h-3.5" />
                     Sterne
                   </div>
-                  <p className="font-bold text-xl">{selectedUser.total_stars}</p>
+                  <p className="font-bold text-xl text-[#111827]">{selectedUser.total_stars}</p>
                 </div>
 
-                <div className="p-4 rounded-lg bg-[#005BBB]/10">
-                  <div className="flex items-center gap-2 text-[#005BBB] text-sm mb-1">
-                    <Video className="w-4 h-4" />
+                <div className="p-4 rounded-lg bg-[#F5F7FA]">
+                  <div className="flex items-center gap-2 text-[#6B7280] text-xs mb-1">
+                    <Video className="w-3.5 h-3.5" />
                     Videos
                   </div>
-                  <p className="font-bold text-xl">{selectedUser.videos_watched}</p>
+                  <p className="font-bold text-xl text-[#111827]">{selectedUser.videos_watched}</p>
                 </div>
               </div>
-
-              <p className="text-xs text-muted-foreground text-center">
-                Lehrer-Status kann oben umgeschaltet werden
-              </p>
             </div>
           )}
         </DialogContent>

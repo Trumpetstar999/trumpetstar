@@ -1,0 +1,472 @@
+/* Admin Backend Design System
+ * Professionell, nüchtern, klar getrennt vom Frontend
+ * Keine blauen Verläufe, keine Gold-Akzente, keine Glas-Effekte
+ */
+
+/* Admin-spezifische CSS-Variablen */
+.admin-layout {
+  --admin-bg-primary: #FFFFFF;
+  --admin-bg-secondary: #F5F7FA;
+  --admin-border: #E5E7EB;
+  --admin-accent: #3B82F6;
+  --admin-accent-light: #EFF6FF;
+  --admin-text-primary: #111827;
+  --admin-text-secondary: #6B7280;
+  --admin-text-disabled: #9CA3AF;
+  --admin-success: #10B981;
+  --admin-warning: #F59E0B;
+  --admin-destructive: #EF4444;
+}
+
+/* Admin Layout Container */
+.admin-layout {
+  min-height: 100vh;
+  background-color: var(--admin-bg-secondary);
+  display: flex;
+}
+
+/* Admin Sidebar */
+.admin-sidebar {
+  background-color: var(--admin-bg-primary);
+  border-right: 1px solid var(--admin-border);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+}
+
+.admin-sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-sidebar-logo {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--admin-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.admin-sidebar-toggle {
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  color: var(--admin-text-secondary);
+  transition: background-color 0.15s ease;
+}
+
+.admin-sidebar-toggle:hover {
+  background-color: var(--admin-bg-secondary);
+}
+
+.admin-sidebar-nav {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.admin-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-nav-item:hover {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+}
+
+.admin-nav-item.active {
+  background-color: var(--admin-accent-light);
+  color: var(--admin-accent);
+  position: relative;
+}
+
+.admin-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.375rem;
+  bottom: 0.375rem;
+  width: 3px;
+  background-color: var(--admin-accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.admin-nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Admin Header */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--admin-bg-primary);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+}
+
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Admin Main Content */
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.admin-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* Admin Page Header */
+.admin-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.admin-page-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin: 0;
+}
+
+.admin-page-description {
+  font-size: 0.875rem;
+  color: var(--admin-text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Admin Cards */
+.admin-card {
+  background-color: var(--admin-bg-primary);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.admin-card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--admin-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-card-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-card-content {
+  padding: 1.25rem;
+}
+
+/* Admin Stat Cards */
+.admin-stat-card {
+  background-color: var(--admin-bg-primary);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+}
+
+.admin-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-bottom: 0.5rem;
+}
+
+.admin-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  line-height: 1;
+}
+
+.admin-stat-subtitle {
+  font-size: 0.75rem;
+  color: var(--admin-text-disabled);
+  margin-top: 0.25rem;
+}
+
+/* Admin Tables */
+.admin-table-container {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  background-color: var(--admin-bg-secondary);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: var(--admin-text-primary);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table tr:nth-child(even) td {
+  background-color: var(--admin-bg-secondary);
+}
+
+.admin-table tr:hover td {
+  background-color: var(--admin-accent-light);
+}
+
+/* Admin Buttons */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.admin-btn-primary {
+  background-color: var(--admin-accent);
+  color: white;
+}
+
+.admin-btn-primary:hover {
+  background-color: #2563EB;
+}
+
+.admin-btn-secondary {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+  border: 1px solid var(--admin-border);
+}
+
+.admin-btn-secondary:hover {
+  background-color: var(--admin-border);
+}
+
+.admin-btn-ghost {
+  background-color: transparent;
+  color: var(--admin-text-secondary);
+}
+
+.admin-btn-ghost:hover {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+}
+
+.admin-btn-destructive {
+  background-color: var(--admin-destructive);
+  color: white;
+}
+
+.admin-btn-destructive:hover {
+  background-color: #DC2626;
+}
+
+/* Admin Badges */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.admin-badge-success {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.admin-badge-warning {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.admin-badge-error {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+.admin-badge-neutral {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-secondary);
+}
+
+.admin-badge-info {
+  background-color: var(--admin-accent-light);
+  color: var(--admin-accent);
+}
+
+/* Admin Form Elements */
+.admin-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.375rem;
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+  transition: border-color 0.15s ease;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px var(--admin-accent-light);
+}
+
+.admin-input::placeholder {
+  color: var(--admin-text-disabled);
+}
+
+/* Admin Tabs */
+.admin-tabs-list {
+  display: inline-flex;
+  background-color: var(--admin-bg-secondary);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+.admin-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.admin-tab:hover {
+  color: var(--admin-text-primary);
+}
+
+.admin-tab.active {
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Admin Status Indicators */
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.admin-status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.admin-status-dot.online {
+  background-color: var(--admin-success);
+}
+
+.admin-status-dot.offline {
+  background-color: var(--admin-destructive);
+}
+
+.admin-status-dot.warning {
+  background-color: var(--admin-warning);
+}
+
+/* Spacing utilities */
+.admin-space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.admin-space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Grid layouts */
+.admin-grid-stats {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .admin-grid-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-grid-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .admin-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
