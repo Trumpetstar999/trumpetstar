@@ -602,25 +602,28 @@ export function UserList() {
               <Button
                 onClick={() => fetchUsers()}
                 variant="outline"
-                className="h-9 border-slate-200"
+                size="sm"
+                className="h-8 px-3 text-xs font-medium border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 disabled={isLoading}
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
                 Aktualisieren
               </Button>
               <Button
                 onClick={handleExportUsers}
                 variant="outline"
-                className="h-9 border-slate-200"
+                size="sm"
+                className="h-8 px-3 text-xs font-medium border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               >
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="w-3.5 h-3.5 mr-1.5" />
                 Exportieren
               </Button>
               <Button
                 onClick={() => setCreateDialogOpen(true)}
-                className="h-9 bg-blue-500 hover:bg-blue-600 text-white"
+                size="sm"
+                className="h-8 px-4 text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm"
               >
-                <UserPlus className="w-4 h-4 mr-2" />
+                <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                 Nutzer anlegen
               </Button>
             </div>
