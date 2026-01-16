@@ -239,9 +239,40 @@ export function usePdfCache() {
       let downloadUrl: string;
       
       if (useProxy) {
-        // Use the proxy endpoint for reliable CORS and headers
-        downloadUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
-        console.log('Using proxy URL:', downloadUrl);
+        // Use the proxy endpoint to get a signed URL
+        const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
+        console.log('Getting signed URL from proxy:', proxyUrl);
+        
+        // Get auth token for proxy requests
+        const session = await supabase.auth.getSession();
+        const authToken = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+        
+        const proxyResponse = await fetch(proxyUrl, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+          },
+        });
+        
+        if (!proxyResponse.ok) {
+          const errorData = await proxyResponse.json().catch(() => ({}));
+          console.error('Proxy request failed:', proxyResponse.status, errorData);
+          
+          // Fallback to direct URL approach
+          console.log('Proxy failed, trying direct URL fallback...');
+          setDownloadProgress(null);
+          return getPdfUrl(pdfId, pdfFileUrl, false);
+        }
+        
+        const proxyData = await proxyResponse.json();
+        
+        if (!proxyData.signedUrl) {
+          console.error('Proxy did not return signed URL:', proxyData);
+          setDownloadProgress(null);
+          return getPdfUrl(pdfId, pdfFileUrl, false);
+        }
+        
+        downloadUrl = proxyData.signedUrl;
+        console.log('Got signed URL from proxy');
       } else {
         // Fallback to direct signed URL approach
         let filePath = '';
@@ -274,30 +305,14 @@ export function usePdfCache() {
         downloadUrl = signedData.signedUrl;
       }
 
-      console.log('Starting download from:', downloadUrl.substring(0, 80) + '...');
+      console.log('Starting download from signed URL...');
 
-      // Get auth token for proxy requests
-      const session = await supabase.auth.getSession();
-      const authToken = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
-      // Download with progress tracking
-      const response = await fetch(downloadUrl, {
-        headers: useProxy ? {
-          'Authorization': `Bearer ${authToken}`,
-        } : {},
-      });
+      // Download the PDF directly from the signed URL (no auth needed)
+      const response = await fetch(downloadUrl);
       
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         console.error('Download failed:', response.status, errorText);
-        
-        // If proxy failed, try direct URL as fallback
-        if (useProxy) {
-          console.log('Proxy failed, trying direct URL fallback...');
-          setDownloadProgress(null);
-          return getPdfUrl(pdfId, pdfFileUrl, false);
-        }
-        
         throw new Error(`Download failed with status: ${response.status}`);
       }
 
