@@ -48,17 +48,17 @@ interface AudioTrack {
 
 interface PdfViewerProps {
   pdf: PdfDocument;
+  pdfBlobUrl: string;
   currentPage: number;
   onPageChange: (page: number) => void;
   audioTracks: AudioTrack[];
   onClose: () => void;
 }
 
-export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
+export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [zoom, setZoom] = useState(1);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,47 +94,17 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
     }
   }, [currentPage, audioTracks]);
 
-  // Get signed URL for PDF
+  // Load PDF document from blob URL
   useEffect(() => {
-    const getSignedUrl = async () => {
-      setIsLoading(true);
-      
-      const urlParts = pdf.pdf_file_url.split('/pdf-documents/');
-      const filePath = urlParts[urlParts.length - 1];
-      
-      if (!filePath) {
-        toast.error('PDF-Pfad konnte nicht ermittelt werden');
-        setIsLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase.storage
-        .from('pdf-documents')
-        .createSignedUrl(filePath, 3600);
-
-      if (error || !data?.signedUrl) {
-        console.error('Failed to get signed URL:', error);
-        toast.error('PDF konnte nicht geladen werden');
-        setIsLoading(false);
-        return;
-      }
-
-      setSignedUrl(data.signedUrl);
-    };
-
-    getSignedUrl();
-  }, [pdf.pdf_file_url]);
-
-  // Load PDF document
-  useEffect(() => {
-    if (!signedUrl) return;
+    if (!pdfBlobUrl) return;
 
     const loadPdf = async () => {
+      setIsLoading(true);
       try {
         const pdfjsLib = await import('pdfjs-dist');
         pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js`;
 
-        const loadingTask = pdfjsLib.getDocument(signedUrl);
+        const loadingTask = pdfjsLib.getDocument(pdfBlobUrl);
         const doc = await loadingTask.promise;
         setPdfDoc(doc);
       } catch (error) {
@@ -145,7 +115,7 @@ export function PdfViewer({ pdf, currentPage, onPageChange, audioTracks, onClose
     };
 
     loadPdf();
-  }, [signedUrl]);
+  }, [pdfBlobUrl]);
 
   // Render current page
   useEffect(() => {
