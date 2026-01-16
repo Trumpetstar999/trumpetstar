@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Play, MoreVertical, Trash2, Download, MessageSquare, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { RecordingShareDialog } from './RecordingShareDialog';
 import type { Recording } from '@/hooks/useRecordings';
+
 interface RecordingCardProps {
   recording: Recording;
   onDelete: (id: string) => void;
   onPlay: (recording: Recording) => void;
   onOpenChat?: (chatId: string) => void;
 }
+
 export function RecordingCard({
   recording,
   onDelete,
@@ -20,6 +22,33 @@ export function RecordingCard({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareType, setShareType] = useState<'admin' | 'teacher'>('teacher');
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Load video and seek to show thumbnail
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !recording.url) return;
+
+    video.src = recording.url;
+    video.load();
+
+    const handleLoadedData = () => {
+      video.currentTime = Math.min(0.1, video.duration / 2);
+    };
+
+    const handleSeeked = () => {
+      video.pause();
+    };
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('seeked', handleSeeked);
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('seeked', handleSeeked);
+    };
+  }, [recording.url]);
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', {
@@ -28,11 +57,13 @@ export function RecordingCard({
       year: 'numeric'
     });
   };
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
   const handleDownload = () => {
     const a = document.createElement('a');
     a.href = recording.url;
@@ -41,20 +72,29 @@ export function RecordingCard({
     a.click();
     document.body.removeChild(a);
   };
+
   const handleShareToTeacher = () => {
     setShareType('teacher');
     setShareDialogOpen(true);
   };
+
   const handleShareToAdmin = () => {
     setShareType('admin');
     setShareDialogOpen(true);
   };
+
   return <>
       <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all">
         <div className="aspect-video bg-muted relative cursor-pointer" onClick={() => onPlay(recording)}>
-          {recording.thumbnail ? <img src={recording.thumbnail} alt={recording.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-              <Play className="w-12 h-12 text-muted-foreground" />
-            </div>}
+          {/* Video element as thumbnail */}
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            crossOrigin="anonymous"
+            muted
+            playsInline
+            preload="auto"
+          />
           
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
             <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
