@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Mic, MicOff, Volume2, Square, MessageSquare, ThumbsUp, ThumbsDown, Bot, User, Trash2 } from 'lucide-react';
+import { X, Send, Mic, MicOff, Volume2, Square, MessageSquare, ThumbsUp, ThumbsDown, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { useAssistant, AssistantMode, AssistantLanguage } from '@/hooks/useAssistant';
 import { format } from 'date-fns';
+import toniAvatar from '@/assets/toni-coach.png';
 
 interface AssistantPanelProps {
   isOpen: boolean;
@@ -89,8 +88,8 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
       {/* Header - WhatsApp style green */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-            <Bot className="h-5 w-5" />
+          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30">
+            <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
           </div>
           <div>
             <h2 className="font-semibold text-[15px]">Toni dein Trompeten-Coach</h2>
@@ -175,11 +174,11 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             {/* Empty State */}
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#25D366]/20 flex items-center justify-center mb-4">
-                  <MessageSquare className="h-8 w-8 text-[#25D366]" />
+                <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-[#25D366]/30 mb-4">
+                  <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
                 </div>
                 <p className="text-[#667781] text-sm font-medium mb-1">
-                  Willkommen beim Trumpetstar Assistenten!
+                  Hallo, ich bin Toni!
                 </p>
                 <p className="text-[#8696a0] text-xs max-w-[280px]">
                   Frag mich zu Trompetentechnik, Übetipps, Repertoire oder der Plattform.
@@ -205,10 +204,16 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                   )}
 
                   {/* Message Bubble */}
-                  <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
+                  <div className={cn('flex items-end gap-2', isUser ? 'justify-end' : 'justify-start')}>
+                    {/* Toni Avatar for assistant messages */}
+                    {!isUser && (
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 mb-1">
+                        <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
+                      </div>
+                    )}
                     <div
                       className={cn(
-                        'max-w-[85%] rounded-lg px-3 py-2 shadow-sm relative',
+                        'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative',
                         isUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                           : 'bg-white text-[#111B21] rounded-tl-none'
@@ -268,7 +273,10 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
 
             {/* Typing Indicator */}
             {isLoading && (
-              <div className="flex justify-start">
+              <div className="flex items-end gap-2 justify-start">
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 mb-1">
+                  <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
+                </div>
                 <div className="bg-white rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
                   <div className="flex gap-1.5">
                     <span className="w-2 h-2 bg-[#8696a0] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
