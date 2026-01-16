@@ -11,6 +11,7 @@ import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 
 const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
@@ -86,14 +87,16 @@ const Index = () => {
   };
 
   return (
-    <AppShell
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      title={tabTitles[activeTab]}
-      stars={totalStars}
-    >
-      {renderPage()}
-    </AppShell>
+    <TabNavigationProvider activeTab={activeTab} onTabChange={setActiveTab}>
+      <AppShell
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        title={tabTitles[activeTab]}
+        stars={totalStars}
+      >
+        {renderPage()}
+      </AppShell>
+    </TabNavigationProvider>
   );
 };
 

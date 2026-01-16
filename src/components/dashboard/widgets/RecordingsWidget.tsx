@@ -1,11 +1,11 @@
 import { useRecordings } from '@/hooks/useRecordings';
+import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import { Video, Plus, Eye, Mic } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 export function RecordingsWidget() {
   const { recordings, loading } = useRecordings();
-  const navigate = useNavigate();
+  const { navigateToTab } = useTabNavigation();
 
   const latestRecording = recordings[0];
   const recordingsCount = recordings.length;
@@ -65,7 +65,7 @@ export function RecordingsWidget() {
 
       <div className="flex gap-2">
         <Button
-          onClick={() => navigate('/recordings')}
+          onClick={() => navigateToTab('recordings')}
           variant="ghost"
           size="sm"
           className="flex-1 text-white hover:text-white hover:bg-white/20 bg-white/10"
@@ -75,7 +75,7 @@ export function RecordingsWidget() {
         </Button>
         {recordingsCount > 0 && (
           <Button
-            onClick={() => navigate('/recordings')}
+            onClick={() => navigateToTab('recordings')}
             variant="ghost"
             size="sm"
             className="text-white hover:text-white hover:bg-white/20 bg-white/10"

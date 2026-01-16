@@ -1,13 +1,13 @@
 import { useMembership } from '@/hooks/useMembership';
+import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Lock, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog';
 import { useState } from 'react';
 
 export function FeedbackChatWidget() {
   const { canAccessFeature, planKey } = useMembership();
-  const navigate = useNavigate();
+  const { navigateToTab } = useTabNavigation();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   
   const hasPremium = canAccessFeature('PREMIUM');
@@ -58,7 +58,7 @@ export function FeedbackChatWidget() {
       </div>
 
       <Button
-        onClick={() => navigate('/chats')}
+        onClick={() => navigateToTab('chats')}
         variant="ghost"
         className="w-full text-white hover:text-white hover:bg-white/20 bg-white/10"
       >

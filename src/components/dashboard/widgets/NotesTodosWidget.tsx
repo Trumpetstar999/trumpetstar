@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { FileText, CheckSquare, Plus, Circle, CheckCircle } from 'lucide-react';
 import { mockJournalEntries, mockTodos } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
+import { useTabNavigation } from '@/hooks/useTabNavigation';
 
 export function NotesTodosWidget() {
-  const navigate = useNavigate();
+  const { navigateToTab } = useTabNavigation();
   const entries = mockJournalEntries.slice(0, 2);
   const todos = mockTodos.filter(t => !t.completed).slice(0, 3);
 
@@ -64,7 +64,7 @@ export function NotesTodosWidget() {
                 <div
                   key={entry.id}
                   className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors cursor-pointer"
-                  onClick={() => navigate('/practice')}
+                  onClick={() => navigateToTab('practice')}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-white/70 text-xs">{formatDate(entry.date)}</span>
@@ -99,7 +99,7 @@ export function NotesTodosWidget() {
                 <div
                   key={todo.id}
                   className="flex items-start gap-3 p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors cursor-pointer"
-                  onClick={() => navigate('/practice')}
+                  onClick={() => navigateToTab('practice')}
                 >
                   <Circle className={`w-5 h-5 mt-0.5 ${getPriorityColor(todo.priority)}`} />
                   <div className="flex-1 min-w-0">
@@ -123,7 +123,7 @@ export function NotesTodosWidget() {
       </Tabs>
 
       <Button
-        onClick={() => navigate('/practice')}
+        onClick={() => navigateToTab('practice')}
         variant="ghost"
         size="sm"
         className="w-full mt-4 text-white hover:text-white hover:bg-white/20 bg-white/10"

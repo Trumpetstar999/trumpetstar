@@ -1,13 +1,13 @@
 import { useMembership } from '@/hooks/useMembership';
+import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import { Users, Lock, Video, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog';
 import { useState } from 'react';
 
 export function ClassroomWidget() {
   const { canAccessFeature } = useMembership();
-  const navigate = useNavigate();
+  const { navigateToTab } = useTabNavigation();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   
   const hasPremium = canAccessFeature('PREMIUM');
@@ -74,13 +74,13 @@ export function ClassroomWidget() {
 
       <div className="flex gap-2">
         <Button
-          onClick={() => navigate('/classroom')}
+          onClick={() => navigateToTab('classroom')}
           className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium"
         >
           Beitreten
         </Button>
         <Button
-          onClick={() => navigate('/classroom')}
+          onClick={() => navigateToTab('classroom')}
           variant="ghost"
           className="text-white hover:text-white hover:bg-white/20 bg-white/10"
         >
