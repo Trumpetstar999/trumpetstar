@@ -1596,6 +1596,7 @@ export type Database = {
       }
     }
     Functions: {
+      can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
