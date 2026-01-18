@@ -55,6 +55,31 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     }
   }, [user, levels]);
 
+  // Check for auto-play video from chat
+  useEffect(() => {
+    if (levels.length === 0) return;
+    
+    const autoPlayVideoId = sessionStorage.getItem('autoPlayVideoId');
+    if (autoPlayVideoId) {
+      sessionStorage.removeItem('autoPlayVideoId');
+      
+      // Find the video in levels
+      for (const level of levels) {
+        for (const section of level.sections) {
+          const foundVideo = section.videos.find(v => v.id === autoPlayVideoId);
+          if (foundVideo) {
+            // Check access first
+            if (canAccessLevel(level.requiredPlanKey)) {
+              setActiveLevel(level.id);
+              setSelectedVideo(foundVideo);
+            }
+            return;
+          }
+        }
+      }
+    }
+  }, [levels, canAccessLevel]);
+
   async function fetchRecentVideos() {
     if (!user) return;
     
