@@ -56,7 +56,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }, [user]);
 
   async function fetchRecentVideos() {
-    if (!user) return;
+    if (!user) {
+      console.log('[RecentVideos] No user, skipping fetch');
+      return;
+    }
+    
+    console.log('[RecentVideos] Fetching for user:', user.id);
     
     try {
       // Get recently watched videos from progress table (includes partially watched)
@@ -67,19 +72,26 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         .order('updated_at', { ascending: false })
         .limit(20);
 
+      console.log('[RecentVideos] Progress data:', progressData, 'Error:', progressError);
+
       if (progressError) throw progressError;
       if (!progressData || progressData.length === 0) {
+        console.log('[RecentVideos] No progress data found, setting empty array');
         setRecentVideos([]);
         return;
       }
 
       // Fetch video details directly from database for the watched video IDs
       const videoIds = progressData.map(p => p.video_id);
+      console.log('[RecentVideos] Fetching videos for IDs:', videoIds);
+      
       const { data: videosData, error: videosError } = await supabase
         .from('videos')
         .select('*, levels!inner(title)')
         .in('id', videoIds)
         .eq('is_active', true);
+
+      console.log('[RecentVideos] Videos data:', videosData, 'Error:', videosError);
 
       if (videosError) throw videosError;
 
@@ -87,11 +99,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       const recentVids: RecentVideo[] = [];
       progressData.forEach(progress => {
         const video = videosData?.find(v => v.id === progress.video_id);
+        console.log('[RecentVideos] Mapping progress:', progress.video_id, 'Found video:', !!video);
         if (video) {
           recentVids.push({
             id: video.id,
             title: video.title,
-            thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+            thumbnail: video.thumbnail_url || 'https://images.unsplash.com/video-thumbnail.jpg',
             duration: video.duration_seconds || 0,
             vimeoId: video.vimeo_video_id,
             vimeoPlayerUrl: video.vimeo_player_url || undefined,
@@ -102,9 +115,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         }
       });
 
+      console.log('[RecentVideos] Final recentVids:', recentVids.length, recentVids);
       setRecentVideos(recentVids.slice(0, 12)); // Max 12 recent videos
     } catch (error) {
-      console.error('Error fetching recent videos:', error);
+      console.error('[RecentVideos] Error fetching recent videos:', error);
     }
   }
 
