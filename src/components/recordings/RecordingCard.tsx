@@ -116,8 +116,12 @@ export function RecordingCard({
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 bg-muted hover:bg-muted/80">
-                  <MoreVertical className="w-4 h-4 text-black" />
+                <Button 
+                  variant="secondary" 
+                  size="icon" 
+                  className="h-9 w-9 flex-shrink-0 rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/20 shadow-sm transition-all hover:scale-105"
+                >
+                  <MoreVertical className="w-5 h-5 text-primary" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
