@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { LevelsPage } from './LevelsPage';
 import { PdfsPage } from './PdfsPage';
@@ -32,6 +32,17 @@ const Index = () => {
   const [totalStars, setTotalStars] = useState(0);
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Handle navigation state (e.g., from MusicXML viewer returning)
+  useEffect(() => {
+    const state = location.state as { activeTab?: TabId } | null;
+    if (state?.activeTab) {
+      setActiveTab(state.activeTab);
+      // Clear the state to prevent re-triggering
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   // Redirect to auth if not logged in
   useEffect(() => {

@@ -409,13 +409,14 @@ export function MusicXMLViewerPage() {
     }
   }, [volume]);
 
-  // Handle close
+  // Handle close - navigate back to main app with musicxml tab active
   const handleClose = () => {
     midiPlayer.stop();
     if (cursor) {
       cursor.hide();
     }
-    navigate('/musicxml');
+    // Navigate to root with state to activate musicxml tab
+    navigate('/', { state: { activeTab: 'musicxml' } });
   };
 
   // Handle retry
