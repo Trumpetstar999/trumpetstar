@@ -87,8 +87,8 @@ function TeacherStudentListPage() {
 function StudentChatPage({ hasTeacher }: { hasTeacher: boolean }) {
   if (!hasTeacher) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4 p-8">
-        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center h-full gap-4 p-8 animate-fade-in">
+        <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center animate-[float_3s_ease-in-out_infinite]">
           <MessageCircle className="w-10 h-10 text-muted-foreground" />
         </div>
         <h3 className="text-xl font-semibold text-foreground">Kein Lehrer zugewiesen</h3>
