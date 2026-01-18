@@ -48,12 +48,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     fetchLevels();
   }, []);
 
-  // Fetch recent videos when levels are loaded
+  // Fetch recent videos when user is available - no dependency on levels
   useEffect(() => {
-    if (user && levels.length > 0) {
+    if (user) {
       fetchRecentVideos();
     }
-  }, [user, levels]);
+  }, [user]);
 
   async function fetchRecentVideos() {
     if (!user) return;
