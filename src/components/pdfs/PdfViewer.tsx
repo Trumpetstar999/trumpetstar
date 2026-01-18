@@ -339,11 +339,26 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           
           const drawCtx = drawingCanvas.getContext('2d');
           if (drawCtx) {
+            // Clear any previous state
+            drawCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            
             const savedData = savedAnnotations.get(currentPage);
             if (savedData) {
               const img = new Image();
               img.onload = () => {
-                drawCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                drawCtx.drawImage(img, 0, 0, drawingCanvas.width, drawingCanvas.height);
+                
+                // Important: Initialize drawing history from loaded annotations
+                // This allows further drawing on top of saved annotations
+                const imageData = drawCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
+                setDrawingHistory(prev => {
+                  const newHistory = new Map(prev);
+                  // Only set if no current history for this page
+                  if (!newHistory.has(currentPage) || newHistory.get(currentPage)?.length === 0) {
+                    newHistory.set(currentPage, [imageData]);
+                  }
+                  return newHistory;
+                });
               };
               img.src = savedData;
             } else {
