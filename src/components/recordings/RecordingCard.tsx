@@ -64,26 +64,13 @@ export function RecordingCard({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleDownload = async () => {
-    try {
-      // Fetch the video as a blob to force download
-      const response = await fetch(recording.url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = `${recording.title}.webm`;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      // Clean up the blob URL after a delay
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-    } catch (error) {
-      console.error('Download failed:', error);
-    }
+  const handleDownload = () => {
+    const a = document.createElement('a');
+    a.href = recording.url;
+    a.download = `${recording.title}.webm`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleShareToTeacher = () => {
@@ -129,7 +116,7 @@ export function RecordingCard({
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50">
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>

@@ -161,74 +161,30 @@ export function useVideoChat() {
     if (!user) return;
 
     try {
-      // First try to get existing active assignment
-      const { data: existingAssignment, error: existingError } = await supabase
+      const { data, error } = await supabase
         .from('teacher_assignments')
         .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .maybeSingle();
+        .single();
 
-      if (existingError && existingError.code !== 'PGRST116') throw existingError;
+      if (error && error.code !== 'PGRST116') throw error;
 
-      if (existingAssignment) {
+      if (data) {
         // Get teacher profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('display_name, avatar_url')
-          .eq('id', existingAssignment.teacher_id)
+          .eq('id', data.teacher_id)
           .single();
 
         setTeacherAssignment({
-          ...existingAssignment,
+          ...data,
           teacher_profile: profile
-        });
-        return;
-      }
-
-      // No assignment exists - try to auto-assign an active teacher
-      console.log('No teacher assignment found, attempting auto-assignment...');
-      
-      // Get all active teachers
-      const { data: teachers, error: teachersError } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url')
-        .eq('is_teacher', true);
-
-      if (teachersError) throw teachersError;
-
-      if (teachers && teachers.length > 0) {
-        // Pick the first available teacher
-        const selectedTeacher = teachers[0];
-        
-        // Create the assignment
-        const { data: newAssignment, error: assignError } = await supabase
-          .from('teacher_assignments')
-          .insert({
-            user_id: user.id,
-            teacher_id: selectedTeacher.id,
-            is_active: true
-          })
-          .select()
-          .single();
-
-        if (assignError) {
-          console.error('Error auto-assigning teacher:', assignError);
-          return;
-        }
-
-        console.log('Auto-assigned teacher:', selectedTeacher.display_name);
-        
-        setTeacherAssignment({
-          ...newAssignment,
-          teacher_profile: {
-            display_name: selectedTeacher.display_name,
-            avatar_url: selectedTeacher.avatar_url
-          }
         });
       }
     } catch (error) {
-      console.error('Error fetching/creating teacher assignment:', error);
+      console.error('Error fetching teacher assignment:', error);
     }
   }, [user]);
 

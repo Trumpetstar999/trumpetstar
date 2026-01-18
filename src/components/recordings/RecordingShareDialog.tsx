@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useTeacherChat } from '@/hooks/useTeacherChat';
+import { useVideoChat } from '@/hooks/useVideoChat';
 import { Loader2, MessageSquare, Shield } from 'lucide-react';
 
 interface RecordingShareDialogProps {
@@ -23,7 +23,7 @@ export function RecordingShareDialog({
   shareType,
   onSuccess
 }: RecordingShareDialogProps) {
-  const { teacher, createChat, sendMessage } = useTeacherChat();
+  const { sendFeedbackToAdmin, sendToTeacher, teacherAssignment } = useVideoChat();
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
 
@@ -31,16 +31,11 @@ export function RecordingShareDialog({
     setSending(true);
     
     let chatId: string | null = null;
-    
-    if (shareType === 'teacher') {
-      // Use new simplified teacher chat
-      chatId = await createChat(videoId);
-      
-      if (chatId && message.trim()) {
-        await sendMessage(chatId, message.trim());
-      }
+    if (shareType === 'admin') {
+      chatId = await sendFeedbackToAdmin(videoId, message);
+    } else {
+      chatId = await sendToTeacher(videoId, message);
     }
-    // Admin feedback can be handled separately if needed
 
     setSending(false);
     
@@ -52,7 +47,7 @@ export function RecordingShareDialog({
   };
 
   const isTeacherShare = shareType === 'teacher';
-  const hasTeacher = !!teacher;
+  const hasTeacher = !!teacherAssignment;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,7 +82,7 @@ export function RecordingShareDialog({
                 <>
                   <p className="text-sm text-muted-foreground">Wird gesendet an:</p>
                   <p className="font-medium text-primary">
-                    {teacher?.display_name || 'Dein Lehrer'}
+                    {teacherAssignment?.teacher_profile?.display_name || 'Dein Lehrer'}
                   </p>
                 </>
               ) : (
