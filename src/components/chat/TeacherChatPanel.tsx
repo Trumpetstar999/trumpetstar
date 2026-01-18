@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VideoRecordDialog } from './VideoRecordDialog';
 import { SelectRecordingDialog } from './SelectRecordingDialog';
 import { SelectLevelVideoDialog } from './SelectLevelVideoDialog';
+import { LevelVideoMessageCard, isLevelVideoContent } from './LevelVideoMessageCard';
 import { Recording } from '@/hooks/useRecordings';
 import { toast } from 'sonner';
 import {
@@ -370,8 +371,15 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
     setUploadingVideo(true);
     try {
-      // Send as a text message with video link info (using 'text' type since 'level_video' is not in allowed values)
-      const content = `📹 Level-Video: ${video.title}\n📚 ${video.level_title}\n🎬 Video-ID: ${video.id}`;
+      // Store video info as JSON in content for rendering as a clickable card
+      const videoData = JSON.stringify({
+        type: 'level_video',
+        id: video.id,
+        title: video.title,
+        thumbnail: video.thumbnail_url,
+        levelTitle: video.level_title,
+        vimeoId: video.vimeo_video_id
+      });
       
       const { error } = await supabase
         .from('video_chat_messages')
@@ -380,7 +388,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
           sender_user_id: user.id,
           sender_role: 'teacher',
           message_type: 'text',
-          content: content
+          content: videoData
         });
 
       if (error) throw error;
@@ -524,6 +532,10 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
               const isVideoMessage = message.message_type === 'video';
               const senderAvatar = message.sender_profile?.avatar_url;
               const senderName = message.sender_profile?.display_name;
+              
+              // Check if this is a level video card message
+              const levelVideoData = message.content ? isLevelVideoContent(message.content) : null;
+              const isLevelVideoMessage = !!levelVideoData;
 
               return (
                 <div key={message.id}>
@@ -549,15 +561,15 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                     )}
                     <div
                       className={cn(
-                        'max-w-[70%] rounded-lg shadow-sm relative overflow-hidden',
+                        'max-w-[80%] rounded-lg shadow-sm relative overflow-hidden',
                         isCurrentUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                           : 'bg-white text-[#111B21] rounded-tl-none',
-                        isVideoMessage ? 'p-1' : 'px-3 py-2'
+                        (isVideoMessage || isLevelVideoMessage) ? 'p-1' : 'px-3 py-2'
                       )}
                     >
                       {/* Message tail */}
-                      {!isVideoMessage && (
+                      {!isVideoMessage && !isLevelVideoMessage && (
                         <div 
                           className={cn(
                             'absolute top-0 w-3 h-3',
@@ -577,6 +589,8 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                       {/* Content */}
                       {isVideoMessage && message.video_storage_path ? (
                         <VideoMessageContent storagePath={message.video_storage_path} />
+                      ) : isLevelVideoMessage && levelVideoData ? (
+                        <LevelVideoMessageCard data={levelVideoData} />
                       ) : (
                         <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
                           {message.content}
