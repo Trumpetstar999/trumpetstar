@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { useEffect, useRef, useState } from 'react';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Download } from 'lucide-react';
 
 interface VideoPlayerDialogProps {
   open: boolean;
@@ -47,11 +48,39 @@ export function VideoPlayerDialog({ open, onOpenChange, video }: VideoPlayerDial
     setLoading(false);
   };
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(video.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${video.title}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed:', err);
+      // Fallback: open in new tab
+      window.open(video.url, '_blank');
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden">
-        <DialogHeader className="p-4 pb-0">
+        <DialogHeader className="p-4 pb-0 flex flex-row items-center justify-between">
           <DialogTitle>{video.title}</DialogTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDownload}
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Herunterladen
+          </Button>
         </DialogHeader>
         <div className="p-4 pt-2">
           <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
