@@ -71,7 +71,11 @@ Deno.serve(async (req) => {
     // Action: Create new user
     if (action === 'create-user') {
       const body: CreateUserPayload = await req.json();
-      const { email, password, displayName, role, planKey, isTeacher } = body;
+      let { email, password, displayName, role, planKey, isTeacher } = body;
+
+      // Clean and validate email
+      email = email?.toString().trim().toLowerCase() || '';
+      displayName = displayName?.toString().trim() || '';
 
       // Validate required fields
       if (!email || !password || !displayName) {
@@ -83,16 +87,29 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // Stricter email validation - must match what Supabase Auth expects
+      // Only allow valid characters: letters, numbers, dots, hyphens, underscores, plus
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(email)) {
         return new Response(JSON.stringify({ 
-          error: 'Ungültige E-Mail-Adresse' 
+          error: 'Ungültige E-Mail-Adresse. Bitte prüfen Sie das Format.' 
         }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+
+      // Check for common email issues
+      if (email.includes('..') || email.startsWith('.') || email.includes('.@') || email.includes('@.')) {
+        return new Response(JSON.stringify({ 
+          error: 'Ungültige E-Mail-Adresse. Bitte prüfen Sie das Format.' 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log(`Creating user with email: ${email}`);
 
       // Validate password length
       if (password.length < 6) {

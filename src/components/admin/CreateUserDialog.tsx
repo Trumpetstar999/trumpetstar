@@ -53,9 +53,14 @@ export function CreateUserDialog({ open, onOpenChange, plans, onUserCreated }: C
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!email.trim()) {
+    // Clean and validate email
+    const cleanEmail = email.trim().toLowerCase();
+    
+    if (!cleanEmail) {
       newErrors.email = 'E-Mail ist erforderlich';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(cleanEmail)) {
+      newErrors.email = 'Ungültige E-Mail-Adresse';
+    } else if (cleanEmail.includes('..') || cleanEmail.startsWith('.') || cleanEmail.includes('.@') || cleanEmail.includes('@.')) {
       newErrors.email = 'Ungültige E-Mail-Adresse';
     }
 
@@ -97,7 +102,7 @@ export function CreateUserDialog({ open, onOpenChange, plans, onUserCreated }: C
             'Authorization': `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            email: email.trim(),
+            email: email.trim().toLowerCase(),
             password,
             displayName: displayName.trim(),
             role: role === 'none' ? null : role,
