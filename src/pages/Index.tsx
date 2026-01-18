@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { AssistantButton } from '@/components/assistant/AssistantButton';
+import { TeacherChatButton } from '@/components/chat/TeacherChatButton';
 
 const tabTitles: Record<TabId, string> = {
   levels: 'Levels',
@@ -116,6 +117,7 @@ const Index = () => {
       >
         {renderPage()}
       </AppShell>
+      <TeacherChatButton />
       <AssistantButton />
     </TabNavigationProvider>
   );
