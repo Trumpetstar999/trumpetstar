@@ -29,20 +29,20 @@ import { cn } from '@/lib/utils';
 import { format, isToday, isYesterday } from 'date-fns';
 import { de } from 'date-fns/locale';
 
-// WhatsApp Color Palette
+// WhatsApp Light Color Palette
 const c = {
-  bgDark: '#0b141a',
-  bgPanel: '#111b21',
-  bgHeader: '#202c33',
-  bgHover: '#2a3942',
-  bgInput: '#2a3942',
-  bubbleOutgoing: '#005c4b',
-  bubbleIncoming: '#202c33',
-  teal: '#00a884',
-  textPrimary: '#e9edef',
-  textSecondary: '#8696a0',
-  textMuted: '#667781',
-  borderLight: '#222d34',
+  bgDark: '#efeae2',
+  bgPanel: '#ffffff',
+  bgHeader: '#f0f2f5',
+  bgHover: '#f5f6f6',
+  bgInput: '#ffffff',
+  bubbleOutgoing: '#d9fdd3',
+  bubbleIncoming: '#ffffff',
+  teal: '#25d366',
+  textPrimary: '#111b21',
+  textSecondary: '#667781',
+  textMuted: '#8696a0',
+  borderLight: '#e9edef',
 };
 
 export function WhatsAppChat() {
@@ -502,7 +502,7 @@ function MessageBubble({ message, isOwn, showTail }: { message: ChatMessage; isO
       const secs = message.timestamp_seconds % 60;
       return (
         <div className="flex items-center gap-2">
-          <span className="px-2 py-1 rounded text-xs font-mono" style={{ background: 'rgba(0,0,0,0.2)', color: c.teal }}>
+          <span className="px-2 py-1 rounded text-xs font-mono" style={{ background: 'rgba(0,0,0,0.08)', color: c.teal }}>
             📍 {mins}:{secs.toString().padStart(2, '0')}
           </span>
           <span>{message.content}</span>
@@ -528,14 +528,14 @@ function MessageBubble({ message, isOwn, showTail }: { message: ChatMessage; isO
           {renderContent()}
         </div>
         <div className="flex items-center justify-end gap-1 mt-1">
-          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+          <span className="text-[11px]" style={{ color: c.textMuted }}>
             {formatTime(message.created_at)}
           </span>
           {isOwn && (
             message.is_read ? (
               <CheckCheck className="w-4 h-4" style={{ color: '#53bdeb' }} />
             ) : (
-              <Check className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.6)' }} />
+              <Check className="w-4 h-4" style={{ color: c.textMuted }} />
             )
           )}
         </div>
