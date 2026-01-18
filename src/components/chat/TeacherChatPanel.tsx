@@ -331,9 +331,13 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
     : chatInfo.teacherProfile?.avatar_url;
   const hasChat = isTeacherView ? !!chatId : !!chatInfo.teacherId;
 
+  // Get both profiles for avatars
+  const myProfile = messages.find(m => m.sender_user_id === user?.id)?.sender_profile;
+  const otherProfile = isTeacherView ? studentProfile : chatInfo.teacherProfile;
+
   // Container classes based on embedded mode
   const containerClasses = embedded
-    ? 'flex flex-col h-full bg-background overflow-hidden'
+    ? 'flex flex-col h-full w-full bg-background'
     : 'fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl';
 
   return (
@@ -436,6 +440,8 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
               const showTimestamp = index === 0 || 
                 new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
               const isVideoMessage = message.message_type === 'video';
+              const senderAvatar = message.sender_profile?.avatar_url;
+              const senderName = message.sender_profile?.display_name;
 
               return (
                 <div key={message.id}>
@@ -450,18 +456,18 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
                   {/* Message Bubble */}
                   <div className={cn('flex items-end gap-2', isCurrentUser ? 'justify-end' : 'justify-start')}>
-                    {/* Avatar for other person's messages */}
+                    {/* Avatar for other person's messages (left side) */}
                     {!isCurrentUser && (
                       <Avatar className="w-8 h-8 shrink-0 mb-1">
-                        <AvatarImage src={message.sender_profile?.avatar_url || undefined} />
+                        <AvatarImage src={senderAvatar || otherProfile?.avatar_url || undefined} />
                         <AvatarFallback className="text-xs bg-[#25D366]/20 text-[#25D366]">
-                          {message.sender_profile?.display_name?.charAt(0)?.toUpperCase() || '?'}
+                          {(senderName || otherProfile?.display_name || '?').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     )}
                     <div
                       className={cn(
-                        'max-w-[75%] rounded-lg shadow-sm relative overflow-hidden',
+                        'max-w-[70%] rounded-lg shadow-sm relative overflow-hidden',
                         isCurrentUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                           : 'bg-white text-[#111B21] rounded-tl-none',
@@ -487,7 +493,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                       )}
                       
                       {/* Content */}
-                      {isVideoMessage ? (
+                      {isVideoMessage && message.video_storage_path ? (
                         <VideoMessageContent storagePath={message.video_storage_path} />
                       ) : (
                         <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
@@ -495,6 +501,15 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                         </p>
                       )}
                     </div>
+                    {/* Avatar for current user's messages (right side) */}
+                    {isCurrentUser && (
+                      <Avatar className="w-8 h-8 shrink-0 mb-1">
+                        <AvatarImage src={senderAvatar || myProfile?.avatar_url || undefined} />
+                        <AvatarFallback className="text-xs bg-[#075E54]/20 text-[#075E54]">
+                          {(senderName || 'Ich').charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                   </div>
                 </div>
               );

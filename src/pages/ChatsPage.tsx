@@ -44,7 +44,7 @@ export function ChatsPage() {
   // For students: show chat with their teacher
   // For teachers: show list of student chats
   return (
-    <div className="h-full">
+    <div className="h-full w-full flex flex-col">
       {isTeacher ? (
         <TeacherStudentListPage />
       ) : (
@@ -60,7 +60,7 @@ function TeacherStudentListPage() {
 
   if (selectedStudentId) {
     return (
-      <div className="h-full flex flex-col">
+      <div className="h-full w-full flex flex-col flex-1">
         <TeacherChatPanel 
           isOpen={true} 
           onClose={() => setSelectedStudentId(null)} 
@@ -72,7 +72,7 @@ function TeacherStudentListPage() {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full w-full flex flex-col flex-1">
       <TeacherStudentList 
         isOpen={true} 
         onClose={() => {}} 
@@ -100,7 +100,7 @@ function StudentChatPage({ hasTeacher }: { hasTeacher: boolean }) {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full w-full flex flex-col flex-1">
       <TeacherChatPanel isOpen={true} onClose={() => {}} embedded={true} />
     </div>
   );
