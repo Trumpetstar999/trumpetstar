@@ -6,19 +6,27 @@ import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Video, Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
 import { useAuth } from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 interface LevelsPageProps {
   onStarEarned: () => void;
 }
 
 type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+
+const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
+  { value: 'all', label: 'Alle Stufen' },
+  { value: 'beginner', label: 'Anfänger' },
+  { value: 'easy', label: 'Einfach' },
+  { value: 'medium', label: 'Mittel' },
+  { value: 'advanced', label: 'Anspruchsvoll' },
+];
 
 // Extended Level type with new plan key and difficulty
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
@@ -38,6 +46,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
+  const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
   const { user } = useAuth();
@@ -240,7 +249,13 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return results;
   }, [searchQuery, levels]);
 
-  const currentLevel = levels.find(l => l.id === activeLevel);
+  // Filter levels by difficulty
+  const filteredLevels = useMemo(() => {
+    if (difficultyFilter === 'all') return levels;
+    return levels.filter(l => l.difficulty === difficultyFilter);
+  }, [levels, difficultyFilter]);
+
+  const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
   const isSearching = searchQuery.trim().length > 0;
 
   if (isLoading) {
@@ -269,9 +284,28 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
-      {/* Header with Title and Search */}
-      <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in">
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in flex-wrap">
         <h2 className="text-lg font-semibold text-white shrink-0">Levels</h2>
+        
+        {/* Difficulty Filter */}
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-white/50" />
+          <Select
+            value={difficultyFilter}
+            onValueChange={(value) => setDifficultyFilter(value as Difficulty | 'all')}
+          >
+            <SelectTrigger className="w-36 h-9 bg-white/10 border-white/20 text-white text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DIFFICULTY_OPTIONS.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         
         {/* Search Field - compact */}
         <div className="relative w-64">
@@ -305,7 +339,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         {/* Sidebar - hidden when searching */}
         {!isSearching && (
           <LevelSidebar
-            levels={levels}
+            levels={filteredLevels}
             activeLevel={activeLevel}
             onLevelSelect={setActiveLevel}
           />

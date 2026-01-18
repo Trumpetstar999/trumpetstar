@@ -239,16 +239,22 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   }
 
   async function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
-    const { error } = await supabase
+    console.log('Updating difficulty for level', levelId, 'to', difficulty);
+    
+    const { data, error } = await supabase
       .from('levels')
-      .update({ difficulty })
-      .eq('id', levelId);
+      .update({ difficulty: difficulty })
+      .eq('id', levelId)
+      .select();
+
+    console.log('Update result:', data, error);
 
     if (error) {
       toast.error('Fehler beim Aktualisieren der Schwierigkeit');
       console.error(error);
     } else {
       toast.success('Schwierigkeit aktualisiert');
+      // Update local state immediately
       setLevels(prev => prev.map(l => 
         l.id === levelId ? { ...l, difficulty } : l
       ));
