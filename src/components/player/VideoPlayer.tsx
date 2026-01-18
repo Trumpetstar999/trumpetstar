@@ -324,6 +324,14 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
         });
       }
     };
+
+    // Poll for current time every 500ms for more reliable progress tracking
+    const pollInterval = setInterval(() => {
+      if (playerReady && iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({ method: 'getCurrentTime' }), '*');
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({ method: 'getDuration' }), '*');
+      }
+    }, 500);
     
     const iframe = iframeRef.current;
     if (iframe) {
@@ -345,6 +353,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       if (loadTimeoutRef.current) {
         clearTimeout(loadTimeoutRef.current);
       }
+      clearInterval(pollInterval);
     };
   }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion, saveProgress, currentTime]);
 
