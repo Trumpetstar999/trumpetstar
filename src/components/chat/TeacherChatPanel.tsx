@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,6 +11,8 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { VideoRecordDialog } from './VideoRecordDialog';
+import { SelectRecordingDialog } from './SelectRecordingDialog';
+import { Recording } from '@/hooks/useRecordings';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
@@ -34,6 +36,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
+  const [selectRecordingDialogOpen, setSelectRecordingDialogOpen] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // For student view, use the standard hook
@@ -321,6 +324,43 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
     }
   };
 
+  // Handle selecting existing recording
+  const handleSelectRecording = async (recording: Recording) => {
+    if (!user || !currentChatId) return;
+
+    setUploadingVideo(true);
+    try {
+      const { error } = await supabase
+        .from('video_chat_messages')
+        .insert({
+          chat_id: currentChatId,
+          sender_user_id: user.id,
+          sender_role: isTeacher ? 'teacher' : 'user',
+          message_type: 'video',
+          video_storage_path: recording.storage_path,
+          content: recording.title
+        });
+
+      if (error) throw error;
+
+      await supabase
+        .from('video_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChatId);
+
+      toast.success('Video gesendet');
+
+      if (isTeacherView && chatId) {
+        fetchMessages(chatId);
+      }
+    } catch (err) {
+      console.error('Error sending recording:', err);
+      toast.error('Video konnte nicht gesendet werden');
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const displayName = isTeacherView 
@@ -555,6 +595,10 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                 <Upload className="h-4 w-4 text-blue-500" />
                 Video hochladen
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectRecordingDialogOpen(true)} className="gap-2 cursor-pointer">
+                <FolderOpen className="h-4 w-4 text-green-500" />
+                Aus Aufnahmen wählen
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -602,6 +646,13 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
         open={videoDialogOpen}
         onOpenChange={setVideoDialogOpen}
         onSave={handleVideoRecordSave}
+      />
+
+      {/* Select Recording Dialog */}
+      <SelectRecordingDialog
+        open={selectRecordingDialogOpen}
+        onOpenChange={setSelectRecordingDialogOpen}
+        onSelect={handleSelectRecording}
       />
     </div>
   );
