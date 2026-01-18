@@ -10,7 +10,8 @@ import {
   MessageSquare,
   Package,
   Music,
-  FileText
+  FileText,
+  ToggleRight
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -30,6 +31,7 @@ const menuItems = [
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
+  { id: 'features', label: 'Feature Flags', icon: ToggleRight },
   { id: 'system', label: 'Einstellungen', icon: Settings },
 ];
 

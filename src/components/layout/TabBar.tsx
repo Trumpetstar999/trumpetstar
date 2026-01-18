@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { TabId } from '@/types';
 import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { AssistantPanel } from '@/components/assistant/AssistantPanel';
 import toniAvatar from '@/assets/toni-coach.png';
 
@@ -12,7 +13,19 @@ interface TabBarProps {
   hidden?: boolean;
 }
 
-const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
+// Map TabId to feature flag key
+const tabToFlagKey: Record<TabId, string> = {
+  levels: 'menu_levels',
+  pdfs: 'menu_pdfs',
+  musicxml: 'menu_musicxml',
+  practice: 'menu_practice',
+  recordings: 'menu_recordings',
+  chats: 'menu_chats',
+  classroom: 'menu_classroom',
+  profile: 'menu_profile',
+};
+
+const allTabs: { id: TabId; label: string; icon: typeof Layers }[] = [
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'Noten', icon: FileText },
   { id: 'musicxml', label: 'MusicXML', icon: FileMusic },
@@ -26,14 +39,22 @@ const tabs: { id: TabId; label: string; icon: typeof Layers }[] = [
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
   const unreadCount = useUnreadMessages();
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const { isEnabled, loading: flagsLoading } = useFeatureFlags();
+
+  // Filter tabs based on feature flags
+  const tabs = useMemo(() => {
+    if (flagsLoading) return allTabs; // Show all while loading
+    return allTabs.filter(tab => isEnabled(tabToFlagKey[tab.id]));
+  }, [isEnabled, flagsLoading]);
 
   if (hidden) {
     return null;
   }
 
   // Split tabs for left and right of center button
-  const leftTabs = tabs.slice(0, 4);
-  const rightTabs = tabs.slice(4);
+  const midpoint = Math.ceil(tabs.length / 2);
+  const leftTabs = tabs.slice(0, midpoint);
+  const rightTabs = tabs.slice(midpoint);
 
   return (
     <>
