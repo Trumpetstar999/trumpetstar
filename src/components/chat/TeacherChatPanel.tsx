@@ -256,8 +256,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
       toast.success('Video gesendet');
       
+      // Refresh messages
       if (isTeacherView && chatId) {
         fetchMessages(chatId);
+      } else {
+        studentChat.fetchMessages();
       }
     } catch (err) {
       console.error('Video upload error:', err);
@@ -314,8 +317,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
       toast.success('Video hochgeladen');
 
+      // Refresh messages
       if (isTeacherView && chatId) {
         fetchMessages(chatId);
+      } else {
+        studentChat.fetchMessages();
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -354,8 +360,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
       toast.success('Video gesendet');
 
+      // Refresh messages
       if (isTeacherView && chatId) {
         fetchMessages(chatId);
+      } else {
+        studentChat.fetchMessages();
       }
     } catch (err) {
       console.error('Error sending recording:', err);
@@ -400,8 +409,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
       toast.success('Video-Empfehlung gesendet');
 
+      // Refresh messages
       if (isTeacherView && chatId) {
         fetchMessages(chatId);
+      } else {
+        studentChat.fetchMessages();
       }
     } catch (err) {
       console.error('Error sending level video:', err);
