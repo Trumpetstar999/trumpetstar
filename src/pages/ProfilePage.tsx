@@ -20,7 +20,7 @@ import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
-import { CalendarWidget } from '@/components/dashboard/widgets/CalendarWidget';
+import { WeeklyStarsWidget } from '@/components/dashboard/widgets/WeeklyStarsWidget';
 import { RecordingsWidget } from '@/components/dashboard/widgets/RecordingsWidget';
 import { NotesTodosWidget } from '@/components/dashboard/widgets/NotesTodosWidget';
 import { FeedbackChatWidget } from '@/components/dashboard/widgets/FeedbackChatWidget';
@@ -30,7 +30,7 @@ import { StatisticsWidget } from '@/components/dashboard/widgets/StatisticsWidge
 const WIDGET_TITLES: Record<WidgetId, string> = {
   'profile': 'Profil',
   'stars-progress': 'Sterne & Fortschritt',
-  'calendar': 'Übungs-Kalender',
+  'calendar': 'Wochenübersicht',
   'recordings': 'Meine Aufnahmen',
   'notes-todo': 'Notizen & To-Do',
   'feedback-chat': 'Feedback & Chat',
@@ -47,7 +47,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
     case 'stars-progress':
       return <StarsProgressWidget />;
     case 'calendar':
-      return <CalendarWidget />;
+      return <WeeklyStarsWidget />;
     case 'recordings':
       return <RecordingsWidget />;
     case 'notes-todo':
