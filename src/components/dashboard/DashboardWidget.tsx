@@ -12,10 +12,11 @@ interface DashboardWidgetProps {
   className?: string;
   isEditing?: boolean;
   noPadding?: boolean;
+  index?: number;
 }
 
 export const DashboardWidget = forwardRef<HTMLDivElement, DashboardWidgetProps>(
-  ({ id, title, children, className, isEditing, noPadding }, ref) => {
+  ({ id, title, children, className, isEditing, noPadding, index = 0 }, ref) => {
     const {
       attributes,
       listeners,
@@ -31,6 +32,7 @@ export const DashboardWidget = forwardRef<HTMLDivElement, DashboardWidgetProps>(
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
+      animationDelay: `${index * 80}ms`,
     };
 
     return (
@@ -38,9 +40,18 @@ export const DashboardWidget = forwardRef<HTMLDivElement, DashboardWidgetProps>(
         ref={setNodeRef}
         style={style}
         className={cn(
-          "bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden transition-all duration-200 shadow-lg",
-          isDragging && "opacity-50 scale-[1.02] shadow-2xl z-50",
-          isEditing && "ring-2 ring-white/30 cursor-grab active:cursor-grabbing",
+          // Base styles
+          "bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-lg",
+          // Animation on mount
+          "animate-fade-in opacity-0 [animation-fill-mode:forwards]",
+          // Hover effects (when not editing)
+          !isEditing && "hover:bg-white/[0.14] hover:border-white/30 hover:shadow-xl hover:scale-[1.01] hover:-translate-y-0.5",
+          // Smooth transitions
+          "transition-all duration-300 ease-out",
+          // Dragging state
+          isDragging && "opacity-50 scale-[1.02] shadow-2xl z-50 rotate-1",
+          // Editing state
+          isEditing && "ring-2 ring-white/30 cursor-grab active:cursor-grabbing animate-pulse-subtle",
           className
         )}
       >
@@ -48,7 +59,7 @@ export const DashboardWidget = forwardRef<HTMLDivElement, DashboardWidgetProps>(
           <div
             {...attributes}
             {...listeners}
-            className="flex items-center justify-center gap-2 py-2 bg-white/10 border-b border-white/20 cursor-grab active:cursor-grabbing"
+            className="flex items-center justify-center gap-2 py-2 bg-white/10 border-b border-white/20 cursor-grab active:cursor-grabbing transition-colors hover:bg-white/20"
           >
             <GripVertical className="w-4 h-4 text-white/70" />
             <span className="text-xs text-white/70 font-medium uppercase tracking-wide">

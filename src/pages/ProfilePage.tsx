@@ -100,8 +100,8 @@ export function ProfilePage() {
 
   return (
     <div className="h-full overflow-auto px-4 py-6 lg:px-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Header with animation */}
+      <div className="flex items-center justify-between mb-6 animate-fade-in">
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-white/60 text-sm">Dein persönlicher Überblick</p>
@@ -113,7 +113,7 @@ export function ProfilePage() {
               onClick={resetLayout}
               variant="ghost"
               size="sm"
-              className="text-white/60 hover:text-white hover:bg-white/10"
+              className="text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Zurücksetzen
@@ -124,10 +124,10 @@ export function ProfilePage() {
             onClick={() => setIsEditing(!isEditing)}
             variant={isEditing ? 'default' : 'ghost'}
             size="sm"
-            className={isEditing 
-              ? 'bg-accent-red hover:bg-accent-red/90 text-white' 
+            className={`transition-all duration-300 ${isEditing 
+              ? 'bg-accent-red hover:bg-accent-red/90 text-white scale-105' 
               : 'text-white/60 hover:text-white hover:bg-white/10'
-            }
+            }`}
           >
             {isEditing ? (
               <>
@@ -144,17 +144,17 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* Edit Mode Hint */}
+      {/* Edit Mode Hint with slide animation */}
       {isEditing && (
         <div className="mb-4 p-3 rounded-xl bg-white/5 border border-white/10 animate-fade-in">
           <div className="flex items-center gap-2 text-white/70 text-sm">
-            <GripVertical className="w-4 h-4" />
+            <GripVertical className="w-4 h-4 animate-pulse" />
             <span>Halte eine Kachel gedrückt und ziehe sie, um die Reihenfolge zu ändern</span>
           </div>
         </div>
       )}
 
-      {/* Widget Grid */}
+      {/* Widget Grid with staggered animations */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -165,12 +165,13 @@ export function ProfilePage() {
           strategy={rectSortingStrategy}
         >
           <div className="grid grid-cols-3 gap-4">
-            {visibleWidgets.map((widget) => (
+            {visibleWidgets.map((widget, index) => (
               <DashboardWidget
                 key={widget.id}
                 id={widget.id}
                 title={WIDGET_TITLES[widget.id]}
                 isEditing={isEditing}
+                index={index}
                 className={
                   widget.id === 'profile' 
                     ? 'md:row-span-1' 
@@ -186,8 +187,11 @@ export function ProfilePage() {
         </SortableContext>
       </DndContext>
 
-      {/* Footer hint */}
-      <p className="text-center text-white/40 text-xs mt-8">
+      {/* Footer hint with delayed animation */}
+      <p 
+        className="text-center text-white/40 text-xs mt-8 animate-fade-in"
+        style={{ animationDelay: '600ms', animationFillMode: 'forwards', opacity: 0 }}
+      >
         Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten.
       </p>
     </div>
