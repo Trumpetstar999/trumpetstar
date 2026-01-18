@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip, FolderOpen } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip, FolderOpen, Film } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,12 +12,14 @@ import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { VideoRecordDialog } from './VideoRecordDialog';
 import { SelectRecordingDialog } from './SelectRecordingDialog';
+import { SelectLevelVideoDialog } from './SelectLevelVideoDialog';
 import { Recording } from '@/hooks/useRecordings';
 import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -37,6 +39,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [selectRecordingDialogOpen, setSelectRecordingDialogOpen] = useState(false);
+  const [selectLevelVideoDialogOpen, setSelectLevelVideoDialogOpen] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // For student view, use the standard hook
@@ -361,6 +364,46 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
     }
   };
 
+  // Handle selecting a level video (teacher only)
+  const handleSelectLevelVideo = async (video: { id: string; title: string; thumbnail_url: string | null; vimeo_video_id: string; level_title: string }) => {
+    if (!user || !currentChatId) return;
+
+    setUploadingVideo(true);
+    try {
+      // Send as a text message with video link info
+      const content = `📹 Level-Video: ${video.title}\n📚 ${video.level_title}`;
+      
+      const { error } = await supabase
+        .from('video_chat_messages')
+        .insert({
+          chat_id: currentChatId,
+          sender_user_id: user.id,
+          sender_role: 'teacher',
+          message_type: 'level_video',
+          content: content,
+          video_storage_path: video.vimeo_video_id // Store vimeo ID for reference
+        });
+
+      if (error) throw error;
+
+      await supabase
+        .from('video_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChatId);
+
+      toast.success('Video-Link gesendet');
+
+      if (isTeacherView && chatId) {
+        fetchMessages(chatId);
+      }
+    } catch (err) {
+      console.error('Error sending level video:', err);
+      toast.error('Video konnte nicht gesendet werden');
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const displayName = isTeacherView 
@@ -599,6 +642,15 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                 <FolderOpen className="h-4 w-4 text-green-500" />
                 Aus Aufnahmen wählen
               </DropdownMenuItem>
+              {isTeacher && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setSelectLevelVideoDialogOpen(true)} className="gap-2 cursor-pointer">
+                    <Film className="h-4 w-4 text-purple-500" />
+                    Video aus Levels
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -653,6 +705,13 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
         open={selectRecordingDialogOpen}
         onOpenChange={setSelectRecordingDialogOpen}
         onSelect={handleSelectRecording}
+      />
+
+      {/* Select Level Video Dialog (Teacher only) */}
+      <SelectLevelVideoDialog
+        open={selectLevelVideoDialogOpen}
+        onOpenChange={setSelectLevelVideoDialogOpen}
+        onSelect={handleSelectLevelVideo}
       />
     </div>
   );
