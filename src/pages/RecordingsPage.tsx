@@ -53,20 +53,20 @@ export function RecordingsPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-6">
       <Tabs defaultValue="my" className="w-full">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
           <TabsList className="bg-muted p-1">
-            <TabsTrigger value="my" className="gap-2 px-6">
+            <TabsTrigger value="my" className="gap-2 px-6 transition-all duration-300 data-[state=active]:shadow-md">
               <Video className="w-4 h-4" />
               Meine Aufnahmen
             </TabsTrigger>
-            <TabsTrigger value="shared" className="gap-2 px-6">
+            <TabsTrigger value="shared" className="gap-2 px-6 transition-all duration-300 data-[state=active]:shadow-md">
               <Users className="w-4 h-4" />
               Geteilt mit mir
             </TabsTrigger>
           </TabsList>
           
           <Button 
-            className="gap-2 bg-accent hover:bg-accent/90"
+            className="gap-2 bg-accent hover:bg-accent/90 hover:scale-105 transition-all duration-200"
             onClick={() => setRecordingDialogOpen(true)}
           >
             <Plus className="w-4 h-4" />
@@ -74,21 +74,29 @@ export function RecordingsPage() {
           </Button>
         </div>
         
-        <TabsContent value="my" className="animate-fade-in">
+        <TabsContent value="my" className="mt-0">
           {recordings.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recordings.map((recording) => (
-                <RecordingCard
+              {recordings.map((recording, index) => (
+                <div 
                   key={recording.id}
-                  recording={recording}
-                  onDelete={handleDeleteRecording}
-                  onPlay={handlePlayRecording}
-                />
+                  className="opacity-0 animate-fade-in"
+                  style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'forwards' }}
+                >
+                  <RecordingCard
+                    recording={recording}
+                    onDelete={handleDeleteRecording}
+                    onPlay={handlePlayRecording}
+                  />
+                </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+            <div 
+              className="text-center py-16 opacity-0 animate-fade-in"
+              style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}
+            >
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6 animate-float">
                 <Video className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Noch keine Aufnahmen</h3>
@@ -97,7 +105,7 @@ export function RecordingsPage() {
                 Teile Videos mit Freunden oder deinem Lehrer.
               </p>
               <Button 
-                className="gap-2 bg-accent hover:bg-accent/90"
+                className="gap-2 bg-accent hover:bg-accent/90 hover:scale-105 transition-all duration-200"
                 onClick={() => setRecordingDialogOpen(true)}
               >
                 <Plus className="w-4 h-4" />
@@ -107,9 +115,12 @@ export function RecordingsPage() {
           )}
         </TabsContent>
         
-        <TabsContent value="shared" className="animate-fade-in">
-          <div className="text-center py-16">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
+        <TabsContent value="shared" className="mt-0">
+          <div 
+            className="text-center py-16 opacity-0 animate-fade-in"
+            style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}
+          >
+            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6 animate-float">
               <Users className="w-10 h-10 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">Keine geteilten Videos</h3>
