@@ -18,9 +18,12 @@ interface LevelsPageProps {
   onStarEarned: () => void;
 }
 
-// Extended Level type with new plan key
+type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+
+// Extended Level type with new plan key and difficulty
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
   requiredPlanKey: PlanKey;
+  difficulty?: Difficulty;
 }
 
 interface RecentVideo extends Video {
@@ -200,6 +203,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           totalStars: 0,
           sections,
           requiredPlanKey,
+          difficulty: (level.difficulty as Difficulty) || 'beginner',
         };
       });
 

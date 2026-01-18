@@ -480,6 +480,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          difficulty: string | null
           id: string
           is_active: boolean
           required_plan: string | null
@@ -493,6 +494,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          difficulty?: string | null
           id?: string
           is_active?: boolean
           required_plan?: string | null
@@ -506,6 +508,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          difficulty?: string | null
           id?: string
           is_active?: boolean
           required_plan?: string | null

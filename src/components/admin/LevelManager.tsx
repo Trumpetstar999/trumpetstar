@@ -25,6 +25,8 @@ import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock } from 'lucide
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
+type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+
 interface Level {
   id: string;
   title: string;
@@ -33,7 +35,22 @@ interface Level {
   sort_order: number;
   is_active: boolean;
   required_plan_key: PlanKey;
+  difficulty: Difficulty;
 }
+
+const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
+  { value: 'beginner', label: 'Anfänger' },
+  { value: 'easy', label: 'Einfach' },
+  { value: 'medium', label: 'Mittel' },
+  { value: 'advanced', label: 'Anspruchsvoll' },
+];
+
+const DIFFICULTY_BADGE_COLORS: Record<Difficulty, string> = {
+  beginner: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+  easy: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  medium: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+  advanced: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+};
 
 interface LevelManagerProps {
   onSelectLevel: (levelId: string) => void;
@@ -55,8 +72,8 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [levels, setLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey });
-  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey });
+  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'beginner' as Difficulty });
+  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'beginner' as Difficulty });
   const [isAdding, setIsAdding] = useState(false);
 
   const sensors = useSensors(
@@ -80,10 +97,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       toast.error('Fehler beim Laden der Levels');
       console.error(error);
     } else {
-      // Map data with default plan key
+      // Map data with default plan key and difficulty
       const mappedLevels = (data || []).map(level => ({
         ...level,
         required_plan_key: (level.required_plan_key as PlanKey) || 'FREE',
+        difficulty: (level.difficulty as Difficulty) || 'beginner',
       }));
       setLevels(mappedLevels);
     }
@@ -128,6 +146,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       vimeo_showcase_id: newLevel.vimeo_showcase_id,
       sort_order: levels.length,
       required_plan_key: newLevel.required_plan_key,
+      difficulty: newLevel.difficulty,
     });
 
     if (error) {
@@ -135,7 +154,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       console.error(error);
     } else {
       toast.success('Level erstellt');
-      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' });
+      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'beginner' });
       setIsAdding(false);
       fetchLevels();
     }
@@ -148,6 +167,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
         title: editForm.title,
         description: editForm.description || null,
         required_plan_key: editForm.required_plan_key,
+        difficulty: editForm.difficulty,
       })
       .eq('id', id);
 
@@ -214,7 +234,25 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       title: level.title, 
       description: level.description || '',
       required_plan_key: level.required_plan_key,
+      difficulty: level.difficulty,
     });
+  }
+
+  async function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
+    const { error } = await supabase
+      .from('levels')
+      .update({ difficulty })
+      .eq('id', levelId);
+
+    if (error) {
+      toast.error('Fehler beim Aktualisieren der Schwierigkeit');
+      console.error(error);
+    } else {
+      toast.success('Schwierigkeit aktualisiert');
+      setLevels(prev => prev.map(l => 
+        l.id === levelId ? { ...l, difficulty } : l
+      ));
+    }
   }
 
   if (isLoading) {
@@ -243,23 +281,43 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
             value={newLevel.vimeo_showcase_id}
             onChange={(e) => setNewLevel({ ...newLevel, vimeo_showcase_id: e.target.value })}
           />
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
-            <Select
-              value={newLevel.required_plan_key}
-              onValueChange={(value) => setNewLevel({ ...newLevel, required_plan_key: value as PlanKey })}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PLAN_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
+              <Select
+                value={newLevel.required_plan_key}
+                onValueChange={(value) => setNewLevel({ ...newLevel, required_plan_key: value as PlanKey })}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PLAN_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Schwierigkeit:</span>
+              <Select
+                value={newLevel.difficulty}
+                onValueChange={(value) => setNewLevel({ ...newLevel, difficulty: value as Difficulty })}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIFFICULTY_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleAddLevel}>Erstellen</Button>
@@ -291,23 +349,43 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         value={editForm.description}
                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                       />
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
-                        <Select
-                          value={editForm.required_plan_key}
-                          onValueChange={(value) => setEditForm({ ...editForm, required_plan_key: value as PlanKey })}
-                        >
-                          <SelectTrigger className="w-40">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {PLAN_OPTIONS.map(option => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="flex items-center gap-4 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Benötigter Plan:</span>
+                          <Select
+                            value={editForm.required_plan_key}
+                            onValueChange={(value) => setEditForm({ ...editForm, required_plan_key: value as PlanKey })}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PLAN_OPTIONS.map(option => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Schwierigkeit:</span>
+                          <Select
+                            value={editForm.difficulty}
+                            onValueChange={(value) => setEditForm({ ...editForm, difficulty: value as Difficulty })}
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DIFFICULTY_OPTIONS.map(option => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -317,6 +395,9 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         {!level.is_active && (
                           <Badge variant="secondary">Inaktiv</Badge>
                         )}
+                        <Badge className={`${DIFFICULTY_BADGE_COLORS[level.difficulty]}`}>
+                          {DIFFICULTY_OPTIONS.find(d => d.value === level.difficulty)?.label || 'Anfänger'}
+                        </Badge>
                         {level.required_plan_key !== 'FREE' && (
                           <Badge className={`${PLAN_BADGE_COLORS[level.required_plan_key]} gap-1`}>
                             {level.required_plan_key === 'PREMIUM' ? (
@@ -358,6 +439,22 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                     </>
                   ) : (
                     <>
+                      {/* Inline Difficulty Selector */}
+                      <Select
+                        value={level.difficulty}
+                        onValueChange={(value) => handleDifficultyChange(level.id, value as Difficulty)}
+                      >
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DIFFICULTY_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {/* Inline Plan Selector */}
                       <Select
                         value={level.required_plan_key}
