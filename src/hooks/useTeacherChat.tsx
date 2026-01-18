@@ -11,6 +11,8 @@ export interface TeacherChatMessage {
   content: string | null;
   created_at: string;
   is_read: boolean;
+  message_type?: string;
+  video_storage_path?: string | null;
   sender_profile?: {
     display_name: string | null;
     avatar_url: string | null;
@@ -151,7 +153,6 @@ export function useTeacherChat() {
         .from('video_chat_messages')
         .select('*')
         .eq('chat_id', chatInfo.chatId)
-        .eq('message_type', 'text')
         .order('created_at', { ascending: true });
 
       if (error) throw error;
