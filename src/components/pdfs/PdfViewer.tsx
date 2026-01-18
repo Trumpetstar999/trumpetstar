@@ -19,6 +19,7 @@ import {
   SkipForward,
   X,
   ChevronDown,
+  ChevronUp,
   Music,
   Pencil,
   Highlighter,
@@ -27,8 +28,6 @@ import {
   Trash2,
   RefreshCw,
   AlertTriangle,
-  Save,
-  Circle,
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -39,11 +38,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 
 interface PdfDocument {
   id: string;
@@ -69,28 +63,29 @@ interface PdfViewerProps {
   onClose: () => void;
 }
 
-// Brush colors
-const BRUSH_COLORS = [
-  { name: 'Schwarz', value: '#1a1a2e' },
-  { name: 'Blau', value: '#2563eb' },
-  { name: 'Rot', value: '#dc2626' },
-  { name: 'Grün', value: '#16a34a' },
-  { name: 'Orange', value: '#ea580c' },
-  { name: 'Lila', value: '#9333ea' },
+// Apple Books style color palette
+const APPLE_PENCIL_COLORS = [
+  { name: 'Schwarz', value: '#000000' },
+  { name: 'Dunkelgrau', value: '#545456' },
+  { name: 'Weiß', value: '#FFFFFF' },
+  { name: 'Gelb', value: '#FFCC02' },
+  { name: 'Orange', value: '#FF9500' },
+  { name: 'Rot', value: '#FF3B30' },
+  { name: 'Pink', value: '#FF2D55' },
+  { name: 'Lila', value: '#AF52DE' },
+  { name: 'Blau', value: '#007AFF' },
+  { name: 'Cyan', value: '#5AC8FA' },
+  { name: 'Grün', value: '#34C759' },
+  { name: 'Dunkelgrün', value: '#00C7BE' },
 ];
 
-// Highlighter colors
-const HIGHLIGHTER_COLORS = [
-  { name: 'Gelb', value: 'rgba(255, 230, 0, 0.4)' },
-  { name: 'Grün', value: 'rgba(34, 197, 94, 0.4)' },
-  { name: 'Blau', value: 'rgba(59, 130, 246, 0.4)' },
-  { name: 'Pink', value: 'rgba(236, 72, 153, 0.4)' },
-  { name: 'Orange', value: 'rgba(249, 115, 22, 0.4)' },
+const APPLE_HIGHLIGHTER_COLORS = [
+  { name: 'Gelb', value: 'rgba(255, 204, 2, 0.45)' },
+  { name: 'Grün', value: 'rgba(52, 199, 89, 0.45)' },
+  { name: 'Blau', value: 'rgba(0, 122, 255, 0.45)' },
+  { name: 'Pink', value: 'rgba(255, 45, 85, 0.45)' },
+  { name: 'Lila', value: 'rgba(175, 82, 222, 0.45)' },
 ];
-
-// Brush sizes
-const BRUSH_SIZES = [2, 4, 6, 8, 12];
-const HIGHLIGHTER_SIZES = [12, 20, 28, 36];
 
 export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
   const [searchParams] = useSearchParams();
@@ -105,6 +100,8 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [showAudioPlayer, setShowAudioPlayer] = useState(true);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -130,16 +127,17 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
   const [savedAnnotations, setSavedAnnotations] = useState<Map<number, string>>(new Map());
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
   
-  // Brush settings
-  const [pencilColor, setPencilColor] = useState(BRUSH_COLORS[0].value);
-  const [pencilSize, setPencilSize] = useState(4);
-  const [highlighterColor, setHighlighterColor] = useState(HIGHLIGHTER_COLORS[0].value);
+  // Apple style brush settings
+  const [pencilColor, setPencilColor] = useState(APPLE_PENCIL_COLORS[0].value);
+  const [pencilSize, setPencilSize] = useState(3);
+  const [highlighterColor, setHighlighterColor] = useState(APPLE_HIGHLIGHTER_COLORS[0].value);
   const [highlighterSize, setHighlighterSize] = useState(20);
-  const [eraserSize, setEraserSize] = useState(25);
+  const [eraserSize, setEraserSize] = useState(20);
 
   // Get audio tracks for current page
   const currentPageTracks = audioTracks.filter(t => t.page_number === currentPage);
   const hasMultipleTracks = currentPageTracks.length > 1;
+  const hasAudio = currentPageTracks.length > 0;
 
   // Auto-select first track when page changes
   useEffect(() => {
@@ -195,7 +193,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     setLoadError(null);
     setIsLoading(true);
     setPdfDoc(null);
-    // Trigger reload by resetting
     const reloadEvent = new CustomEvent('pdf-reload', { detail: pdf.id });
     window.dispatchEvent(reloadEvent);
     onClose();
@@ -210,7 +207,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       return;
     }
 
-    // Reset state when URL changes
     setPdfDoc(null);
     setIsLoading(true);
     setLoadError(null);
@@ -219,7 +215,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       console.log('PdfViewer: Starting PDF load from blob URL:', pdfBlobUrl);
       
       try {
-        // First, fetch the blob to verify it's valid and get ArrayBuffer
         console.log('PdfViewer: Fetching blob...');
         const response = await fetch(pdfBlobUrl);
         
@@ -234,7 +229,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           throw new Error(`File too small to be a valid PDF (${arrayBuffer.byteLength} bytes)`);
         }
         
-        // Verify PDF header
         const header = new Uint8Array(arrayBuffer.slice(0, 5));
         const headerStr = String.fromCharCode(...header);
         console.log('PdfViewer: PDF header check:', headerStr);
@@ -243,18 +237,13 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           throw new Error(`Invalid PDF header: "${headerStr}" - File may be corrupted or not a PDF`);
         }
         
-        // Load PDF.js with explicit worker configuration
         const pdfjsLib = await import('pdfjs-dist');
-        
-        // Set worker source to locally hosted file for iPad Safari compatibility
         pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
-        // Use ArrayBuffer directly - more reliable than blob URL
         const loadingTask = pdfjsLib.getDocument({ 
           data: arrayBuffer,
-          // iPad Safari optimizations
           disableAutoFetch: false,
           disableStream: false,
         });
@@ -281,7 +270,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     loadPdf();
   }, [pdfBlobUrl]);
 
-  // Render current page
+  // Render current page - edge to edge
   useEffect(() => {
     if (!pdfDoc) return;
 
@@ -295,19 +284,17 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         
         if (!canvas || !container) {
           console.log('Canvas or container not ready');
-          // Retry after a short delay
           setTimeout(() => setIsLoading(true), 100);
           return;
         }
 
-        const containerWidth = container.clientWidth - 48;
-        const containerHeight = container.clientHeight - 48;
+        // Use full container dimensions for edge-to-edge display
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
         
-        // Wait for container to have dimensions
         if (containerWidth <= 0 || containerHeight <= 0) {
           console.log('Container dimensions not ready, retrying...');
           setTimeout(() => {
-            // Trigger re-render by toggling loading state
             setIsLoading(false);
             setTimeout(() => setIsLoading(true), 50);
           }, 100);
@@ -321,12 +308,12 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           return;
         }
 
-        // Calculate scale to fit container
         const viewport = page.getViewport({ scale: 1 });
         
+        // Scale to fit container perfectly (edge to edge)
         const scaleX = containerWidth / viewport.width;
         const scaleY = containerHeight / viewport.height;
-        const baseScale = Math.min(scaleX, scaleY, 1.5);
+        const baseScale = Math.min(scaleX, scaleY);
         const scale = baseScale * zoom;
         
         const scaledViewport = page.getViewport({ scale });
@@ -351,7 +338,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           
           const drawCtx = drawingCanvas.getContext('2d');
           if (drawCtx) {
-            // First try to restore from saved annotations (from database)
             const savedData = savedAnnotations.get(currentPage);
             if (savedData) {
               const img = new Image();
@@ -360,7 +346,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
               };
               img.src = savedData;
             } else {
-              // Fall back to in-memory history
               const pageHistory = drawingHistory.get(currentPage);
               if (pageHistory && pageHistory.length > 0) {
                 drawCtx.putImageData(pageHistory[pageHistory.length - 1], 0, 0);
@@ -555,7 +540,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     lastPointRef.current = null;
     setHasUnsavedChanges(true);
     
-    // Save current state to history
     const canvas = drawingCanvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (canvas && ctx) {
@@ -576,7 +560,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     
     const pageHistory = drawingHistory.get(currentPage) || [];
     if (pageHistory.length <= 1) {
-      // Clear canvas if only one or no history
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       setDrawingHistory(prev => {
         const newHistory = new Map(prev);
@@ -586,7 +569,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       return;
     }
     
-    // Remove last state and restore previous
     const newHistory = pageHistory.slice(0, -1);
     const previousState = newHistory[newHistory.length - 1];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -625,15 +607,12 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
 
     setIsSaving(true);
     try {
-      // Get all pages with drawings
       const pagesToSave = new Set(drawingHistory.keys());
       
       for (const pageNum of pagesToSave) {
-        // Get the image data as base64
         const pageHistory = drawingHistory.get(pageNum);
         if (!pageHistory || pageHistory.length === 0) continue;
 
-        // Create a temporary canvas to get the data URL
         const tempCanvas = document.createElement('canvas');
         const lastImageData = pageHistory[pageHistory.length - 1];
         tempCanvas.width = lastImageData.width;
@@ -644,7 +623,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         tempCtx.putImageData(lastImageData, 0, 0);
         const dataUrl = tempCanvas.toDataURL('image/png');
 
-        // Upsert to database
         const { error } = await supabase
           .from('pdf_user_annotations')
           .upsert({
@@ -670,6 +648,17 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     }
   }, [user, pdf.id, drawingHistory]);
 
+  // Toggle tool
+  const selectTool = (tool: DrawingTool) => {
+    if (activeTool === tool) {
+      setActiveTool('none');
+      setShowToolbar(false);
+    } else {
+      setActiveTool(tool);
+      setShowToolbar(true);
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -678,7 +667,12 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
       } else if (e.key === 'ArrowRight') {
         goToNextPage();
       } else if (e.key === 'Escape') {
-        onClose();
+        if (showToolbar) {
+          setShowToolbar(false);
+          setActiveTool('none');
+        } else {
+          onClose();
+        }
       } else if (e.key === ' ' && audioSignedUrl) {
         e.preventDefault();
         togglePlayPause();
@@ -690,275 +684,32 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToPreviousPage, goToNextPage, onClose, audioSignedUrl, togglePlayPause, saveAnnotations]);
+  }, [goToPreviousPage, goToNextPage, onClose, audioSignedUrl, togglePlayPause, saveAnnotations, showToolbar]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-white">
-      {/* Minimal header bar */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200">
-        {/* Left: Zoom controls */}
-        <div className="flex items-center gap-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleZoomOut}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <span className="text-xs font-medium text-gray-600 w-10 text-center">
-            {Math.round(zoom * 100)}%
-          </span>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleZoomIn}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleResetZoom}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Center: Title */}
-        <h2 className="text-sm font-medium text-gray-800 truncate max-w-md mx-4">
-          {pdf.title}
-        </h2>
-
-        {/* Right: Drawing tools */}
-        <div className="flex items-center gap-1">
-          {/* Pencil with color/size picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'pencil' && setActiveTool('pencil')}
-                className={cn(
-                  "h-8 w-8 transition-all relative",
-                  activeTool === 'pencil' 
-                    ? "bg-gray-900 text-white hover:bg-gray-800" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Pencil className="w-4 h-4" />
-                <span 
-                  className="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-white"
-                  style={{ backgroundColor: pencilColor }}
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="end">
-              <div className="space-y-3">
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Farbe</span>
-                  <div className="flex gap-1 flex-wrap">
-                    {BRUSH_COLORS.map(color => (
-                      <button
-                        key={color.value}
-                        onClick={() => { setPencilColor(color.value); setActiveTool('pencil'); }}
-                        className={cn(
-                          "w-7 h-7 rounded-full border-2 transition-all",
-                          pencilColor === color.value ? "border-gray-900 scale-110" : "border-transparent hover:scale-105"
-                        )}
-                        style={{ backgroundColor: color.value }}
-                        title={color.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                  <div className="flex gap-2 items-center">
-                    {BRUSH_SIZES.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => { setPencilSize(size); setActiveTool('pencil'); }}
-                        className={cn(
-                          "rounded-full transition-all flex items-center justify-center",
-                          pencilSize === size ? "bg-gray-900" : "bg-gray-300 hover:bg-gray-400"
-                        )}
-                        style={{ width: size + 12, height: size + 12 }}
-                      >
-                        <Circle className="w-full h-full" style={{ width: size, height: size }} fill="currentColor" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Highlighter with color/size picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'highlighter' && setActiveTool('highlighter')}
-                className={cn(
-                  "h-8 w-8 transition-all",
-                  activeTool === 'highlighter' 
-                    ? "bg-yellow-400 text-black hover:bg-yellow-500" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Highlighter className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="end">
-              <div className="space-y-3">
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Farbe</span>
-                  <div className="flex gap-1 flex-wrap">
-                    {HIGHLIGHTER_COLORS.map(color => (
-                      <button
-                        key={color.value}
-                        onClick={() => { setHighlighterColor(color.value); setActiveTool('highlighter'); }}
-                        className={cn(
-                          "w-7 h-7 rounded-full border-2 transition-all",
-                          highlighterColor === color.value ? "border-gray-900 scale-110" : "border-transparent hover:scale-105"
-                        )}
-                        style={{ backgroundColor: color.value.replace('0.4', '0.8') }}
-                        title={color.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                  <div className="flex gap-2 items-center">
-                    {HIGHLIGHTER_SIZES.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => { setHighlighterSize(size); setActiveTool('highlighter'); }}
-                        className={cn(
-                          "h-6 rounded transition-all",
-                          highlighterSize === size ? "bg-yellow-400" : "bg-yellow-200 hover:bg-yellow-300"
-                        )}
-                        style={{ width: size }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Eraser */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'eraser' && setActiveTool('eraser')}
-                className={cn(
-                  "h-8 w-8 transition-all",
-                  activeTool === 'eraser' 
-                    ? "bg-gray-200 text-gray-900" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Eraser className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-3" align="end">
-              <div>
-                <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                <Slider
-                  value={[eraserSize]}
-                  min={10}
-                  max={50}
-                  step={5}
-                  onValueChange={([val]) => { setEraserSize(val); setActiveTool('eraser'); }}
-                  className="w-full"
-                />
-                <span className="text-xs text-gray-500 mt-1 block text-center">{eraserSize}px</span>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={undoDrawing}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <Undo2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={clearDrawings}
-            className="h-8 w-8 text-gray-600 hover:text-red-600 hover:bg-gray-200"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          {/* Save button */}
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={saveAnnotations}
-            disabled={isSaving || !hasUnsavedChanges}
-            className={cn(
-              "h-8 px-3 gap-1.5",
-              hasUnsavedChanges 
-                ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
-                : "text-gray-400"
-            )}
-          >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            <span className="text-xs">Speichern</span>
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          {/* Close button */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* PDF Canvas Area - maximized */}
+    <div className="fixed inset-0 z-[100] flex flex-col bg-black">
+      {/* Edge-to-edge PDF Canvas Area */}
       <div 
         ref={containerRef}
-        className="flex-1 min-h-0 flex items-center justify-center p-2 bg-gray-50 relative overflow-auto"
+        className="flex-1 min-h-0 flex items-center justify-center relative overflow-auto bg-neutral-900"
       >
         {/* Error overlay */}
         {loadError && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 bg-white">
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-neutral-900">
             <div className="flex flex-col items-center gap-6 max-w-md text-center px-4">
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-500" />
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-red-400" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">PDF konnte nicht geladen werden</h3>
-                <p className="text-gray-600 text-sm mb-4">{loadError}</p>
+                <h3 className="text-xl font-semibold text-white mb-2">PDF konnte nicht geladen werden</h3>
+                <p className="text-neutral-400 text-sm mb-4">{loadError}</p>
               </div>
               <div className="flex gap-3">
-                <Button onClick={handleRetry}>
+                <Button onClick={handleRetry} className="bg-white text-black hover:bg-neutral-200">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Erneut versuchen
                 </Button>
-                <Button variant="outline" onClick={onClose}>
+                <Button variant="outline" onClick={onClose} className="border-neutral-600 text-white hover:bg-neutral-800">
                   Schließen
                 </Button>
               </div>
@@ -968,21 +719,20 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
 
         {/* Loading overlay */}
         {isLoading && !loadError && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/80">
+          <div className="absolute inset-0 flex items-center justify-center z-10 bg-neutral-900">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-              <span className="text-gray-600">Seite wird geladen...</span>
+              <Loader2 className="w-10 h-10 animate-spin text-white" />
+              <span className="text-neutral-400">Seite wird geladen...</span>
             </div>
           </div>
         )}
 
-        {/* Canvas container for both PDF and drawing */}
-        <div className="relative shadow-lg" style={{ maxWidth: '100%', maxHeight: '100%' }}>
-          {/* PDF Canvas */}
+        {/* Canvas container - edge to edge */}
+        <div className="relative" style={{ maxWidth: '100%', maxHeight: '100%' }}>
           <canvas
             ref={canvasRef}
             className={cn(
-              "transition-opacity duration-300 bg-white",
+              "transition-opacity duration-300",
               isLoading ? "opacity-0" : "opacity-100"
             )}
             style={{
@@ -991,7 +741,6 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
             }}
           />
           
-          {/* Drawing Canvas (overlay) */}
           <canvas
             ref={drawingCanvasRef}
             className={cn(
@@ -1014,63 +763,292 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           />
         </div>
 
-        {/* Page Navigation Arrows - subtle */}
+        {/* Page Navigation - Apple style invisible tap zones */}
         <button
           onClick={goToPreviousPage}
           disabled={currentPage <= 1}
           className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md transition-all",
-            currentPage <= 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-100"
+            "absolute left-0 top-0 bottom-0 w-1/4 opacity-0 hover:opacity-100 transition-opacity",
+            currentPage <= 1 && "cursor-not-allowed"
           )}
         >
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
+          {currentPage > 1 && (
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm">
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </div>
+          )}
         </button>
 
         <button
           onClick={goToNextPage}
           disabled={currentPage >= pdf.page_count}
           className={cn(
-            "absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md transition-all",
-            currentPage >= pdf.page_count ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-100"
+            "absolute right-0 top-0 bottom-0 w-1/4 opacity-0 hover:opacity-100 transition-opacity",
+            currentPage >= pdf.page_count && "cursor-not-allowed"
           )}
         >
-          <ChevronRight className="w-5 h-5 text-gray-700" />
+          {currentPage < pdf.page_count && (
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 backdrop-blur-sm">
+              <ChevronRight className="w-6 h-6 text-white" />
+            </div>
+          )}
         </button>
-      </div>
 
-      {/* Compact bottom bar */}
-      <div className="shrink-0 z-[105] bg-gray-100 border-t border-gray-200 px-4 py-1.5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left: Page navigation */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage <= 1}
-              className={cn(
-                "p-1.5 rounded transition-all",
-                currentPage <= 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-200"
-              )}
+        {/* Top bar - Apple Books style floating overlay */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm"
             >
-              <ChevronLeft className="w-4 h-4 text-gray-700" />
-            </button>
-            <span className="text-sm text-gray-700 font-medium min-w-[80px] text-center">
-              {currentPage} / {pdf.page_count}
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+
+          <h2 className="text-white text-sm font-medium truncate max-w-md px-4 text-shadow">
+            {pdf.title}
+          </h2>
+
+          <div className="pointer-events-auto flex items-center gap-2">
+            {/* Zoom controls */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleZoomOut}
+              className="h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm"
+            >
+              <ZoomOut className="w-5 h-5" />
+            </Button>
+            <span className="text-white text-xs font-medium w-12 text-center">
+              {Math.round(zoom * 100)}%
             </span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleZoomIn}
+              className="h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm"
+            >
+              <ZoomIn className="w-5 h-5" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleResetZoom}
+              className="h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-sm"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Right sidebar - Apple Books style tool palette */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+          {/* Tool buttons */}
+          <div className="flex flex-col gap-1 p-1.5 rounded-2xl bg-black/50 backdrop-blur-md">
             <button
-              onClick={goToNextPage}
-              disabled={currentPage >= pdf.page_count}
+              onClick={() => selectTool('pencil')}
               className={cn(
-                "p-1.5 rounded transition-all",
-                currentPage >= pdf.page_count ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-200"
+                "w-11 h-11 rounded-xl flex items-center justify-center transition-all",
+                activeTool === 'pencil' 
+                  ? "bg-white text-black" 
+                  : "text-white hover:bg-white/20"
               )}
             >
-              <ChevronRight className="w-4 h-4 text-gray-700" />
+              <Pencil className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => selectTool('highlighter')}
+              className={cn(
+                "w-11 h-11 rounded-xl flex items-center justify-center transition-all",
+                activeTool === 'highlighter' 
+                  ? "bg-yellow-400 text-black" 
+                  : "text-white hover:bg-white/20"
+              )}
+            >
+              <Highlighter className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => selectTool('eraser')}
+              className={cn(
+                "w-11 h-11 rounded-xl flex items-center justify-center transition-all",
+                activeTool === 'eraser' 
+                  ? "bg-white/80 text-black" 
+                  : "text-white hover:bg-white/20"
+              )}
+            >
+              <Eraser className="w-5 h-5" />
+            </button>
+            
+            <div className="w-8 h-px bg-white/20 mx-auto my-1" />
+            
+            <button
+              onClick={undoDrawing}
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-all"
+            >
+              <Undo2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={clearDrawings}
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-white hover:bg-white/20 hover:text-red-400 transition-all"
+            >
+              <Trash2 className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Center: Audio Player (if tracks available) */}
-          {audioSignedUrl && selectedTrack ? (
-            <div className="flex items-center gap-3 flex-1 max-w-xl mx-4">
+          {/* Save indicator */}
+          {hasUnsavedChanges && (
+            <button
+              onClick={saveAnnotations}
+              disabled={isSaving}
+              className="w-11 h-11 rounded-full bg-green-500 text-white flex items-center justify-center animate-pulse"
+            >
+              {isSaving ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <span className="text-xs font-bold">✓</span>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Tool options panel - slides from right */}
+        {showToolbar && (
+          <div className="absolute right-20 top-1/2 -translate-y-1/2 p-4 rounded-2xl bg-black/70 backdrop-blur-xl animate-fade-in">
+            {activeTool === 'pencil' && (
+              <div className="space-y-4">
+                <div>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Farbe</span>
+                  <div className="grid grid-cols-4 gap-2">
+                    {APPLE_PENCIL_COLORS.map(color => (
+                      <button
+                        key={color.value}
+                        onClick={() => setPencilColor(color.value)}
+                        className={cn(
+                          "w-8 h-8 rounded-full transition-all border-2",
+                          pencilColor === color.value 
+                            ? "border-white scale-110 shadow-lg" 
+                            : "border-transparent hover:scale-105",
+                          color.value === '#FFFFFF' && "border border-white/30"
+                        )}
+                        style={{ backgroundColor: color.value }}
+                        title={color.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Größe</span>
+                  <Slider
+                    value={[pencilSize]}
+                    min={1}
+                    max={12}
+                    step={1}
+                    onValueChange={([val]) => setPencilSize(val)}
+                    className="w-32"
+                  />
+                  <div className="flex justify-between text-xs text-white/50 mt-1">
+                    <span>Fein</span>
+                    <span>Dick</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTool === 'highlighter' && (
+              <div className="space-y-4">
+                <div>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Farbe</span>
+                  <div className="flex gap-2">
+                    {APPLE_HIGHLIGHTER_COLORS.map(color => (
+                      <button
+                        key={color.value}
+                        onClick={() => setHighlighterColor(color.value)}
+                        className={cn(
+                          "w-10 h-10 rounded-lg transition-all border-2",
+                          highlighterColor === color.value 
+                            ? "border-white scale-110 shadow-lg" 
+                            : "border-transparent hover:scale-105"
+                        )}
+                        style={{ backgroundColor: color.value.replace('0.45', '0.8') }}
+                        title={color.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Größe</span>
+                  <Slider
+                    value={[highlighterSize]}
+                    min={12}
+                    max={40}
+                    step={4}
+                    onValueChange={([val]) => setHighlighterSize(val)}
+                    className="w-32"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTool === 'eraser' && (
+              <div>
+                <span className="text-xs font-medium text-white/70 mb-3 block">Größe</span>
+                <Slider
+                  value={[eraserSize]}
+                  min={10}
+                  max={50}
+                  step={5}
+                  onValueChange={([val]) => setEraserSize(val)}
+                  className="w-32"
+                />
+                <div className="flex justify-center mt-3">
+                  <div 
+                    className="rounded-full bg-white/30 border border-white/50"
+                    style={{ width: eraserSize, height: eraserSize }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Page indicator - bottom center */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+          <span className="text-white text-sm font-medium">
+            {currentPage} / {pdf.page_count}
+          </span>
+        </div>
+      </div>
+
+      {/* Collapsible Audio Player - Apple style */}
+      {hasAudio && (
+        <div className={cn(
+          "shrink-0 transition-all duration-300 bg-neutral-900/95 backdrop-blur-xl border-t border-white/10",
+          showAudioPlayer ? "h-auto" : "h-12"
+        )}>
+          {/* Toggle bar */}
+          <button
+            onClick={() => setShowAudioPlayer(!showAudioPlayer)}
+            className="w-full h-12 flex items-center justify-center gap-2 text-white/70 hover:text-white transition-colors"
+          >
+            <Music className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {selectedTrack?.title || 'Audio'}
+            </span>
+            {showAudioPlayer ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronUp className="w-4 h-4" />
+            )}
+            {isPlaying && (
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            )}
+          </button>
+
+          {/* Expanded player */}
+          {showAudioPlayer && audioSignedUrl && selectedTrack && (
+            <div className="px-6 pb-6 pt-2">
               <audio
                 ref={audioRef}
                 src={audioSignedUrl}
@@ -1079,98 +1057,97 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
                 onEnded={() => setIsPlaying(false)}
               />
               
-              <button
-                onClick={togglePlayPause}
-                className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all shrink-0 flex items-center justify-center"
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-              </button>
-              
-              <button
-                onClick={() => skipSeconds(-10)}
-                className="p-1 rounded text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-all"
-              >
-                <SkipBack className="w-4 h-4" />
-              </button>
-              
-              <span className="text-xs text-gray-600 font-mono w-10 text-right">
-                {formatTime(audioProgress)}
-              </span>
-              
-              <Slider
-                value={[audioProgress]}
-                min={0}
-                max={audioDuration || 100}
-                step={0.1}
-                onValueChange={handleSeek}
-                className="flex-1 min-w-[80px]"
-              />
-              
-              <span className="text-xs text-gray-600 font-mono w-10">
-                {formatTime(audioDuration)}
-              </span>
-              
-              <button
-                onClick={() => skipSeconds(10)}
-                className="p-1 rounded text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-all"
-              >
-                <SkipForward className="w-4 h-4" />
-              </button>
+              <div className="max-w-2xl mx-auto">
+                {/* Progress bar */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs text-white/60 font-mono w-12 text-right">
+                    {formatTime(audioProgress)}
+                  </span>
+                  <Slider
+                    value={[audioProgress]}
+                    min={0}
+                    max={audioDuration || 100}
+                    step={0.1}
+                    onValueChange={handleSeek}
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-white/60 font-mono w-12">
+                    {formatTime(audioDuration)}
+                  </span>
+                </div>
 
-              {hasMultipleTracks && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-600 hover:bg-gray-200 transition-all">
-                      <Music className="w-3 h-3" />
-                      <ChevronDown className="w-3 h-3" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {currentPageTracks.map((track) => (
-                      <DropdownMenuItem
-                        key={track.id}
-                        onClick={() => setSelectedTrack(track)}
-                        className={cn(
-                          "cursor-pointer text-sm",
-                          track.id === selectedTrack.id && "bg-blue-50 text-blue-600"
-                        )}
-                      >
-                        <Music className="w-3 h-3 mr-2" />
-                        {track.title}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+                {/* Controls */}
+                <div className="flex items-center justify-center gap-6">
+                  <button
+                    onClick={() => skipSeconds(-10)}
+                    className="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  >
+                    <SkipBack className="w-5 h-5" />
+                  </button>
+                  
+                  <button
+                    onClick={togglePlayPause}
+                    className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
+                  >
+                    {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
+                  </button>
+                  
+                  <button
+                    onClick={() => skipSeconds(10)}
+                    className="p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                  >
+                    <SkipForward className="w-5 h-5" />
+                  </button>
+                </div>
 
-              <div className="flex items-center gap-1 pl-2 border-l border-gray-300">
-                <span className="text-xs text-gray-500">{playbackRate}%</span>
-                <Slider
-                  value={[playbackRate]}
-                  min={50}
-                  max={150}
-                  step={5}
-                  onValueChange={handleSpeedChange}
-                  className="w-16"
-                />
+                {/* Speed & Track selection */}
+                <div className="flex items-center justify-center gap-6 mt-4">
+                  {hasMultipleTracks && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-white/70 hover:text-white hover:bg-white/10 transition-all">
+                          <Music className="w-4 h-4" />
+                          Tracks
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="center" className="w-56 bg-neutral-900 border-white/10">
+                        {currentPageTracks.map((track) => (
+                          <DropdownMenuItem
+                            key={track.id}
+                            onClick={() => setSelectedTrack(track)}
+                            className={cn(
+                              "cursor-pointer text-sm text-white/80 hover:text-white hover:bg-white/10",
+                              track.id === selectedTrack.id && "bg-white/10 text-white"
+                            )}
+                          >
+                            <Music className="w-3 h-3 mr-2" />
+                            {track.title}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/60">{playbackRate}%</span>
+                    <Slider
+                      value={[playbackRate]}
+                      min={50}
+                      max={150}
+                      step={5}
+                      onValueChange={handleSpeedChange}
+                      className="w-24"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="flex-1 text-center">
-              <span className="text-xs text-gray-400">Kein Audio für diese Seite</span>
-            </div>
           )}
-
-          {/* Right: Unsaved indicator */}
-          <div className="flex items-center gap-2">
-            {hasUnsavedChanges && (
-              <span className="text-xs text-orange-600">Ungespeicherte Änderungen</span>
-            )}
-          </div>
         </div>
-      </div>
+      )}
 
-      {/* Debug Panel - only visible to admins or with ?debug=1 */}
+      {/* Debug Panel */}
       {showDebug && (
         <PdfDebugPanel
           diagnostics={diagnostics}
