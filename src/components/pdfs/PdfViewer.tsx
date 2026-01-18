@@ -63,8 +63,8 @@ interface PdfViewerProps {
   onClose: () => void;
 }
 
-// Apple Books style color palette
-const APPLE_PENCIL_COLORS = [
+// Apple Books style color palette - Felt-tip pen colors (fully opaque)
+const APPLE_PEN_COLORS = [
   { name: 'Schwarz', value: '#000000' },
   { name: 'Dunkelgrau', value: '#545456' },
   { name: 'Weiß', value: '#FFFFFF' },
@@ -79,12 +79,13 @@ const APPLE_PENCIL_COLORS = [
   { name: 'Dunkelgrün', value: '#00C7BE' },
 ];
 
+// Highlighter colors - transparent like real highlighters
 const APPLE_HIGHLIGHTER_COLORS = [
-  { name: 'Gelb', value: 'rgba(255, 204, 2, 0.45)' },
-  { name: 'Grün', value: 'rgba(52, 199, 89, 0.45)' },
-  { name: 'Blau', value: 'rgba(0, 122, 255, 0.45)' },
-  { name: 'Pink', value: 'rgba(255, 45, 85, 0.45)' },
-  { name: 'Lila', value: 'rgba(175, 82, 222, 0.45)' },
+  { name: 'Gelb', value: '#FFEB3B', alpha: 0.35 },
+  { name: 'Grün', value: '#4CAF50', alpha: 0.35 },
+  { name: 'Blau', value: '#2196F3', alpha: 0.35 },
+  { name: 'Pink', value: '#E91E63', alpha: 0.35 },
+  { name: 'Lila', value: '#9C27B0', alpha: 0.35 },
 ];
 
 export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
@@ -127,11 +128,11 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
   const [savedAnnotations, setSavedAnnotations] = useState<Map<number, string>>(new Map());
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
   
-  // Apple style brush settings
-  const [pencilColor, setPencilColor] = useState(APPLE_PENCIL_COLORS[0].value);
-  const [pencilSize, setPencilSize] = useState(3);
-  const [highlighterColor, setHighlighterColor] = useState(APPLE_HIGHLIGHTER_COLORS[0].value);
-  const [highlighterSize, setHighlighterSize] = useState(20);
+  // Apple style brush settings - Felt-tip pen style
+  const [penColor, setPenColor] = useState(APPLE_PEN_COLORS[0].value);
+  const [penSize, setPenSize] = useState(4);
+  const [highlighterColorIndex, setHighlighterColorIndex] = useState(0);
+  const [highlighterSize, setHighlighterSize] = useState(24);
   const [eraserSize, setEraserSize] = useState(20);
 
   // Get audio tracks for current page
@@ -510,28 +511,35 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     ctx.lineTo(point.x, point.y);
     
     if (activeTool === 'pencil') {
-      ctx.strokeStyle = pencilColor;
-      ctx.lineWidth = pencilSize;
+      // Felt-tip pen style - solid, opaque strokes
+      ctx.strokeStyle = penColor;
+      ctx.lineWidth = penSize;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
     } else if (activeTool === 'highlighter') {
-      ctx.strokeStyle = highlighterColor;
+      // Transparent highlighter - like a real marker
+      const hColor = APPLE_HIGHLIGHTER_COLORS[highlighterColorIndex];
+      ctx.strokeStyle = hColor.value;
       ctx.lineWidth = highlighterSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      ctx.lineCap = 'square'; // Square ends like real highlighter
+      ctx.lineJoin = 'miter';
       ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = hColor.alpha;
     } else if (activeTool === 'eraser') {
       ctx.strokeStyle = 'rgba(0,0,0,1)';
       ctx.lineWidth = eraserSize;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalAlpha = 1;
     }
     
     ctx.stroke();
+    ctx.globalAlpha = 1; // Reset alpha
     lastPointRef.current = point;
-  }, [isDrawing, activeTool, getCanvasCoordinates, pencilColor, pencilSize, highlighterColor, highlighterSize, eraserSize]);
+  }, [isDrawing, activeTool, getCanvasCoordinates, penColor, penSize, highlighterColorIndex, highlighterSize, eraserSize]);
 
   const stopDrawing = useCallback(() => {
     if (!isDrawing) return;
@@ -919,15 +927,15 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
             {activeTool === 'pencil' && (
               <div className="space-y-4">
                 <div>
-                  <span className="text-xs font-medium text-white/70 mb-3 block">Farbe</span>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Filzstift Farbe</span>
                   <div className="grid grid-cols-4 gap-2">
-                    {APPLE_PENCIL_COLORS.map(color => (
+                    {APPLE_PEN_COLORS.map(color => (
                       <button
                         key={color.value}
-                        onClick={() => setPencilColor(color.value)}
+                        onClick={() => setPenColor(color.value)}
                         className={cn(
                           "w-8 h-8 rounded-full transition-all border-2",
-                          pencilColor === color.value 
+                          penColor === color.value 
                             ? "border-white scale-110 shadow-lg" 
                             : "border-transparent hover:scale-105",
                           color.value === '#FFFFFF' && "border border-white/30"
@@ -939,13 +947,13 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs font-medium text-white/70 mb-3 block">Größe</span>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Stärke</span>
                   <Slider
-                    value={[pencilSize]}
-                    min={1}
-                    max={12}
+                    value={[penSize]}
+                    min={2}
+                    max={16}
                     step={1}
-                    onValueChange={([val]) => setPencilSize(val)}
+                    onValueChange={([val]) => setPenSize(val)}
                     className="w-32"
                   />
                   <div className="flex justify-between text-xs text-white/50 mt-1">
@@ -959,19 +967,19 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
             {activeTool === 'highlighter' && (
               <div className="space-y-4">
                 <div>
-                  <span className="text-xs font-medium text-white/70 mb-3 block">Farbe</span>
+                  <span className="text-xs font-medium text-white/70 mb-3 block">Textmarker Farbe</span>
                   <div className="flex gap-2">
-                    {APPLE_HIGHLIGHTER_COLORS.map(color => (
+                    {APPLE_HIGHLIGHTER_COLORS.map((color, index) => (
                       <button
                         key={color.value}
-                        onClick={() => setHighlighterColor(color.value)}
+                        onClick={() => setHighlighterColorIndex(index)}
                         className={cn(
                           "w-10 h-10 rounded-lg transition-all border-2",
-                          highlighterColor === color.value 
+                          highlighterColorIndex === index 
                             ? "border-white scale-110 shadow-lg" 
                             : "border-transparent hover:scale-105"
                         )}
-                        style={{ backgroundColor: color.value.replace('0.45', '0.8') }}
+                        style={{ backgroundColor: color.value, opacity: 0.7 }}
                         title={color.name}
                       />
                     ))}
