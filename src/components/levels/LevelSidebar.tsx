@@ -4,9 +4,26 @@ import { useMembership } from '@/hooks/useMembership';
 import { Star, Lock, Crown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  beginner: 'Anfänger',
+  easy: 'Einfach',
+  medium: 'Mittel',
+  advanced: 'Anspruchsvoll',
+};
+
+const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  beginner: 'text-green-400',
+  easy: 'text-blue-400',
+  medium: 'text-orange-400',
+  advanced: 'text-red-400',
+};
+
 // Extended interface for levels with new plan key
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
   requiredPlanKey: PlanKey;
+  difficulty?: Difficulty;
 }
 
 interface LevelSidebarProps {
@@ -100,17 +117,24 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
                   )}>
                     {level.title}
                   </span>
-                  {isLocked && (
-                    <span className={cn(
-                      'text-xs flex items-center gap-1',
-                      isPremiumLevel 
-                        ? 'text-reward-gold' 
-                        : 'text-brand-blue-start'
-                    )}>
-                      {isPremiumLevel && <Crown className="w-3 h-3" />}
-                      {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2 text-xs">
+                    {level.difficulty && (
+                      <span className={cn(DIFFICULTY_COLORS[level.difficulty])}>
+                        {DIFFICULTY_LABELS[level.difficulty]}
+                      </span>
+                    )}
+                    {isLocked && (
+                      <span className={cn(
+                        'flex items-center gap-1',
+                        isPremiumLevel 
+                          ? 'text-reward-gold' 
+                          : 'text-brand-blue-start'
+                      )}>
+                        {isPremiumLevel && <Crown className="w-3 h-3" />}
+                        {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Stars earned */}
