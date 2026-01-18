@@ -266,7 +266,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
       {/* Header with Title and Search */}
-      <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10">
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in">
         <h2 className="text-lg font-semibold text-white shrink-0">Levels</h2>
         
         {/* Search Field - compact */}
@@ -277,12 +277,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
             placeholder="Videos suchen..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9 pl-9 pr-8 bg-white/10 border-white/20 text-white text-sm placeholder:text-white/40 rounded-lg focus:bg-white/15 focus:border-white/30"
+            className="h-9 pl-9 pr-8 bg-white/10 border-white/20 text-white text-sm placeholder:text-white/40 rounded-lg focus:bg-white/15 focus:border-white/30 transition-all duration-200"
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-all duration-200"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -291,7 +291,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
 
         {/* Search results count */}
         {isSearching && (
-          <span className="text-sm text-white/60">
+          <span className="text-sm text-white/60 animate-fade-in">
             {searchResults.length} {searchResults.length === 1 ? 'Ergebnis' : 'Ergebnisse'}
           </span>
         )}
@@ -342,16 +342,17 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                       return acc;
                     }, {})
                   ).map(([levelId, { levelTitle, videos }]) => (
-                    <div key={levelId} className="mb-6">
+                    <div key={levelId} className="mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
                       <h3 className="text-sm font-medium text-white/60 uppercase tracking-wide mb-3 px-1">
                         {levelTitle}
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {videos.map(({ video }) => (
+                        {videos.map(({ video }, videoIndex) => (
                           <VideoCard
                             key={video.id}
                             video={video}
                             onClick={() => setSelectedVideo(video)}
+                            index={videoIndex}
                           />
                         ))}
                       </div>
@@ -363,8 +364,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           ) : activeLevel === 'recent' ? (
             /* Recent Videos View */
             <div className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
                   <Clock className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -374,8 +375,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               </div>
               
               {recentVideos.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center py-16 text-center opacity-0 animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-4 animate-float">
                     <Film className="w-7 h-7 text-white/40" />
                   </div>
                   <h3 className="text-base font-medium text-white mb-1">Noch keine Videos angesehen</h3>
@@ -386,7 +387,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                     onClick={() => levels.length > 0 && setActiveLevel(levels[0].id)}
                     variant="ghost"
                     size="sm"
-                    className="text-white/70 hover:text-white hover:bg-white/10 gap-2"
+                    className="text-white/70 hover:text-white hover:bg-white/10 gap-2 hover:scale-105 transition-all duration-200"
                   >
                     Zum ersten Level
                     <ChevronRight className="w-4 h-4" />
@@ -394,13 +395,18 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {recentVideos.map((video) => (
-                    <div key={`${video.id}-${video.watchedAt}`} className="relative">
+                  {recentVideos.map((video, index) => (
+                    <div 
+                      key={`${video.id}-${video.watchedAt}`} 
+                      className="relative opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+                    >
                       <VideoCard
                         video={video}
                         onClick={() => setSelectedVideo(video)}
+                        index={0}
                       />
-                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80">
+                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
                         {video.levelTitle}
                       </span>
                     </div>
@@ -420,11 +426,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               
               {/* Sections */}
               <div className="p-6">
-                {currentLevel.sections.map((section) => (
+                {currentLevel.sections.map((section, sectionIndex) => (
                   <SectionRow
                     key={section.id}
                     section={section}
                     onVideoClick={setSelectedVideo}
+                    sectionIndex={sectionIndex}
                   />
                 ))}
               </div>
