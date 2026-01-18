@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -10,6 +10,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { VideoRecordDialog } from './VideoRecordDialog';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface TeacherChatPanelProps {
   isOpen: boolean;
@@ -24,6 +32,9 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
   const [inputValue, setInputValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [videoDialogOpen, setVideoDialogOpen] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // For student view, use the standard hook
   const studentChat = useTeacherChat();
@@ -84,7 +95,6 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
       .from('video_chat_messages')
       .select('*')
       .eq('chat_id', cId)
-      .eq('message_type', 'text')
       .order('created_at', { ascending: true });
 
     if (error) return;
@@ -146,6 +156,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
   const chatInfo = isTeacherView 
     ? { teacherId: user?.id, teacherProfile: studentProfile }
     : studentChat.chatInfo;
+  const currentChatId = isTeacherView ? chatId : studentChat.chatInfo.chatId;
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -203,6 +214,113 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
     }
   };
 
+  // Handle video recording save
+  const handleVideoRecordSave = async (data: { blob: Blob; duration: number; title: string }) => {
+    if (!user || !currentChatId) return;
+
+    setUploadingVideo(true);
+    try {
+      const fileName = `${user.id}/${Date.now()}-chat-video.webm`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('recordings')
+        .upload(fileName, data.blob, { contentType: 'video/webm' });
+
+      if (uploadError) throw uploadError;
+
+      // Send video message
+      const { error } = await supabase
+        .from('video_chat_messages')
+        .insert({
+          chat_id: currentChatId,
+          sender_user_id: user.id,
+          sender_role: isTeacher ? 'teacher' : 'user',
+          message_type: 'video',
+          video_storage_path: fileName,
+          content: data.title || 'Video-Nachricht'
+        });
+
+      if (error) throw error;
+
+      await supabase
+        .from('video_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChatId);
+
+      toast.success('Video gesendet');
+      
+      if (isTeacherView && chatId) {
+        fetchMessages(chatId);
+      }
+    } catch (err) {
+      console.error('Video upload error:', err);
+      toast.error('Video konnte nicht gesendet werden');
+      throw err;
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
+  // Handle video file upload
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !currentChatId) return;
+
+    if (!file.type.startsWith('video/')) {
+      toast.error('Bitte wähle eine Videodatei aus');
+      return;
+    }
+
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('Video darf maximal 100MB groß sein');
+      return;
+    }
+
+    setUploadingVideo(true);
+    try {
+      const ext = file.name.split('.').pop() || 'mp4';
+      const fileName = `${user.id}/${Date.now()}-chat-upload.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('recordings')
+        .upload(fileName, file, { contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { error } = await supabase
+        .from('video_chat_messages')
+        .insert({
+          chat_id: currentChatId,
+          sender_user_id: user.id,
+          sender_role: isTeacher ? 'teacher' : 'user',
+          message_type: 'video',
+          video_storage_path: fileName,
+          content: file.name
+        });
+
+      if (error) throw error;
+
+      await supabase
+        .from('video_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChatId);
+
+      toast.success('Video hochgeladen');
+
+      if (isTeacherView && chatId) {
+        fetchMessages(chatId);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      toast.error('Upload fehlgeschlagen');
+    } finally {
+      setUploadingVideo(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   if (!isOpen) return null;
 
   const displayName = isTeacherView 
@@ -215,13 +333,13 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
   // Container classes based on embedded mode
   const containerClasses = embedded
-    ? 'flex flex-col h-full bg-background'
+    ? 'flex flex-col h-full bg-background overflow-hidden'
     : 'fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl';
 
   return (
     <div className={containerClasses}>
       {/* Header - WhatsApp style */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
         <div className="flex items-center gap-3">
           {embedded && isTeacherView && (
             <Button 
@@ -242,7 +360,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
           <div>
             <h2 className="font-semibold text-[15px]">{displayName}</h2>
             <p className="text-[11px] text-white/70">
-              {sendingMessage ? 'sendet...' : 'online'}
+              {sendingMessage || uploadingVideo ? 'sendet...' : 'online'}
             </p>
           </div>
         </div>
@@ -260,14 +378,14 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
       {/* Chat Area - WhatsApp wallpaper style */}
       <div 
-        className="flex-1 overflow-hidden"
+        className="flex-1 min-h-0 overflow-hidden"
         style={{ 
           backgroundColor: '#ECE5DD',
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4cfc4' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
         }}
       >
         <ScrollArea className="h-full" ref={scrollRef}>
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-3 pb-4">
             {/* Loading State */}
             {loading && (
               <div className="flex items-center justify-center py-12">
@@ -317,6 +435,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
               const isCurrentUser = message.sender_user_id === user?.id;
               const showTimestamp = index === 0 || 
                 new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
+              const isVideoMessage = message.message_type === 'video';
 
               return (
                 <div key={message.id}>
@@ -342,32 +461,39 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                     )}
                     <div
                       className={cn(
-                        'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative',
+                        'max-w-[75%] rounded-lg shadow-sm relative overflow-hidden',
                         isCurrentUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
-                          : 'bg-white text-[#111B21] rounded-tl-none'
+                          : 'bg-white text-[#111B21] rounded-tl-none',
+                        isVideoMessage ? 'p-1' : 'px-3 py-2'
                       )}
                     >
                       {/* Message tail */}
-                      <div 
-                        className={cn(
-                          'absolute top-0 w-3 h-3',
-                          isCurrentUser 
-                            ? 'right-[-6px]'
-                            : 'left-[-6px]'
-                        )}
-                        style={{ 
-                          borderLeft: isCurrentUser ? '12px solid #DCF8C6' : 'none', 
-                          borderRight: !isCurrentUser ? '12px solid white' : 'none',
-                          borderTop: '6px solid transparent',
-                          borderBottom: '6px solid transparent'
-                        }}
-                      />
+                      {!isVideoMessage && (
+                        <div 
+                          className={cn(
+                            'absolute top-0 w-3 h-3',
+                            isCurrentUser 
+                              ? 'right-[-6px]'
+                              : 'left-[-6px]'
+                          )}
+                          style={{ 
+                            borderLeft: isCurrentUser ? '12px solid #DCF8C6' : 'none', 
+                            borderRight: !isCurrentUser ? '12px solid white' : 'none',
+                            borderTop: '6px solid transparent',
+                            borderBottom: '6px solid transparent'
+                          }}
+                        />
+                      )}
                       
                       {/* Content */}
-                      <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
-                        {message.content}
-                      </p>
+                      {isVideoMessage ? (
+                        <VideoMessageContent storagePath={message.video_storage_path} />
+                      ) : (
+                        <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
+                          {message.content}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -375,7 +501,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
             })}
 
             {/* Sending Indicator */}
-            {sendingMessage && (
+            {(sendingMessage || uploadingVideo) && (
               <div className="flex items-end gap-2 justify-end">
                 <div className="bg-[#DCF8C6] rounded-lg rounded-tr-none px-4 py-3 shadow-sm">
                   <div className="flex gap-1.5">
@@ -390,9 +516,42 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
         </ScrollArea>
       </div>
 
-      {/* Input Area */}
+      {/* Fixed Input Area at Bottom */}
       {hasChat && (
-        <div className="flex items-end gap-2 p-2 bg-[#F0F2F5]">
+        <div className="flex-shrink-0 flex items-end gap-2 p-2 bg-[#F0F2F5] border-t border-gray-200">
+          {/* Attachment/Video Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 h-10 w-10 rounded-full text-[#54656F] hover:bg-gray-200"
+                disabled={sendingMessage || uploadingVideo}
+              >
+                <Paperclip className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="bg-white">
+              <DropdownMenuItem onClick={() => setVideoDialogOpen(true)} className="gap-2 cursor-pointer">
+                <Video className="h-4 w-4 text-red-500" />
+                Video aufnehmen
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="gap-2 cursor-pointer">
+                <Upload className="h-4 w-4 text-blue-500" />
+                Video hochladen
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/*"
+            onChange={handleVideoUpload}
+            className="hidden"
+          />
+
           {/* Text Input */}
           <div className="flex-1 bg-white rounded-3xl px-4 py-2 flex items-center shadow-sm">
             <Textarea
@@ -401,7 +560,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Nachricht eingeben..."
-              disabled={sendingMessage}
+              disabled={sendingMessage || uploadingVideo}
               className="border-0 bg-transparent resize-none min-h-[24px] max-h-[120px] py-0 px-0 focus-visible:ring-0 text-[15px] placeholder:text-[#8696a0]"
               rows={1}
             />
@@ -410,11 +569,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
           {/* Send Button */}
           <Button
             onClick={handleSend}
-            disabled={sendingMessage || !inputValue.trim()}
+            disabled={sendingMessage || uploadingVideo || !inputValue.trim()}
             size="icon"
             className="shrink-0 h-10 w-10 rounded-full bg-[#25D366] hover:bg-[#1DAF5A] text-white shadow-md disabled:opacity-50"
           >
-            {sendingMessage ? (
+            {sendingMessage || uploadingVideo ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
               <Send className="h-5 w-5" />
@@ -422,6 +581,64 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
           </Button>
         </div>
       )}
+
+      {/* Video Record Dialog */}
+      <VideoRecordDialog
+        open={videoDialogOpen}
+        onOpenChange={setVideoDialogOpen}
+        onSave={handleVideoRecordSave}
+      />
     </div>
+  );
+}
+
+// Component to display video messages
+function VideoMessageContent({ storagePath }: { storagePath: string }) {
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadVideo = async () => {
+      try {
+        const { data } = await supabase.storage
+          .from('recordings')
+          .createSignedUrl(storagePath, 3600);
+        
+        if (data?.signedUrl) {
+          setVideoUrl(data.signedUrl);
+        }
+      } catch (err) {
+        console.error('Error loading video:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVideo();
+  }, [storagePath]);
+
+  if (loading) {
+    return (
+      <div className="w-[240px] h-[135px] bg-black/10 rounded flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+      </div>
+    );
+  }
+
+  if (!videoUrl) {
+    return (
+      <div className="w-[240px] h-[135px] bg-black/10 rounded flex items-center justify-center">
+        <Video className="w-6 h-6 text-gray-500" />
+      </div>
+    );
+  }
+
+  return (
+    <video
+      src={videoUrl}
+      controls
+      playsInline
+      className="w-[240px] max-h-[200px] rounded object-contain bg-black"
+    />
   );
 }
