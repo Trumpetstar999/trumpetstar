@@ -370,8 +370,8 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
 
     setUploadingVideo(true);
     try {
-      // Send as a text message with video link info
-      const content = `📹 Level-Video: ${video.title}\n📚 ${video.level_title}`;
+      // Send as a text message with video link info (using 'text' type since 'level_video' is not in allowed values)
+      const content = `📹 Level-Video: ${video.title}\n📚 ${video.level_title}\n🎬 Video-ID: ${video.id}`;
       
       const { error } = await supabase
         .from('video_chat_messages')
@@ -379,9 +379,8 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
           chat_id: currentChatId,
           sender_user_id: user.id,
           sender_role: 'teacher',
-          message_type: 'level_video',
-          content: content,
-          video_storage_path: video.vimeo_video_id // Store vimeo ID for reference
+          message_type: 'text',
+          content: content
         });
 
       if (error) throw error;
@@ -391,7 +390,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
         .update({ updated_at: new Date().toISOString() })
         .eq('id', currentChatId);
 
-      toast.success('Video-Link gesendet');
+      toast.success('Video-Empfehlung gesendet');
 
       if (isTeacherView && chatId) {
         fetchMessages(chatId);
