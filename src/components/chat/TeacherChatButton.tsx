@@ -28,9 +28,9 @@ export function TeacherChatButton() {
 
   return (
     <>
-      <Button
+<Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 z-40 h-14 w-14 rounded-full bg-[#25D366] hover:bg-[#1DAF5A] shadow-lg"
+        className="fixed bottom-6 right-4 z-40 h-14 w-14 rounded-full bg-[#25D366] hover:bg-[#1DAF5A] shadow-lg"
         size="icon"
       >
         {isTeacher ? (
