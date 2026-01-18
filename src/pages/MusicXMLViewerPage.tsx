@@ -831,21 +831,7 @@ export function MusicXMLViewerPage() {
                   variant="player"
                   className="w-20"
                 />
-              </div>
-
-              {/* Loop Toggle */}
-              <button
-                onClick={() => setLoopEnabled(!loopEnabled)}
-                className={cn(
-                  "px-3 py-1.5 rounded-full transition-all flex items-center gap-1 text-sm font-medium",
-                  loopEnabled 
-                    ? 'bg-reward-gold text-black' 
-                    : 'glass text-white/70 hover:text-white'
-                )}
-              >
-                <Repeat className="w-3.5 h-3.5" />
-                Loop
-              </button>
+            </div>
 
               {/* Settings Sheet */}
               <Sheet>
