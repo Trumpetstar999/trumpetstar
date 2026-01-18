@@ -60,30 +60,46 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     
     try {
       // Get recently watched videos from progress table (includes partially watched)
-      const { data: progressData, error } = await supabase
+      const { data: progressData, error: progressError } = await supabase
         .from('user_video_progress')
         .select('video_id, updated_at, progress_percent')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false })
         .limit(20);
 
-      if (error) throw error;
+      if (progressError) throw progressError;
+      if (!progressData || progressData.length === 0) {
+        setRecentVideos([]);
+        return;
+      }
 
-      // Map to videos from levels data
+      // Fetch video details directly from database for the watched video IDs
+      const videoIds = progressData.map(p => p.video_id);
+      const { data: videosData, error: videosError } = await supabase
+        .from('videos')
+        .select('*, levels!inner(title)')
+        .in('id', videoIds)
+        .eq('is_active', true);
+
+      if (videosError) throw videosError;
+
+      // Map progress data to videos with level info
       const recentVids: RecentVideo[] = [];
-      (progressData || []).forEach(progress => {
-        levels.forEach(level => {
-          level.sections.forEach(section => {
-            const video = section.videos.find(v => v.id === progress.video_id);
-            if (video) {
-              recentVids.push({
-                ...video,
-                watchedAt: progress.updated_at,
-                levelTitle: level.title,
-              });
-            }
+      progressData.forEach(progress => {
+        const video = videosData?.find(v => v.id === progress.video_id);
+        if (video) {
+          recentVids.push({
+            id: video.id,
+            title: video.title,
+            thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+            duration: video.duration_seconds || 0,
+            vimeoId: video.vimeo_video_id,
+            vimeoPlayerUrl: video.vimeo_player_url || undefined,
+            completions: 0,
+            watchedAt: progress.updated_at,
+            levelTitle: (video.levels as any)?.title || 'Unbekannt',
           });
-        });
+        }
       });
 
       setRecentVideos(recentVids.slice(0, 12)); // Max 12 recent videos
