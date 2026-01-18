@@ -15,109 +15,129 @@ import { de } from 'date-fns/locale';
 interface TeacherStudentListProps {
   isOpen: boolean;
   onClose: () => void;
+  embedded?: boolean;
+  onSelectStudent?: (studentId: string) => void;
 }
 
-export function TeacherStudentList({ isOpen, onClose }: TeacherStudentListProps) {
+export function TeacherStudentList({ isOpen, onClose, embedded = false, onSelectStudent }: TeacherStudentListProps) {
   const { user } = useAuth();
   const { studentChats, loading } = useTeacherStudentChats();
   const [selectedStudent, setSelectedStudent] = useState<StudentChatInfo | null>(null);
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
-      {selectedStudent ? (
+  const handleSelectStudent = (student: StudentChatInfo) => {
+    if (onSelectStudent) {
+      onSelectStudent(student.studentId);
+    } else {
+      setSelectedStudent(student);
+    }
+  };
+
+  // Container classes based on embedded mode
+  const containerClasses = embedded
+    ? 'flex flex-col h-full bg-background'
+    : 'fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl';
+
+  if (selectedStudent && !onSelectStudent) {
+    return (
+      <div className={containerClasses}>
         <TeacherChatView 
           student={selectedStudent} 
           onBack={() => setSelectedStudent(null)}
           onClose={onClose}
+          embedded={embedded}
         />
-      ) : (
-        <>
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <MessageSquare className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-[15px]">Schüler-Chats</h2>
-                <p className="text-[11px] text-white/70">
-                  {studentChats.length} Schüler
-                </p>
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={onClose} 
-              className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+      </div>
+    );
+  }
 
-          {/* Student List */}
-          <ScrollArea className="flex-1 bg-white">
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-[#667781]" />
-              </div>
-            ) : studentChats.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                  <MessageSquare className="w-10 h-10 text-gray-400" />
+  return (
+    <div className={containerClasses}>
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+            <MessageSquare className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-[15px]">Schüler-Chats</h2>
+            <p className="text-[11px] text-white/70">
+              {studentChats.length} Schüler
+            </p>
+          </div>
+        </div>
+        {!embedded && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose} 
+            className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
+      {/* Student List */}
+      <ScrollArea className="flex-1 bg-white">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-[#667781]" />
+          </div>
+        ) : studentChats.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <MessageSquare className="w-10 h-10 text-gray-400" />
+            </div>
+            <p className="text-gray-600 text-sm font-medium mb-1">
+              Keine Schüler zugewiesen
+            </p>
+            <p className="text-gray-400 text-xs max-w-[280px]">
+              Dir sind noch keine Schüler zugewiesen.
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100">
+            {studentChats.map((student) => (
+              <button
+                key={student.chatId || student.studentId}
+                onClick={() => handleSelectStudent(student)}
+                className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left"
+              >
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={student.studentProfile?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-[#25D366]/20 text-[#25D366]">
+                    {student.studentProfile?.display_name?.charAt(0)?.toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-[15px] text-gray-900 truncate">
+                      {student.studentProfile?.display_name || 'Unbekannt'}
+                    </span>
+                    {student.lastMessageTime && (
+                      <span className="text-xs text-gray-500">
+                        {formatDistanceToNow(new Date(student.lastMessageTime), { addSuffix: true, locale: de })}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-sm text-gray-500 truncate">
+                      {student.lastMessage || 'Noch keine Nachrichten'}
+                    </p>
+                    {student.unreadCount > 0 && (
+                      <Badge className="bg-[#25D366] text-white text-xs h-5 min-w-[20px]">
+                        {student.unreadCount}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
-                  Keine Schüler zugewiesen
-                </p>
-                <p className="text-gray-400 text-xs max-w-[280px]">
-                  Dir sind noch keine Schüler zugewiesen.
-                </p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {studentChats.map((student) => (
-                  <button
-                    key={student.chatId}
-                    onClick={() => setSelectedStudent(student)}
-                    className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left"
-                  >
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={student.studentProfile?.avatar_url || undefined} />
-                      <AvatarFallback className="bg-[#25D366]/20 text-[#25D366]">
-                        {student.studentProfile?.display_name?.charAt(0)?.toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-[15px] text-gray-900 truncate">
-                          {student.studentProfile?.display_name || 'Unbekannt'}
-                        </span>
-                        {student.lastMessageTime && (
-                          <span className="text-xs text-gray-500">
-                            {formatDistanceToNow(new Date(student.lastMessageTime), { addSuffix: true, locale: de })}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between mt-0.5">
-                        <p className="text-sm text-gray-500 truncate">
-                          {student.lastMessage || 'Noch keine Nachrichten'}
-                        </p>
-                        {student.unreadCount > 0 && (
-                          <Badge className="bg-[#25D366] text-white text-xs h-5 min-w-[20px]">
-                            {student.unreadCount}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </>
-      )}
+              </button>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
     </div>
   );
 }
@@ -127,9 +147,10 @@ interface TeacherChatViewProps {
   student: StudentChatInfo;
   onBack: () => void;
   onClose: () => void;
+  embedded?: boolean;
 }
 
-function TeacherChatView({ student, onBack, onClose }: TeacherChatViewProps) {
+function TeacherChatView({ student, onBack, onClose, embedded = false }: TeacherChatViewProps) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -285,14 +306,16 @@ function TeacherChatView({ student, onBack, onClose }: TeacherChatViewProps) {
             </p>
           </div>
         </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose}
-          className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        {!embedded && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Chat Area */}

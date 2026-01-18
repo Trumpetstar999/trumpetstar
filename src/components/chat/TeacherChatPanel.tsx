@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,26 +9,143 @@ import { useTeacherChat } from '@/hooks/useTeacherChat';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TeacherChatPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  embedded?: boolean;
+  studentId?: string; // For teacher view - chat with specific student
 }
 
-export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
+export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId }: TeacherChatPanelProps) {
   const { user } = useAuth();
   const { isTeacher } = useUserRole();
   const [inputValue, setInputValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const {
-    chatInfo,
-    messages,
-    loading,
-    sendingMessage,
-    sendMessage,
-  } = useTeacherChat();
+  // For student view, use the standard hook
+  const studentChat = useTeacherChat();
+
+  // For teacher view with specific student, we need custom state
+  const [teacherMessages, setTeacherMessages] = useState<any[]>([]);
+  const [teacherLoading, setTeacherLoading] = useState(false);
+  const [teacherSending, setTeacherSending] = useState(false);
+  const [studentProfile, setStudentProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
+
+  // Fetch teacher-student chat when studentId is provided
+  useEffect(() => {
+    if (!studentId || !user) return;
+
+    const fetchChat = async () => {
+      setTeacherLoading(true);
+      try {
+        // Get student profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name, avatar_url')
+          .eq('id', studentId)
+          .single();
+        
+        setStudentProfile(profile);
+
+        // Find existing chat
+        const { data: chats } = await supabase
+          .from('video_chats')
+          .select(`
+            id,
+            video_chat_participants!inner(user_id, role)
+          `)
+          .eq('context_type', 'teacher_chat');
+
+        const existingChat = chats?.find(chat => {
+          const participants = chat.video_chat_participants;
+          const hasStudent = participants.some((p: any) => p.user_id === studentId && p.role === 'user');
+          const hasTeacher = participants.some((p: any) => p.user_id === user.id && p.role === 'teacher');
+          return hasStudent && hasTeacher;
+        });
+
+        if (existingChat) {
+          setChatId(existingChat.id);
+          await fetchMessages(existingChat.id);
+        }
+      } finally {
+        setTeacherLoading(false);
+      }
+    };
+
+    fetchChat();
+  }, [studentId, user]);
+
+  const fetchMessages = async (cId: string) => {
+    const { data, error } = await supabase
+      .from('video_chat_messages')
+      .select('*')
+      .eq('chat_id', cId)
+      .eq('message_type', 'text')
+      .order('created_at', { ascending: true });
+
+    if (error) return;
+
+    // Get sender profiles
+    const senderIds = [...new Set(data?.map(m => m.sender_user_id) || [])];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, display_name, avatar_url')
+      .in('id', senderIds);
+
+    const messagesWithProfiles = (data || []).map(msg => ({
+      ...msg,
+      sender_profile: profiles?.find(p => p.id === msg.sender_user_id)
+    }));
+
+    setTeacherMessages(messagesWithProfiles);
+
+    // Mark as read
+    if (user) {
+      await supabase
+        .from('video_chat_messages')
+        .update({ is_read: true })
+        .eq('chat_id', cId)
+        .neq('sender_user_id', user.id);
+    }
+  };
+
+  // Realtime for teacher view
+  useEffect(() => {
+    if (!chatId) return;
+
+    const channel = supabase
+      .channel(`teacher-chat-${chatId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'video_chat_messages',
+          filter: `chat_id=eq.${chatId}`
+        },
+        () => {
+          fetchMessages(chatId);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [chatId]);
+
+  // Determine which data to use
+  const isTeacherView = !!studentId;
+  const messages = isTeacherView ? teacherMessages : studentChat.messages;
+  const loading = isTeacherView ? teacherLoading : studentChat.loading;
+  const sendingMessage = isTeacherView ? teacherSending : studentChat.sendingMessage;
+  const chatInfo = isTeacherView 
+    ? { teacherId: user?.id, teacherProfile: studentProfile }
+    : studentChat.chatInfo;
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -45,9 +162,34 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
   }, [isOpen]);
 
   const handleSend = async () => {
-    if (inputValue.trim() && !sendingMessage) {
+    if (!inputValue.trim() || sendingMessage || !user) return;
+
+    if (isTeacherView && chatId) {
+      setTeacherSending(true);
+      try {
+        const { error } = await supabase
+          .from('video_chat_messages')
+          .insert({
+            chat_id: chatId,
+            sender_user_id: user.id,
+            sender_role: 'teacher',
+            message_type: 'text',
+            content: inputValue.trim()
+          });
+
+        if (!error) {
+          await supabase
+            .from('video_chats')
+            .update({ updated_at: new Date().toISOString() })
+            .eq('id', chatId);
+          setInputValue('');
+        }
+      } finally {
+        setTeacherSending(false);
+      }
+    } else {
       const role = isTeacher ? 'teacher' : 'user';
-      const success = await sendMessage(inputValue, role);
+      const success = await studentChat.sendMessage(inputValue, role);
       if (success) {
         setInputValue('');
       }
@@ -63,35 +205,57 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
 
   if (!isOpen) return null;
 
-  const teacherName = chatInfo.teacherProfile?.display_name || 'Dein Lehrer';
-  const teacherAvatar = chatInfo.teacherProfile?.avatar_url;
+  const displayName = isTeacherView 
+    ? (studentProfile?.display_name || 'Schüler')
+    : (chatInfo.teacherProfile?.display_name || 'Dein Lehrer');
+  const avatarUrl = isTeacherView 
+    ? studentProfile?.avatar_url 
+    : chatInfo.teacherProfile?.avatar_url;
+  const hasChat = isTeacherView ? !!chatId : !!chatInfo.teacherId;
+
+  // Container classes based on embedded mode
+  const containerClasses = embedded
+    ? 'flex flex-col h-full bg-background'
+    : 'fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl';
 
   return (
-    <div className="fixed right-0 top-0 h-full w-[420px] max-w-full z-50 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
+    <div className={containerClasses}>
       {/* Header - WhatsApp style */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#075E54] text-white">
         <div className="flex items-center gap-3">
+          {embedded && isTeacherView && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
           <Avatar className="w-10 h-10 border-2 border-white/30">
-            <AvatarImage src={teacherAvatar || undefined} />
+            <AvatarImage src={avatarUrl || undefined} />
             <AvatarFallback className="bg-white/20 text-white">
-              {teacherName.charAt(0).toUpperCase()}
+              {displayName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h2 className="font-semibold text-[15px]">{teacherName}</h2>
+            <h2 className="font-semibold text-[15px]">{displayName}</h2>
             <p className="text-[11px] text-white/70">
               {sendingMessage ? 'sendet...' : 'online'}
             </p>
           </div>
         </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose} 
-          className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        {!embedded && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose} 
+            className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Chat Area - WhatsApp wallpaper style */}
@@ -111,42 +275,46 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
               </div>
             )}
 
-            {/* No Teacher Assigned */}
-            {!loading && !chatInfo.teacherId && (
+            {/* No Chat Available */}
+            {!loading && !hasChat && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="w-20 h-20 rounded-full bg-white/80 flex items-center justify-center mb-4">
                   <MessageSquare className="w-10 h-10 text-[#667781]" />
                 </div>
                 <p className="text-[#667781] text-sm font-medium mb-1">
-                  Kein Lehrer zugewiesen
+                  {isTeacherView ? 'Kein Chat gefunden' : 'Kein Lehrer zugewiesen'}
                 </p>
                 <p className="text-[#8696a0] text-xs max-w-[280px]">
-                  Dir ist noch kein Lehrer zugewiesen. Bitte wende dich an den Admin.
+                  {isTeacherView 
+                    ? 'Der Schüler muss zuerst eine Nachricht senden.'
+                    : 'Dir ist noch kein Lehrer zugewiesen. Bitte wende dich an den Admin.'}
                 </p>
               </div>
             )}
 
             {/* Empty State */}
-            {!loading && chatInfo.teacherId && messages.length === 0 && (
+            {!loading && hasChat && messages.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Avatar className="w-20 h-20 border-4 border-[#25D366]/30 mb-4">
-                  <AvatarImage src={teacherAvatar || undefined} />
+                  <AvatarImage src={avatarUrl || undefined} />
                   <AvatarFallback className="bg-[#25D366]/20 text-[#25D366] text-2xl">
-                    {teacherName.charAt(0).toUpperCase()}
+                    {displayName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <p className="text-[#667781] text-sm font-medium mb-1">
-                  Chat mit {teacherName}
+                  Chat mit {displayName}
                 </p>
                 <p className="text-[#8696a0] text-xs max-w-[280px]">
-                  Schreibe deinem Lehrer eine Nachricht!
+                  {isTeacherView 
+                    ? 'Noch keine Nachrichten. Schreibe die erste Nachricht!'
+                    : 'Schreibe deinem Lehrer eine Nachricht!'}
                 </p>
               </div>
             )}
 
             {/* Messages */}
             {messages.map((message, index) => {
-              const isUser = message.sender_user_id === user?.id;
+              const isCurrentUser = message.sender_user_id === user?.id;
               const showTimestamp = index === 0 || 
                 new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
 
@@ -162,9 +330,9 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
                   )}
 
                   {/* Message Bubble */}
-                  <div className={cn('flex items-end gap-2', isUser ? 'justify-end' : 'justify-start')}>
+                  <div className={cn('flex items-end gap-2', isCurrentUser ? 'justify-end' : 'justify-start')}>
                     {/* Avatar for other person's messages */}
-                    {!isUser && (
+                    {!isCurrentUser && (
                       <Avatar className="w-8 h-8 shrink-0 mb-1">
                         <AvatarImage src={message.sender_profile?.avatar_url || undefined} />
                         <AvatarFallback className="text-xs bg-[#25D366]/20 text-[#25D366]">
@@ -175,7 +343,7 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
                     <div
                       className={cn(
                         'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative',
-                        isUser 
+                        isCurrentUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                           : 'bg-white text-[#111B21] rounded-tl-none'
                       )}
@@ -184,13 +352,13 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
                       <div 
                         className={cn(
                           'absolute top-0 w-3 h-3',
-                          isUser 
+                          isCurrentUser 
                             ? 'right-[-6px]'
                             : 'left-[-6px]'
                         )}
                         style={{ 
-                          borderLeft: isUser ? '12px solid #DCF8C6' : 'none', 
-                          borderRight: !isUser ? '12px solid white' : 'none',
+                          borderLeft: isCurrentUser ? '12px solid #DCF8C6' : 'none', 
+                          borderRight: !isCurrentUser ? '12px solid white' : 'none',
                           borderTop: '6px solid transparent',
                           borderBottom: '6px solid transparent'
                         }}
@@ -223,7 +391,7 @@ export function TeacherChatPanel({ isOpen, onClose }: TeacherChatPanelProps) {
       </div>
 
       {/* Input Area */}
-      {chatInfo.teacherId && (
+      {hasChat && (
         <div className="flex items-end gap-2 p-2 bg-[#F0F2F5]">
           {/* Text Input */}
           <div className="flex-1 bg-white rounded-3xl px-4 py-2 flex items-center shadow-sm">
