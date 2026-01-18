@@ -600,19 +600,6 @@ export function MusicXMLViewerPage() {
         </h2>
         
         <div className="flex items-center gap-3">
-          {/* Concert Pitch Toggle */}
-          <div className="flex items-center gap-2 px-4 py-2 glass rounded-full">
-            <span className="text-sm text-white/80">
-              {isConcertPitch ? 'Konzertton' : 'B♭ Trompete'}
-            </span>
-            <Switch
-              id="concert-pitch"
-              checked={isConcertPitch}
-              onCheckedChange={setIsConcertPitch}
-              className="data-[state=checked]:bg-reward-gold"
-            />
-          </div>
-
           {/* Zoom Controls */}
           <div className="flex items-center gap-1 px-3 py-1.5 glass rounded-full">
             <Button 
