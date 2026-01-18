@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { LevelsPage } from './LevelsPage';
@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
+import { cn } from '@/lib/utils';
 
 
 const tabTitles: Record<TabId, string> = {
@@ -27,9 +28,15 @@ const tabTitles: Record<TabId, string> = {
   profile: 'Profil',
 };
 
+// Define tab order for determining slide direction
+const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'chats', 'classroom', 'profile'];
+
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('levels');
   const [totalStars, setTotalStars] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const previousTabRef = useRef<TabId>('levels');
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,6 +71,28 @@ const Index = () => {
       fetchStars();
     }
   }, [user]);
+
+  const handleTabChange = (newTab: TabId) => {
+    if (newTab === activeTab) return;
+    
+    // Determine slide direction based on tab order
+    const currentIndex = tabOrder.indexOf(activeTab);
+    const newIndex = tabOrder.indexOf(newTab);
+    setSlideDirection(newIndex > currentIndex ? 'left' : 'right');
+    
+    // Start transition
+    setIsTransitioning(true);
+    previousTabRef.current = activeTab;
+    
+    // Change tab after a brief delay for exit animation
+    setTimeout(() => {
+      setActiveTab(newTab);
+      // End transition after enter animation
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 300);
+    }, 150);
+  };
 
   const handleStarEarned = () => {
     setTotalStars(prev => prev + 1);
@@ -107,14 +136,23 @@ const Index = () => {
   };
 
   return (
-    <TabNavigationProvider activeTab={activeTab} onTabChange={setActiveTab}>
+    <TabNavigationProvider activeTab={activeTab} onTabChange={handleTabChange}>
       <AppShell
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         title={tabTitles[activeTab]}
         stars={totalStars}
       >
-        {renderPage()}
+        <div 
+          className={cn(
+            "h-full transition-all duration-300 ease-out",
+            isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+            isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
+            !isTransitioning && "opacity-100 translate-x-0"
+          )}
+        >
+          {renderPage()}
+        </div>
       </AppShell>
       
     </TabNavigationProvider>
