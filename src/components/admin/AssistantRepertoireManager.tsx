@@ -460,7 +460,7 @@ export function AssistantRepertoireManager() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv,.tsv,.txt,.xlsx,.xls"
+            accept=".csv,.tsv,.txt,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
             onChange={handleFileUpload}
             className="hidden"
           />
