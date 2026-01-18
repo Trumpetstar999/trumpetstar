@@ -960,21 +960,6 @@ export function MusicXMLViewerPage() {
                       </div>
                     )}
 
-                    {/* Debug Info */}
-                    {showDebug && (
-                      <div className="space-y-2 pt-4 border-t">
-                        <Label className="text-xs text-muted-foreground">Debug Info</Label>
-                        <div className="text-xs space-y-1 font-mono bg-muted p-3 rounded-lg text-card-foreground">
-                          <div>MIDI Ready: {midiPlayer.isReady ? 'Yes' : 'No'}</div>
-                          <div>MIDI Loading: {midiPlayer.isLoading ? 'Yes' : 'No'}</div>
-                          <div>MIDI Error: {midiPlayer.error || 'None'}</div>
-                          <div>Playback Mode: {playbackMode}</div>
-                          <div>Total Bars: {totalBars}</div>
-                          <div>Current Time: {formatTime(midiPlayer.currentTime)}</div>
-                          <div>Duration: {formatTime(midiPlayer.duration)}</div>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </SheetContent>
               </Sheet>
