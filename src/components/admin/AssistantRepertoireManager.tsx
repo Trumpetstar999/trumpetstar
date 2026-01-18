@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import * as XLSX from 'xlsx';
 
 interface RepertoireItem {
   id: string;
@@ -311,8 +312,20 @@ export function AssistantRepertoireManager() {
     setIsImporting(true);
 
     try {
-      const text = await file.text();
-      const items = parseSpreadsheet(text);
+      let items: Partial<RepertoireItem>[] = [];
+      
+      // Check if it's an Excel file
+      if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+        items = parseSpreadsheet(csvContent);
+      } else {
+        const text = await file.text();
+        items = parseSpreadsheet(text);
+      }
 
       if (items.length === 0) {
         toast.error('Keine gültigen Einträge gefunden');
@@ -447,7 +460,7 @@ export function AssistantRepertoireManager() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv,.tsv,.txt"
+            accept=".csv,.tsv,.txt,.xlsx,.xls"
             onChange={handleFileUpload}
             className="hidden"
           />
