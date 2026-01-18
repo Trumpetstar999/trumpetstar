@@ -19,13 +19,14 @@ import { PdfDocumentManager } from '@/components/admin/PdfDocumentManager';
 import { PdfAudioManager } from '@/components/admin/PdfAudioManager';
 import { MusicXMLManager } from '@/components/admin/MusicXMLManager';
 import { MusicXMLAudioManager } from '@/components/admin/MusicXMLAudioManager';
+import { FeatureFlagManager } from '@/components/admin/FeatureFlagManager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -138,6 +139,7 @@ export default function AdminPage() {
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
+      case 'features': return 'Feature Flags';
       case 'system': return 'Systemstatus';
       default: return 'Admin';
     }
@@ -154,6 +156,7 @@ export default function AdminPage() {
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
+      case 'features': return 'Menüpunkte und Features ein-/ausblenden';
       case 'system': return 'Systemstatus und Einstellungen';
       default: return '';
     }
@@ -412,6 +415,7 @@ export default function AdminPage() {
 
           {activeTab === 'feedback' && <AdminFeedbackPanel />}
 
+          {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'system' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Status Cards */}
