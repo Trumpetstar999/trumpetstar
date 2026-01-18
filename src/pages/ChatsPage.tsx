@@ -1,4 +1,4 @@
-import { ChatLayout } from '@/components/chat/ChatLayout';
+import { WhatsAppChat } from '@/components/chat/WhatsAppChat';
 import { PremiumFeatureLock } from '@/components/premium/PremiumFeatureLock';
 import { useMembership } from '@/hooks/useMembership';
 
@@ -15,7 +15,7 @@ export function ChatsPage() {
 
   return (
     <div className="h-[calc(100vh-8rem)]">
-      <ChatLayout />
+      <WhatsAppChat />
     </div>
   );
 }
