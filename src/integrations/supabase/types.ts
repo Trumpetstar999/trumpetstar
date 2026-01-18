@@ -1603,6 +1603,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_chat_creator: {
+        Args: { _chat_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_chat_participant: {
+        Args: { _chat_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_recording_owner: { Args: { recording_id: string }; Returns: boolean }
       is_recording_shared_with_me: {
         Args: { recording_id: string }

@@ -89,8 +89,33 @@ export function MusicXMLViewerPage() {
   // Refs
   const containerRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const lastBarRef = useRef<number>(0);
   const customCursorRef = useRef<HTMLDivElement | null>(null);
+
+  // Force re-render when exiting fullscreen to fix layout
+  const [, forceUpdate] = useState({});
+  
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      // Force re-render when fullscreen state changes
+      forceUpdate({});
+      // Also trigger a resize event to ensure proper layout recalculation
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    globalThis.document.addEventListener('fullscreenchange', handleFullscreenChange);
+    globalThis.document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    globalThis.document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    globalThis.document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      globalThis.document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      globalThis.document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      globalThis.document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      globalThis.document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
 
   // Create and update custom cursor overlay (since OSMD's cursor img is transparent)
   const updateCustomCursor = useCallback(() => {
