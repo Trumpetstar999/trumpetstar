@@ -84,25 +84,25 @@ export function RecordingCard({
   };
 
   return <>
-      <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all">
-        <div className="aspect-video bg-muted relative cursor-pointer" onClick={() => onPlay(recording)}>
+      <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300">
+        <div className="aspect-video bg-muted relative cursor-pointer overflow-hidden" onClick={() => onPlay(recording)}>
           {/* Video element as thumbnail */}
           <video
             ref={videoRef}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             crossOrigin="anonymous"
             muted
             playsInline
             preload="auto"
           />
           
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-            <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-primary/90 flex items-center justify-center scale-75 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300">
               <Play className="w-6 h-6 text-primary-foreground ml-1" />
             </div>
           </div>
           
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/70 text-white text-xs font-medium">
+          <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/70 text-white text-xs font-medium transition-transform duration-300 group-hover:scale-105">
             {formatDuration(recording.duration)}
           </div>
         </div>
