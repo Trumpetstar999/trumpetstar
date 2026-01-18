@@ -86,8 +86,8 @@ export function TeacherStudentList({ isOpen, onClose, embedded = false, onSelect
             <Loader2 className="w-8 h-8 animate-spin text-[#667781]" />
           </div>
         ) : studentChats.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
-            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center justify-center py-12 text-center px-4 animate-fade-in">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4 animate-[float_3s_ease-in-out_infinite]">
               <MessageSquare className="w-10 h-10 text-gray-400" />
             </div>
             <p className="text-gray-600 text-sm font-medium mb-1">
@@ -99,13 +99,17 @@ export function TeacherStudentList({ isOpen, onClose, embedded = false, onSelect
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {studentChats.map((student) => (
+            {studentChats.map((student, index) => (
               <button
                 key={student.chatId || student.studentId}
                 onClick={() => handleSelectStudent(student)}
-                className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-all text-left opacity-0 animate-fade-in hover:scale-[1.01]"
+                style={{ 
+                  animationDelay: `${index * 60}ms`,
+                  animationFillMode: 'forwards'
+                }}
               >
-                <Avatar className="w-12 h-12">
+                <Avatar className="w-12 h-12 transition-transform group-hover:scale-105">
                   <AvatarImage src={student.studentProfile?.avatar_url || undefined} />
                   <AvatarFallback className="bg-[#25D366]/20 text-[#25D366]">
                     {student.studentProfile?.display_name?.charAt(0)?.toUpperCase() || '?'}
@@ -127,7 +131,7 @@ export function TeacherStudentList({ isOpen, onClose, embedded = false, onSelect
                       {student.lastMessage || 'Noch keine Nachrichten'}
                     </p>
                     {student.unreadCount > 0 && (
-                      <Badge className="bg-[#25D366] text-white text-xs h-5 min-w-[20px]">
+                      <Badge className="bg-[#25D366] text-white text-xs h-5 min-w-[20px] animate-scale-in">
                         {student.unreadCount}
                       </Badge>
                     )}
@@ -354,7 +358,14 @@ function TeacherChatView({ student, onBack, onClose, embedded = false }: Teacher
                   new Date(message.created_at).getTime() - new Date(messages[index - 1].created_at).getTime() > 300000;
 
                 return (
-                  <div key={message.id}>
+                  <div 
+                    key={message.id}
+                    className="opacity-0 animate-fade-in"
+                    style={{ 
+                      animationDelay: `${Math.min(index * 40, 400)}ms`,
+                      animationFillMode: 'forwards'
+                    }}
+                  >
                     {showTimestamp && (
                       <div className="flex justify-center my-2">
                         <span className="bg-white/80 text-[#667781] text-[11px] px-3 py-1 rounded-lg shadow-sm">
@@ -374,7 +385,7 @@ function TeacherChatView({ student, onBack, onClose, embedded = false }: Teacher
                       )}
                       <div
                         className={cn(
-                          'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative',
+                          'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative transition-transform hover:scale-[1.02]',
                           isTeacher 
                             ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                             : 'bg-white text-[#111B21] rounded-tl-none'
