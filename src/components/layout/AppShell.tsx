@@ -30,25 +30,30 @@ export function AppShell({
   
   const isFullscreen = isVideoPlaying || isPdfViewerOpen;
 
-  // In fullscreen mode, render only the children without any shell chrome
-  if (isFullscreen) {
-    return <>{children}</>;
-  }
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header 
-        title={title} 
-        stars={stars} 
-        isOffline={isOffline} 
-        videoCount={videoCount}
-      />
+    <div className={cn(
+      "flex flex-col",
+      isFullscreen ? "h-screen" : "min-h-screen"
+    )}>
+      {!isFullscreen && (
+        <Header 
+          title={title} 
+          stars={stars} 
+          isOffline={isOffline} 
+          videoCount={videoCount}
+        />
+      )}
       
-      <main className="flex-1 overflow-auto pb-24">
+      <main className={cn(
+        "flex-1 overflow-auto",
+        isFullscreen ? "p-0" : "pb-24"
+      )}>
         {children}
       </main>
       
-      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={false} />
+      {!isFullscreen && (
+        <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={false} />
+      )}
     </div>
   );
 }
