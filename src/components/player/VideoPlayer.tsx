@@ -5,10 +5,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/hooks/useAuth';
+import { useVideoRecorder } from '@/hooks/useVideoRecorder';
+import { useRecordings } from '@/hooks/useRecordings';
+import { RecordingOverlay } from './RecordingOverlay';
 import { toast } from 'sonner';
 
 interface VideoPlayerProps {
   video: Video;
+  levelId?: string;
+  levelTitle?: string;
   onClose: () => void;
   onComplete: () => void;
 }
@@ -23,8 +28,10 @@ interface VimeoErrorLog {
   timestamp: string;
 }
 
-export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
+export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }: VideoPlayerProps) {
   const { user } = useAuth();
+  const recorder = useVideoRecorder();
+  const { saveRecording } = useRecordings();
   const [showCompleted, setShowCompleted] = useState(false);
   const [error, setError] = useState<VimeoErrorLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -403,6 +410,36 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
     }
   };
 
+  // Recording handlers
+  const handleStartRecording = useCallback(async () => {
+    const success = await recorder.startRecording();
+    if (success) {
+      toast.info('Aufnahme gestartet');
+    }
+  }, [recorder]);
+
+  const handleStopRecording = useCallback(async () => {
+    const result = await recorder.stopRecording();
+    if (result) {
+      // Save with level reference
+      await saveRecording({
+        title: levelTitle ? `${levelTitle}` : video.title,
+        blob: result.blob,
+        duration: result.duration,
+        levelId,
+        levelTitle,
+      });
+    }
+  }, [recorder, saveRecording, video.title, levelId, levelTitle]);
+
+  // Cancel recording when closing the player
+  const handleCloseWithRecording = useCallback(() => {
+    if (recorder.isRecording) {
+      recorder.cancelRecording();
+    }
+    handleClose();
+  }, [recorder, handleClose]);
+
   return (
     <div 
       className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
@@ -448,11 +485,25 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
       
       {/* Close button - Glass style */}
       <button
-        onClick={handleClose}
+        onClick={handleCloseWithRecording}
         className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
       >
         <X className="w-6 h-6" />
       </button>
+
+      {/* Recording error overlay */}
+      {recorder.error && (
+        <RecordingOverlay
+          isRecording={false}
+          isStarting={false}
+          isStopping={false}
+          duration={0}
+          error={recorder.error}
+          onStart={handleStartRecording}
+          onStop={handleStopRecording}
+          onClearError={recorder.clearError}
+        />
+      )}
 
       {/* Video title - Glass header */}
       <div className="shrink-0 glass px-6 py-3 safe-top">
@@ -568,7 +619,7 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
 
           {/* Speed control */}
           <div className="flex items-center gap-3 shrink-0 ml-4 pl-4 border-l border-white/20">
-            <span className="text-white/60 text-sm">Tempo</span>
+            <span className="text-white/60 text-sm hidden md:inline">Tempo</span>
             <div className="flex items-center gap-2 w-28">
               <Slider
                 value={[playbackSpeed]}
@@ -583,6 +634,20 @@ export function VideoPlayer({ video, onClose, onComplete }: VideoPlayerProps) {
             <span className="text-reward-gold font-bold text-sm w-12 text-center bg-white/10 rounded-full px-2 py-1">
               {playbackSpeed}%
             </span>
+          </div>
+
+          {/* Recording controls - separated with border */}
+          <div className="shrink-0 ml-2 pl-4 border-l border-white/20">
+            <RecordingOverlay
+              isRecording={recorder.isRecording}
+              isStarting={recorder.isStarting}
+              isStopping={recorder.isStopping}
+              duration={recorder.duration}
+              error={null}
+              onStart={handleStartRecording}
+              onStop={handleStopRecording}
+              onClearError={recorder.clearError}
+            />
           </div>
         </div>
       </div>

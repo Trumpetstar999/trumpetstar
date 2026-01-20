@@ -39,11 +39,17 @@ interface RecentVideo extends Video {
   levelTitle: string;
 }
 
+interface SelectedVideo {
+  video: Video;
+  levelId?: string;
+  levelTitle?: string;
+}
+
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [levels, setLevels] = useState<LevelWithPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLevel, setActiveLevel] = useState<string>('recent'); // Default to 'recent'
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
@@ -385,11 +391,11 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                         {levelTitle}
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {videos.map(({ video }, videoIndex) => (
+                        {videos.map(({ video, levelId, levelTitle }, videoIndex) => (
                           <VideoCard
                             key={video.id}
                             video={video}
-                            onClick={() => setSelectedVideo(video)}
+                            onClick={() => setSelectedVideo({ video, levelId, levelTitle })}
                             index={videoIndex}
                           />
                         ))}
@@ -441,7 +447,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                     >
                       <VideoCard
                         video={video}
-                        onClick={() => setSelectedVideo(video)}
+                        onClick={() => setSelectedVideo({ video, levelTitle: video.levelTitle })}
                         index={0}
                       />
                       <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
@@ -468,7 +474,11 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                   <SectionRow
                     key={section.id}
                     section={section}
-                    onVideoClick={setSelectedVideo}
+                    onVideoClick={(video) => setSelectedVideo({ 
+                      video, 
+                      levelId: currentLevel.id, 
+                      levelTitle: currentLevel.title 
+                    })}
                     sectionIndex={sectionIndex}
                   />
                 ))}
@@ -481,7 +491,9 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       {/* Video Player Overlay */}
       {selectedVideo && (
         <VideoPlayer
-          video={selectedVideo}
+          video={selectedVideo.video}
+          levelId={selectedVideo.levelId}
+          levelTitle={selectedVideo.levelTitle}
           onClose={() => setSelectedVideo(null)}
           onComplete={onStarEarned}
         />
