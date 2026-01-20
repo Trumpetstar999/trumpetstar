@@ -442,9 +442,10 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in overflow-hidden"
       style={{ 
-        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
+        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)',
+        height: '100dvh'
       }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
@@ -506,9 +507,9 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       )}
 
       {/* Video container - true fullscreen optimized */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full aspect-video rounded-none overflow-hidden">
+      <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full max-h-full overflow-hidden">
             {/* Loading indicator */}
             {isLoading && !error && (
               <div className="absolute inset-0 flex items-center justify-center z-10"
@@ -578,7 +579,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       </div>
       
       {/* Fixed bottom control bar - Glass style with gold accents */}
-      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
+      <div className="shrink-0 z-[105] glass px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
