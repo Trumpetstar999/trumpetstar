@@ -505,18 +505,10 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         />
       )}
 
-      {/* Video title - Glass header */}
-      <div className="shrink-0 glass px-6 py-3 safe-top">
-        <h2 className="text-lg font-semibold text-white truncate text-center max-w-3xl mx-auto">
-          {video.title}
-        </h2>
-      </div>
-      
-      {/* Video container - fullscreen optimized */}
-      <div className="flex-1 min-h-0 flex items-center justify-center px-2 py-1 sm:p-2">
+      {/* Video container - true fullscreen optimized */}
+      <div className="flex-1 min-h-0 flex items-center justify-center">
         <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full h-full max-h-[calc(100vh-8rem)] aspect-video rounded-lg overflow-hidden shadow-2xl" 
-               style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+          <div className="relative w-full h-full aspect-video rounded-none overflow-hidden">
             {/* Loading indicator */}
             {isLoading && !error && (
               <div className="absolute inset-0 flex items-center justify-center z-10"
