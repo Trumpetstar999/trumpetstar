@@ -442,9 +442,9 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
+      className="fullscreen-container z-[100] flex flex-col animate-fade-in"
       style={{ 
-        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
+        background: '#000'
       }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
