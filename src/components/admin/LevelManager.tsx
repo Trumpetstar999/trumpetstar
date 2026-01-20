@@ -25,7 +25,7 @@ import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock } from 'lucide
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
-type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 
 interface Level {
   id: string;
@@ -39,6 +39,7 @@ interface Level {
 }
 
 const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
+  { value: 'basics', label: 'Basics' },
   { value: 'beginner', label: 'Anfänger' },
   { value: 'easy', label: 'Einfach' },
   { value: 'medium', label: 'Mittel' },
@@ -46,6 +47,7 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
 ];
 
 const DIFFICULTY_BADGE_COLORS: Record<Difficulty, string> = {
+  basics: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
   beginner: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
   easy: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
   medium: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
@@ -72,8 +74,8 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [levels, setLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'beginner' as Difficulty });
-  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'beginner' as Difficulty });
+  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
+  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
   const [isAdding, setIsAdding] = useState(false);
 
   const sensors = useSensors(
@@ -119,19 +121,46 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       setLevels(newLevels);
 
       // Update sort_order in database
-      const updates = newLevels.map((level, index) => ({
-        id: level.id,
-        sort_order: index,
-      }));
+      try {
+        const updates = newLevels.map((level, index) => ({
+          id: level.id,
+          sort_order: index,
+        }));
 
-      for (const update of updates) {
-        await supabase
-          .from('levels')
-          .update({ sort_order: update.sort_order })
-          .eq('id', update.id);
+        for (const update of updates) {
+          const { error } = await supabase
+            .from('levels')
+            .update({ sort_order: update.sort_order })
+            .eq('id', update.id);
+          
+          if (error) {
+            console.error('Error updating sort order:', error);
+            throw error;
+          }
+        }
+
+        toast.success('Reihenfolge aktualisiert');
+      } catch (error) {
+        console.error('Failed to save sort order:', error);
+        toast.error('Fehler beim Speichern der Reihenfolge');
+        // Revert to previous state
+        fetchLevels();
       }
+    }
+  }
 
-      toast.success('Reihenfolge aktualisiert');
+  async function handleSortOrderChange(levelId: string, newSortOrder: number) {
+    const { error } = await supabase
+      .from('levels')
+      .update({ sort_order: newSortOrder })
+      .eq('id', levelId);
+
+    if (error) {
+      toast.error('Fehler beim Speichern der Reihenfolge');
+      console.error(error);
+    } else {
+      toast.success('Reihenfolge gespeichert');
+      fetchLevels();
     }
   }
 
@@ -141,10 +170,12 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       return;
     }
 
+    const sortOrder = newLevel.sort_order || levels.length;
+
     const { error } = await supabase.from('levels').insert({
       title: newLevel.title,
       vimeo_showcase_id: newLevel.vimeo_showcase_id,
-      sort_order: levels.length,
+      sort_order: sortOrder,
       required_plan_key: newLevel.required_plan_key,
       difficulty: newLevel.difficulty,
     });
@@ -154,7 +185,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       console.error(error);
     } else {
       toast.success('Level erstellt');
-      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'beginner' });
+      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'basics', sort_order: 0 });
       setIsAdding(false);
       fetchLevels();
     }
@@ -168,6 +199,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
         description: editForm.description || null,
         required_plan_key: editForm.required_plan_key,
         difficulty: editForm.difficulty,
+        sort_order: editForm.sort_order,
       })
       .eq('id', id);
 
@@ -235,29 +267,34 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       description: level.description || '',
       required_plan_key: level.required_plan_key,
       difficulty: level.difficulty,
+      sort_order: level.sort_order,
     });
   }
 
   async function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
     console.log('Updating difficulty for level', levelId, 'to', difficulty);
     
-    const { data, error } = await supabase
-      .from('levels')
-      .update({ difficulty: difficulty })
-      .eq('id', levelId)
-      .select();
+    try {
+      const { data, error } = await supabase
+        .from('levels')
+        .update({ difficulty: difficulty })
+        .eq('id', levelId)
+        .select();
 
-    console.log('Update result:', data, error);
+      console.log('Update result:', data, error);
 
-    if (error) {
-      toast.error('Fehler beim Aktualisieren der Schwierigkeit');
-      console.error(error);
-    } else {
+      if (error) {
+        throw error;
+      }
+      
       toast.success('Schwierigkeit aktualisiert');
       // Update local state immediately
       setLevels(prev => prev.map(l => 
         l.id === levelId ? { ...l, difficulty } : l
       ));
+    } catch (error) {
+      toast.error('Fehler beim Aktualisieren der Schwierigkeit');
+      console.error('Difficulty update error:', error);
     }
   }
 
@@ -323,6 +360,16 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Reihenfolge:</span>
+              <Input
+                type="number"
+                min={0}
+                className="w-20"
+                value={newLevel.sort_order}
+                onChange={(e) => setNewLevel({ ...newLevel, sort_order: parseInt(e.target.value) || 0 })}
+              />
             </div>
           </div>
           <div className="flex gap-2">
@@ -392,6 +439,16 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                             </SelectContent>
                           </Select>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Reihenfolge:</span>
+                          <Input
+                            type="number"
+                            min={0}
+                            className="w-20"
+                            value={editForm.sort_order}
+                            onChange={(e) => setEditForm({ ...editForm, sort_order: parseInt(e.target.value) || 0 })}
+                          />
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -445,6 +502,33 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                     </>
                   ) : (
                     <>
+                      {/* Sort Order Input */}
+                      <Input
+                        type="number"
+                        min={0}
+                        className="w-16 h-8 text-xs text-center"
+                        value={level.sort_order}
+                        onChange={(e) => {
+                          const newValue = parseInt(e.target.value) || 0;
+                          // Update locally first for responsive feedback
+                          setLevels(prev => prev.map(l => 
+                            l.id === level.id ? { ...l, sort_order: newValue } : l
+                          ));
+                        }}
+                        onBlur={(e) => {
+                          const newValue = parseInt(e.target.value) || 0;
+                          if (newValue !== level.sort_order) {
+                            handleSortOrderChange(level.id, newValue);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const newValue = parseInt((e.target as HTMLInputElement).value) || 0;
+                            handleSortOrderChange(level.id, newValue);
+                            (e.target as HTMLInputElement).blur();
+                          }
+                        }}
+                      />
                       {/* Inline Difficulty Selector */}
                       <Select
                         value={level.difficulty}

@@ -4,9 +4,10 @@ import { useMembership } from '@/hooks/useMembership';
 import { Star, Lock, Crown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  basics: 'Basics',
   beginner: 'Anfänger',
   easy: 'Einfach',
   medium: 'Mittel',
@@ -14,6 +15,7 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
 };
 
 const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+  basics: 'text-purple-400',
   beginner: 'text-green-400',
   easy: 'text-blue-400',
   medium: 'text-orange-400',
