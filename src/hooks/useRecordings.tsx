@@ -11,6 +11,8 @@ export interface Recording {
   thumbnail?: string;
   createdAt: string;
   duration: number;
+  levelId?: string;
+  levelTitle?: string;
 }
 
 export function useRecordings() {
@@ -65,7 +67,13 @@ export function useRecordings() {
     }
   }, [user]);
 
-  const saveRecording = useCallback(async (recording: { title: string; blob: Blob; duration: number }) => {
+  const saveRecording = useCallback(async (recording: { 
+    title: string; 
+    blob: Blob; 
+    duration: number;
+    levelId?: string;
+    levelTitle?: string;
+  }) => {
     if (!user) {
       toast.error('Du musst eingeloggt sein, um Aufnahmen zu speichern');
       return null;
@@ -93,12 +101,17 @@ export function useRecordings() {
         throw uploadError;
       }
 
+      // Build title with level reference if available
+      const finalTitle = recording.levelTitle 
+        ? `${recording.levelTitle} – ${new Date().toLocaleDateString('de-DE')}`
+        : recording.title;
+
       // Save metadata to database
       const { data, error: dbError } = await supabase
         .from('user_recordings')
         .insert({
           user_id: user.id,
-          title: recording.title,
+          title: finalTitle,
           storage_path: storagePath,
           duration_seconds: recording.duration,
         })
@@ -119,6 +132,8 @@ export function useRecordings() {
         storage_path: storagePath,
         createdAt: data.created_at,
         duration: data.duration_seconds || 0,
+        levelId: recording.levelId,
+        levelTitle: recording.levelTitle,
       };
 
       setRecordings(prev => [newRecording, ...prev]);
