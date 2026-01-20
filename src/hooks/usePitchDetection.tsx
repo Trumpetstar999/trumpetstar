@@ -11,6 +11,7 @@ interface PitchData {
 interface UsePitchDetectionResult {
   isListening: boolean;
   pitchData: PitchData | null;
+  smoothedCents: number;
   error: string | null;
   startListening: () => Promise<void>;
   stopListening: () => void;
@@ -87,9 +88,33 @@ function frequencyToNote(frequency: number, referenceA4: number): PitchData {
   };
 }
 
+// Smoothing class for stable needle movement
+class ExponentialSmoothing {
+  private value: number = 0;
+  private alpha: number;
+  
+  constructor(alpha: number = 0.15) {
+    this.alpha = alpha;
+  }
+  
+  update(newValue: number): number {
+    this.value = this.alpha * newValue + (1 - this.alpha) * this.value;
+    return this.value;
+  }
+  
+  reset() {
+    this.value = 0;
+  }
+  
+  getValue(): number {
+    return this.value;
+  }
+}
+
 export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionResult {
   const [isListening, setIsListening] = useState(false);
   const [pitchData, setPitchData] = useState<PitchData | null>(null);
+  const [smoothedCents, setSmoothedCents] = useState(0);
   const [error, setError] = useState<string | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -97,6 +122,8 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
+  const smootherRef = useRef<ExponentialSmoothing>(new ExponentialSmoothing(0.12));
+  const lastNoteRef = useRef<string | null>(null);
 
   const analyze = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
@@ -106,6 +133,15 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
 
     if (frequency > 0 && frequency < 2000) {
       const data = frequencyToNote(frequency, referenceA4);
+      
+      // Reset smoother if note changed significantly
+      if (lastNoteRef.current !== data.note) {
+        smootherRef.current.reset();
+        lastNoteRef.current = data.note;
+      }
+      
+      const smoothed = smootherRef.current.update(data.cents);
+      setSmoothedCents(Math.round(smoothed));
       setPitchData(data);
     }
 
@@ -115,6 +151,7 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
   const startListening = useCallback(async () => {
     try {
       setError(null);
+      smootherRef.current.reset();
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: { 
@@ -160,8 +197,10 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
     
     analyserRef.current = null;
     bufferRef.current = null;
+    smootherRef.current.reset();
     setIsListening(false);
     setPitchData(null);
+    setSmoothedCents(0);
   }, []);
 
   // Cleanup on unmount
@@ -174,6 +213,7 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
   return {
     isListening,
     pitchData,
+    smoothedCents,
     error,
     startListening,
     stopListening

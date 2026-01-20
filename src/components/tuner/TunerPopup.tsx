@@ -16,7 +16,7 @@ interface TunerPopupProps {
 
 export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
   const [referenceA4, setReferenceA4] = useState(440);
-  const { isListening, pitchData, error, startListening, stopListening } = usePitchDetection(referenceA4);
+  const { isListening, pitchData, smoothedCents, error, startListening, stopListening } = usePitchDetection(referenceA4);
 
   // Auto-start listening when popup opens
   useEffect(() => {
@@ -49,47 +49,75 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
         className={cn(
-          "w-[90vw] max-w-[460px] p-0 border-0 overflow-hidden",
-          "bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f0f23]",
-          "shadow-[0_25px_80px_-15px_rgba(0,0,0,0.8)]",
-          "rounded-3xl"
+          "w-[90vw] max-w-[420px] p-0 border-0 overflow-hidden"
         )}
+        style={{
+          background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 50%, #3d2d22 100%)',
+          boxShadow: '0 25px 80px -15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)',
+          borderRadius: '16px',
+          border: '3px solid #6d5545'
+        }}
       >
         <VisuallyHidden>
           <DialogTitle>Bb Trumpet Tuner</DialogTitle>
         </VisuallyHidden>
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <div 
+          className="flex items-center justify-between px-5 py-3"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
+        >
           <div>
-            <h2 className="text-lg font-bold text-white">Bb Trumpet Tuner</h2>
-            <p className="text-sm text-white/50">A = {referenceA4} Hz</p>
+            <h2 
+              className="text-lg font-bold italic"
+              style={{ color: '#e8dcc8', fontFamily: 'serif' }}
+            >
+              Bb Trumpet Tuner
+            </h2>
+            <p 
+              className="text-xs"
+              style={{ color: '#a08060' }}
+            >
+              A = {referenceA4} Hz
+            </p>
           </div>
           <button 
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-all"
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-80"
+            style={{
+              background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
+              border: '1px solid #6d5545',
+              color: '#c4a882'
+            }}
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Main Content */}
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-4 py-4 space-y-4">
           {/* Error Message */}
           {error && (
-            <div className="p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">
+            <div 
+              className="p-3 rounded-lg text-sm text-center"
+              style={{
+                background: 'rgba(200,50,50,0.2)',
+                border: '1px solid rgba(200,50,50,0.3)',
+                color: '#ff8888'
+              }}
+            >
               {error}
             </div>
           )}
 
-          {/* Analog Tuner Dial */}
-          <TunerDial cents={pitchData?.cents ?? 0} isActive={isListening && !!pitchData} />
+          {/* Analog Tuner Dial - use smoothed cents */}
+          <TunerDial cents={smoothedCents} isActive={isListening && !!pitchData} />
 
           {/* Note Display */}
           <NoteDisplay 
             note={pitchData?.note ?? '—'} 
             octave={pitchData?.octave ?? 0}
-            cents={pitchData?.cents ?? 0}
+            cents={smoothedCents}
             frequency={pitchData?.frequency ?? 0}
             isActive={isListening && !!pitchData}
           />
@@ -101,26 +129,30 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           />
 
           {/* Listening Toggle */}
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-2">
             <button
               onClick={handleToggleListening}
-              className={cn(
-                "flex items-center gap-3 px-6 py-3 rounded-full transition-all",
-                "font-medium text-sm",
-                isListening 
-                  ? "bg-green-500/20 text-green-400 border border-green-500/40 hover:bg-green-500/30" 
-                  : "bg-white/10 text-white/70 border border-white/20 hover:bg-white/20"
-              )}
+              className="flex items-center gap-2 px-5 py-2 rounded-full transition-all"
+              style={{
+                background: isListening 
+                  ? 'linear-gradient(180deg, #2a5530 0%, #1a3320 100%)'
+                  : 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
+                border: isListening 
+                  ? '1px solid #3a7540'
+                  : '1px solid #6d5545',
+                color: isListening ? '#88dd88' : '#c4a882',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              }}
             >
               {isListening ? (
                 <>
-                  <Volume2 className="w-5 h-5 animate-pulse" />
-                  <span>Hört zu...</span>
+                  <Volume2 className="w-4 h-4" />
+                  <span className="text-sm font-medium">Hört zu...</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-5 h-5" />
-                  <span>Mikrofon aktivieren</span>
+                  <VolumeX className="w-4 h-4" />
+                  <span className="text-sm font-medium">Aktivieren</span>
                 </>
               )}
             </button>

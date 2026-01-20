@@ -1,5 +1,3 @@
-import { cn } from '@/lib/utils';
-
 interface NoteDisplayProps {
   note: string;
   octave: number;
@@ -8,59 +6,67 @@ interface NoteDisplayProps {
   isActive: boolean;
 }
 
-export function NoteDisplay({ note, octave, cents, frequency, isActive }: NoteDisplayProps) {
-  const absCents = Math.abs(cents);
+export function NoteDisplay({ note, octave, cents, isActive }: NoteDisplayProps) {
+  const displayNote = note.replace('♯', '#');
   
   return (
-    <div className="flex flex-col items-center gap-2">
-      {/* Main Note */}
-      <div className="relative flex items-baseline justify-center">
-        <span 
-          className={cn(
-            "text-7xl font-bold tracking-tight transition-all duration-200",
-            !isActive && "text-white/30",
-            isActive && absCents <= 5 && "text-green-400",
-            isActive && absCents > 5 && absCents <= 15 && "text-yellow-400",
-            isActive && absCents > 15 && "text-red-400"
+    <div className="flex flex-col items-center gap-3">
+      {/* LED-style note display */}
+      <div 
+        className="relative px-6 py-3 rounded-lg"
+        style={{
+          background: 'linear-gradient(180deg, #2a0a0a 0%, #1a0505 100%)',
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)',
+          border: '2px solid #3d2222'
+        }}
+      >
+        {/* LED segments container */}
+        <div className="flex items-baseline gap-1">
+          <span 
+            className="text-5xl font-bold tracking-wide"
+            style={{ 
+              color: isActive ? '#ff2222' : '#330808',
+              textShadow: isActive ? '0 0 15px #ff2222, 0 0 30px #ff0000, 0 0 45px #cc0000' : 'none',
+              fontFamily: '"Digital-7", "Courier New", monospace',
+              letterSpacing: '0.1em'
+            }}
+          >
+            {displayNote}
+          </span>
+          {isActive && octave > 0 && (
+            <span 
+              className="text-2xl font-bold"
+              style={{ 
+                color: '#ff2222',
+                textShadow: '0 0 10px #ff2222, 0 0 20px #ff0000',
+                fontFamily: '"Digital-7", "Courier New", monospace'
+              }}
+            >
+              {octave}
+            </span>
           )}
-          style={{
-            textShadow: isActive && absCents <= 5 
-              ? '0 0 30px rgba(34, 197, 94, 0.5)' 
-              : 'none'
+        </div>
+      </div>
+      
+      {/* Cents deviation */}
+      <div 
+        className="px-4 py-2 rounded"
+        style={{
+          background: 'linear-gradient(180deg, #1a0505 0%, #0f0303 100%)',
+          border: '1px solid #2d1515'
+        }}
+      >
+        <span 
+          className="text-lg font-mono"
+          style={{ 
+            color: isActive ? '#ff4444' : '#441111',
+            textShadow: isActive ? '0 0 8px #ff4444' : 'none'
           }}
         >
-          {note}
+          {isActive ? (cents >= 0 ? `+${cents}` : cents) : '---'} 
+          <span className="text-sm opacity-70 ml-1">cent</span>
         </span>
-        {isActive && octave > 0 && (
-          <span className="text-2xl font-medium text-white/50 ml-1">
-            {octave}
-          </span>
-        )}
       </div>
-      
-      {/* Cents Display */}
-      <div className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-full transition-all",
-        "bg-white/5 border border-white/10"
-      )}>
-        <span className={cn(
-          "text-xl font-mono font-semibold transition-colors",
-          !isActive && "text-white/30",
-          isActive && cents < 0 && "text-blue-400",
-          isActive && cents === 0 && "text-green-400",
-          isActive && cents > 0 && "text-orange-400"
-        )}>
-          {isActive ? (cents >= 0 ? `+${cents}` : cents) : '—'}
-        </span>
-        <span className="text-sm text-white/40">cent</span>
-      </div>
-      
-      {/* Frequency */}
-      {isActive && frequency > 0 && (
-        <span className="text-xs text-white/30 font-mono">
-          {frequency.toFixed(1)} Hz
-        </span>
-      )}
     </div>
   );
 }
