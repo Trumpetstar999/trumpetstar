@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
@@ -72,11 +72,16 @@ const PLAN_BADGE_COLORS: Record<PlanKey, string> = {
 
 export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [levels, setLevels] = useState<Level[]>([]);
+  const [originalLevels, setOriginalLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
   const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
   const [isAdding, setIsAdding] = useState(false);
+  
+  // Track if there are unsaved changes
+  const hasUnsavedChanges = JSON.stringify(levels) !== JSON.stringify(originalLevels);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -106,6 +111,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
         difficulty: (level.difficulty as Difficulty) || 'beginner',
       }));
       setLevels(mappedLevels);
+      setOriginalLevels(mappedLevels);
     }
     setIsLoading(false);
   }
@@ -117,51 +123,51 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       const oldIndex = levels.findIndex((l) => l.id === active.id);
       const newIndex = levels.findIndex((l) => l.id === over.id);
 
-      const newLevels = arrayMove(levels, oldIndex, newIndex);
+      const newLevels = arrayMove(levels, oldIndex, newIndex).map((level, index) => ({
+        ...level,
+        sort_order: index,
+      }));
       setLevels(newLevels);
-
-      // Update sort_order in database
-      try {
-        const updates = newLevels.map((level, index) => ({
-          id: level.id,
-          sort_order: index,
-        }));
-
-        for (const update of updates) {
-          const { error } = await supabase
-            .from('levels')
-            .update({ sort_order: update.sort_order })
-            .eq('id', update.id);
-          
-          if (error) {
-            console.error('Error updating sort order:', error);
-            throw error;
-          }
-        }
-
-        toast.success('Reihenfolge aktualisiert');
-      } catch (error) {
-        console.error('Failed to save sort order:', error);
-        toast.error('Fehler beim Speichern der Reihenfolge');
-        // Revert to previous state
-        fetchLevels();
-      }
+      // Don't save immediately - user will click Save button
     }
   }
 
-  async function handleSortOrderChange(levelId: string, newSortOrder: number) {
-    const { error } = await supabase
-      .from('levels')
-      .update({ sort_order: newSortOrder })
-      .eq('id', levelId);
+  async function handleSaveAll() {
+    setIsSaving(true);
+    
+    try {
+      // Save all levels with their current state
+      for (const level of levels) {
+        const { error } = await supabase
+          .from('levels')
+          .update({
+            sort_order: level.sort_order,
+            difficulty: level.difficulty,
+            required_plan_key: level.required_plan_key,
+          })
+          .eq('id', level.id);
+        
+        if (error) {
+          console.error('Error saving level:', level.id, error);
+          throw error;
+        }
+      }
 
-    if (error) {
-      toast.error('Fehler beim Speichern der Reihenfolge');
-      console.error(error);
-    } else {
-      toast.success('Reihenfolge gespeichert');
-      fetchLevels();
+      toast.success('Alle Änderungen gespeichert');
+      setOriginalLevels([...levels]);
+    } catch (error) {
+      console.error('Failed to save levels:', error);
+      toast.error('Fehler beim Speichern');
+    } finally {
+      setIsSaving(false);
     }
+  }
+
+  function handleSortOrderChange(levelId: string, newSortOrder: number) {
+    // Update local state only - save with Save button
+    setLevels(prev => prev.map(l => 
+      l.id === levelId ? { ...l, sort_order: newSortOrder } : l
+    ));
   }
 
   async function handleAddLevel() {
@@ -242,22 +248,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     }
   }
 
-  async function handlePlanChange(levelId: string, planKey: PlanKey) {
-    const { error } = await supabase
-      .from('levels')
-      .update({ required_plan_key: planKey })
-      .eq('id', levelId);
-
-    if (error) {
-      toast.error('Fehler beim Aktualisieren des Plans');
-      console.error(error);
-    } else {
-      toast.success('Plan aktualisiert');
-      // Update local state
-      setLevels(prev => prev.map(l => 
-        l.id === levelId ? { ...l, required_plan_key: planKey } : l
-      ));
-    }
+  function handlePlanChange(levelId: string, planKey: PlanKey) {
+    // Update local state only - save with Save button
+    setLevels(prev => prev.map(l => 
+      l.id === levelId ? { ...l, required_plan_key: planKey } : l
+    ));
   }
 
   function startEditing(level: Level) {
@@ -271,31 +266,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     });
   }
 
-  async function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
-    console.log('Updating difficulty for level', levelId, 'to', difficulty);
-    
-    try {
-      const { data, error } = await supabase
-        .from('levels')
-        .update({ difficulty: difficulty })
-        .eq('id', levelId)
-        .select();
-
-      console.log('Update result:', data, error);
-
-      if (error) {
-        throw error;
-      }
-      
-      toast.success('Schwierigkeit aktualisiert');
-      // Update local state immediately
-      setLevels(prev => prev.map(l => 
-        l.id === levelId ? { ...l, difficulty } : l
-      ));
-    } catch (error) {
-      toast.error('Fehler beim Aktualisieren der Schwierigkeit');
-      console.error('Difficulty update error:', error);
-    }
+  function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
+    // Update local state only - save with Save button
+    setLevels(prev => prev.map(l => 
+      l.id === levelId ? { ...l, difficulty } : l
+    ));
   }
 
   if (isLoading) {
@@ -306,10 +281,30 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Levels</h2>
-        <Button onClick={() => setIsAdding(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Neues Level
-        </Button>
+        <div className="flex items-center gap-2">
+          {hasUnsavedChanges && (
+            <span className="text-sm text-amber-600 dark:text-amber-400">
+              Ungespeicherte Änderungen
+            </span>
+          )}
+          <Button 
+            onClick={handleSaveAll} 
+            disabled={!hasUnsavedChanges || isSaving}
+            variant={hasUnsavedChanges ? "default" : "outline"}
+            className="gap-2"
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            Alle speichern
+          </Button>
+          <Button onClick={() => setIsAdding(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Neues Level
+          </Button>
+        </div>
       </div>
 
       {isAdding && (
@@ -510,23 +505,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         value={level.sort_order}
                         onChange={(e) => {
                           const newValue = parseInt(e.target.value) || 0;
-                          // Update locally first for responsive feedback
-                          setLevels(prev => prev.map(l => 
-                            l.id === level.id ? { ...l, sort_order: newValue } : l
-                          ));
-                        }}
-                        onBlur={(e) => {
-                          const newValue = parseInt(e.target.value) || 0;
-                          if (newValue !== level.sort_order) {
-                            handleSortOrderChange(level.id, newValue);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const newValue = parseInt((e.target as HTMLInputElement).value) || 0;
-                            handleSortOrderChange(level.id, newValue);
-                            (e.target as HTMLInputElement).blur();
-                          }
+                          handleSortOrderChange(level.id, newValue);
                         }}
                       />
                       {/* Inline Difficulty Selector */}
