@@ -440,9 +440,13 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
     handleClose();
   }, [recorder, handleClose]);
 
+  // Fixed height for the control bar
+  const CONTROL_BAR_HEIGHT = 72; // px
+
   return (
     <div 
       className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-black"
+      style={{ height: '100dvh' }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
       {showCompleted && (
@@ -483,7 +487,8 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       {/* Close button - Glass style */}
       <button
         onClick={handleCloseWithRecording}
-        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
+        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all safe-top"
+        style={{ top: 'max(16px, env(safe-area-inset-top))' }}
       >
         <X className="w-6 h-6" />
       </button>
@@ -502,8 +507,11 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         />
       )}
 
-      {/* Video container - true fullscreen, fills entire available space */}
-      <div className="absolute inset-0 w-full h-full">
+      {/* Video container - takes remaining space above control bar */}
+      <div 
+        className="flex-1 relative bg-black"
+        style={{ height: `calc(100dvh - ${CONTROL_BAR_HEIGHT}px)` }}
+      >
         {/* Loading indicator */}
         {isLoading && !error && (
           <div className="absolute inset-0 flex items-center justify-center z-10 bg-black">
@@ -555,7 +563,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
           </div>
         )}
 
-        {/* Vimeo iFrame Player - fills entire screen */}
+        {/* Vimeo iFrame Player - fills video container completely */}
         <iframe
           ref={iframeRef}
           src={vimeoUrl}
@@ -568,9 +576,15 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         />
       </div>
       
-      {/* Fixed bottom control bar - positioned absolutely over video */}
-      <div className="absolute bottom-0 left-0 right-0 z-[105] glass px-6 py-3">
-        <div className="max-w-6xl mx-auto flex items-center gap-4">
+      {/* Fixed bottom control bar - NOT overlaying video, part of flex layout */}
+      <div 
+        className="shrink-0 z-[105] bg-black/95 backdrop-blur-sm px-6 flex items-center"
+        style={{ 
+          height: `${CONTROL_BAR_HEIGHT}px`,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+        }}
+      >
+        <div className="w-full max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
             onClick={togglePlayPause}
