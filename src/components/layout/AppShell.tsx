@@ -30,6 +30,16 @@ export function AppShell({
   
   const isFullscreen = isVideoPlaying || isPdfViewerOpen;
 
+  // In fullscreen mode, render only children without any layout chrome
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 w-screen h-screen overflow-hidden">
+        {children}
+      </div>
+    );
+  }
+
+  // Normal mode with Header and TabBar
   return (
     <div className="min-h-screen flex flex-col">
       <Header 
@@ -39,14 +49,11 @@ export function AppShell({
         videoCount={videoCount}
       />
       
-      <main className={cn(
-        "flex-1 overflow-auto transition-all duration-300",
-        isFullscreen ? "pb-0" : "pb-24"
-      )}>
+      <main className="flex-1 overflow-auto pb-24">
         {children}
       </main>
       
-      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={isFullscreen} />
+      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={false} />
     </div>
   );
 }
