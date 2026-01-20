@@ -30,13 +30,6 @@ export function AppShell({
   
   const isFullscreen = isVideoPlaying || isPdfViewerOpen;
 
-  // In fullscreen mode, render children directly without any wrapper
-  // The VideoPlayer component itself is fixed positioned, so we just need to render it
-  if (isFullscreen) {
-    return <>{children}</>;
-  }
-
-  // Normal mode with Header and TabBar
   return (
     <div className="min-h-screen flex flex-col">
       <Header 
@@ -46,11 +39,14 @@ export function AppShell({
         videoCount={videoCount}
       />
       
-      <main className="flex-1 overflow-auto pb-24">
+      <main className={cn(
+        "flex-1 overflow-auto transition-all duration-300",
+        isFullscreen ? "pb-0" : "pb-24"
+      )}>
         {children}
       </main>
       
-      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={false} />
+      <TabBar activeTab={activeTab} onTabChange={onTabChange} hidden={isFullscreen} />
     </div>
   );
 }

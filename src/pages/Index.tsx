@@ -143,21 +143,18 @@ const Index = () => {
         title={tabTitles[activeTab]}
         stars={totalStars}
       >
-        {/* Transition wrapper - only apply transitions when NOT in fullscreen */}
         <div 
           className={cn(
-            "h-full",
-            // Only apply transition animations when not transitioning to fullscreen
-            !isTransitioning ? "opacity-100 translate-x-0" : (
-              slideDirection === 'left' 
-                ? "opacity-0 translate-x-[-20px] transition-all duration-300 ease-out" 
-                : "opacity-0 translate-x-[20px] transition-all duration-300 ease-out"
-            )
+            "h-full transition-all duration-300 ease-out",
+            isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+            isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
+            !isTransitioning && "opacity-100 translate-x-0"
           )}
         >
           {renderPage()}
         </div>
       </AppShell>
+      
     </TabNavigationProvider>
   );
 };

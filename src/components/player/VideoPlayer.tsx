@@ -442,7 +442,10 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-black"
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
+      style={{ 
+        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
+      }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
       {showCompleted && (
@@ -502,74 +505,80 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         />
       )}
 
-      {/* Video container - fills all space above control bar */}
-      <div className="flex-1 min-h-0 relative bg-black">
-        {/* Loading indicator */}
-        {isLoading && !error && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black">
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
-              <span className="text-white/70">Video wird geladen...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Error display - Glass card */}
-        {error && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black">
-            <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-lg">
-              {error.errorType === 'network_error' ? (
-                <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
-                  <WifiOff className="w-8 h-8 text-accent-red" />
+      {/* Video container - true fullscreen optimized */}
+      <div className="flex-1 min-h-0 flex items-center justify-center">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-full h-full aspect-video rounded-none overflow-hidden">
+            {/* Loading indicator */}
+            {isLoading && !error && (
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
+                  <span className="text-white/70">Video wird geladen...</span>
                 </div>
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
-                  <AlertTriangle className="w-8 h-8 text-accent-red" />
-                </div>
-              )}
-              <h3 className="text-xl font-semibold text-gray-900">
-                {error.errorType === 'embed_blocked' 
-                  ? 'Video nicht freigegeben'
-                  : error.errorType === 'network_error'
-                  ? 'Verbindungsproblem'
-                  : 'Video-Fehler'}
-              </h3>
-              <p className="text-gray-600">
-                {error.errorType === 'embed_blocked' 
-                  ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
-                  : error.message}
-              </p>
-              <div className="flex gap-3 mt-4">
-                <Button onClick={handleRetry} className="gap-2 bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white rounded-full">
-                  <RefreshCw className="w-4 h-4" />
-                  Erneut versuchen
-                </Button>
-                <Button variant="outline" onClick={handleClose} className="rounded-full">
-                  Schließen
-                </Button>
               </div>
-              <p className="text-gray-400 text-xs mt-4">
-                Video-ID: {video.vimeoId}
-              </p>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Vimeo iFrame Player - fills entire container */}
-        <iframe
-          ref={iframeRef}
-          src={vimeoUrl}
-          className="absolute inset-0 w-full h-full"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          allowFullScreen
-          title={video.title}
-          onError={handleIframeError}
-        />
+            {/* Error display - Glass card */}
+            {error && (
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
+                <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-lg">
+                  {error.errorType === 'network_error' ? (
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <WifiOff className="w-8 h-8 text-accent-red" />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <AlertTriangle className="w-8 h-8 text-accent-red" />
+                    </div>
+                  )}
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Video nicht freigegeben'
+                      : error.errorType === 'network_error'
+                      ? 'Verbindungsproblem'
+                      : 'Video-Fehler'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
+                      : error.message}
+                  </p>
+                  <div className="flex gap-3 mt-4">
+                    <Button onClick={handleRetry} className="gap-2 bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white rounded-full">
+                      <RefreshCw className="w-4 h-4" />
+                      Erneut versuchen
+                    </Button>
+                    <Button variant="outline" onClick={handleClose} className="rounded-full">
+                      Schließen
+                    </Button>
+                  </div>
+                  <p className="text-gray-400 text-xs mt-4">
+                    Video-ID: {video.vimeoId}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Vimeo iFrame Player */}
+            <iframe
+              ref={iframeRef}
+              src={vimeoUrl}
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+              title={video.title}
+              onError={handleIframeError}
+            />
+          </div>
+        </div>
       </div>
       
-      {/* Fixed bottom control bar - Opaque, NOT overlay on video */}
-      <div className="shrink-0 z-[105] bg-black/95 border-t border-white/10 px-6 py-3">
+      {/* Fixed bottom control bar - Glass style with gold accents */}
+      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
         <div className="max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
