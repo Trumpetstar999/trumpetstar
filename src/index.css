@@ -113,8 +113,6 @@
   html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    /* Prevent any background color from showing through */
-    background-color: #000;
   }
   
   body {
@@ -127,32 +125,13 @@
       hsl(218 88% 46%) 40%, 
       hsl(222 86% 29%) 100%
     );
-    /* Use dynamic viewport height with fallback */
     min-height: 100vh;
-    min-height: var(--app-height, 100vh);
     background-attachment: fixed;
-    /* Prevent overscroll showing background */
-    overscroll-behavior: none;
   }
   
   /* iPad optimized touch targets */
   button, a, [role="button"] {
     @apply min-h-[44px] min-w-[44px];
-  }
-  
-  /* Fullscreen container utility using real viewport height */
-  .fullscreen-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100vh;
-    height: var(--app-height, 100vh);
-    /* Disable safe area insets - video should fill entire screen */
-    padding: 0 !important;
-    margin: 0 !important;
   }
 }
 

@@ -8,7 +8,6 @@ import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
 import { WordPressMembershipProvider } from "@/hooks/useWordPressMembership";
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
-import { useViewportHeight } from "@/hooks/useViewportHeight";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
@@ -24,10 +23,6 @@ console.log('[App.tsx] App component loading...');
 
 const App = () => {
   console.log('[App.tsx] App component rendering...');
-  
-  // Initialize dynamic viewport height for iOS/Android tablets
-  useViewportHeight();
-  
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
