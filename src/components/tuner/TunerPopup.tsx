@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { usePitchDetection } from '@/hooks/usePitchDetection';
 import { TunerDial } from './TunerDial';
-import { NoteDisplay } from './NoteDisplay';
 import { NoteWheel } from './NoteWheel';
 import { TunerControls } from './TunerControls';
 import { cn } from '@/lib/utils';
@@ -18,7 +17,6 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
   const [referenceA4, setReferenceA4] = useState(440);
   const { isListening, pitchData, smoothedCents, error, startListening, stopListening } = usePitchDetection(referenceA4);
 
-  // Auto-start listening when popup opens
   useEffect(() => {
     if (isOpen && !isListening) {
       startListening();
@@ -30,7 +28,6 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
     };
   }, [isOpen, isListening, startListening, stopListening]);
 
-  // Stop listening when popup closes
   useEffect(() => {
     if (!isOpen) {
       stopListening();
@@ -49,7 +46,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
         className={cn(
-          "w-[90vw] max-w-[420px] p-0 border-0 overflow-hidden"
+          "w-[90vw] max-w-[380px] p-0 border-0 overflow-hidden"
         )}
         style={{
           background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 50%, #3d2d22 100%)',
@@ -62,44 +59,42 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           <DialogTitle>Bb Trumpet Tuner</DialogTitle>
         </VisuallyHidden>
         
-        {/* Header */}
+        {/* Header - compact */}
         <div 
-          className="flex items-center justify-between px-5 py-3"
+          className="flex items-center justify-between px-4 py-2"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
         >
           <div>
             <h2 
-              className="text-lg font-bold italic"
+              className="text-base font-bold italic"
               style={{ color: '#e8dcc8', fontFamily: 'serif' }}
             >
               Bb Trumpet Tuner
             </h2>
-            <p 
-              className="text-xs"
-              style={{ color: '#a08060' }}
-            >
-              A = {referenceA4} Hz
-            </p>
           </div>
-          <button 
-            onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:opacity-80"
-            style={{
-              background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
-              border: '1px solid #6d5545',
-              color: '#c4a882'
-            }}
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-3">
+            <span className="text-xs" style={{ color: '#a08060' }}>
+              A={referenceA4}Hz
+            </span>
+            <button 
+              onClick={onClose}
+              className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:opacity-80"
+              style={{
+                background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
+                border: '1px solid #6d5545',
+                color: '#c4a882'
+              }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Main Content */}
-        <div className="px-4 py-4 space-y-4">
-          {/* Error Message */}
+        {/* Main Content - compact spacing */}
+        <div className="px-3 py-3 space-y-3">
           {error && (
             <div 
-              className="p-3 rounded-lg text-sm text-center"
+              className="p-2 rounded-lg text-xs text-center"
               style={{
                 background: 'rgba(200,50,50,0.2)',
                 border: '1px solid rgba(200,50,50,0.3)',
@@ -110,29 +105,25 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
             </div>
           )}
 
-          {/* Analog Tuner Dial - use smoothed cents */}
-          <TunerDial cents={smoothedCents} isActive={isListening && !!pitchData} />
-
-          {/* Note Display */}
-          <NoteDisplay 
-            note={pitchData?.note ?? '—'} 
-            octave={pitchData?.octave ?? 0}
-            cents={smoothedCents}
-            frequency={pitchData?.frequency ?? 0}
+          {/* Tuner Dial with integrated note display */}
+          <TunerDial 
+            cents={smoothedCents} 
             isActive={isListening && !!pitchData}
+            note={pitchData?.note ?? '—'}
+            octave={pitchData?.octave ?? 0}
           />
 
-          {/* Note Wheel */}
+          {/* Note Wheel - compact */}
           <NoteWheel 
             currentNoteIndex={pitchData?.noteIndex ?? -1}
             isActive={isListening && !!pitchData}
           />
 
-          {/* Listening Toggle */}
-          <div className="flex justify-center pt-2">
+          {/* Listening Toggle - inline */}
+          <div className="flex justify-center">
             <button
               onClick={handleToggleListening}
-              className="flex items-center gap-2 px-5 py-2 rounded-full transition-all"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full transition-all"
               style={{
                 background: isListening 
                   ? 'linear-gradient(180deg, #2a5530 0%, #1a3320 100%)'
@@ -147,19 +138,19 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
               {isListening ? (
                 <>
                   <Volume2 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Hört zu...</span>
+                  <span className="text-xs font-medium">Hört zu...</span>
                 </>
               ) : (
                 <>
                   <VolumeX className="w-4 h-4" />
-                  <span className="text-sm font-medium">Aktivieren</span>
+                  <span className="text-xs font-medium">Aktivieren</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Footer Controls */}
+        {/* Footer Controls - compact */}
         <TunerControls 
           referenceA4={referenceA4}
           onReferenceChange={setReferenceA4}

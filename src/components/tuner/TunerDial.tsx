@@ -3,19 +3,16 @@ import { useMemo } from 'react';
 interface TunerDialProps {
   cents: number;
   isActive: boolean;
+  note: string;
+  octave: number;
 }
 
-export function TunerDial({ cents, isActive }: TunerDialProps) {
-  // Clamp cents to -50 to +50 range
+export function TunerDial({ cents, isActive, note, octave }: TunerDialProps) {
   const clampedCents = Math.max(-50, Math.min(50, cents));
-  
-  // Calculate needle rotation (-45° to +45° for the visual range)
   const needleRotation = (clampedCents / 50) * 40;
 
-  // Generate scale marks
   const scaleMarks = useMemo(() => {
     const marks = [];
-    // Main marks at -50, -40, -30, -20, -10, 0, +10, +20, +30, +40, +50
     for (let i = -50; i <= 50; i += 10) {
       const angle = (i / 50) * 40 - 90;
       const isMajor = i % 20 === 0;
@@ -24,10 +21,9 @@ export function TunerDial({ cents, isActive }: TunerDialProps) {
     return marks;
   }, []);
 
-  // Minor tick marks
   const minorTicks = useMemo(() => {
     const ticks = [];
-    for (let i = -50; i <= 50; i += 2) {
+    for (let i = -50; i <= 50; i += 5) {
       if (i % 10 !== 0) {
         const angle = (i / 50) * 40 - 90;
         ticks.push({ angle });
@@ -36,61 +32,44 @@ export function TunerDial({ cents, isActive }: TunerDialProps) {
     return ticks;
   }, []);
 
+  const displayNote = note.replace('♯', '#');
+
   return (
-    <div className="relative w-full aspect-[1.6/1] max-w-[360px] mx-auto">
+    <div className="relative w-full max-w-[320px] mx-auto">
       {/* Vintage tuner frame */}
       <div 
-        className="absolute inset-0 rounded-lg overflow-hidden"
+        className="relative rounded-lg overflow-hidden"
         style={{
           background: 'linear-gradient(180deg, #4a3728 0%, #3d2d22 50%, #2e211a 100%)',
-          boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 4px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.4)',
-          border: '2px solid #5c4535'
+          boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 4px rgba(0,0,0,0.3)',
+          border: '2px solid #5c4535',
+          aspectRatio: '2.2 / 1'
         }}
       >
         {/* Inner cream display area */}
         <div 
-          className="absolute left-3 right-3 top-3 bottom-3 rounded overflow-hidden"
+          className="absolute left-2 right-2 top-2 bottom-2 rounded overflow-hidden"
           style={{
             background: 'linear-gradient(180deg, #f5f0e1 0%, #e8e0cc 50%, #ddd5c0 100%)',
-            boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.15), inset 0 -1px 0 rgba(255,255,255,0.5)'
+            boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.12)'
           }}
         >
           {/* Dial SVG */}
-          <svg viewBox="0 0 240 140" className="w-full h-full">
-            {/* Decorative arc background */}
-            <defs>
-              <linearGradient id="dialBg" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="rgba(0,0,0,0.03)" />
-                <stop offset="100%" stopColor="rgba(0,0,0,0.08)" />
-              </linearGradient>
-            </defs>
-            
-            {/* Center area accent */}
-            <ellipse
-              cx="120"
-              cy="125"
-              rx="100"
-              ry="80"
-              fill="url(#dialBg)"
-            />
-            
+          <svg viewBox="0 0 220 95" className="w-full h-full" preserveAspectRatio="xMidYMax meet">
             {/* Minor tick marks */}
             {minorTicks.map(({ angle }, idx) => {
               const radians = (angle * Math.PI) / 180;
-              const innerR = 85;
-              const outerR = 90;
-              const x1 = 120 + innerR * Math.cos(radians);
-              const y1 = 120 + innerR * Math.sin(radians);
-              const x2 = 120 + outerR * Math.cos(radians);
-              const y2 = 120 + outerR * Math.sin(radians);
+              const innerR = 70;
+              const outerR = 75;
+              const x1 = 110 + innerR * Math.cos(radians);
+              const y1 = 90 + innerR * Math.sin(radians);
+              const x2 = 110 + outerR * Math.cos(radians);
+              const y2 = 90 + outerR * Math.sin(radians);
               
               return (
                 <line
                   key={idx}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
+                  x1={x1} y1={y1} x2={x2} y2={y2}
                   stroke="#8b7355"
                   strokeWidth="0.5"
                 />
@@ -100,32 +79,28 @@ export function TunerDial({ cents, isActive }: TunerDialProps) {
             {/* Major scale marks */}
             {scaleMarks.map(({ value, angle, isMajor }) => {
               const radians = (angle * Math.PI) / 180;
-              const innerR = isMajor ? 78 : 82;
-              const outerR = 92;
-              const textR = 68;
-              const x1 = 120 + innerR * Math.cos(radians);
-              const y1 = 120 + innerR * Math.sin(radians);
-              const x2 = 120 + outerR * Math.cos(radians);
-              const y2 = 120 + outerR * Math.sin(radians);
-              const textX = 120 + textR * Math.cos(radians);
-              const textY = 120 + textR * Math.sin(radians);
+              const innerR = isMajor ? 62 : 68;
+              const outerR = 76;
+              const textR = 52;
+              const x1 = 110 + innerR * Math.cos(radians);
+              const y1 = 90 + innerR * Math.sin(radians);
+              const x2 = 110 + outerR * Math.cos(radians);
+              const y2 = 90 + outerR * Math.sin(radians);
+              const textX = 110 + textR * Math.cos(radians);
+              const textY = 90 + textR * Math.sin(radians);
               
               return (
                 <g key={value}>
                   <line
-                    x1={x1}
-                    y1={y1}
-                    x2={x2}
-                    y2={y2}
+                    x1={x1} y1={y1} x2={x2} y2={y2}
                     stroke="#2e211a"
-                    strokeWidth={isMajor ? 2 : 1}
+                    strokeWidth={isMajor ? 1.5 : 1}
                   />
                   {isMajor && (
                     <text
-                      x={textX}
-                      y={textY + 1}
+                      x={textX} y={textY + 1}
                       fill="#2e211a"
-                      fontSize="9"
+                      fontSize="7"
                       fontWeight="500"
                       textAnchor="middle"
                       dominantBaseline="middle"
@@ -139,111 +114,94 @@ export function TunerDial({ cents, isActive }: TunerDialProps) {
             })}
             
             {/* "cent" label */}
-            <text
-              x="25"
-              y="100"
-              fill="#5c4535"
-              fontSize="8"
-              style={{ fontFamily: 'serif', fontStyle: 'italic' }}
-            >
+            <text x="18" y="78" fill="#5c4535" fontSize="6" style={{ fontFamily: 'serif', fontStyle: 'italic' }}>
               cent
             </text>
             
-            {/* Center "Perfect" indicator - green zone */}
+            {/* Center green zone */}
             <path
-              d={`M ${120 + 45 * Math.cos(-95 * Math.PI / 180)} ${120 + 45 * Math.sin(-95 * Math.PI / 180)} 
-                  A 45 45 0 0 1 ${120 + 45 * Math.cos(-85 * Math.PI / 180)} ${120 + 45 * Math.sin(-85 * Math.PI / 180)}`}
+              d={`M ${110 + 38 * Math.cos(-94 * Math.PI / 180)} ${90 + 38 * Math.sin(-94 * Math.PI / 180)} 
+                  A 38 38 0 0 1 ${110 + 38 * Math.cos(-86 * Math.PI / 180)} ${90 + 38 * Math.sin(-86 * Math.PI / 180)}`}
               fill="none"
               stroke="#22a855"
-              strokeWidth="4"
+              strokeWidth="3"
               strokeLinecap="round"
-              opacity="0.6"
+              opacity="0.5"
             />
             
-            {/* Needle with smooth transition */}
+            {/* Needle */}
             <g 
               style={{ 
                 transform: `rotate(${needleRotation}deg)`,
-                transformOrigin: '120px 120px',
+                transformOrigin: '110px 90px',
                 transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
-              {/* Needle shadow */}
               <line
-                x1="120"
-                y1="120"
-                x2="120"
-                y2="25"
-                stroke="rgba(0,0,0,0.2)"
-                strokeWidth="4"
-                strokeLinecap="round"
-                transform="translate(1, 1)"
-              />
-              {/* Needle body */}
-              <line
-                x1="120"
-                y1="115"
-                x2="120"
-                y2="30"
+                x1="110" y1="88" x2="110" y2="18"
                 stroke="#1a1410"
-                strokeWidth="2.5"
+                strokeWidth="2"
                 strokeLinecap="round"
               />
-              {/* Needle point */}
-              <polygon
-                points="120,18 117,32 123,32"
-                fill="#1a1410"
-              />
+              <polygon points="110,12 107,22 113,22" fill="#1a1410" />
             </g>
             
             {/* Center pivot */}
-            <circle
-              cx="120"
-              cy="120"
-              r="8"
-              fill="#3d2d22"
-              stroke="#5c4535"
-              strokeWidth="2"
-            />
-            <circle
-              cx="120"
-              cy="120"
-              r="4"
-              fill="#8b7355"
-            />
+            <circle cx="110" cy="90" r="6" fill="#3d2d22" stroke="#5c4535" strokeWidth="1.5" />
+            <circle cx="110" cy="90" r="3" fill="#8b7355" />
           </svg>
           
-          {/* LED Note Display - positioned in the dial */}
+          {/* LED Note Display - integrated */}
           <div 
-            className="absolute right-6 bottom-6 flex items-center gap-1 px-2 py-1 rounded"
+            className="absolute right-3 bottom-2 flex items-baseline gap-0.5 px-2 py-1 rounded"
             style={{
               background: 'radial-gradient(ellipse at center, #cc2233 0%, #991122 60%, #660011 100%)',
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.4), 0 0 8px rgba(200,30,50,0.3)',
+              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4)',
               border: '1px solid #440000'
             }}
           >
             <span 
-              className="text-xl font-bold tracking-wider"
+              className="text-lg font-bold"
               style={{ 
                 color: isActive ? '#ff3344' : '#661122',
-                textShadow: isActive ? '0 0 10px #ff3344, 0 0 20px #ff3344' : 'none',
+                textShadow: isActive ? '0 0 8px #ff3344' : 'none',
                 fontFamily: 'monospace'
               }}
             >
-              {isActive ? '●' : '○'}
+              {displayNote}
             </span>
+            {isActive && octave > 0 && (
+              <span 
+                className="text-xs"
+                style={{ 
+                  color: '#ff3344',
+                  textShadow: '0 0 6px #ff3344',
+                  fontFamily: 'monospace'
+                }}
+              >
+                {octave}
+              </span>
+            )}
+          </div>
+          
+          {/* Cents display */}
+          <div 
+            className="absolute left-3 bottom-2 text-xs font-mono"
+            style={{ color: '#5c4535' }}
+          >
+            {isActive ? (cents >= 0 ? `+${cents}` : cents) : '—'} ct
           </div>
         </div>
         
-        {/* Status LEDs */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+        {/* Status LED */}
+        <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
           <div 
-            className="w-3 h-3 rounded-full"
+            className="w-2.5 h-2.5 rounded-full"
             style={{
               background: isActive 
                 ? 'radial-gradient(circle at 30% 30%, #ffaa44, #ff6600)' 
                 : 'radial-gradient(circle at 30% 30%, #553322, #331100)',
-              boxShadow: isActive ? '0 0 6px #ff6600' : 'none'
+              boxShadow: isActive ? '0 0 4px #ff6600' : 'none'
             }}
           />
         </div>
