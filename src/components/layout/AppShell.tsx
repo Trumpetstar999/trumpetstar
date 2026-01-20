@@ -30,13 +30,10 @@ export function AppShell({
   
   const isFullscreen = isVideoPlaying || isPdfViewerOpen;
 
-  // In fullscreen mode, render only children without any layout chrome
+  // In fullscreen mode, render children directly without any wrapper
+  // The VideoPlayer component itself is fixed positioned, so we just need to render it
   if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 w-screen h-screen overflow-hidden">
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   // Normal mode with Header and TabBar
