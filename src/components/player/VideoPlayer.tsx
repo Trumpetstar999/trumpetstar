@@ -442,10 +442,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
 
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col animate-fade-in"
-      style={{ 
-        background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)'
-      }}
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-black"
     >
       {/* Star earned animation - Enhanced celebration effect */}
       {showCompleted && (
@@ -578,7 +575,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       </div>
       
       {/* Fixed bottom control bar - Glass style with gold accents */}
-      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
+      <div className="shrink-0 z-[105] glass px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
