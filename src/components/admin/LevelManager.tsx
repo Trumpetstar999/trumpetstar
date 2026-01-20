@@ -136,28 +136,51 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     setIsSaving(true);
     
     try {
+      console.log('Saving levels:', levels.map(l => ({ 
+        id: l.id, 
+        title: l.title,
+        sort_order: l.sort_order, 
+        difficulty: l.difficulty, 
+        required_plan_key: l.required_plan_key 
+      })));
+
+      let savedCount = 0;
+      const errors: string[] = [];
+
       // Save all levels with their current state
       for (const level of levels) {
-        const { error } = await supabase
+        const updateData = {
+          sort_order: level.sort_order,
+          difficulty: level.difficulty,
+          required_plan_key: level.required_plan_key,
+        };
+        
+        console.log(`Updating level ${level.id} (${level.title}):`, updateData);
+        
+        const { data, error } = await supabase
           .from('levels')
-          .update({
-            sort_order: level.sort_order,
-            difficulty: level.difficulty,
-            required_plan_key: level.required_plan_key,
-          })
-          .eq('id', level.id);
+          .update(updateData)
+          .eq('id', level.id)
+          .select();
         
         if (error) {
           console.error('Error saving level:', level.id, error);
-          throw error;
+          errors.push(`${level.title}: ${error.message}`);
+        } else {
+          console.log(`Level ${level.id} saved successfully:`, data);
+          savedCount++;
         }
       }
 
-      toast.success('Alle Änderungen gespeichert');
-      setOriginalLevels([...levels]);
+      if (errors.length > 0) {
+        toast.error(`${errors.length} Fehler beim Speichern: ${errors[0]}`);
+      } else {
+        toast.success(`${savedCount} Levels erfolgreich gespeichert`);
+        setOriginalLevels([...levels]);
+      }
     } catch (error) {
       console.error('Failed to save levels:', error);
-      toast.error('Fehler beim Speichern');
+      toast.error('Fehler beim Speichern: ' + (error instanceof Error ? error.message : 'Unbekannt'));
     } finally {
       setIsSaving(false);
     }
