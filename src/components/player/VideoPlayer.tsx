@@ -512,10 +512,10 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         </h2>
       </div>
       
-      {/* Video container */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-4">
-        <div className="relative w-full h-full max-w-6xl flex items-center justify-center">
-          <div className="relative w-full aspect-video max-h-full rounded-lg overflow-hidden shadow-2xl" 
+      {/* Video container - fullscreen optimized */}
+      <div className="flex-1 min-h-0 flex items-center justify-center px-2 py-1 sm:p-2">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-full h-full max-h-[calc(100vh-8rem)] aspect-video rounded-lg overflow-hidden shadow-2xl" 
                style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             {/* Loading indicator */}
             {isLoading && !error && (
