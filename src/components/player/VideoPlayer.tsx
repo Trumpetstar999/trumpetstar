@@ -440,13 +440,9 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
     handleClose();
   }, [recorder, handleClose]);
 
-  // Fixed height for the control bar
-  const CONTROL_BAR_HEIGHT = 72; // px
-
   return (
     <div 
       className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-black"
-      style={{ height: '100dvh' }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
       {showCompleted && (
@@ -487,8 +483,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       {/* Close button - Glass style */}
       <button
         onClick={handleCloseWithRecording}
-        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all safe-top"
-        style={{ top: 'max(16px, env(safe-area-inset-top))' }}
+        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
       >
         <X className="w-6 h-6" />
       </button>
@@ -507,84 +502,81 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         />
       )}
 
-      {/* Video container - takes remaining space above control bar */}
-      <div 
-        className="flex-1 relative bg-black"
-        style={{ height: `calc(100dvh - ${CONTROL_BAR_HEIGHT}px)` }}
-      >
-        {/* Loading indicator */}
-        {isLoading && !error && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black">
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
-              <span className="text-white/70">Video wird geladen...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Error display - Glass card */}
-        {error && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black">
-            <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-lg">
-              {error.errorType === 'network_error' ? (
-                <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
-                  <WifiOff className="w-8 h-8 text-accent-red" />
+      {/* Video container - true fullscreen optimized */}
+      <div className="flex-1 min-h-0 flex items-center justify-center">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="relative w-full h-full aspect-video rounded-none overflow-hidden">
+            {/* Loading indicator */}
+            {isLoading && !error && (
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-14 h-14 rounded-full border-4 border-reward-gold border-t-transparent animate-spin" />
+                  <span className="text-white/70">Video wird geladen...</span>
                 </div>
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
-                  <AlertTriangle className="w-8 h-8 text-accent-red" />
-                </div>
-              )}
-              <h3 className="text-xl font-semibold text-gray-900">
-                {error.errorType === 'embed_blocked' 
-                  ? 'Video nicht freigegeben'
-                  : error.errorType === 'network_error'
-                  ? 'Verbindungsproblem'
-                  : 'Video-Fehler'}
-              </h3>
-              <p className="text-gray-600">
-                {error.errorType === 'embed_blocked' 
-                  ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
-                  : error.message}
-              </p>
-              <div className="flex gap-3 mt-4">
-                <Button onClick={handleRetry} className="gap-2 bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white rounded-full">
-                  <RefreshCw className="w-4 h-4" />
-                  Erneut versuchen
-                </Button>
-                <Button variant="outline" onClick={handleClose} className="rounded-full">
-                  Schließen
-                </Button>
               </div>
-              <p className="text-gray-400 text-xs mt-4">
-                Video-ID: {video.vimeoId}
-              </p>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Vimeo iFrame Player - fills video container completely */}
-        <iframe
-          ref={iframeRef}
-          src={vimeoUrl}
-          className="absolute inset-0 w-full h-full"
-          frameBorder="0"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          allowFullScreen
-          title={video.title}
-          onError={handleIframeError}
-        />
+            {/* Error display - Glass card */}
+            {error && (
+              <div className="absolute inset-0 flex items-center justify-center z-10"
+                   style={{ background: 'linear-gradient(180deg, hsl(222 86% 29%) 0%, hsl(0 0% 0%) 100%)' }}>
+                <div className="card-glass flex flex-col items-center gap-4 max-w-md text-center p-8 rounded-lg">
+                  {error.errorType === 'network_error' ? (
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <WifiOff className="w-8 h-8 text-accent-red" />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center">
+                      <AlertTriangle className="w-8 h-8 text-accent-red" />
+                    </div>
+                  )}
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Video nicht freigegeben'
+                      : error.errorType === 'network_error'
+                      ? 'Verbindungsproblem'
+                      : 'Video-Fehler'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {error.errorType === 'embed_blocked' 
+                      ? 'Dieses Video ist auf dieser Domain nicht freigegeben. Bitte kontaktiere den Administrator.'
+                      : error.message}
+                  </p>
+                  <div className="flex gap-3 mt-4">
+                    <Button onClick={handleRetry} className="gap-2 bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white rounded-full">
+                      <RefreshCw className="w-4 h-4" />
+                      Erneut versuchen
+                    </Button>
+                    <Button variant="outline" onClick={handleClose} className="rounded-full">
+                      Schließen
+                    </Button>
+                  </div>
+                  <p className="text-gray-400 text-xs mt-4">
+                    Video-ID: {video.vimeoId}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Vimeo iFrame Player */}
+            <iframe
+              ref={iframeRef}
+              src={vimeoUrl}
+              className="absolute inset-0 w-full h-full"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+              title={video.title}
+              onError={handleIframeError}
+            />
+          </div>
+        </div>
       </div>
       
-      {/* Fixed bottom control bar - NOT overlaying video, part of flex layout */}
-      <div 
-        className="shrink-0 z-[105] bg-black/95 backdrop-blur-sm px-6 flex items-center"
-        style={{ 
-          height: `${CONTROL_BAR_HEIGHT}px`,
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-        }}
-      >
-        <div className="w-full max-w-6xl mx-auto flex items-center gap-4">
+      {/* Fixed bottom control bar - Glass style with gold accents */}
+      <div className="shrink-0 z-[105] glass px-6 py-3">
+        <div className="max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
             onClick={togglePlayPause}
