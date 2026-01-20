@@ -32,15 +32,12 @@ export function AppShell({
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hide header in fullscreen mode for maximum video space */}
-      {!isFullscreen && (
-        <Header 
-          title={title} 
-          stars={stars} 
-          isOffline={isOffline} 
-          videoCount={videoCount}
-        />
-      )}
+      <Header 
+        title={title} 
+        stars={stars} 
+        isOffline={isOffline} 
+        videoCount={videoCount}
+      />
       
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300",
