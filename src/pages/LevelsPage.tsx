@@ -18,10 +18,11 @@ interface LevelsPageProps {
   onStarEarned: () => void;
 }
 
-type Difficulty = 'beginner' | 'easy' | 'medium' | 'advanced';
+type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 
 const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
   { value: 'all', label: 'Alle Stufen' },
+  { value: 'basics', label: 'Basics' },
   { value: 'beginner', label: 'Anfänger' },
   { value: 'easy', label: 'Einfach' },
   { value: 'medium', label: 'Mittel' },
