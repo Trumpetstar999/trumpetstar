@@ -578,7 +578,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       </div>
       
       {/* Fixed bottom control bar - Glass style with gold accents */}
-      <div className="shrink-0 z-[105] glass px-6 py-4 safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-[105] glass px-6 py-4 safe-bottom">
         <div className="max-w-6xl mx-auto flex items-center gap-4">
           {/* Play/Pause - Gold accent */}
           <button
