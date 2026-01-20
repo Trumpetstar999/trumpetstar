@@ -5,10 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useAuth } from '@/hooks/useAuth';
-import { useVideoRecorder } from '@/hooks/useVideoRecorder';
-import { useRecordings } from '@/hooks/useRecordings';
-import { RecordingOverlay } from './RecordingOverlay';
-import { toast } from 'sonner';
 
 interface VideoPlayerProps {
   video: Video;
@@ -30,8 +26,6 @@ interface VimeoErrorLog {
 
 export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }: VideoPlayerProps) {
   const { user } = useAuth();
-  const recorder = useVideoRecorder();
-  const { saveRecording } = useRecordings();
   const [showCompleted, setShowCompleted] = useState(false);
   const [error, setError] = useState<VimeoErrorLog | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -410,36 +404,6 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
     }
   };
 
-  // Recording handlers
-  const handleStartRecording = useCallback(async () => {
-    const success = await recorder.startRecording();
-    if (success) {
-      toast.info('Aufnahme gestartet');
-    }
-  }, [recorder]);
-
-  const handleStopRecording = useCallback(async () => {
-    const result = await recorder.stopRecording();
-    if (result) {
-      // Save with level reference
-      await saveRecording({
-        title: levelTitle ? `${levelTitle}` : video.title,
-        blob: result.blob,
-        duration: result.duration,
-        levelId,
-        levelTitle,
-      });
-    }
-  }, [recorder, saveRecording, video.title, levelId, levelTitle]);
-
-  // Cancel recording when closing the player
-  const handleCloseWithRecording = useCallback(() => {
-    if (recorder.isRecording) {
-      recorder.cancelRecording();
-    }
-    handleClose();
-  }, [recorder, handleClose]);
-
   return (
     <div 
       className="fullscreen-container z-[100] flex flex-col animate-fade-in"
@@ -485,25 +449,11 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       
       {/* Close button - Glass style */}
       <button
-        onClick={handleCloseWithRecording}
+        onClick={handleClose}
         className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
       >
         <X className="w-6 h-6" />
       </button>
-
-      {/* Recording error overlay */}
-      {recorder.error && (
-        <RecordingOverlay
-          isRecording={false}
-          isStarting={false}
-          isStopping={false}
-          duration={0}
-          error={recorder.error}
-          onStart={handleStartRecording}
-          onStop={handleStopRecording}
-          onClearError={recorder.clearError}
-        />
-      )}
 
       {/* Video container - true fullscreen optimized */}
       <div className="flex-1 min-h-0 flex items-center justify-center">
@@ -628,19 +578,6 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
             </span>
           </div>
 
-          {/* Recording controls - separated with border */}
-          <div className="shrink-0 ml-2 pl-4 border-l border-white/20">
-            <RecordingOverlay
-              isRecording={recorder.isRecording}
-              isStarting={recorder.isStarting}
-              isStopping={recorder.isStopping}
-              duration={recorder.duration}
-              error={null}
-              onStart={handleStartRecording}
-              onStop={handleStopRecording}
-              onClearError={recorder.clearError}
-            />
-          </div>
         </div>
       </div>
     </div>
