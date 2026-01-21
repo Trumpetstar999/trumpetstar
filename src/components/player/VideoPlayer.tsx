@@ -434,11 +434,11 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
   }, [recorder, saveRecording, video.title, levelId, levelTitle]);
 
   // Cancel recording when closing the player
-  const handleCloseWithRecording = useCallback(() => {
+  const handleCloseWithRecording = useCallback(async () => {
     if (recorder.isRecording) {
       recorder.cancelRecording();
     }
-    handleClose();
+    await handleClose();
   }, [recorder, handleClose]);
 
   return (
