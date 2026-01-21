@@ -1429,21 +1429,21 @@ export type Database = {
           id: string
           playback_speed: number
           user_id: string
-          video_id: string
+          video_id: string | null
         }
         Insert: {
           completed_at?: string
           id?: string
           playback_speed?: number
           user_id: string
-          video_id: string
+          video_id?: string | null
         }
         Update: {
           completed_at?: string
           id?: string
           playback_speed?: number
           user_id?: string
-          video_id?: string
+          video_id?: string | null
         }
         Relationships: [
           {
