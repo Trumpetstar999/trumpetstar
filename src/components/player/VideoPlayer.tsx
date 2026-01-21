@@ -263,15 +263,9 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
             saveProgress(seconds, dur);
           }
           
-          if (percent >= 0.8 && !hasCompletedRef.current) {
+          // Track progress for 40% threshold check on close
+          if (percent >= 0.4) {
             hasCompletedRef.current = true;
-            saveCompletion().then((isNew) => {
-              if (isNew) {
-                setShowCompleted(true);
-                onComplete();
-                setTimeout(() => setShowCompleted(false), 3000);
-              }
-            });
           }
         }
         
@@ -279,30 +273,15 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
           const { seconds, duration: dur } = data.value;
           setCurrentTime(seconds);
           if (dur) setDuration(dur);
-          if (dur > 0 && seconds / dur >= 0.8 && !hasCompletedRef.current) {
+          // Track progress for 40% threshold check on close
+          if (dur > 0 && seconds / dur >= 0.4) {
             hasCompletedRef.current = true;
-            saveCompletion().then((isNew) => {
-              if (isNew) {
-                setShowCompleted(true);
-                onComplete();
-                setTimeout(() => setShowCompleted(false), 3000);
-              }
-            });
           }
         }
 
-        // Handle video end/finish event
+        // Handle video end/finish event - mark as completed
         if (data.event === 'ended' || data.event === 'finish') {
-          if (!hasCompletedRef.current) {
-            hasCompletedRef.current = true;
-            saveCompletion().then((isNew) => {
-              if (isNew) {
-                setShowCompleted(true);
-                onComplete();
-                setTimeout(() => setShowCompleted(false), 3000);
-              }
-            });
-          }
+          hasCompletedRef.current = true;
         }
 
         if (data.event === 'error') {
@@ -364,14 +343,36 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
     };
   }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion, saveProgress, currentTime]);
 
-  // Handle close with progress save
-  const handleClose = useCallback(() => {
+  // State for showing star animation on close
+  const [showStarOnClose, setShowStarOnClose] = useState(false);
+  const starAnimationResolveRef = useRef<(() => void) | null>(null);
+
+  // Handle close with progress save AND star award if 40%+ watched
+  const handleClose = useCallback(async () => {
     // Save progress when closing the video player
     if (currentTimeRef.current > 0 && durationRef.current > 0) {
       saveProgress(currentTimeRef.current, durationRef.current);
     }
+    
+    // Award star if user watched 40% or more
+    if (hasCompletedRef.current) {
+      const isNew = await saveCompletion();
+      if (isNew) {
+        // Show animation and wait for it to complete
+        setShowStarOnClose(true);
+        onComplete();
+        await new Promise<void>((resolve) => {
+          starAnimationResolveRef.current = resolve;
+          setTimeout(() => {
+            setShowStarOnClose(false);
+            resolve();
+          }, 2500);
+        });
+      }
+    }
+    
     onClose();
-  }, [onClose, saveProgress]);
+  }, [onClose, saveProgress, saveCompletion, onComplete]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -449,7 +450,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
-      {showCompleted && (
+      {(showCompleted || showStarOnClose) && (
         <div className="fixed inset-0 z-[120] pointer-events-none flex items-center justify-center">
           {/* Background overlay */}
           <div className="absolute inset-0 bg-black/40 animate-fade-in" />
@@ -461,11 +462,11 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
             <div className="absolute inset-0 -m-4 rounded-full bg-reward-gold/30 animate-pulse" />
             
             {/* Main content */}
-            <div className="relative flex flex-col items-center gap-4 p-10 rounded-3xl bg-gradient-to-br from-amber-500/90 to-orange-600/90 shadow-2xl border-2 border-amber-300/50">
+            <div className="relative flex flex-col items-center gap-4 p-10 rounded-3xl bg-gradient-to-br from-reward-gold/90 to-reward-gold/70 shadow-2xl border-2 border-reward-gold/50">
               {/* Sparkle effects */}
               <div className="absolute -top-3 -left-3 w-6 h-6 bg-white rounded-full opacity-80 animate-ping" style={{ animationDelay: '0.1s' }} />
-              <div className="absolute -top-2 -right-4 w-4 h-4 bg-yellow-200 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.3s' }} />
-              <div className="absolute -bottom-2 -left-2 w-5 h-5 bg-amber-200 rounded-full opacity-75 animate-ping" style={{ animationDelay: '0.2s' }} />
+              <div className="absolute -top-2 -right-4 w-4 h-4 bg-reward-gold/60 rounded-full opacity-70 animate-ping" style={{ animationDelay: '0.3s' }} />
+              <div className="absolute -bottom-2 -left-2 w-5 h-5 bg-reward-gold/50 rounded-full opacity-75 animate-ping" style={{ animationDelay: '0.2s' }} />
               <div className="absolute -bottom-3 -right-3 w-4 h-4 bg-white rounded-full opacity-80 animate-ping" style={{ animationDelay: '0.4s' }} />
               
               {/* Star icon with glow */}
