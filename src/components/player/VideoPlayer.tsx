@@ -263,9 +263,16 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
             saveProgress(seconds, dur);
           }
           
-          // Track progress for 40% threshold check on close
-          if (percent >= 0.4) {
+          // Award star immediately when 40% is reached
+          if (percent >= 0.4 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
+            saveCompletion().then((isNew) => {
+              if (isNew) {
+                setShowCompleted(true);
+                onComplete();
+                setTimeout(() => setShowCompleted(false), 3000);
+              }
+            });
           }
         }
         
@@ -273,9 +280,16 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
           const { seconds, duration: dur } = data.value;
           setCurrentTime(seconds);
           if (dur) setDuration(dur);
-          // Track progress for 40% threshold check on close
-          if (dur > 0 && seconds / dur >= 0.4) {
+          // Award star immediately when 40% is reached
+          if (dur > 0 && seconds / dur >= 0.4 && !hasCompletedRef.current) {
             hasCompletedRef.current = true;
+            saveCompletion().then((isNew) => {
+              if (isNew) {
+                setShowCompleted(true);
+                onComplete();
+                setTimeout(() => setShowCompleted(false), 3000);
+              }
+            });
           }
         }
 
@@ -343,36 +357,14 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
     };
   }, [onComplete, playerReady, logVimeoError, sendVimeoCommand, playbackSpeed, duration, saveCompletion, saveProgress, currentTime]);
 
-  // State for showing star animation on close
-  const [showStarOnClose, setShowStarOnClose] = useState(false);
-  const starAnimationResolveRef = useRef<(() => void) | null>(null);
-
-  // Handle close with progress save AND star award if 40%+ watched
-  const handleClose = useCallback(async () => {
+  // Handle close with progress save
+  const handleClose = useCallback(() => {
     // Save progress when closing the video player
     if (currentTimeRef.current > 0 && durationRef.current > 0) {
       saveProgress(currentTimeRef.current, durationRef.current);
     }
-    
-    // Award star if user watched 40% or more
-    if (hasCompletedRef.current) {
-      const isNew = await saveCompletion();
-      if (isNew) {
-        // Show animation and wait for it to complete
-        setShowStarOnClose(true);
-        onComplete();
-        await new Promise<void>((resolve) => {
-          starAnimationResolveRef.current = resolve;
-          setTimeout(() => {
-            setShowStarOnClose(false);
-            resolve();
-          }, 2500);
-        });
-      }
-    }
-    
     onClose();
-  }, [onClose, saveProgress, saveCompletion, onComplete]);
+  }, [onClose, saveProgress]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -434,11 +426,11 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
   }, [recorder, saveRecording, video.title, levelId, levelTitle]);
 
   // Cancel recording when closing the player
-  const handleCloseWithRecording = useCallback(async () => {
+  const handleCloseWithRecording = useCallback(() => {
     if (recorder.isRecording) {
       recorder.cancelRecording();
     }
-    await handleClose();
+    handleClose();
   }, [recorder, handleClose]);
 
   return (
@@ -450,7 +442,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       }}
     >
       {/* Star earned animation - Enhanced celebration effect */}
-      {(showCompleted || showStarOnClose) && (
+      {showCompleted && (
         <div className="fixed inset-0 z-[120] pointer-events-none flex items-center justify-center">
           {/* Background overlay */}
           <div className="absolute inset-0 bg-black/40 animate-fade-in" />
