@@ -42,18 +42,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Log login activity (prevent duplicate logs for same session)
+        // Log login activity and award daily login star (prevent duplicate logs for same session)
         if (event === 'SIGNED_IN' && session?.user) {
           const sessionKey = `${session.user.id}-${session.access_token?.slice(-10)}`;
           if (lastLoginLoggedRef.current !== sessionKey) {
             lastLoginLoggedRef.current = sessionKey;
             setTimeout(async () => {
               try {
+                // Log login activity
                 await supabase.from('activity_logs').insert([{
                   user_id: session.user.id,
                   action: 'login',
                   metadata: { event } as Json,
                 }]);
+                
+                // Check if user already got a login star today
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayIso = today.toISOString();
+                
+                const { data: existingLoginStar } = await supabase
+                  .from('video_completions')
+                  .select('id')
+                  .eq('user_id', session.user.id)
+                  .is('video_id', null)
+                  .gte('completed_at', todayIso)
+                  .limit(1);
+                
+                // Award daily login star if not already awarded today
+                if (!existingLoginStar || existingLoginStar.length === 0) {
+                  await supabase.from('video_completions').insert([{
+                    user_id: session.user.id,
+                    video_id: null,
+                    playback_speed: 100,
+                  }]);
+                  console.log('[Auth] Daily login star awarded');
+                }
               } catch (error) {
                 console.error('Error logging login:', error);
               }
