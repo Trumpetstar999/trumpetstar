@@ -48,10 +48,14 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
 
   // Save completion to database
   const saveCompletion = useCallback(async () => {
-    if (!user) return false;
+    if (!user) {
+      console.log('[VideoPlayer] No user, skipping save');
+      return false;
+    }
+    
+    console.log('[VideoPlayer] Saving star for video:', video.id);
     
     try {
-      // Insert new completion (allow multiple completions per video)
       const { error } = await supabase
         .from('video_completions')
         .insert({
@@ -61,22 +65,24 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         });
       
       if (error) {
-        console.error('Error saving completion:', error);
+        console.error('[VideoPlayer] Error saving completion:', error);
         return false;
       }
       
+      console.log('[VideoPlayer] Star saved successfully!');
       return true;
     } catch (err) {
-      console.error('Error saving completion:', err);
+      console.error('[VideoPlayer] Error saving completion:', err);
       return false;
     }
   }, [user, video.id, playbackSpeed]);
 
   const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
-  // Load saved playback speed
+  // Load saved playback speed AND create/update progress entry immediately on mount
   useEffect(() => {
     if (user) {
+      // Load existing playback speed
       supabase
         .from('user_video_progress')
         .select('playback_speed')
@@ -88,6 +94,24 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
             const speedPercent = Math.round(data.playback_speed * 100);
             setPlaybackSpeed(speedPercent);
           }
+        });
+      
+      // Create/update progress entry immediately so video appears in "recently watched"
+      supabase
+        .from('user_video_progress')
+        .upsert({
+          user_id: user.id,
+          video_id: video.id,
+          playback_speed: 1,
+          progress_percent: 0,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,video_id',
+          ignoreDuplicates: false,
+        })
+        .then(({ error }) => {
+          if (error) console.error('[VideoPlayer] Error creating initial progress:', error);
+          else console.log('[VideoPlayer] Initial progress entry created/updated');
         });
     }
   }, [user, video.id]);
@@ -265,12 +289,12 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
           
           // Award star immediately when 40% is reached
           if (percent >= 0.4 && !hasCompletedRef.current) {
+            console.log('[VideoPlayer] 40% reached via playProgress, percent:', percent);
             hasCompletedRef.current = true;
-            saveCompletion().then((isNew) => {
-              if (isNew) {
-                setShowCompleted(true);
+            saveCompletion().then((saved) => {
+              if (saved) {
+                console.log('[VideoPlayer] Calling onComplete');
                 onComplete();
-                setTimeout(() => setShowCompleted(false), 3000);
               }
             });
           }
@@ -282,20 +306,26 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
           if (dur) setDuration(dur);
           // Award star immediately when 40% is reached
           if (dur > 0 && seconds / dur >= 0.4 && !hasCompletedRef.current) {
+            console.log('[VideoPlayer] 40% reached via timeupdate, seconds:', seconds, 'dur:', dur);
             hasCompletedRef.current = true;
-            saveCompletion().then((isNew) => {
-              if (isNew) {
-                setShowCompleted(true);
+            saveCompletion().then((saved) => {
+              if (saved) {
+                console.log('[VideoPlayer] Calling onComplete');
                 onComplete();
-                setTimeout(() => setShowCompleted(false), 3000);
               }
             });
           }
         }
 
-        // Handle video end/finish event - mark as completed
+        // Handle video end/finish event - award star
         if (data.event === 'ended' || data.event === 'finish') {
-          hasCompletedRef.current = true;
+          if (!hasCompletedRef.current) {
+            console.log('[VideoPlayer] Video ended, awarding star');
+            hasCompletedRef.current = true;
+            saveCompletion().then((saved) => {
+              if (saved) onComplete();
+            });
+          }
         }
 
         if (data.event === 'error') {
