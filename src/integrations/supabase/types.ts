@@ -402,8 +402,12 @@ export type Database = {
       knowledge_chunks: {
         Row: {
           chunk_text: string
+          chunk_text_en: string | null
+          chunk_text_es: string | null
           created_at: string
           embedding_json: Json | null
+          embedding_json_en: Json | null
+          embedding_json_es: Json | null
           id: string
           plan_required: string
           source_id: string | null
@@ -412,8 +416,12 @@ export type Database = {
         }
         Insert: {
           chunk_text: string
+          chunk_text_en?: string | null
+          chunk_text_es?: string | null
           created_at?: string
           embedding_json?: Json | null
+          embedding_json_en?: Json | null
+          embedding_json_es?: Json | null
           id?: string
           plan_required?: string
           source_id?: string | null
@@ -422,8 +430,12 @@ export type Database = {
         }
         Update: {
           chunk_text?: string
+          chunk_text_en?: string | null
+          chunk_text_es?: string | null
           created_at?: string
           embedding_json?: Json | null
+          embedding_json_en?: Json | null
+          embedding_json_es?: Json | null
           id?: string
           plan_required?: string
           source_id?: string | null
@@ -443,33 +455,45 @@ export type Database = {
       knowledge_sources: {
         Row: {
           content: string | null
+          content_en: string | null
+          content_es: string | null
           created_at: string
           id: string
           language: string
           tags: string[] | null
           title: string
+          title_en: string | null
+          title_es: string | null
           type: string
           updated_at: string
           visibility: string
         }
         Insert: {
           content?: string | null
+          content_en?: string | null
+          content_es?: string | null
           created_at?: string
           id?: string
           language?: string
           tags?: string[] | null
           title: string
+          title_en?: string | null
+          title_es?: string | null
           type: string
           updated_at?: string
           visibility?: string
         }
         Update: {
           content?: string | null
+          content_en?: string | null
+          content_es?: string | null
           created_at?: string
           id?: string
           language?: string
           tags?: string[] | null
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           type?: string
           updated_at?: string
           visibility?: string
@@ -480,42 +504,57 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          description_en: string | null
+          description_es: string | null
           difficulty: string | null
           id: string
           is_active: boolean
+          language: string | null
           required_plan: string | null
           required_plan_key: string | null
           sort_order: number
           thumbnail_url: string | null
           title: string
+          title_en: string | null
+          title_es: string | null
           updated_at: string
           vimeo_showcase_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           difficulty?: string | null
           id?: string
           is_active?: boolean
+          language?: string | null
           required_plan?: string | null
           required_plan_key?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           vimeo_showcase_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           difficulty?: string | null
           id?: string
           is_active?: boolean
+          language?: string | null
           required_plan?: string | null
           required_plan_key?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           vimeo_showcase_id?: string
         }
@@ -565,37 +604,52 @@ export type Database = {
       musicxml_documents: {
         Row: {
           category: string | null
+          category_en: string | null
+          category_es: string | null
           created_at: string
           id: string
           is_active: boolean
+          language: string | null
           level_id: string | null
           plan_required: string
           sort_index: number
           title: string
+          title_en: string | null
+          title_es: string | null
           updated_at: string
           xml_file_url: string
         }
         Insert: {
           category?: string | null
+          category_en?: string | null
+          category_es?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
+          language?: string | null
           level_id?: string | null
           plan_required?: string
           sort_index?: number
           title: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           xml_file_url: string
         }
         Update: {
           category?: string | null
+          category_en?: string | null
+          category_es?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
+          language?: string | null
           level_id?: string | null
           plan_required?: string
           sort_index?: number
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           xml_file_url?: string
         }
@@ -746,40 +800,55 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          description_en: string | null
+          description_es: string | null
           id: string
           is_active: boolean
+          language: string | null
           level_id: string | null
           page_count: number
           pdf_file_url: string
           plan_required: string
           sort_index: number
           title: string
+          title_en: string | null
+          title_es: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           id?: string
           is_active?: boolean
+          language?: string | null
           level_id?: string | null
           page_count?: number
           pdf_file_url: string
           plan_required?: string
           sort_index?: number
           title: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           id?: string
           is_active?: boolean
+          language?: string | null
           level_id?: string | null
           page_count?: number
           pdf_file_url?: string
           plan_required?: string
           sort_index?: number
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -994,58 +1063,88 @@ export type Database = {
       repertoire_items: {
         Row: {
           common_pitfalls: string | null
+          common_pitfalls_en: string | null
+          common_pitfalls_es: string | null
           composer: string | null
           created_at: string
           difficulty: string | null
           goal: string | null
+          goal_en: string | null
+          goal_es: string | null
           id: string
           key: string | null
           language: string
           notes: string | null
+          notes_en: string | null
+          notes_es: string | null
           plan_required: string
           practice_steps: string | null
+          practice_steps_en: string | null
+          practice_steps_es: string | null
           target_minutes: number | null
           techniques_tags: string[] | null
           tempo_bpm: number | null
           title: string
+          title_en: string | null
+          title_es: string | null
           type: string | null
           updated_at: string
         }
         Insert: {
           common_pitfalls?: string | null
+          common_pitfalls_en?: string | null
+          common_pitfalls_es?: string | null
           composer?: string | null
           created_at?: string
           difficulty?: string | null
           goal?: string | null
+          goal_en?: string | null
+          goal_es?: string | null
           id?: string
           key?: string | null
           language?: string
           notes?: string | null
+          notes_en?: string | null
+          notes_es?: string | null
           plan_required?: string
           practice_steps?: string | null
+          practice_steps_en?: string | null
+          practice_steps_es?: string | null
           target_minutes?: number | null
           techniques_tags?: string[] | null
           tempo_bpm?: number | null
           title: string
+          title_en?: string | null
+          title_es?: string | null
           type?: string | null
           updated_at?: string
         }
         Update: {
           common_pitfalls?: string | null
+          common_pitfalls_en?: string | null
+          common_pitfalls_es?: string | null
           composer?: string | null
           created_at?: string
           difficulty?: string | null
           goal?: string | null
+          goal_en?: string | null
+          goal_es?: string | null
           id?: string
           key?: string | null
           language?: string
           notes?: string | null
+          notes_en?: string | null
+          notes_es?: string | null
           plan_required?: string
           practice_steps?: string | null
+          practice_steps_en?: string | null
+          practice_steps_es?: string | null
           target_minutes?: number | null
           techniques_tags?: string[] | null
           tempo_bpm?: number | null
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           type?: string | null
           updated_at?: string
         }
@@ -1058,6 +1157,8 @@ export type Database = {
           level_id: string
           sort_order: number
           title: string
+          title_en: string | null
+          title_es: string | null
         }
         Insert: {
           created_at?: string
@@ -1065,6 +1166,8 @@ export type Database = {
           level_id: string
           sort_order?: number
           title: string
+          title_en?: string | null
+          title_es?: string | null
         }
         Update: {
           created_at?: string
@@ -1072,6 +1175,8 @@ export type Database = {
           level_id?: string
           sort_order?: number
           title?: string
+          title_en?: string | null
+          title_es?: string | null
         }
         Relationships: [
           {
@@ -1223,6 +1328,30 @@ export type Database = {
           updated_at?: string
           user_id?: string
           wp_user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          language: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          language?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          language?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1507,15 +1636,20 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          description_en: string | null
+          description_es: string | null
           duration_seconds: number | null
           id: string
           is_active: boolean
+          language: string | null
           last_synced_at: string
           level_id: string
           section_id: string | null
           sort_order: number
           thumbnail_url: string | null
           title: string
+          title_en: string | null
+          title_es: string | null
           updated_at: string
           vimeo_player_url: string | null
           vimeo_video_id: string
@@ -1523,15 +1657,20 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           duration_seconds?: number | null
           id?: string
           is_active?: boolean
+          language?: string | null
           last_synced_at?: string
           level_id: string
           section_id?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           vimeo_player_url?: string | null
           vimeo_video_id: string
@@ -1539,15 +1678,20 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          description_en?: string | null
+          description_es?: string | null
           duration_seconds?: number | null
           id?: string
           is_active?: boolean
+          language?: string | null
           last_synced_at?: string
           level_id?: string
           section_id?: string | null
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
+          title_en?: string | null
+          title_es?: string | null
           updated_at?: string
           vimeo_player_url?: string | null
           vimeo_video_id?: string

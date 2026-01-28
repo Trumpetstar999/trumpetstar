@@ -11,22 +11,12 @@ import { ClassroomPage } from './ClassroomPage';
 import { ProfilePage } from './ProfilePage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
+import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { cn } from '@/lib/utils';
-
-
-const tabTitles: Record<TabId, string> = {
-  levels: 'Levels',
-  pdfs: 'Notenhefte',
-  musicxml: 'MusicXML Noten',
-  practice: 'Üben',
-  recordings: 'Aufnahmen',
-  chats: 'Chats',
-  classroom: 'Klassenzimmer',
-  profile: 'Profil',
-};
 
 // Define tab order for determining slide direction
 const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'chats', 'classroom', 'profile'];
@@ -36,10 +26,27 @@ const Index = () => {
   const [totalStars, setTotalStars] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const previousTabRef = useRef<TabId>('levels');
   const { user, loading } = useAuth();
+  const { t, isLoading: languageLoading } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Tab titles from translation
+  const getTabTitle = (tab: TabId): string => {
+    return t(`navigation.${tab}`);
+  };
+
+  // Check if onboarding language selection is needed
+  useEffect(() => {
+    if (!loading && user) {
+      const onboardingComplete = localStorage.getItem('trumpetstar_onboarding_complete');
+      if (!onboardingComplete) {
+        setShowLanguageSelection(true);
+      }
+    }
+  }, [loading, user]);
 
   // Handle navigation state (e.g., from MusicXML viewer returning)
   useEffect(() => {
@@ -136,26 +143,33 @@ const Index = () => {
   };
 
   return (
-    <TabNavigationProvider activeTab={activeTab} onTabChange={handleTabChange}>
-      <AppShell
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        title={tabTitles[activeTab]}
-        stars={totalStars}
-      >
-        <div 
-          className={cn(
-            "h-full transition-all duration-300 ease-out",
-            isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
-            isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
-            !isTransitioning && "opacity-100 translate-x-0"
-          )}
+    <>
+      <TabNavigationProvider activeTab={activeTab} onTabChange={handleTabChange}>
+        <AppShell
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          title={getTabTitle(activeTab)}
+          stars={totalStars}
         >
-          {renderPage()}
-        </div>
-      </AppShell>
-      
-    </TabNavigationProvider>
+          <div 
+            className={cn(
+              "h-full transition-all duration-300 ease-out",
+              isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+              isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
+              !isTransitioning && "opacity-100 translate-x-0"
+            )}
+          >
+            {renderPage()}
+          </div>
+        </AppShell>
+      </TabNavigationProvider>
+
+      {/* Language Selection Dialog for first-time users */}
+      <LanguageSelectionDialog 
+        open={showLanguageSelection} 
+        onComplete={() => setShowLanguageSelection(false)} 
+      />
+    </>
   );
 };
 

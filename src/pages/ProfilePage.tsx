@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { GripVertical, RotateCcw, Pencil, X } from 'lucide-react';
 import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
+import { useLanguage } from '@/hooks/useLanguage';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
@@ -26,19 +27,7 @@ import { NotesTodosWidget } from '@/components/dashboard/widgets/NotesTodosWidge
 import { FeedbackChatWidget } from '@/components/dashboard/widgets/FeedbackChatWidget';
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
 import { StatisticsWidget } from '@/components/dashboard/widgets/StatisticsWidget';
-
-const WIDGET_TITLES: Record<WidgetId, string> = {
-  'profile': 'Profil',
-  'stars-progress': 'Sterne & Fortschritt',
-  'calendar': 'Wochenübersicht',
-  'recordings': 'Meine Aufnahmen',
-  'notes-todo': 'Notizen & To-Do',
-  'feedback-chat': 'Feedback & Chat',
-  'classroom': 'Klassenzimmer',
-  'statistics': 'Statistik',
-  'recent-videos': 'Zuletzt gespielt',
-  'weekly-goals': 'Wochenziele',
-};
+import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 function WidgetContent({ id }: { id: WidgetId }) {
   switch (id) {
@@ -64,6 +53,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
 }
 
 export function ProfilePage() {
+  const { t } = useLanguage();
   const {
     visibleWidgets,
     isEditing,
@@ -72,27 +62,19 @@ export function ProfilePage() {
     resetLayout,
   } = useDashboardLayout();
 
+  const getWidgetTitle = (id: WidgetId): string => {
+    const key = id.replace(/-/g, '');
+    return t(`widgets.${id === 'stars-progress' ? 'starsProgress' : id === 'notes-todo' ? 'notesTodo' : id === 'feedback-chat' ? 'feedbackChat' : id === 'recent-videos' ? 'recentVideos' : id === 'weekly-goals' ? 'weeklyGoals' : id}`);
+  };
+
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        delay: 150,
-        tolerance: 5,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 200,
-        tolerance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
     if (over && active.id !== over.id) {
       reorderWidgets(active.id as WidgetId, over.id as WidgetId);
     }
@@ -100,85 +82,55 @@ export function ProfilePage() {
 
   return (
     <div className="h-full overflow-auto px-4 py-6 lg:px-8">
-      {/* Header with animation */}
       <div className="flex items-center justify-between mb-6 animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-white/60 text-sm">Dein persönlicher Überblick</p>
+          <h1 className="text-2xl font-bold text-white">{t('profile.dashboard')}</h1>
+          <p className="text-white/60 text-sm">{t('profile.personalOverview')}</p>
         </div>
         
         <div className="flex items-center gap-2">
           {isEditing && (
-            <Button
-              onClick={resetLayout}
-              variant="ghost"
-              size="sm"
-              className="text-white/60 hover:text-white hover:bg-white/10 transition-all duration-200"
-            >
+            <Button onClick={resetLayout} variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Zurücksetzen
+              {t('profile.reset')}
             </Button>
           )}
-          
           <Button
             onClick={() => setIsEditing(!isEditing)}
             variant={isEditing ? 'default' : 'ghost'}
             size="sm"
-            className={`transition-all duration-300 ${isEditing 
-              ? 'bg-accent-red hover:bg-accent-red/90 text-white scale-105' 
-              : 'text-white/60 hover:text-white hover:bg-white/10'
-            }`}
+            className={isEditing ? 'bg-accent-red hover:bg-accent-red/90 text-white' : 'text-white/60 hover:text-white hover:bg-white/10'}
           >
-            {isEditing ? (
-              <>
-                <X className="w-4 h-4 mr-2" />
-                Fertig
-              </>
-            ) : (
-              <>
-                <Pencil className="w-4 h-4 mr-2" />
-                Anordnen
-              </>
-            )}
+            {isEditing ? <><X className="w-4 h-4 mr-2" />{t('profile.done')}</> : <><Pencil className="w-4 h-4 mr-2" />{t('profile.arrangeWidgets')}</>}
           </Button>
         </div>
       </div>
 
-      {/* Edit Mode Hint with slide animation */}
+      {/* Language Selector */}
+      <div className="mb-6 max-w-xs">
+        <LanguageSelector />
+      </div>
+
       {isEditing && (
         <div className="mb-4 p-3 rounded-xl bg-white/5 border border-white/10 animate-fade-in">
           <div className="flex items-center gap-2 text-white/70 text-sm">
             <GripVertical className="w-4 h-4 animate-pulse" />
-            <span>Halte eine Kachel gedrückt und ziehe sie, um die Reihenfolge zu ändern</span>
+            <span>{t('profile.dragHint')}</span>
           </div>
         </div>
       )}
 
-      {/* Widget Grid with staggered animations */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={visibleWidgets.map(w => w.id)}
-          strategy={rectSortingStrategy}
-        >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={visibleWidgets.map(w => w.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 gap-4">
             {visibleWidgets.map((widget, index) => (
               <DashboardWidget
                 key={widget.id}
                 id={widget.id}
-                title={WIDGET_TITLES[widget.id]}
+                title={getWidgetTitle(widget.id)}
                 isEditing={isEditing}
                 index={index}
-                className={
-                  widget.id === 'profile' 
-                    ? 'md:row-span-1' 
-                    : widget.id === 'calendar' 
-                      ? 'lg:col-span-1' 
-                      : ''
-                }
+                className={widget.id === 'profile' ? 'md:row-span-1' : widget.id === 'calendar' ? 'lg:col-span-1' : ''}
               >
                 <WidgetContent id={widget.id} />
               </DashboardWidget>
@@ -187,13 +139,7 @@ export function ProfilePage() {
         </SortableContext>
       </DndContext>
 
-      {/* Footer hint with delayed animation */}
-      <p 
-        className="text-center text-white/40 text-xs mt-8 animate-fade-in"
-        style={{ animationDelay: '600ms', animationFillMode: 'forwards', opacity: 0 }}
-      >
-        Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten.
-      </p>
+      <p className="text-center text-white/40 text-xs mt-8">{t('profile.premiumHint')}</p>
     </div>
   );
 }

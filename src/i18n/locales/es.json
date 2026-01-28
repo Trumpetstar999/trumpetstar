@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtro",
+    "all": "Todos",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "yes": "Sí",
+    "no": "No",
+    "confirm": "Confirmar",
+    "error": "Error",
+    "success": "Éxito",
+    "noResults": "No se encontraron resultados",
+    "resultsCount": "{{count}} resultado",
+    "resultsCount_other": "{{count}} resultados"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "signedOutSuccess": "Sesión cerrada correctamente"
+  },
+  "navigation": {
+    "levels": "Niveles",
+    "pdfs": "Partituras",
+    "musicxml": "MusicXML",
+    "practice": "Practicar",
+    "recordings": "Grabaciones",
+    "chats": "Chats",
+    "classroom": "Aula",
+    "profile": "Perfil"
+  },
+  "levels": {
+    "title": "Niveles",
+    "searchPlaceholder": "Buscar videos...",
+    "recentlyWatched": "Visto recientemente",
+    "recentlyWatchedDesc": "Tus videos vistos recientemente",
+    "noRecentVideos": "Aún no has visto videos",
+    "startLearning": "Elige un nivel y comienza a aprender",
+    "firstLevel": "Ir al primer nivel",
+    "noLevels": "No hay niveles disponibles.",
+    "importShowcases": "Importa showcases en el área de administración primero.",
+    "noVideosFound": "No se encontraron videos",
+    "tryDifferentSearch": "Intenta con otro término de búsqueda",
+    "resetSearch": "Restablecer búsqueda",
+    "difficulty": {
+      "all": "Todos los niveles",
+      "basics": "Básicos",
+      "beginner": "Principiante",
+      "easy": "Fácil",
+      "medium": "Intermedio",
+      "advanced": "Avanzado"
+    }
+  },
+  "pdfs": {
+    "title": "Cuadernos de Partituras",
+    "available": "{{count}} cuadernos disponibles",
+    "searchPlaceholder": "Buscar...",
+    "noPdfs": "No hay PDFs disponibles",
+    "noPdfsDesc": "Aún no se han subido cuadernos de partituras.",
+    "upgradeRequired": "Se requiere actualizar a {{plan}}",
+    "noPdfsFound": "No se encontraron partituras"
+  },
+  "musicxml": {
+    "title": "Partituras MusicXML",
+    "available": "{{count}} piezas disponibles",
+    "searchPlaceholder": "Buscar...",
+    "allLevels": "Todos los niveles",
+    "allCategories": "Todas las categorías",
+    "noDocuments": "No hay partituras MusicXML disponibles",
+    "noDocumentsDesc": "Aún no se han subido partituras.",
+    "noDocumentsFound": "No se encontraron partituras"
+  },
+  "player": {
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "stop": "Detener",
+    "tempo": "Tempo",
+    "speed": "Velocidad",
+    "volume": "Volumen",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
+    "selectTrack": "Seleccionar pista",
+    "export": "Exportar",
+    "markings": "Marcas",
+    "concertPitch": "Afinación de concierto",
+    "transposed": "Transpuesto"
+  },
+  "recordings": {
+    "title": "Grabaciones",
+    "myRecordings": "Mis Grabaciones",
+    "noRecordings": "Aún no hay grabaciones",
+    "noRecordingsDesc": "Comienza a grabar en el reproductor de video"
+  },
+  "practice": {
+    "title": "Practicar",
+    "journal": "Diario de Práctica",
+    "todos": "Tareas",
+    "startPractice": "Comenzar práctica",
+    "lastActivity": "Última actividad",
+    "minutes": "Minutos",
+    "mood": "Estado de ánimo",
+    "notes": "Notas",
+    "tags": "Etiquetas"
+  },
+  "chats": {
+    "title": "Chats",
+    "newChat": "Nuevo Chat",
+    "noChats": "No hay chats disponibles",
+    "typeMessage": "Escribe un mensaje..."
+  },
+  "profile": {
+    "title": "Perfil",
+    "dashboard": "Panel",
+    "personalOverview": "Tu resumen personal",
+    "editProfile": "Editar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "settings": "Configuración",
+    "language": "Idioma",
+    "selectLanguage": "Seleccionar idioma",
+    "arrangeWidgets": "Organizar",
+    "done": "Listo",
+    "reset": "Restablecer",
+    "dragHint": "Mantén presionado y arrastra una tarjeta para cambiar el orden",
+    "premiumHint": "Puedes cambiar a Premium en cualquier momento – tu progreso se guarda."
+  },
+  "widgets": {
+    "profile": "Perfil",
+    "starsProgress": "Estrellas y Progreso",
+    "calendar": "Resumen Semanal",
+    "recordings": "Mis Grabaciones",
+    "notesTodo": "Notas y Tareas",
+    "feedbackChat": "Comentarios y Chat",
+    "classroom": "Aula",
+    "statistics": "Estadísticas",
+    "recentVideos": "Reproducido Recientemente",
+    "weeklyGoals": "Objetivos Semanales"
+  },
+  "assistant": {
+    "name": "Toni tu Entrenador de Trompeta",
+    "online": "en línea",
+    "typing": "escribiendo...",
+    "greeting": "¡Hola, soy Toni!",
+    "greetingDesc": "Pregúntame sobre técnica de trompeta, consejos de práctica, repertorio o la plataforma.",
+    "inputPlaceholder": "Escribe un mensaje...",
+    "recording": "Grabando... Toca de nuevo para detener",
+    "readingAloud": "Leyendo en voz alta...",
+    "wasHelpful": "¿Fue esto útil?",
+    "modes": {
+      "platform": "📱 Plataforma",
+      "technique": "🎺 Consejos",
+      "mental": "🧠 Mental",
+      "repertoire": "🎵 Repertorio",
+      "mixed": "✨ Todo"
+    }
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español"
+  },
+  "languageTabs": {
+    "german": "Deutsch",
+    "english": "English",
+    "spanish": "Español"
+  },
+  "onboarding": {
+    "welcome": "¡Bienvenido!",
+    "selectLanguage": "Elige tu idioma",
+    "continue": "Continuar"
+  }
+}
