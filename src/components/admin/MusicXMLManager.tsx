@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -13,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import { MultilingualInput } from './MultilingualInput';
 import { 
   Plus, 
   Pencil, 
@@ -22,14 +22,19 @@ import {
   Search, 
   FileMusic,
   ArrowLeft,
-  Headphones
+  Headphones,
+  Globe
 } from 'lucide-react';
 
 interface MusicXMLDocument {
   id: string;
   level_id: string | null;
   title: string;
+  title_en: string | null;
+  title_es: string | null;
   category: string | null;
+  category_en: string | null;
+  category_es: string | null;
   plan_required: string;
   xml_file_url: string;
   is_active: boolean;
@@ -57,7 +62,11 @@ export function MusicXMLManager({ onManageAudio }: MusicXMLManagerProps) {
 
   // Form state
   const [title, setTitle] = useState('');
+  const [titleEn, setTitleEn] = useState('');
+  const [titleEs, setTitleEs] = useState('');
   const [category, setCategory] = useState('');
+  const [categoryEn, setCategoryEn] = useState('');
+  const [categoryEs, setCategoryEs] = useState('');
   const [levelId, setLevelId] = useState<string>('none');
   const [planRequired, setPlanRequired] = useState('BASIC');
   const [isActive, setIsActive] = useState(true);
@@ -158,7 +167,11 @@ export function MusicXMLManager({ onManageAudio }: MusicXMLManagerProps) {
 
       const docData = {
         title,
+        title_en: titleEn || null,
+        title_es: titleEs || null,
         category: category || null,
+        category_en: categoryEn || null,
+        category_es: categoryEs || null,
         level_id: levelId === 'none' ? null : levelId,
         plan_required: planRequired,
         is_active: isActive,
@@ -216,14 +229,22 @@ export function MusicXMLManager({ onManageAudio }: MusicXMLManagerProps) {
     if (doc) {
       setEditingDoc(doc);
       setTitle(doc.title);
+      setTitleEn(doc.title_en || '');
+      setTitleEs(doc.title_es || '');
       setCategory(doc.category || '');
+      setCategoryEn(doc.category_en || '');
+      setCategoryEs(doc.category_es || '');
       setLevelId(doc.level_id || 'none');
       setPlanRequired(doc.plan_required);
       setIsActive(doc.is_active);
     } else {
       setEditingDoc(null);
       setTitle('');
+      setTitleEn('');
+      setTitleEs('');
       setCategory('');
+      setCategoryEn('');
+      setCategoryEs('');
       setLevelId('none');
       setPlanRequired('BASIC');
       setIsActive(true);
@@ -300,7 +321,12 @@ export function MusicXMLManager({ onManageAudio }: MusicXMLManagerProps) {
                       <Music className="w-5 h-5 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="font-medium truncate">{doc.title}</h3>
+                    <div className="flex items-center gap-2">
+                        <h3 className="font-medium truncate">{doc.title}</h3>
+                        {(doc.title_en || doc.title_es) && (
+                          <Globe className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         {doc.levels?.title && <span>{doc.levels.title}</span>}
                         {doc.category && <span>• {doc.category}</span>}
@@ -405,27 +431,30 @@ export function MusicXMLManager({ onManageAudio }: MusicXMLManagerProps) {
               )}
             </div>
 
-            {/* Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title">Titel *</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="z.B. Tonleiter C-Dur"
-              />
-            </div>
+            {/* Title - Multilingual */}
+            <MultilingualInput
+              label="Titel"
+              required
+              valueDE={title}
+              valueEN={titleEn}
+              valueES={titleEs}
+              onChangeDE={setTitle}
+              onChangeEN={setTitleEn}
+              onChangeES={setTitleEs}
+              placeholder="z.B. Tonleiter C-Dur"
+            />
 
-            {/* Category */}
-            <div className="space-y-2">
-              <Label htmlFor="category">Kategorie</Label>
-              <Input
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="z.B. Tonleitern, Etüden, Stücke"
-              />
-            </div>
+            {/* Category - Multilingual */}
+            <MultilingualInput
+              label="Kategorie"
+              valueDE={category}
+              valueEN={categoryEn}
+              valueES={categoryEs}
+              onChangeDE={setCategory}
+              onChangeEN={setCategoryEn}
+              onChangeES={setCategoryEs}
+              placeholder="z.B. Tonleitern, Etüden, Stücke"
+            />
 
             {/* Level */}
             <div className="space-y-2">
