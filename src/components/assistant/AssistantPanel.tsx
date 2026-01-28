@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useAssistant, AssistantMode, AssistantLanguage } from '@/hooks/useAssistant';
+import { useLanguage } from '@/hooks/useLanguage';
 import { format } from 'date-fns';
 import toniAvatar from '@/assets/toni-coach.png';
 
@@ -13,15 +14,8 @@ interface AssistantPanelProps {
   onClose: () => void;
 }
 
-const MODE_LABELS: Record<AssistantMode, string> = {
-  platform: '📱 Plattform',
-  technique: '🎺 Übetipps',
-  mental: '🧠 Mental',
-  repertoire: '🎵 Repertoire',
-  mixed: '✨ Alles',
-};
-
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
+  const { t } = useLanguage();
   const [inputValue, setInputValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -92,9 +86,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
           </div>
           <div>
-            <h2 className="font-semibold text-[15px]">Toni dein Trompeten-Coach</h2>
+            <h2 className="font-semibold text-[15px]">{t('assistant.name')}</h2>
             <p className="text-[11px] text-white/70">
-              {isLoading ? 'tippt...' : 'online'}
+              {isLoading ? t('assistant.typing') : t('assistant.online')}
             </p>
           </div>
         </div>
@@ -137,10 +131,10 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                   <img src={toniAvatar} alt="Toni" className="h-full w-full object-cover" />
                 </div>
                 <p className="text-[#667781] text-sm font-medium mb-1">
-                  Hallo, ich bin Toni!
+                  {t('assistant.greeting')}
                 </p>
                 <p className="text-[#8696a0] text-xs max-w-[280px]">
-                  Frag mich zu Trompetentechnik, Übetipps, Repertoire oder der Plattform.
+                  {t('assistant.greetingDesc')}
                 </p>
               </div>
             )}
@@ -197,9 +191,9 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                       </p>
                       
                       {/* Feedback for assistant messages */}
-                      {!isUser && message.content && (
+                        {!isUser && message.content && (
                         <div className="flex items-center justify-end gap-1 mt-2 pt-1 border-t border-[#e9edef]">
-                          <span className="text-[10px] text-[#8696a0] mr-auto">War das hilfreich?</span>
+                          <span className="text-[10px] text-[#8696a0] mr-auto">{t('assistant.wasHelpful')}</span>
                           <button
                             onClick={() => provideFeedback(message.id, 'positive')}
                             className={cn(
@@ -253,7 +247,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
       {isSpeaking && (
         <div className="flex items-center justify-center gap-3 px-4 py-2 bg-[#25D366] text-white">
           <Volume2 className="h-4 w-4 animate-pulse" />
-          <span className="text-sm">Wird vorgelesen...</span>
+          <span className="text-sm">{t('assistant.readingAloud')}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -269,7 +263,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
       {isListening && (
         <div className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white">
           <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-          <span className="text-sm">Aufnahme läuft... Tippe erneut zum Stoppen</span>
+          <span className="text-sm">{t('assistant.recording')}</span>
         </div>
       )}
 
@@ -282,7 +276,7 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Nachricht eingeben..."
+            placeholder={t('assistant.inputPlaceholder')}
             disabled={isLoading || isListening}
             className="border-0 bg-transparent resize-none min-h-[24px] max-h-[120px] py-0 px-0 focus-visible:ring-0 text-[15px] placeholder:text-[#8696a0]"
             rows={1}

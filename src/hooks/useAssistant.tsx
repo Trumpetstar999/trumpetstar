@@ -2,10 +2,11 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMembership } from './useMembership';
+import { useLanguage, Language } from './useLanguage';
 import { useToast } from './use-toast';
 
 export type AssistantMode = 'platform' | 'technique' | 'mental' | 'repertoire' | 'mixed';
-export type AssistantLanguage = 'auto' | 'de' | 'en';
+export type AssistantLanguage = 'auto' | 'de' | 'en' | 'es';
 
 interface Message {
   id: string;
@@ -31,17 +32,23 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-ch
 const TTS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`;
 const STT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-stt`;
 
-// Detect language from text
-function detectLanguage(text: string): 'de' | 'en' {
+// Detect language from text - supports DE, EN, ES
+function detectLanguage(text: string): 'de' | 'en' | 'es' {
   const germanWords = ['ich', 'und', 'der', 'die', 'das', 'ist', 'nicht', 'ein', 'eine', 'wie', 'was', 'kann', 'mit', 'für', 'auf', 'haben', 'werden', 'bei', 'nach', 'über'];
+  const spanishWords = ['el', 'la', 'los', 'las', 'un', 'una', 'que', 'de', 'en', 'es', 'por', 'con', 'para', 'como', 'más', 'pero', 'muy', 'yo', 'tu', 'su', 'qué', 'cómo'];
   const words = text.toLowerCase().split(/\s+/);
   const germanCount = words.filter(w => germanWords.includes(w)).length;
-  return germanCount >= 2 ? 'de' : 'en';
+  const spanishCount = words.filter(w => spanishWords.includes(w)).length;
+  
+  if (spanishCount >= 2 && spanishCount > germanCount) return 'es';
+  if (germanCount >= 2) return 'de';
+  return 'en';
 }
 
 export function useAssistant() {
   const { user } = useAuth();
   const { planKey } = useMembership();
+  const { language: appLanguage } = useLanguage();
   const { toast } = useToast();
   
   const [state, setState] = useState<AssistantState>({
@@ -112,8 +119,13 @@ export function useAssistant() {
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || state.isLoading) return;
 
-    // Detect language if auto
-    const detectedLang = state.language === 'auto' ? detectLanguage(content) : state.language;
+    // Use app language if auto, otherwise use explicit setting
+    let detectedLang: 'de' | 'en' | 'es';
+    if (state.language === 'auto') {
+      detectedLang = appLanguage as 'de' | 'en' | 'es';
+    } else {
+      detectedLang = state.language;
+    }
 
     // Add user message
     const userMessage: Message = {
@@ -239,9 +251,9 @@ export function useAssistant() {
       });
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  }, [state.messages, state.mode, state.language, state.isLoading, state.readAloud, state.userName, planKey, toast]);
+  }, [state.messages, state.mode, state.language, state.isLoading, state.readAloud, state.userName, planKey, appLanguage, toast]);
 
-  const speakText = useCallback(async (text: string, language: 'de' | 'en') => {
+  const speakText = useCallback(async (text: string, language: 'de' | 'en' | 'es') => {
     try {
       setState(prev => ({ ...prev, isSpeaking: true }));
 
