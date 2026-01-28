@@ -16,12 +16,12 @@ import {
 } from '@dnd-kit/sortable';
 import { supabase } from '@/integrations/supabase/client';
 import { SortableItem } from './SortableItem';
+import { MultilingualInput } from './MultilingualInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2, Globe } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
@@ -30,7 +30,11 @@ type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 interface Level {
   id: string;
   title: string;
+  title_en: string | null;
+  title_es: string | null;
   description: string | null;
+  description_en: string | null;
+  description_es: string | null;
   vimeo_showcase_id: string;
   sort_order: number;
   is_active: boolean;
@@ -76,8 +80,15 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
-  const [newLevel, setNewLevel] = useState({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 });
+  const [editForm, setEditForm] = useState({ 
+    title: '', title_en: '', title_es: '',
+    description: '', description_en: '', description_es: '',
+    required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 
+  });
+  const [newLevel, setNewLevel] = useState({ 
+    title: '', title_en: '', title_es: '',
+    vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 
+  });
   const [isAdding, setIsAdding] = useState(false);
   
   // Track if there are unsaved changes
@@ -203,6 +214,8 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
 
     const { error } = await supabase.from('levels').insert({
       title: newLevel.title,
+      title_en: newLevel.title_en || null,
+      title_es: newLevel.title_es || null,
       vimeo_showcase_id: newLevel.vimeo_showcase_id,
       sort_order: sortOrder,
       required_plan_key: newLevel.required_plan_key,
@@ -214,7 +227,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       console.error(error);
     } else {
       toast.success('Level erstellt');
-      setNewLevel({ title: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'basics', sort_order: 0 });
+      setNewLevel({ title: '', title_en: '', title_es: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'basics', sort_order: 0 });
       setIsAdding(false);
       fetchLevels();
     }
@@ -225,7 +238,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       .from('levels')
       .update({
         title: editForm.title,
+        title_en: editForm.title_en || null,
+        title_es: editForm.title_es || null,
         description: editForm.description || null,
+        description_en: editForm.description_en || null,
+        description_es: editForm.description_es || null,
         required_plan_key: editForm.required_plan_key,
         difficulty: editForm.difficulty,
         sort_order: editForm.sort_order,
@@ -282,7 +299,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     setEditingId(level.id);
     setEditForm({ 
       title: level.title, 
+      title_en: level.title_en || '',
+      title_es: level.title_es || '',
       description: level.description || '',
+      description_en: level.description_en || '',
+      description_es: level.description_es || '',
       required_plan_key: level.required_plan_key,
       difficulty: level.difficulty,
       sort_order: level.sort_order,
@@ -332,10 +353,16 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
 
       {isAdding && (
         <div className="p-4 border border-border rounded-lg bg-card space-y-4">
-          <Input
+          <MultilingualInput
+            label="Level Titel"
+            valueDE={newLevel.title}
+            valueEN={newLevel.title_en}
+            valueES={newLevel.title_es}
+            onChangeDE={(v) => setNewLevel({ ...newLevel, title: v })}
+            onChangeEN={(v) => setNewLevel({ ...newLevel, title_en: v })}
+            onChangeES={(v) => setNewLevel({ ...newLevel, title_es: v })}
             placeholder="Level Titel"
-            value={newLevel.title}
-            onChange={(e) => setNewLevel({ ...newLevel, title: e.target.value })}
+            required
           />
           <Input
             placeholder="Vimeo Showcase ID (z.B. 8414886)"
@@ -410,15 +437,27 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
               <SortableItem key={level.id} id={level.id}>
                 <div className="flex-1">
                   {editingId === level.id ? (
-                    <div className="space-y-3">
-                      <Input
-                        value={editForm.title}
-                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    <div className="space-y-4">
+                      <MultilingualInput
+                        label="Titel"
+                        valueDE={editForm.title}
+                        valueEN={editForm.title_en}
+                        valueES={editForm.title_es}
+                        onChangeDE={(v) => setEditForm({ ...editForm, title: v })}
+                        onChangeEN={(v) => setEditForm({ ...editForm, title_en: v })}
+                        onChangeES={(v) => setEditForm({ ...editForm, title_es: v })}
+                        required
                       />
-                      <Textarea
-                        placeholder="Beschreibung"
-                        value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      <MultilingualInput
+                        label="Beschreibung"
+                        valueDE={editForm.description}
+                        valueEN={editForm.description_en}
+                        valueES={editForm.description_es}
+                        onChangeDE={(v) => setEditForm({ ...editForm, description: v })}
+                        onChangeEN={(v) => setEditForm({ ...editForm, description_en: v })}
+                        onChangeES={(v) => setEditForm({ ...editForm, description_es: v })}
+                        multiline
+                        rows={2}
                       />
                       <div className="flex items-center gap-4 flex-wrap">
                         <div className="flex items-center gap-2">
@@ -473,6 +512,11 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium">{level.title}</span>
+                        {(level.title_en || level.title_es) && (
+                          <span title="Übersetzungen vorhanden">
+                            <Globe className="w-3.5 h-3.5 text-blue-500" />
+                          </span>
+                        )}
                         {!level.is_active && (
                           <Badge variant="secondary">Inaktiv</Badge>
                         )}

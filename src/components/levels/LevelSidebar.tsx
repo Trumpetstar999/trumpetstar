@@ -7,10 +7,12 @@ import { cn } from '@/lib/utils';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 
-// Extended interface for levels with new plan key
+// Extended interface for levels with new plan key and localization
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
   requiredPlanKey: PlanKey;
   difficulty?: Difficulty;
+  title_en?: string | null;
+  title_es?: string | null;
 }
 
 interface LevelSidebarProps {
@@ -22,7 +24,7 @@ interface LevelSidebarProps {
 
 export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
   const { canAccessLevel } = useMembership();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const DIFFICULTY_COLORS: Record<Difficulty, string> = {
     basics: 'text-purple-400',
@@ -34,6 +36,12 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
 
   const getDifficultyLabel = (difficulty: Difficulty): string => {
     return t(`levels.difficulty.${difficulty}`);
+  };
+
+  const getLocalizedTitle = (level: LevelWithPlan): string => {
+    if (language === 'en' && level.title_en) return level.title_en;
+    if (language === 'es' && level.title_es) return level.title_es;
+    return level.title;
   };
 
   return (
@@ -115,7 +123,7 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
                     'block font-medium truncate',
                     isActive ? 'text-white' : 'text-white/90'
                   )}>
-                    {level.title}
+                    {getLocalizedTitle(level)}
                   </span>
                   <div className="flex items-center gap-2 text-xs">
                     {level.difficulty && (
