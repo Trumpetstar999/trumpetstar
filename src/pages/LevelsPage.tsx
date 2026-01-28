@@ -56,6 +56,8 @@ interface LocalizedSection {
 interface LocalizedLevel extends Omit<Level, 'sections'> {
   requiredPlanKey: PlanKey;
   difficulty?: Difficulty;
+  title_en?: string | null;
+  title_es?: string | null;
   sections: LocalizedSection[];
 }
 
@@ -246,6 +248,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         return {
           id: level.id,
           title: level.title,
+          title_en: level.title_en,
+          title_es: level.title_es,
           showcaseId: level.vimeo_showcase_id,
           totalStars: 0,
           sections,

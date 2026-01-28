@@ -10,14 +10,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye, X, CheckCircle2 } from 'lucide-react';
+import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye, X, CheckCircle2, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MultilingualInput } from './MultilingualInput';
 
 interface PdfDocument {
   id: string;
   level_id: string | null;
   title: string;
+  title_en: string | null;
+  title_es: string | null;
   description: string | null;
+  description_en: string | null;
+  description_es: string | null;
   plan_required: string;
   pdf_file_url: string;
   page_count: number;
@@ -58,7 +63,11 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
 
   const [formData, setFormData] = useState({
     title: '',
+    title_en: '',
+    title_es: '',
     description: '',
+    description_en: '',
+    description_es: '',
     level_id: '',
     plan_required: 'BASIC',
     is_active: true,
@@ -227,7 +236,11 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
 
       const payload = {
         title: data.title,
+        title_en: data.title_en || null,
+        title_es: data.title_es || null,
         description: data.description || null,
+        description_en: data.description_en || null,
+        description_es: data.description_es || null,
         level_id: data.level_id || null,
         plan_required: data.plan_required,
         is_active: data.is_active,
@@ -296,7 +309,11 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
       setEditingPdf(pdf);
       setFormData({
         title: pdf.title,
+        title_en: pdf.title_en || '',
+        title_es: pdf.title_es || '',
         description: pdf.description || '',
+        description_en: pdf.description_en || '',
+        description_es: pdf.description_es || '',
         level_id: pdf.level_id || '',
         plan_required: pdf.plan_required,
         is_active: pdf.is_active,
@@ -306,7 +323,11 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
       setEditingPdf(null);
       setFormData({
         title: '',
+        title_en: '',
+        title_es: '',
         description: '',
+        description_en: '',
+        description_es: '',
         level_id: '',
         plan_required: 'BASIC',
         is_active: true,
@@ -418,7 +439,14 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                   <FileText className="w-6 h-6 text-red-500" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-slate-900 truncate">{pdf.title}</h3>
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-medium text-slate-900 truncate">{pdf.title}</h3>
+                    {(pdf.title_en || pdf.title_es) && (
+                      <span title="Übersetzungen vorhanden">
+                        <Globe className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-slate-500 mt-0.5">
                     {pdf.page_count} Seiten • {trackCounts?.[pdf.id] || 0} Audios
                   </p>
@@ -609,27 +637,31 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
             {/* Right Column - Form Fields */}
             <div className="space-y-4">
               {/* Title */}
-              <div>
-                <Label>Titel *</Label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="z.B. Arban Übungen Kapitel 1"
-                  className="mt-1.5"
-                />
-              </div>
+              <MultilingualInput
+                label="Titel"
+                valueDE={formData.title}
+                valueEN={formData.title_en}
+                valueES={formData.title_es}
+                onChangeDE={(v) => setFormData(prev => ({ ...prev, title: v }))}
+                onChangeEN={(v) => setFormData(prev => ({ ...prev, title_en: v }))}
+                onChangeES={(v) => setFormData(prev => ({ ...prev, title_es: v }))}
+                placeholder="z.B. Arban Übungen Kapitel 1"
+                required
+              />
 
               {/* Description */}
-              <div>
-                <Label>Beschreibung</Label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Optionale Beschreibung..."
-                  className="mt-1.5"
-                  rows={3}
-                />
-              </div>
+              <MultilingualInput
+                label="Beschreibung"
+                valueDE={formData.description}
+                valueEN={formData.description_en}
+                valueES={formData.description_es}
+                onChangeDE={(v) => setFormData(prev => ({ ...prev, description: v }))}
+                onChangeEN={(v) => setFormData(prev => ({ ...prev, description_en: v }))}
+                onChangeES={(v) => setFormData(prev => ({ ...prev, description_es: v }))}
+                placeholder="Optionale Beschreibung..."
+                multiline
+                rows={2}
+              />
 
               {/* Level */}
               <div>
