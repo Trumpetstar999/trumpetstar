@@ -16,17 +16,20 @@ import {
 } from '@dnd-kit/sortable';
 import { supabase } from '@/integrations/supabase/client';
 import { SortableItem } from './SortableItem';
+import { MultilingualInput } from './MultilingualInput';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Trash2, Edit2, Check, X, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Trash2, Edit2, Check, X, ArrowLeft, ExternalLink, Globe } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Video {
   id: string;
   title: string;
+  title_en: string | null;
+  title_es: string | null;
   description: string | null;
+  description_en: string | null;
+  description_es: string | null;
   vimeo_video_id: string;
   thumbnail_url: string | null;
   duration_seconds: number | null;
@@ -45,7 +48,14 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: '', description: '' });
+  const [editForm, setEditForm] = useState({ 
+    title: '', 
+    title_en: '', 
+    title_es: '', 
+    description: '',
+    description_en: '',
+    description_es: '',
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -61,7 +71,7 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
   async function fetchVideos() {
     const { data, error } = await supabase
       .from('videos')
-      .select('*')
+      .select('id, title, title_en, title_es, description, description_en, description_es, vimeo_video_id, thumbnail_url, duration_seconds, sort_order, is_active')
       .eq('section_id', sectionId)
       .order('sort_order');
 
@@ -105,7 +115,11 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
       .from('videos')
       .update({
         title: editForm.title,
+        title_en: editForm.title_en || null,
+        title_es: editForm.title_es || null,
         description: editForm.description || null,
+        description_en: editForm.description_en || null,
+        description_es: editForm.description_es || null,
       })
       .eq('id', id);
 
@@ -155,6 +169,11 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
+  // Check if video has translations
+  function hasTranslations(video: Video) {
+    return (video.title_en && video.title_en.trim()) || (video.title_es && video.title_es.trim());
+  }
+
   if (isLoading) {
     return <div className="p-6 text-muted-foreground">Laden...</div>;
   }
@@ -190,15 +209,27 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
 
                 <div className="flex-1 min-w-0">
                   {editingId === video.id ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={editForm.title}
-                        onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    <div className="space-y-4">
+                      <MultilingualInput
+                        label="Titel"
+                        valueDE={editForm.title}
+                        valueEN={editForm.title_en}
+                        valueES={editForm.title_es}
+                        onChangeDE={(v) => setEditForm({ ...editForm, title: v })}
+                        onChangeEN={(v) => setEditForm({ ...editForm, title_en: v })}
+                        onChangeES={(v) => setEditForm({ ...editForm, title_es: v })}
+                        required
                       />
-                      <Textarea
-                        placeholder="Beschreibung"
-                        value={editForm.description}
-                        onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                      <MultilingualInput
+                        label="Beschreibung"
+                        valueDE={editForm.description}
+                        valueEN={editForm.description_en}
+                        valueES={editForm.description_es}
+                        onChangeDE={(v) => setEditForm({ ...editForm, description: v })}
+                        onChangeEN={(v) => setEditForm({ ...editForm, description_en: v })}
+                        onChangeES={(v) => setEditForm({ ...editForm, description_es: v })}
+                        multiline
+                        rows={2}
                       />
                     </div>
                   ) : (
@@ -207,6 +238,11 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
                         <span className="font-medium truncate">{video.title}</span>
                         {!video.is_active && (
                           <Badge variant="secondary">Inaktiv</Badge>
+                        )}
+                        {hasTranslations(video) && (
+                          <span title="Übersetzungen vorhanden">
+                            <Globe className="w-3.5 h-3.5 text-green-500" />
+                          </span>
                         )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
@@ -244,7 +280,11 @@ export function VideoManager({ sectionId, sectionTitle, onBack }: VideoManagerPr
                           setEditingId(video.id);
                           setEditForm({
                             title: video.title,
+                            title_en: video.title_en || '',
+                            title_es: video.title_es || '',
                             description: video.description || '',
+                            description_en: video.description_en || '',
+                            description_es: video.description_es || '',
                           });
                         }}
                       >

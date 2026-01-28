@@ -1,9 +1,19 @@
 import { Section, Video } from '@/types';
 import { VideoCard } from './VideoCard';
 
+// Extended video type with localization
+interface LocalizedVideo extends Video {
+  title_en?: string | null;
+  title_es?: string | null;
+}
+
+interface LocalizedSection extends Omit<Section, 'videos'> {
+  videos: LocalizedVideo[];
+}
+
 interface SectionRowProps {
-  section: Section;
-  onVideoClick: (video: Video) => void;
+  section: LocalizedSection;
+  onVideoClick: (video: LocalizedVideo) => void;
   sectionIndex?: number;
 }
 

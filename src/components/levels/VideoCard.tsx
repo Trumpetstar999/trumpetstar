@@ -1,9 +1,13 @@
 import { Play, Star, Clock } from 'lucide-react';
 import { Video } from '@/types';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface VideoCardProps {
-  video: Video;
+  video: Video & {
+    title_en?: string | null;
+    title_es?: string | null;
+  };
   onClick: () => void;
   index?: number;
 }
@@ -15,6 +19,21 @@ function formatDuration(seconds: number): string {
 }
 
 export function VideoCard({ video, onClick, index = 0 }: VideoCardProps) {
+  const { language } = useLanguage();
+
+  // Get localized title based on current language
+  const getLocalizedTitle = () => {
+    if (language === 'en' && video.title_en) {
+      return video.title_en;
+    }
+    if (language === 'es' && video.title_es) {
+      return video.title_es;
+    }
+    return video.title;
+  };
+
+  const displayTitle = getLocalizedTitle();
+
   return (
     <button
       onClick={onClick}
@@ -28,7 +47,7 @@ export function VideoCard({ video, onClick, index = 0 }: VideoCardProps) {
       <div className="relative aspect-video overflow-hidden">
         <img
           src={video.thumbnail}
-          alt={video.title}
+          alt={displayTitle}
           className="w-full h-full object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-105"
         />
         
@@ -60,7 +79,7 @@ export function VideoCard({ video, onClick, index = 0 }: VideoCardProps) {
       {/* Title */}
       <div className="p-4 bg-white">
         <h3 className="text-base font-medium text-gray-900 text-left line-clamp-2 group-hover:text-brand-blue-mid transition-colors duration-200">
-          {video.title}
+          {displayTitle}
         </h3>
       </div>
     </button>

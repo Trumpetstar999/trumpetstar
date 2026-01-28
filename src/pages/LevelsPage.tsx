@@ -4,7 +4,7 @@ import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
-import { Video, Level, Section } from '@/types';
+import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
 import { Loader2, Search, X, Film, Clock, ChevronRight, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -29,19 +29,44 @@ interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
   difficulty?: Difficulty;
 }
 
-interface RecentVideo extends Video {
+// Extended Video type with localization fields
+interface LocalizedVideo {
+  id: string;
+  title: string;
+  title_en?: string | null;
+  title_es?: string | null;
+  thumbnail: string;
+  duration: number;
+  vimeoId: string;
+  vimeoPlayerUrl?: string;
+  completions: number;
+}
+
+interface RecentVideo extends LocalizedVideo {
   watchedAt: string;
   levelTitle: string;
 }
 
+interface LocalizedSection {
+  id: string;
+  title: string;
+  videos: LocalizedVideo[];
+}
+
+interface LocalizedLevel extends Omit<Level, 'sections'> {
+  requiredPlanKey: PlanKey;
+  difficulty?: Difficulty;
+  sections: LocalizedSection[];
+}
+
 interface SelectedVideo {
-  video: Video;
+  video: LocalizedVideo;
   levelId?: string;
   levelTitle?: string;
 }
 
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
-  const [levels, setLevels] = useState<LevelWithPlan[]>([]);
+  const [levels, setLevels] = useState<LocalizedLevel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLevel, setActiveLevel] = useState<string>('recent'); // Default to 'recent'
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
@@ -130,6 +155,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           recentVids.push({
             id: video.id,
             title: video.title,
+            title_en: video.title_en,
+            title_es: video.title_es,
             thumbnail: video.thumbnail_url || 'https://images.unsplash.com/video-thumbnail.jpg',
             duration: video.duration_seconds || 0,
             vimeoId: video.vimeo_video_id,
@@ -177,40 +204,37 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
 
       if (videosError) throw videosError;
 
-      // Transform data to match Level type
-      const transformedLevels: LevelWithPlan[] = (levelsData || []).map((level) => {
+      // Transform data to match LocalizedLevel type
+      const transformedLevels: LocalizedLevel[] = (levelsData || []).map((level) => {
         const levelSections = (sectionsData || []).filter(s => s.level_id === level.id);
         const levelVideos = (videosData || []).filter(v => v.level_id === level.id);
 
+        // Helper to map video data with localized fields
+        const mapVideo = (video: any): LocalizedVideo => ({
+          id: video.id,
+          title: video.title,
+          title_en: video.title_en,
+          title_es: video.title_es,
+          thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+          duration: video.duration_seconds || 0,
+          vimeoId: video.vimeo_video_id,
+          vimeoPlayerUrl: video.vimeo_player_url || undefined,
+          completions: 0,
+        });
+
         // Group videos by section, or create a default "Alle Videos" section
-        const sections: Section[] = levelSections.length > 0
+        const sections: LocalizedSection[] = levelSections.length > 0
           ? levelSections.map((section) => ({
               id: section.id,
               title: section.title,
               videos: levelVideos
                 .filter(v => v.section_id === section.id)
-                .map((video) => ({
-                  id: video.id,
-                  title: video.title,
-                  thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
-                  duration: video.duration_seconds || 0,
-                  vimeoId: video.vimeo_video_id,
-                  vimeoPlayerUrl: video.vimeo_player_url || undefined,
-                  completions: 0,
-                })),
+                .map(mapVideo),
             }))
           : [{
               id: `${level.id}-default`,
               title: 'Alle Videos',
-              videos: levelVideos.map((video) => ({
-                id: video.id,
-                title: video.title,
-                thumbnail: video.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
-                duration: video.duration_seconds || 0,
-                vimeoId: video.vimeo_video_id,
-                vimeoPlayerUrl: video.vimeo_player_url || undefined,
-                completions: 0,
-              })),
+              videos: levelVideos.map(mapVideo),
             }];
 
         // Use new required_plan_key field, fallback to mapping from old field
@@ -243,7 +267,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     if (!searchQuery.trim()) return [];
     
     const query = searchQuery.toLowerCase().trim();
-    const results: { video: Video; levelTitle: string; sectionTitle: string; levelId: string }[] = [];
+    const results: { video: LocalizedVideo; levelTitle: string; sectionTitle: string; levelId: string }[] = [];
     
     levels.forEach(level => {
       level.sections.forEach(section => {
