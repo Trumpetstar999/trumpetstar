@@ -8,6 +8,7 @@ import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
 import { WordPressMembershipProvider } from "@/hooks/useWordPressMembership";
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
@@ -26,31 +27,33 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <WordPressMembershipProvider>
-          <MembershipProvider>
-            <VideoPlayerProvider>
-              <PdfViewerProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<AuthPage />} />
-                    <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
-                    <Route path="/admin" element={<AdminPage />} />
-                    <Route path="/chats" element={<ChatsPage />} />
-                    <Route path="/musicxml" element={<MusicXMLPage />} />
-                    <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </BrowserRouter>
-              </PdfViewerProvider>
-            </VideoPlayerProvider>
-          </MembershipProvider>
-        </WordPressMembershipProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <WordPressMembershipProvider>
+            <MembershipProvider>
+              <VideoPlayerProvider>
+                <PdfViewerProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<AuthPage />} />
+                      <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
+                      <Route path="/admin" element={<AdminPage />} />
+                      <Route path="/chats" element={<ChatsPage />} />
+                      <Route path="/musicxml" element={<MusicXMLPage />} />
+                      <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </BrowserRouter>
+                </PdfViewerProvider>
+              </VideoPlayerProvider>
+            </MembershipProvider>
+          </WordPressMembershipProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
   );

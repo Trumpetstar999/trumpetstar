@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "search": "Suchen",
+    "filter": "Filter",
+    "all": "Alle",
+    "back": "Zurück",
+    "next": "Weiter",
+    "yes": "Ja",
+    "no": "Nein",
+    "confirm": "Bestätigen",
+    "error": "Fehler",
+    "success": "Erfolgreich",
+    "noResults": "Keine Ergebnisse gefunden",
+    "resultsCount": "{{count}} Ergebnis",
+    "resultsCount_other": "{{count}} Ergebnisse"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "forgotPassword": "Passwort vergessen?",
+    "signedOutSuccess": "Erfolgreich abgemeldet"
+  },
+  "navigation": {
+    "levels": "Levels",
+    "pdfs": "Noten",
+    "musicxml": "MusicXML",
+    "practice": "Üben",
+    "recordings": "Aufnahmen",
+    "chats": "Chats",
+    "classroom": "Klassenzimmer",
+    "profile": "Profil"
+  },
+  "levels": {
+    "title": "Levels",
+    "searchPlaceholder": "Videos suchen...",
+    "recentlyWatched": "Zuletzt angesehen",
+    "recentlyWatchedDesc": "Deine kürzlich geschauten Videos",
+    "noRecentVideos": "Noch keine Videos angesehen",
+    "startLearning": "Wähle ein Level aus und starte mit dem Lernen",
+    "firstLevel": "Zum ersten Level",
+    "noLevels": "Keine Levels verfügbar.",
+    "importShowcases": "Importiere zuerst Showcases im Admin-Bereich.",
+    "noVideosFound": "Keine Videos gefunden",
+    "tryDifferentSearch": "Versuche einen anderen Suchbegriff",
+    "resetSearch": "Suche zurücksetzen",
+    "difficulty": {
+      "all": "Alle Stufen",
+      "basics": "Basics",
+      "beginner": "Anfänger",
+      "easy": "Einfach",
+      "medium": "Mittel",
+      "advanced": "Anspruchsvoll"
+    }
+  },
+  "pdfs": {
+    "title": "Notenhefte",
+    "available": "{{count}} Hefte verfügbar",
+    "searchPlaceholder": "Suchen...",
+    "noPdfs": "Keine PDFs verfügbar",
+    "noPdfsDesc": "Es wurden noch keine Notenhefte hochgeladen.",
+    "upgradeRequired": "Upgrade auf {{plan}} erforderlich",
+    "noPdfsFound": "Keine Notenhefte gefunden"
+  },
+  "musicxml": {
+    "title": "MusicXML Noten",
+    "available": "{{count}} Stücke verfügbar",
+    "searchPlaceholder": "Suchen...",
+    "allLevels": "Alle Levels",
+    "allCategories": "Alle Kategorien",
+    "noDocuments": "Keine MusicXML Noten verfügbar",
+    "noDocumentsDesc": "Es wurden noch keine Noten hochgeladen.",
+    "noDocumentsFound": "Keine Noten gefunden"
+  },
+  "player": {
+    "play": "Abspielen",
+    "pause": "Pausieren",
+    "stop": "Stoppen",
+    "tempo": "Tempo",
+    "speed": "Geschwindigkeit",
+    "volume": "Lautstärke",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden",
+    "selectTrack": "Track auswählen",
+    "export": "Exportieren",
+    "markings": "Markierungen",
+    "concertPitch": "Klingend",
+    "transposed": "Transponiert"
+  },
+  "recordings": {
+    "title": "Aufnahmen",
+    "myRecordings": "Meine Aufnahmen",
+    "noRecordings": "Noch keine Aufnahmen",
+    "noRecordingsDesc": "Starte eine Aufnahme im Video-Player"
+  },
+  "practice": {
+    "title": "Üben",
+    "journal": "Übungstagebuch",
+    "todos": "Aufgaben",
+    "startPractice": "Üben starten",
+    "lastActivity": "Letzte Aktivität",
+    "minutes": "Minuten",
+    "mood": "Stimmung",
+    "notes": "Notizen",
+    "tags": "Tags"
+  },
+  "chats": {
+    "title": "Chats",
+    "newChat": "Neuer Chat",
+    "noChats": "Keine Chats vorhanden",
+    "typeMessage": "Nachricht eingeben..."
+  },
+  "profile": {
+    "title": "Profil",
+    "dashboard": "Dashboard",
+    "personalOverview": "Dein persönlicher Überblick",
+    "editProfile": "Profil bearbeiten",
+    "changePassword": "Passwort ändern",
+    "settings": "Einstellungen",
+    "language": "Sprache",
+    "selectLanguage": "Sprache auswählen",
+    "arrangeWidgets": "Anordnen",
+    "done": "Fertig",
+    "reset": "Zurücksetzen",
+    "dragHint": "Halte eine Kachel gedrückt und ziehe sie, um die Reihenfolge zu ändern",
+    "premiumHint": "Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten."
+  },
+  "widgets": {
+    "profile": "Profil",
+    "starsProgress": "Sterne & Fortschritt",
+    "calendar": "Wochenübersicht",
+    "recordings": "Meine Aufnahmen",
+    "notesTodo": "Notizen & To-Do",
+    "feedbackChat": "Feedback & Chat",
+    "classroom": "Klassenzimmer",
+    "statistics": "Statistik",
+    "recentVideos": "Zuletzt gespielt",
+    "weeklyGoals": "Wochenziele"
+  },
+  "assistant": {
+    "name": "Toni dein Trompeten-Coach",
+    "online": "online",
+    "typing": "tippt...",
+    "greeting": "Hallo, ich bin Toni!",
+    "greetingDesc": "Frag mich zu Trompetentechnik, Übetipps, Repertoire oder der Plattform.",
+    "inputPlaceholder": "Nachricht eingeben...",
+    "recording": "Aufnahme läuft... Tippe erneut zum Stoppen",
+    "readingAloud": "Wird vorgelesen...",
+    "wasHelpful": "War das hilfreich?",
+    "modes": {
+      "platform": "📱 Plattform",
+      "technique": "🎺 Übetipps",
+      "mental": "🧠 Mental",
+      "repertoire": "🎵 Repertoire",
+      "mixed": "✨ Alles"
+    }
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español"
+  },
+  "languageTabs": {
+    "german": "Deutsch",
+    "english": "English",
+    "spanish": "Español"
+  },
+  "onboarding": {
+    "welcome": "Willkommen!",
+    "selectLanguage": "Wähle deine Sprache",
+    "continue": "Weiter"
+  }
+}

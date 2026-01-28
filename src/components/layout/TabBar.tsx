@@ -4,6 +4,7 @@ import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic }
 import { cn } from '@/lib/utils';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
+import { useLanguage } from '@/hooks/useLanguage';
 import { AssistantPanel } from '@/components/assistant/AssistantPanel';
 import toniAvatar from '@/assets/toni-coach.png';
 
@@ -25,27 +26,38 @@ const tabToFlagKey: Record<TabId, string> = {
   profile: 'menu_profile',
 };
 
-const allTabs: { id: TabId; label: string; icon: typeof Layers }[] = [
-  { id: 'levels', label: 'Levels', icon: Layers },
-  { id: 'pdfs', label: 'Noten', icon: FileText },
-  { id: 'musicxml', label: 'MusicXML', icon: FileMusic },
-  { id: 'practice', label: 'Üben', icon: Music },
-  { id: 'recordings', label: 'Aufnahmen', icon: Video },
-  { id: 'chats', label: 'Chats', icon: MessageSquare },
-  { id: 'classroom', label: 'Klasse', icon: Users },
-  { id: 'profile', label: 'Profil', icon: User },
-];
+// Tab icons mapping
+const tabIcons: Record<TabId, typeof Layers> = {
+  levels: Layers,
+  pdfs: FileText,
+  musicxml: FileMusic,
+  practice: Music,
+  recordings: Video,
+  chats: MessageSquare,
+  classroom: Users,
+  profile: User,
+};
+
+// All tab IDs in order
+const allTabIds: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'chats', 'classroom', 'profile'];
 
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
   const unreadCount = useUnreadMessages();
   const [assistantOpen, setAssistantOpen] = useState(false);
   const { isEnabled, loading: flagsLoading } = useFeatureFlags();
+  const { t } = useLanguage();
 
-  // Filter tabs based on feature flags
+  // Build tabs with localized labels
   const tabs = useMemo(() => {
-    if (flagsLoading) return allTabs; // Show all while loading
+    const allTabs = allTabIds.map(id => ({
+      id,
+      label: t(`navigation.${id}`),
+      icon: tabIcons[id],
+    }));
+
+    if (flagsLoading) return allTabs;
     return allTabs.filter(tab => isEnabled(tabToFlagKey[tab.id]));
-  }, [isEnabled, flagsLoading]);
+  }, [isEnabled, flagsLoading, t]);
 
   if (hidden) {
     return null;

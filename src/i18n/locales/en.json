@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "error": "Error",
+    "success": "Success",
+    "noResults": "No results found",
+    "resultsCount": "{{count}} result",
+    "resultsCount_other": "{{count}} results"
+  },
+  "auth": {
+    "login": "Log in",
+    "logout": "Log out",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signedOutSuccess": "Signed out successfully"
+  },
+  "navigation": {
+    "levels": "Levels",
+    "pdfs": "Sheet Music",
+    "musicxml": "MusicXML",
+    "practice": "Practice",
+    "recordings": "Recordings",
+    "chats": "Chats",
+    "classroom": "Classroom",
+    "profile": "Profile"
+  },
+  "levels": {
+    "title": "Levels",
+    "searchPlaceholder": "Search videos...",
+    "recentlyWatched": "Recently Watched",
+    "recentlyWatchedDesc": "Your recently watched videos",
+    "noRecentVideos": "No videos watched yet",
+    "startLearning": "Choose a level and start learning",
+    "firstLevel": "Go to first level",
+    "noLevels": "No levels available.",
+    "importShowcases": "Import showcases in the admin area first.",
+    "noVideosFound": "No videos found",
+    "tryDifferentSearch": "Try a different search term",
+    "resetSearch": "Reset search",
+    "difficulty": {
+      "all": "All Levels",
+      "basics": "Basics",
+      "beginner": "Beginner",
+      "easy": "Easy",
+      "medium": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "pdfs": {
+    "title": "Sheet Music Books",
+    "available": "{{count}} books available",
+    "searchPlaceholder": "Search...",
+    "noPdfs": "No PDFs available",
+    "noPdfsDesc": "No sheet music books have been uploaded yet.",
+    "upgradeRequired": "Upgrade to {{plan}} required",
+    "noPdfsFound": "No sheet music found"
+  },
+  "musicxml": {
+    "title": "MusicXML Scores",
+    "available": "{{count}} pieces available",
+    "searchPlaceholder": "Search...",
+    "allLevels": "All Levels",
+    "allCategories": "All Categories",
+    "noDocuments": "No MusicXML scores available",
+    "noDocumentsDesc": "No scores have been uploaded yet.",
+    "noDocumentsFound": "No scores found"
+  },
+  "player": {
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "tempo": "Tempo",
+    "speed": "Speed",
+    "volume": "Volume",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "selectTrack": "Select Track",
+    "export": "Export",
+    "markings": "Markings",
+    "concertPitch": "Concert Pitch",
+    "transposed": "Transposed"
+  },
+  "recordings": {
+    "title": "Recordings",
+    "myRecordings": "My Recordings",
+    "noRecordings": "No recordings yet",
+    "noRecordingsDesc": "Start recording in the video player"
+  },
+  "practice": {
+    "title": "Practice",
+    "journal": "Practice Journal",
+    "todos": "Tasks",
+    "startPractice": "Start Practice",
+    "lastActivity": "Last Activity",
+    "minutes": "Minutes",
+    "mood": "Mood",
+    "notes": "Notes",
+    "tags": "Tags"
+  },
+  "chats": {
+    "title": "Chats",
+    "newChat": "New Chat",
+    "noChats": "No chats available",
+    "typeMessage": "Type a message..."
+  },
+  "profile": {
+    "title": "Profile",
+    "dashboard": "Dashboard",
+    "personalOverview": "Your personal overview",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "settings": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "arrangeWidgets": "Arrange",
+    "done": "Done",
+    "reset": "Reset",
+    "dragHint": "Hold and drag a tile to change the order",
+    "premiumHint": "You can switch to Premium anytime – your progress is saved."
+  },
+  "widgets": {
+    "profile": "Profile",
+    "starsProgress": "Stars & Progress",
+    "calendar": "Weekly Overview",
+    "recordings": "My Recordings",
+    "notesTodo": "Notes & To-Do",
+    "feedbackChat": "Feedback & Chat",
+    "classroom": "Classroom",
+    "statistics": "Statistics",
+    "recentVideos": "Recently Played",
+    "weeklyGoals": "Weekly Goals"
+  },
+  "assistant": {
+    "name": "Toni your Trumpet Coach",
+    "online": "online",
+    "typing": "typing...",
+    "greeting": "Hello, I'm Toni!",
+    "greetingDesc": "Ask me about trumpet technique, practice tips, repertoire, or the platform.",
+    "inputPlaceholder": "Type a message...",
+    "recording": "Recording... Tap again to stop",
+    "readingAloud": "Reading aloud...",
+    "wasHelpful": "Was this helpful?",
+    "modes": {
+      "platform": "📱 Platform",
+      "technique": "🎺 Practice Tips",
+      "mental": "🧠 Mental",
+      "repertoire": "🎵 Repertoire",
+      "mixed": "✨ Everything"
+    }
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español"
+  },
+  "languageTabs": {
+    "german": "Deutsch",
+    "english": "English",
+    "spanish": "Español"
+  },
+  "onboarding": {
+    "welcome": "Welcome!",
+    "selectLanguage": "Choose your language",
+    "continue": "Continue"
+  }
+}
