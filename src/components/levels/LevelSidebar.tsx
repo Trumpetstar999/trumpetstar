@@ -1,26 +1,11 @@
 import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Star, Lock, Crown, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
-
-const DIFFICULTY_LABELS: Record<Difficulty, string> = {
-  basics: 'Basics',
-  beginner: 'Anfänger',
-  easy: 'Einfach',
-  medium: 'Mittel',
-  advanced: 'Anspruchsvoll',
-};
-
-const DIFFICULTY_COLORS: Record<Difficulty, string> = {
-  basics: 'text-purple-400',
-  beginner: 'text-green-400',
-  easy: 'text-blue-400',
-  medium: 'text-orange-400',
-  advanced: 'text-red-400',
-};
 
 // Extended interface for levels with new plan key
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
@@ -37,6 +22,19 @@ interface LevelSidebarProps {
 
 export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
   const { canAccessLevel } = useMembership();
+  const { t } = useLanguage();
+
+  const DIFFICULTY_COLORS: Record<Difficulty, string> = {
+    basics: 'text-purple-400',
+    beginner: 'text-green-400',
+    easy: 'text-blue-400',
+    medium: 'text-orange-400',
+    advanced: 'text-red-400',
+  };
+
+  const getDifficultyLabel = (difficulty: Difficulty): string => {
+    return t(`levels.difficulty.${difficulty}`);
+  };
 
   return (
     <aside className="w-[260px] glass-strong h-full overflow-y-auto flex-shrink-0">
@@ -65,7 +63,7 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
                 'font-medium',
                 activeLevel === 'recent' ? 'text-white' : 'text-white/90'
               )}>
-                Zuletzt angesehen
+                {t('levels.recentlyWatched')}
               </span>
             </button>
             
@@ -74,7 +72,7 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
         )}
         
         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 px-2">
-          Alle Levels
+          {t('levels.allLevels')}
         </h2>
         
         <nav className="space-y-2">
@@ -122,7 +120,7 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
                   <div className="flex items-center gap-2 text-xs">
                     {level.difficulty && (
                       <span className={cn(DIFFICULTY_COLORS[level.difficulty])}>
-                        {DIFFICULTY_LABELS[level.difficulty]}
+                        {getDifficultyLabel(level.difficulty)}
                       </span>
                     )}
                     {isLocked && (
