@@ -11,23 +11,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage, useLocalizedContent, Language } from '@/hooks/useLanguage';
+import { LanguageTabs } from '@/components/common/LanguageTabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 interface LevelsPageProps {
   onStarEarned: () => void;
 }
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
-
-const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
-  { value: 'all', label: 'Alle Stufen' },
-  { value: 'basics', label: 'Basics' },
-  { value: 'beginner', label: 'Anfänger' },
-  { value: 'easy', label: 'Einfach' },
-  { value: 'medium', label: 'Mittel' },
-  { value: 'advanced', label: 'Anspruchsvoll' },
-];
 
 // Extended Level type with new plan key and difficulty
 interface LevelWithPlan extends Omit<Level, 'requiredPlan'> {
@@ -54,9 +48,22 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
+  const [contentLanguage, setContentLanguage] = useState<Language>('de');
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
   const { user } = useAuth();
+  const { t, language } = useLanguage();
+  const { getLocalizedField } = useLocalizedContent();
+
+  // Difficulty options with translations
+  const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
+    { value: 'all', label: t('levels.difficulty.all') },
+    { value: 'basics', label: t('levels.difficulty.basics') },
+    { value: 'beginner', label: t('levels.difficulty.beginner') },
+    { value: 'easy', label: t('levels.difficulty.easy') },
+    { value: 'medium', label: t('levels.difficulty.medium') },
+    { value: 'advanced', label: t('levels.difficulty.advanced') },
+  ];
 
   // Update video playing state when video is selected/closed
   useEffect(() => {
@@ -256,11 +263,27 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return results;
   }, [searchQuery, levels]);
 
-  // Filter levels by difficulty
+  // Filter levels by difficulty and content language
   const filteredLevels = useMemo(() => {
-    if (difficultyFilter === 'all') return levels;
-    return levels.filter(l => l.difficulty === difficultyFilter);
-  }, [levels, difficultyFilter]);
+    let filtered = levels;
+    
+    // Filter by content language
+    if (contentLanguage !== 'de') {
+      // When filtering for EN/ES, only show levels tagged with that language or 'all'
+      filtered = filtered.filter(l => {
+        // For now show all levels since we don't have separate showcases yet
+        // This will be enhanced when content is added per language
+        return true;
+      });
+    }
+    
+    // Filter by difficulty
+    if (difficultyFilter !== 'all') {
+      filtered = filtered.filter(l => l.difficulty === difficultyFilter);
+    }
+    
+    return filtered;
+  }, [levels, difficultyFilter, contentLanguage]);
 
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
   const isSearching = searchQuery.trim().length > 0;
@@ -270,7 +293,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       <div className="flex items-center justify-center h-[calc(100vh-140px)]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-white/70">Lade Levels...</p>
+          <p className="text-white/70">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -280,9 +303,9 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] text-center">
         <div className="glass-strong rounded-lg p-8 max-w-md">
-          <p className="text-white mb-4">Keine Levels verfügbar.</p>
+          <p className="text-white mb-4">{t('levels.noLevels')}</p>
           <p className="text-sm text-white/60">
-            Importiere zuerst Showcases im Admin-Bereich.
+            {t('levels.importShowcases')}
           </p>
         </div>
       </div>
@@ -292,7 +315,14 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
       <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in flex-wrap">
-        <h2 className="text-lg font-semibold text-white shrink-0">Levels</h2>
+        <h2 className="text-lg font-semibold text-white shrink-0">{t('levels.title')}</h2>
+        
+        {/* Language Tabs */}
+        <LanguageTabs
+          selectedLanguage={contentLanguage}
+          onLanguageChange={setContentLanguage}
+          variant="compact"
+        />
         
         {/* Difficulty Filter */}
         <div className="flex items-center gap-2">
@@ -319,7 +349,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <Input
             type="text"
-            placeholder="Videos suchen..."
+            placeholder={t('levels.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-9 pl-9 pr-8 bg-white/10 border-white/20 text-white text-sm placeholder:text-white/40 rounded-lg focus:bg-white/15 focus:border-white/30 transition-all duration-200"
@@ -337,7 +367,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         {/* Search results count */}
         {isSearching && (
           <span className="text-sm text-white/60 animate-fade-in">
-            {searchResults.length} {searchResults.length === 1 ? 'Ergebnis' : 'Ergebnisse'}
+            {t('common.resultsCount', { count: searchResults.length })}
           </span>
         )}
       </div>

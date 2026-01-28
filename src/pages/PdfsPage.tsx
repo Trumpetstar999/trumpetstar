@@ -4,8 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useMembership } from '@/hooks/useMembership';
 import { usePdfCache } from '@/hooks/usePdfCache';
+import { useLanguage, useLocalizedContent, Language } from '@/hooks/useLanguage';
 import { PdfViewer } from '@/components/pdfs/PdfViewer';
 import { PdfBookCard } from '@/components/pdfs/PdfBookCard';
+import { LanguageTabs } from '@/components/common/LanguageTabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, FileText, Search, Music } from 'lucide-react';
@@ -17,13 +19,18 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 interface PdfDocument {
   id: string;
   title: string;
+  title_en?: string | null;
+  title_es?: string | null;
   description: string | null;
+  description_en?: string | null;
+  description_es?: string | null;
   pdf_file_url: string;
   page_count: number;
   plan_required: string;
   level_id: string | null;
   is_active: boolean;
   sort_index: number;
+  language?: string | null;
 }
 
 interface AudioTrack {
@@ -40,13 +47,15 @@ export function PdfsPage() {
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
   const { setIsPdfViewerOpen } = usePdfViewer();
   const { getPdfUrl, downloadProgress, isCached } = usePdfCache();
+  const { t } = useLanguage();
+  const { getLocalizedField } = useLocalizedContent();
   
   const [selectedPdfId, setSelectedPdfId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [cachedStatus, setCachedStatus] = useState<Map<string, boolean>>(new Map());
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [contentLanguage, setContentLanguage] = useState<Language>('de');
   // Fetch PDF documents
   const { data: pdfs = [], isLoading: pdfsLoading } = useQuery({
     queryKey: ['user-pdfs'],
@@ -147,11 +156,23 @@ export function PdfsPage() {
     }
   }, [pdfBlobUrl]);
 
-  // Filter PDFs by search
-  const filteredPdfs = pdfs.filter(pdf =>
-    pdf.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (pdf.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
-  );
+  // Filter PDFs by search and content language
+  const filteredPdfs = pdfs.filter(pdf => {
+    const localizedTitle = getLocalizedField(pdf, 'title');
+    const localizedDesc = getLocalizedField(pdf, 'description');
+    
+    const matchesSearch = localizedTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (localizedDesc?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+    
+    // Content language filter - show all if DE, or filter by language field if available
+    const matchesLanguage = contentLanguage === 'de' || 
+      !pdf.language || 
+      pdf.language === contentLanguage ||
+      pdf.language === 'all';
+    
+    return matchesSearch && matchesLanguage;
+  });
+
 
   if (isLoading) {
     return (
@@ -166,38 +187,49 @@ export function PdfsPage() {
       <div className="flex h-[calc(100vh-140px)] items-center justify-center">
         <div className="text-center text-muted-foreground">
           <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-          <p className="text-lg">Keine PDFs verfügbar</p>
-          <p className="text-sm">Es wurden noch keine Notenhefte hochgeladen.</p>
+          <p className="text-lg">{t('pdfs.noPdfs')}</p>
+          <p className="text-sm">{t('pdfs.noPdfsDesc')}</p>
         </div>
       </div>
     );
   }
+
 
   return (
     <>
       <div className="h-[calc(100vh-140px)] flex flex-col">
         {/* Header */}
         <div className="shrink-0 px-6 py-4 border-b bg-card/50">
-          <div className="flex items-center justify-between gap-4 max-w-6xl mx-auto">
+          <div className="flex items-center justify-between gap-4 max-w-6xl mx-auto flex-wrap">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Music className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">Notenhefte</h1>
-                <p className="text-sm text-muted-foreground">{pdfs.length} Hefte verfügbar</p>
+                <h1 className="text-xl font-bold">{t('pdfs.title')}</h1>
+                <p className="text-sm text-muted-foreground">{t('pdfs.available', { count: pdfs.length })}</p>
               </div>
             </div>
             
-            {/* Search */}
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Suchen..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9"
+            <div className="flex items-center gap-3">
+              {/* Language Tabs */}
+              <LanguageTabs
+                selectedLanguage={contentLanguage}
+                onLanguageChange={setContentLanguage}
+                variant="compact"
+                className="bg-muted/50 border border-border"
               />
+              
+              {/* Search */}
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('pdfs.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-9"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -211,13 +243,15 @@ export function PdfsPage() {
                 const isDownloading = downloadProgress?.pdfId === pdf.id && downloadProgress.isDownloading;
                 const progress = downloadProgress?.pdfId === pdf.id ? downloadProgress.progress : 0;
                 const cached = cachedStatus.get(pdf.id) || false;
+                const localizedTitle = getLocalizedField(pdf, 'title');
+                const localizedDesc = getLocalizedField(pdf, 'description');
 
                 return (
                   <PdfBookCard
                     key={pdf.id}
                     id={pdf.id}
-                    title={pdf.title}
-                    description={pdf.description}
+                    title={localizedTitle}
+                    description={localizedDesc}
                     pageCount={pdf.page_count}
                     planRequired={pdf.plan_required as PlanKey}
                     hasAccess={hasAccess}
@@ -233,7 +267,7 @@ export function PdfsPage() {
             {filteredPdfs.length === 0 && (
               <div className="text-center py-16 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>Keine Notenhefte gefunden</p>
+                <p>{t('pdfs.noPdfsFound')}</p>
               </div>
             )}
           </div>
