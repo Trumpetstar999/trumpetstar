@@ -27,8 +27,8 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <LanguageProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <LanguageProvider>
           <WordPressMembershipProvider>
             <MembershipProvider>
               <VideoPlayerProvider>
@@ -52,8 +52,8 @@ const App = () => {
               </VideoPlayerProvider>
             </MembershipProvider>
           </WordPressMembershipProvider>
-        </AuthProvider>
-      </LanguageProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
   );
