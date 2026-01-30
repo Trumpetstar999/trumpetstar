@@ -46,19 +46,19 @@ export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverla
         <div className="space-y-3">
           {upgradePlans.map((plan) => {
             const link = getUpgradeLink(plan);
-            const isPremium = plan === 'PREMIUM';
+            const isPro = plan === 'PRO';
             return (
               <Button
                 key={plan}
                 onClick={() => handleUpgrade(plan)}
                 disabled={isLoading || !link}
                 className={`w-full gap-2 rounded-full text-base py-5 ${
-                  isPremium 
+                  isPro 
                     ? 'bg-accent-red hover:bg-accent-red/90 text-white shadow-lg' 
                     : 'bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white'
                 }`}
               >
-                {isPremium && <Sparkles className="w-4 h-4" />}
+                {isPro && <Sparkles className="w-4 h-4" />}
                 <ExternalLink className="w-4 h-4" />
                 {PLAN_DISPLAY_NAMES[plan]} freischalten
               </Button>

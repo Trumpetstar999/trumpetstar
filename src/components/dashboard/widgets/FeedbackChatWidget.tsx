@@ -26,7 +26,7 @@ export function FeedbackChatWidget() {
   const [chatSummary, setChatSummary] = useState<ChatSummary | null>(null);
   const [totalUnread, setTotalUnread] = useState(0);
   
-  const hasPremium = canAccessFeature('PREMIUM');
+  const hasPremium = canAccessFeature('PRO');
 
   useEffect(() => {
     if (!user || !hasPremium) {
@@ -96,22 +96,22 @@ export function FeedbackChatWidget() {
         
         <h3 className="text-white font-semibold mb-2">Feedback & Chat</h3>
         <p className="text-white/70 text-sm mb-4">
-          Persönliches Feedback ist Teil von Premium
+          Persönliches Feedback ist Teil von Pro
         </p>
         
         <Button
           onClick={() => setUpgradeOpen(true)}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
-          Premium freischalten
+          Pro freischalten
         </Button>
 
         <UpgradeDialog
           open={upgradeOpen}
           onOpenChange={setUpgradeOpen}
-          requiredPlanKey="PREMIUM"
+          requiredPlanKey="PRO"
           title="Persönliches Feedback zu deinen Aufnahmen"
-          description="Mit Premium kannst du deine Aufnahmen direkt an deinen Lehrer oder den Admin senden und gezieltes Feedback mit Zeitmarken und Antwort-Videos erhalten."
+          description="Mit Pro kannst du deine Aufnahmen direkt an deinen Lehrer oder den Admin senden und gezieltes Feedback mit Zeitmarken und Antwort-Videos erhalten."
         />
       </div>
     );

@@ -15,8 +15,8 @@ export function ChatsPage() {
   const { chatInfo, loading: studentLoading } = useTeacherChat();
   const { loading: teacherLoading } = useTeacherStudentChats();
   
-  // Check if user has PREMIUM access for Chat
-  const hasPremiumAccess = canAccessFeature('PREMIUM');
+  // Check if user has PRO access for Chat
+  const hasPremiumAccess = canAccessFeature('PRO');
 
   // Show Premium Lock if user doesn't have access (only for non-teachers)
   if (!hasPremiumAccess && !isTeacher) {

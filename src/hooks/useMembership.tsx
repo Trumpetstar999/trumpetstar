@@ -28,7 +28,7 @@ const defaultState: MembershipState = {
   planKey: 'FREE',
   planRank: 0,
   activeProductIds: [],
-  upgradeLinks: { BASIC: null, PREMIUM: null },
+  upgradeLinks: { BASIC: null, PRO: null },
   lastSync: null,
   error: null,
 };
@@ -112,7 +112,7 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
           activeProductIds: data.activeProductIds || [],
           upgradeLinks: {
             BASIC: data.upgradeLinks?.BASIC || null,
-            PREMIUM: data.upgradeLinks?.PREMIUM || null,
+            PRO: data.upgradeLinks?.PRO || data.upgradeLinks?.PREMIUM || null,
           },
           lastSync: new Date(),
           error: null,
@@ -145,7 +145,7 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
 
   const getUpgradeLink = useCallback((planKey: PlanKey): string | null => {
     if (planKey === 'BASIC') return state.upgradeLinks.BASIC;
-    if (planKey === 'PREMIUM') return state.upgradeLinks.PREMIUM;
+    if (planKey === 'PRO') return state.upgradeLinks.PRO;
     return null;
   }, [state.upgradeLinks]);
 
