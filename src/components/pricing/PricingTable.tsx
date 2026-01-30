@@ -108,8 +108,8 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             <Card
               key={plan.key}
               className={cn(
-                'relative flex flex-col transition-all duration-300',
-                isHighlighted && 'border-2 border-primary shadow-xl scale-[1.02] bg-primary/5',
+                'relative flex flex-col transition-all duration-300 bg-card',
+                isHighlighted && 'border-2 border-primary shadow-xl scale-[1.02]',
                 isCurrentPlan && 'ring-2 ring-emerald-500'
               )}
             >
@@ -127,7 +127,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               )}
 
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-2xl flex items-center justify-center gap-2 text-foreground">
+                <CardTitle className="text-2xl flex items-center justify-center gap-2 text-card-foreground">
                   {plan.key === 'PRO' && <Crown className="w-6 h-6 text-amber-500" />}
                   {plan.key === 'BASIC' && <Sparkles className="w-5 h-5 text-blue-500" />}
                   {plan.title}
@@ -140,7 +140,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               <CardContent className="flex-1 flex flex-col">
                 {/* Price */}
                 <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-foreground">{getPrice(plan)}</div>
+                  <div className="text-4xl font-bold text-card-foreground">{getPrice(plan)}</div>
                   <div className="text-sm text-muted-foreground">{getPriceSubtext(plan)}</div>
                 </div>
 
@@ -210,21 +210,21 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                     {category.features.map((feature, idx) => (
                       <tr 
                         key={`${category.category}-${idx}`} 
-                        className="border-b last:border-b-0 hover:bg-muted/30 transition-colors"
+                        className="border-b last:border-b-0 hover:bg-muted/50 transition-colors"
                       >
-                        <td className="p-4 text-sm text-foreground">{feature.name}</td>
+                        <td className="p-4 text-sm font-medium text-card-foreground">{feature.name}</td>
                         {plans.map(plan => {
                           const planFeature = plan.features.find(f => f.name === feature.name);
                           const included = planFeature?.included ?? false;
                           return (
                             <td key={plan.key} className="text-center p-4">
                               {included ? (
-                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/15">
+                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
                                   <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 </div>
                               ) : (
                                 <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted">
-                                  <X className="w-4 h-4 text-muted-foreground/50" />
+                                  <X className="w-4 h-4 text-muted-foreground" />
                                 </div>
                               )}
                             </td>
