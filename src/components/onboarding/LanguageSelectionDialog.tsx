@@ -20,17 +20,15 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 
 interface LanguageSelectionDialogProps {
   open: boolean;
-  onComplete: () => void;
 }
 
-export function LanguageSelectionDialog({ open, onComplete }: LanguageSelectionDialogProps) {
+export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) {
   const { language, setLanguage, t } = useLanguage();
   const [selectedLang, setSelectedLang] = useState<Language>(language);
 
   const handleContinue = async () => {
+    // setLanguage will save to database and mark setup as complete
     await setLanguage(selectedLang);
-    localStorage.setItem('trumpetstar_onboarding_complete', 'true');
-    onComplete();
   };
 
   return (
