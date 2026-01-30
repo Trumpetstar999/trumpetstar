@@ -22,11 +22,14 @@ const planStyles: Record<PlanKey, { bg: string; text: string; border: string }> 
 };
 
 export function MembershipStatusBadge() {
-  const { planKey } = useMembership();
+  const { planKey: rawPlanKey } = useMembership();
+
+  // Handle legacy PREMIUM -> PRO mapping
+  const planKey: PlanKey = (rawPlanKey === 'PREMIUM' as any) ? 'PRO' : rawPlanKey;
 
   const isPro = planKey === 'PRO';
   const isBasic = planKey === 'BASIC';
-  const styles = planStyles[planKey];
+  const styles = planStyles[planKey] || planStyles.FREE;
 
   return (
     <div className={cn(
