@@ -92,9 +92,9 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
     shortDescription: 'Zugriff auf alle Videos & Lernmaterialien.',
     description: 'Enthält alle Lernvideos, alle Noten/Materialien, MusicXML-Viewer, Offline, KI-Chat in DE/EN/ES, Fortschrittsanzeige, Kalender & Spielspaß-Tools. Kein persönliches Feedback von Lehrern.',
     cta: 'Basic freischalten',
-    monthlyPrice: 19,
+    monthlyPrice: 15,
     yearlyPrice: 149,
-    yearlyDiscount: 35,
+    yearlyDiscount: 17,
     features: [
       // Lernen
       { category: 'lernen', name: 'Ausgewählte Lernvideos', included: true },
