@@ -69,7 +69,6 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
       { category: 'lernen', name: 'Alle Lernvideos', included: false },
       { category: 'lernen', name: 'PDF-Noten (Auswahl)', included: true },
       { category: 'lernen', name: 'Alle PDF-Noten & Materialien', included: false },
-      { category: 'lernen', name: 'MusicXML-Viewer', included: false },
       { category: 'lernen', name: 'Offline-Zugriff', included: false },
       // Feedback
       { category: 'feedback', name: 'KI-Assistent (DE/EN/ES)', included: false },
@@ -102,7 +101,6 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
       { category: 'lernen', name: 'Alle Lernvideos', included: true },
       { category: 'lernen', name: 'PDF-Noten (Auswahl)', included: true },
       { category: 'lernen', name: 'Alle PDF-Noten & Materialien', included: true },
-      { category: 'lernen', name: 'MusicXML-Viewer', included: true },
       { category: 'lernen', name: 'Offline-Zugriff', included: true },
       // Feedback
       { category: 'feedback', name: 'KI-Assistent (DE/EN/ES)', included: true },
@@ -136,7 +134,6 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
       { category: 'lernen', name: 'Alle Lernvideos', included: true },
       { category: 'lernen', name: 'PDF-Noten (Auswahl)', included: true },
       { category: 'lernen', name: 'Alle PDF-Noten & Materialien', included: true },
-      { category: 'lernen', name: 'MusicXML-Viewer', included: true },
       { category: 'lernen', name: 'Offline-Zugriff', included: true },
       // Feedback
       { category: 'feedback', name: 'KI-Assistent (DE/EN/ES)', included: true },
