@@ -26,10 +26,9 @@ const Index = () => {
   const [totalStars, setTotalStars] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
-  const [showLanguageSelection, setShowLanguageSelection] = useState(false);
   const previousTabRef = useRef<TabId>('levels');
   const { user, loading } = useAuth();
-  const { t, isLoading: languageLoading } = useLanguage();
+  const { t, isLoading: languageLoading, hasCompletedLanguageSetup } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,16 +36,6 @@ const Index = () => {
   const getTabTitle = (tab: TabId): string => {
     return t(`navigation.${tab}`);
   };
-
-  // Check if onboarding language selection is needed
-  useEffect(() => {
-    if (!loading && user) {
-      const onboardingComplete = localStorage.getItem('trumpetstar_onboarding_complete');
-      if (!onboardingComplete) {
-        setShowLanguageSelection(true);
-      }
-    }
-  }, [loading, user]);
 
   // Handle navigation state (e.g., from MusicXML viewer returning)
   useEffect(() => {
@@ -166,8 +155,7 @@ const Index = () => {
 
       {/* Language Selection Dialog for first-time users */}
       <LanguageSelectionDialog 
-        open={showLanguageSelection} 
-        onComplete={() => setShowLanguageSelection(false)} 
+        open={!languageLoading && !hasCompletedLanguageSetup} 
       />
     </>
   );

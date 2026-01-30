@@ -19,6 +19,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => Promise<void>;
   t: (key: string, params?: Record<string, string | number>) => string;
   isLoading: boolean;
+  hasCompletedLanguageSetup: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -60,6 +61,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return detectBrowserLanguage();
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [hasCompletedLanguageSetup, setHasCompletedLanguageSetup] = useState(true); // Default true to avoid flash
 
   // Load user preference from database when authenticated
   useEffect(() => {
@@ -77,17 +79,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
 
         if (data?.language && ['de', 'en', 'es'].includes(data.language)) {
+          // User has a saved language preference - they've completed setup
           setLanguageState(data.language as Language);
           localStorage.setItem('trumpetstar_language', data.language);
-        } else if (!data) {
-          // Create preference entry with detected language
-          const detectedLang = localStorage.getItem('trumpetstar_language') as Language || detectBrowserLanguage();
-          await supabase
-            .from('user_preferences')
-            .insert({ user_id: user.id, language: detectedLang });
+          setHasCompletedLanguageSetup(true);
+        } else {
+          // No language preference exists - show language selection on first login
+          setHasCompletedLanguageSetup(false);
         }
       } catch (error) {
         console.error('[useLanguage] Error loading language preference:', error);
+        setHasCompletedLanguageSetup(true); // Default to true on error to avoid blocking
       } finally {
         setIsLoading(false);
       }
@@ -105,6 +107,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         await supabase
           .from('user_preferences')
           .upsert({ user_id: user.id, language: lang }, { onConflict: 'user_id' });
+        // Mark setup as complete after saving
+        setHasCompletedLanguageSetup(true);
       } catch (error) {
         console.error('[useLanguage] Error saving language preference:', error);
       }
@@ -149,7 +153,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isLoading }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isLoading, hasCompletedLanguageSetup }}>
       {children}
     </LanguageContext.Provider>
   );
