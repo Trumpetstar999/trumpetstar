@@ -105,10 +105,13 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
       
       if (data.success) {
+        // Normalize PREMIUM -> PRO for legacy API responses
+        const normalizedPlanKey = (data.planKey === 'PREMIUM' ? 'PRO' : data.planKey) || 'FREE';
+        
         const newState: MembershipState = {
           isLoading: false,
-          planKey: data.planKey || 'FREE',
-          planRank: data.planRank || PLAN_RANKS[data.planKey as PlanKey] || 0,
+          planKey: normalizedPlanKey as PlanKey,
+          planRank: data.planRank || PLAN_RANKS[normalizedPlanKey as PlanKey] || 0,
           activeProductIds: data.activeProductIds || [],
           upgradeLinks: {
             BASIC: data.upgradeLinks?.BASIC || null,
