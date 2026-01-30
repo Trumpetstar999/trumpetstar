@@ -87,7 +87,7 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
           {levels.map((level, index) => {
             const isActive = activeLevel === level.id;
             const isLocked = level.requiredPlanKey !== 'FREE' && !canAccessLevel(level.requiredPlanKey);
-            const isPremiumLevel = level.requiredPlanKey === 'PREMIUM';
+            const isProLevel = level.requiredPlanKey === 'PRO';
             
             return (
               <button
@@ -134,11 +134,11 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
                     {isLocked && (
                       <span className={cn(
                         'flex items-center gap-1',
-                        isPremiumLevel 
+                        isProLevel 
                           ? 'text-reward-gold' 
                           : 'text-brand-blue-start'
                       )}>
-                        {isPremiumLevel && <Crown className="w-3 h-3" />}
+                        {isProLevel && <Crown className="w-3 h-3" />}
                         {PLAN_DISPLAY_NAMES[level.requiredPlanKey]}
                       </span>
                     )}

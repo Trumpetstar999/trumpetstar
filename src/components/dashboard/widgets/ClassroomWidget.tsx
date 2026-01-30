@@ -10,7 +10,7 @@ export function ClassroomWidget() {
   const { navigateToTab } = useTabNavigation();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   
-  const hasPremium = canAccessFeature('PREMIUM');
+  const hasPremium = canAccessFeature('PRO');
 
   if (!hasPremium) {
     return (
@@ -21,22 +21,22 @@ export function ClassroomWidget() {
         
         <h3 className="text-white font-semibold mb-2">Klassenzimmer</h3>
         <p className="text-white/70 text-sm mb-4">
-          Live-Unterricht ist Teil von Premium
+          Live-Unterricht ist Teil von Pro
         </p>
         
         <Button
           onClick={() => setUpgradeOpen(true)}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
-          Premium freischalten
+          Pro freischalten
         </Button>
 
         <UpgradeDialog
           open={upgradeOpen}
           onOpenChange={setUpgradeOpen}
-          requiredPlanKey="PREMIUM"
+          requiredPlanKey="PRO"
           title="Live-Unterricht & gemeinsames Musizieren"
-          description="Im Klassenzimmer triffst du deinen Lehrer und andere Musiker live. Ihr könnt gemeinsam spielen, Fragen klären und gezielt an deinem Fortschritt arbeiten. Diese Funktion ist Teil von Premium."
+          description="Im Klassenzimmer triffst du deinen Lehrer und andere Musiker live. Ihr könnt gemeinsam spielen, Fragen klären und gezielt an deinem Fortschritt arbeiten. Diese Funktion ist Teil von Pro."
         />
       </div>
     );

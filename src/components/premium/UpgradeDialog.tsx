@@ -24,7 +24,7 @@ const DEFAULT_DESCRIPTION = 'Premium eröffnet dir Live-Unterricht, persönliche
 export function UpgradeDialog({ 
   open, 
   onOpenChange, 
-  requiredPlanKey = 'PREMIUM',
+  requiredPlanKey = 'PRO',
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
 }: UpgradeDialogProps) {
@@ -55,7 +55,7 @@ export function UpgradeDialog({
         <div className="space-y-3 mt-4">
           {upgradePlans.map((plan) => {
             const link = getUpgradeLink(plan);
-            const isPremium = plan === 'PREMIUM';
+            const isPro = plan === 'PRO';
             
             return (
               <Button
@@ -63,14 +63,14 @@ export function UpgradeDialog({
                 onClick={() => handleUpgrade(plan)}
                 disabled={isLoading || !link}
                 className={`w-full gap-2 ${
-                  isPremium 
+                  isPro 
                     ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-lg' 
                     : ''
                 }`}
-                variant={isPremium ? 'default' : 'outline'}
+                variant={isPro ? 'default' : 'outline'}
                 size="lg"
               >
-                {isPremium && <Sparkles className="w-5 h-5" />}
+                {isPro && <Sparkles className="w-5 h-5" />}
                 {PLAN_DISPLAY_NAMES[plan]}
                 <ExternalLink className="w-4 h-4 ml-1" />
               </Button>

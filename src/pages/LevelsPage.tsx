@@ -243,7 +243,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         const requiredPlanKey: PlanKey = 
           (level.required_plan_key as PlanKey) || 
           (level.required_plan === 'PLAN_A' ? 'BASIC' : 
-           level.required_plan === 'PLAN_B' ? 'PREMIUM' : 'FREE');
+           level.required_plan === 'PLAN_B' ? 'PRO' : 'FREE');
 
         return {
           id: level.id,

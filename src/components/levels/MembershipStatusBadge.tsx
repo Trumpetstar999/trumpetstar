@@ -5,16 +5,16 @@ import { cn } from '@/lib/utils';
 
 const planStyles: Record<PlanKey, { bg: string; text: string; border: string }> = {
   FREE: { 
-    bg: 'bg-gray-100', 
-    text: 'text-gray-700', 
-    border: 'border-gray-300' 
+    bg: 'bg-muted', 
+    text: 'text-muted-foreground', 
+    border: 'border-border' 
   },
   BASIC: { 
-    bg: 'bg-blue-100', 
-    text: 'text-blue-700', 
-    border: 'border-blue-300' 
+    bg: 'bg-primary/10', 
+    text: 'text-primary', 
+    border: 'border-primary/30' 
   },
-  PREMIUM: { 
+  PRO: { 
     bg: 'bg-gradient-to-r from-amber-100 to-orange-100', 
     text: 'text-amber-700', 
     border: 'border-amber-300' 
@@ -24,7 +24,7 @@ const planStyles: Record<PlanKey, { bg: string; text: string; border: string }> 
 export function MembershipStatusBadge() {
   const { planKey } = useMembership();
 
-  const isPremium = planKey === 'PREMIUM';
+  const isPro = planKey === 'PRO';
   const isBasic = planKey === 'BASIC';
   const styles = planStyles[planKey];
 
@@ -35,7 +35,7 @@ export function MembershipStatusBadge() {
       styles.text,
       styles.border
     )}>
-      {isPremium && <Crown className="w-3.5 h-3.5" />}
+      {isPro && <Crown className="w-3.5 h-3.5" />}
       {isBasic && <Sparkles className="w-3.5 h-3.5" />}
       <span>{PLAN_DISPLAY_NAMES[planKey]}</span>
     </div>

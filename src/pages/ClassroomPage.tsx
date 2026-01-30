@@ -27,8 +27,8 @@ export function ClassroomPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [activeRoom, setActiveRoom] = useState<Room | null>(null);
 
-  // Check if user has PREMIUM access for Classroom
-  const hasPremiumAccess = canAccessFeature('PREMIUM');
+  // Check if user has PRO access for Classroom
+  const hasPremiumAccess = canAccessFeature('PRO');
 
   const handleCreateRoom = (roomData: {
     title: string;

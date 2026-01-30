@@ -65,13 +65,13 @@ interface LevelManagerProps {
 const PLAN_OPTIONS: { value: PlanKey; label: string }[] = [
   { value: 'FREE', label: 'Free (alle)' },
   { value: 'BASIC', label: 'Basic' },
-  { value: 'PREMIUM', label: 'Premium' },
+  { value: 'PRO', label: 'Pro' },
 ];
 
 const PLAN_BADGE_COLORS: Record<PlanKey, string> = {
-  FREE: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-  BASIC: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  PREMIUM: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+  FREE: 'bg-muted text-muted-foreground',
+  BASIC: 'bg-primary/10 text-primary',
+  PRO: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
 };
 
 export function LevelManager({ onSelectLevel }: LevelManagerProps) {
@@ -525,7 +525,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         </Badge>
                         {level.required_plan_key !== 'FREE' && (
                           <Badge className={`${PLAN_BADGE_COLORS[level.required_plan_key]} gap-1`}>
-                            {level.required_plan_key === 'PREMIUM' ? (
+                            {level.required_plan_key === 'PRO' ? (
                               <Crown className="w-3 h-3" />
                             ) : (
                               <Lock className="w-3 h-3" />

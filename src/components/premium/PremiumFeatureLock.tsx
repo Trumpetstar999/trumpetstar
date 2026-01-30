@@ -41,11 +41,11 @@ interface PremiumFeatureLockProps {
 export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLockProps) {
   const { getUpgradeLink, isLoading } = useMembership();
   const content = FEATURE_CONTENT[feature];
-  const premiumLink = getUpgradeLink('PREMIUM');
+  const proLink = getUpgradeLink('PRO');
 
   const handleUpgrade = () => {
-    if (premiumLink) {
-      window.open(premiumLink, '_blank', 'noopener,noreferrer');
+    if (proLink) {
+      window.open(proLink, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -81,23 +81,23 @@ export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLo
 
         <Button
           onClick={handleUpgrade}
-          disabled={isLoading || !premiumLink}
+          disabled={isLoading || !proLink}
           className="w-full gap-2 bg-accent-red hover:bg-accent-red/90 text-white shadow-lg rounded-full text-lg py-6"
           size="lg"
         >
           <Sparkles className="w-5 h-5" />
-          Premium freischalten
+          Pro freischalten
           <ExternalLink className="w-4 h-4 ml-1" />
         </Button>
         
         {content.hint && (
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-muted-foreground mt-4">
             {content.hint}
           </p>
         )}
         
-        {!premiumLink && !isLoading && (
-          <p className="text-xs text-gray-500 mt-4">
+        {!proLink && !isLoading && (
+          <p className="text-xs text-muted-foreground mt-4">
             Upgrade-Link nicht verfügbar. Bitte kontaktiere den Support.
           </p>
         )}
