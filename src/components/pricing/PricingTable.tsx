@@ -35,6 +35,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
 
   // Fallback checkout URLs
   const CHECKOUT_URLS: Partial<Record<PlanKey, string>> = {
+    BASIC: 'https://www.checkout-ds24.com/product/346007/',
     PRO: 'https://www.checkout-ds24.com/product/575565/',
   };
 
