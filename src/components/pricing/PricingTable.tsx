@@ -147,6 +147,12 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold text-slate-900">{getPrice(plan)}</div>
                   <div className="text-sm text-slate-600">{getPriceSubtext(plan)}</div>
+                  {/* Pro promo */}
+                  {plan.key === 'PRO' && (
+                    <div className="mt-2 inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
+                      🎉 Erstes Monat nur 1€
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -171,6 +177,14 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             </Card>
           );
         })}
+      </div>
+
+      {/* Guarantee Badge */}
+      <div className="flex justify-center">
+        <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium">
+          <span>✓</span>
+          30 Tage Geld-zurück-Garantie
+        </div>
       </div>
 
       {/* Feature Comparison Table */}
