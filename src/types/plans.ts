@@ -125,8 +125,8 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
     description: 'Enthält alles aus Basic + individuelles Feedback zu eigenen Videos, 1:1 Chat mit Lehrer, regelmäßige Live-Feedback-Calls, priorisierter Support.',
     cta: 'Pro freischalten',
     monthlyPrice: 59,
-    yearlyPrice: 399,
-    yearlyDiscount: 32,
+    yearlyPrice: 600,
+    yearlyDiscount: 15,
     highlighted: true,
     features: [
       // Lernen
