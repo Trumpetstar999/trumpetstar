@@ -69,12 +69,12 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
   return (
     <div className="w-full max-w-6xl mx-auto space-y-10">
       {/* Billing Toggle */}
-      <div className="flex items-center justify-center gap-4 p-4 bg-card rounded-xl border">
+      <div className="flex items-center justify-center gap-4 p-4 bg-white/95 rounded-xl border shadow-lg">
         <Label 
           htmlFor="billing-toggle" 
           className={cn(
             'text-sm font-medium transition-colors cursor-pointer',
-            !isYearly ? 'text-foreground' : 'text-muted-foreground'
+            !isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
           Monatlich
@@ -88,11 +88,11 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
           htmlFor="billing-toggle" 
           className={cn(
             'text-sm font-medium transition-colors cursor-pointer flex items-center gap-2',
-            isYearly ? 'text-foreground' : 'text-muted-foreground'
+            isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
           Jährlich
-          <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20">
+          <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
             Spare bis zu 35%
           </Badge>
         </Label>
@@ -108,13 +108,13 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             <Card
               key={plan.key}
               className={cn(
-                'relative flex flex-col transition-all duration-300 bg-card',
+                'relative flex flex-col transition-all duration-300 bg-white/95 shadow-lg',
                 isHighlighted && 'border-2 border-primary shadow-xl scale-[1.02]',
                 isCurrentPlan && 'ring-2 ring-emerald-500'
               )}
             >
               {isHighlighted && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground shadow-lg">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white shadow-lg">
                   <Crown className="w-3 h-3 mr-1" />
                   Empfohlen
                 </Badge>
@@ -127,12 +127,12 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               )}
 
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-2xl flex items-center justify-center gap-2 text-card-foreground">
+                <CardTitle className="text-2xl flex items-center justify-center gap-2 text-slate-900">
                   {plan.key === 'PRO' && <Crown className="w-6 h-6 text-amber-500" />}
                   {plan.key === 'BASIC' && <Sparkles className="w-5 h-5 text-blue-500" />}
                   {plan.title}
                 </CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
+                <CardDescription className="text-sm text-slate-600">
                   {plan.shortDescription}
                 </CardDescription>
               </CardHeader>
@@ -140,12 +140,12 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               <CardContent className="flex-1 flex flex-col">
                 {/* Price */}
                 <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-card-foreground">{getPrice(plan)}</div>
-                  <div className="text-sm text-muted-foreground">{getPriceSubtext(plan)}</div>
+                  <div className="text-4xl font-bold text-slate-900">{getPrice(plan)}</div>
+                  <div className="text-sm text-slate-600">{getPriceSubtext(plan)}</div>
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground mb-6 flex-1 leading-relaxed">
+                <p className="text-sm text-slate-600 mb-6 flex-1 leading-relaxed">
                   {plan.description}
                 </p>
 
@@ -170,17 +170,17 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
 
       {/* Feature Comparison Table */}
       <div className="mt-16">
-        <h3 className="text-2xl font-bold text-center mb-8 text-foreground">Funktionen im Vergleich</h3>
+        <h3 className="text-2xl font-bold text-center mb-8 text-white">Funktionen im Vergleich</h3>
         
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-xl border bg-white/95 shadow-lg">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-muted/50">
-                <th className="text-left p-4 w-1/3 font-semibold text-foreground">Funktion</th>
+              <tr className="border-b bg-slate-100">
+                <th className="text-left p-4 w-1/3 font-semibold text-slate-900">Funktion</th>
                 {plans.map(plan => (
                   <th key={plan.key} className="text-center p-4">
                     <span className={cn(
-                      'font-bold text-foreground',
+                      'font-bold text-slate-900',
                       plan.highlighted && 'text-primary'
                     )}>
                       {plan.title}
@@ -210,21 +210,21 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                     {category.features.map((feature, idx) => (
                       <tr 
                         key={`${category.category}-${idx}`} 
-                        className="border-b last:border-b-0 hover:bg-muted/50 transition-colors"
+                        className="border-b last:border-b-0 hover:bg-slate-50 transition-colors"
                       >
-                        <td className="p-4 text-sm font-medium text-card-foreground">{feature.name}</td>
+                        <td className="p-4 text-sm font-medium text-slate-800">{feature.name}</td>
                         {plans.map(plan => {
                           const planFeature = plan.features.find(f => f.name === feature.name);
                           const included = planFeature?.included ?? false;
                           return (
                             <td key={plan.key} className="text-center p-4">
                               {included ? (
-                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100">
+                                  <Check className="w-4 h-4 text-emerald-600" />
                                 </div>
                               ) : (
-                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-muted">
-                                  <X className="w-4 h-4 text-muted-foreground" />
+                                <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200">
+                                  <X className="w-4 h-4 text-slate-400" />
                                 </div>
                               )}
                             </td>
