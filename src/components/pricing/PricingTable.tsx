@@ -33,13 +33,18 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
 
   const plans = [PLAN_INFO.FREE, PLAN_INFO.BASIC, PLAN_INFO.PRO];
 
+  // Fallback checkout URLs
+  const CHECKOUT_URLS: Partial<Record<PlanKey, string>> = {
+    PRO: 'https://www.checkout-ds24.com/product/575565/',
+  };
+
   const handleSelectPlan = (planKey: PlanKey) => {
     if (onSelectPlan) {
       onSelectPlan(planKey);
       return;
     }
     
-    const link = getUpgradeLink(planKey);
+    const link = getUpgradeLink(planKey) || CHECKOUT_URLS[planKey];
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
