@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Lock, Download, CheckCircle2, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +14,7 @@ interface PdfBookCardProps {
   isDownloading: boolean;
   downloadProgress: number;
   isCached: boolean;
+  coverImageUrl?: string | null;
   onClick: () => void;
 }
 
@@ -28,6 +28,7 @@ export function PdfBookCard({
   isDownloading,
   downloadProgress,
   isCached,
+  coverImageUrl,
   onClick,
 }: PdfBookCardProps) {
   // Generate a consistent color based on title
@@ -70,30 +71,39 @@ export function PdfBookCard({
           <div className={cn(
             'relative ml-2 aspect-[3/4] rounded-r-md rounded-l-sm overflow-hidden',
             'bg-gradient-to-br shadow-lg',
-            spineColor,
+            !coverImageUrl && spineColor,
             'transform perspective-1000',
             'group-hover:shadow-xl group-hover:shadow-primary/20'
           )}>
-            {/* Cover Design */}
-            <div className="absolute inset-0 p-4 flex flex-col">
-              {/* Decorative top bar */}
-              <div className="h-1 w-full bg-white/20 rounded-full mb-3" />
-              
-              {/* Title */}
-              <div className="flex-1 flex items-center justify-center">
-                <h3 className="text-white font-bold text-sm md:text-base text-center leading-tight line-clamp-3 px-1">
-                  {title}
-                </h3>
+            {/* Cover Image or Default Design */}
+            {coverImageUrl ? (
+              <img 
+                src={coverImageUrl} 
+                alt={title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              /* Default Cover Design */
+              <div className="absolute inset-0 p-4 flex flex-col">
+                {/* Decorative top bar */}
+                <div className="h-1 w-full bg-white/20 rounded-full mb-3" />
+                
+                {/* Title */}
+                <div className="flex-1 flex items-center justify-center">
+                  <h3 className="text-white font-bold text-sm md:text-base text-center leading-tight line-clamp-3 px-1">
+                    {title}
+                  </h3>
+                </div>
+                
+                {/* Bottom info */}
+                <div className="mt-auto">
+                  <div className="h-px w-full bg-white/20 mb-2" />
+                  <p className="text-white/60 text-[10px] text-center">
+                    {pageCount} Seiten
+                  </p>
+                </div>
               </div>
-              
-              {/* Bottom info */}
-              <div className="mt-auto">
-                <div className="h-px w-full bg-white/20 mb-2" />
-                <p className="text-white/60 text-[10px] text-center">
-                  {pageCount} Seiten
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Lock Overlay */}
             {!hasAccess && (

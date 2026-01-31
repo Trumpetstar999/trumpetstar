@@ -31,6 +31,7 @@ interface PdfDocument {
   is_active: boolean;
   sort_index: number;
   language?: string | null;
+  cover_image_url?: string | null;
 }
 
 interface AudioTrack {
@@ -258,6 +259,7 @@ export function PdfsPage() {
                     isDownloading={isDownloading}
                     downloadProgress={progress}
                     isCached={cached}
+                    coverImageUrl={pdf.cover_image_url}
                     onClick={() => handleSelectPdf(pdf.id)}
                   />
                 );
