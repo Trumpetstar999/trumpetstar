@@ -15,8 +15,9 @@ interface AssistantPanelProps {
 }
 
 export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
-  const { t } = useLanguage();
+  const { t, language: appLanguage } = useLanguage();
   const [inputValue, setInputValue] = useState('');
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,12 +33,32 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
     setLanguage,
     setReadAloud,
     sendMessage,
+    speakText,
     stopSpeaking,
     startListening,
     stopListening,
     provideFeedback,
     clearMessages,
   } = useAssistant();
+  
+  // Get current language for TTS
+  const getTtsLanguage = (): 'de' | 'en' | 'es' => {
+    if (language === 'auto') {
+      return (appLanguage as 'de' | 'en' | 'es') || 'de';
+    }
+    return language as 'de' | 'en' | 'es';
+  };
+  
+  const handleSpeak = async (messageId: string, content: string) => {
+    if (speakingMessageId === messageId && isSpeaking) {
+      stopSpeaking();
+      setSpeakingMessageId(null);
+    } else {
+      setSpeakingMessageId(messageId);
+      await speakText(content, getTtsLanguage());
+      setSpeakingMessageId(null);
+    }
+  };
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -190,10 +211,28 @@ export function AssistantPanel({ isOpen, onClose }: AssistantPanelProps) {
                         )}
                       </p>
                       
-                      {/* Feedback for assistant messages */}
-                        {!isUser && message.content && (
+                      {/* Actions for assistant messages */}
+                      {!isUser && message.content && (
                         <div className="flex items-center justify-end gap-1 mt-2 pt-1 border-t border-[#e9edef]">
-                          <span className="text-[10px] text-[#8696a0] mr-auto">{t('assistant.wasHelpful')}</span>
+                          {/* Speaker button */}
+                          <button
+                            onClick={() => handleSpeak(message.id, message.content)}
+                            className={cn(
+                              'p-1 rounded transition-colors mr-auto',
+                              speakingMessageId === message.id && isSpeaking
+                                ? 'text-[#25D366] bg-[#25D366]/10 animate-pulse' 
+                                : 'text-[#8696a0] hover:text-[#25D366] hover:bg-[#25D366]/10'
+                            )}
+                            title={speakingMessageId === message.id && isSpeaking ? 'Stop' : 'Vorlesen'}
+                          >
+                            {speakingMessageId === message.id && isSpeaking ? (
+                              <Square className="h-3.5 w-3.5" />
+                            ) : (
+                              <Volume2 className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                          
+                          <span className="text-[10px] text-[#8696a0]">{t('assistant.wasHelpful')}</span>
                           <button
                             onClick={() => provideFeedback(message.id, 'positive')}
                             className={cn(
