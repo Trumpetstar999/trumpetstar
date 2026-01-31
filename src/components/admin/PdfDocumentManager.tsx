@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye, X, CheckCircle2, Globe } from 'lucide-react';
+import { Plus, FileText, Upload, Trash2, Edit, Loader2, Music, Eye, X, CheckCircle2, Globe, ImagePlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MultilingualInput } from './MultilingualInput';
 
@@ -30,6 +30,7 @@ interface PdfDocument {
   sort_index: number;
   created_at: string;
   levels?: { title: string } | null;
+  cover_image_url?: string | null;
 }
 
 interface Level {
@@ -54,6 +55,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
   
   const [uploadState, setUploadState] = useState<UploadState>({
     progress: 0,
@@ -72,6 +74,8 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     plan_required: 'BASIC',
     is_active: true,
     pdf_file: null as File | null,
+    cover_image: null as File | null,
+    cover_image_url: '' as string | null,
   });
 
   // Fetch PDFs
@@ -226,12 +230,29 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   const saveMutation = useMutation({
     mutationFn: async (data: typeof formData & { id?: string; pdf_file_url?: string; page_count?: number }) => {
       let pdfUrl = data.pdf_file_url || '';
+      let coverImageUrl = data.cover_image_url || null;
       const originalFile = data.pdf_file;
 
       // Upload PDF if new file
       if (data.pdf_file) {
         const result = await uploadFileWithProgress(data.pdf_file);
         pdfUrl = result.url;
+      }
+
+      // Upload cover image if new file
+      if (data.cover_image) {
+        const fileName = `${Date.now()}-${data.cover_image.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('pdf-covers')
+          .upload(fileName, data.cover_image, { upsert: true });
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: urlData } = supabase.storage
+          .from('pdf-covers')
+          .getPublicUrl(fileName);
+        
+        coverImageUrl = urlData.publicUrl;
       }
 
       const payload = {
@@ -245,7 +266,8 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         plan_required: data.plan_required,
         is_active: data.is_active,
         pdf_file_url: pdfUrl,
-        page_count: data.page_count || 0, // Will be updated in background
+        page_count: data.page_count || 0,
+        cover_image_url: coverImageUrl,
       };
 
       let docId = data.id;
@@ -271,6 +293,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['admin-pdfs'] });
+      queryClient.invalidateQueries({ queryKey: ['user-pdfs'] });
       toast.success(editingPdf ? 'PDF aktualisiert' : 'PDF erstellt');
       handleCloseDialog();
       
@@ -318,6 +341,8 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         plan_required: pdf.plan_required,
         is_active: pdf.is_active,
         pdf_file: null,
+        cover_image: null,
+        cover_image_url: pdf.cover_image_url || null,
       });
     } else {
       setEditingPdf(null);
@@ -332,6 +357,8 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         plan_required: 'BASIC',
         is_active: true,
         pdf_file: null,
+        cover_image: null,
+        cover_image_url: null,
       });
     }
     setIsDialogOpen(true);
@@ -343,6 +370,9 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     setUploadState({ progress: 0, status: 'idle', message: '' });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+    if (coverImageInputRef.current) {
+      coverImageInputRef.current.value = '';
     }
   };
 
@@ -632,6 +662,81 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                   </div>
                 </div>
               )}
+
+              {/* Cover Image Upload */}
+              <div>
+                <Label className="text-base font-medium">Cover-Bild (optional)</Label>
+                <p className="text-sm text-muted-foreground mb-3">Wird als Vorschaubild für das PDF angezeigt</p>
+                
+                {!formData.cover_image && !formData.cover_image_url ? (
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-all">
+                    <ImagePlus className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-sm font-medium text-slate-600">Bild auswählen</span>
+                    <span className="text-xs text-slate-400 mt-1">JPG, PNG, WebP</span>
+                    <input
+                      ref={coverImageInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toast.error('Bild ist größer als 5 MB');
+                            return;
+                          }
+                          setFormData(prev => ({
+                            ...prev,
+                            cover_image: file,
+                            cover_image_url: null,
+                          }));
+                        }
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <div className="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                    <div className="flex items-center gap-3">
+                      {formData.cover_image ? (
+                        <img 
+                          src={URL.createObjectURL(formData.cover_image)} 
+                          alt="Cover preview" 
+                          className="w-16 h-20 object-cover rounded-lg"
+                        />
+                      ) : formData.cover_image_url ? (
+                        <img 
+                          src={formData.cover_image_url} 
+                          alt="Cover" 
+                          className="w-16 h-20 object-cover rounded-lg"
+                        />
+                      ) : null}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-900 truncate">
+                          {formData.cover_image?.name || 'Aktuelles Cover'}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {formData.cover_image 
+                            ? `${(formData.cover_image.size / 1024).toFixed(1)} KB`
+                            : 'Hochgeladen'}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setFormData(prev => ({ ...prev, cover_image: null, cover_image_url: null }));
+                          if (coverImageInputRef.current) {
+                            coverImageInputRef.current.value = '';
+                          }
+                        }}
+                        className="shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right Column - Form Fields */}

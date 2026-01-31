@@ -798,6 +798,7 @@ export type Database = {
       }
       pdf_documents: {
         Row: {
+          cover_image_url: string | null
           created_at: string
           description: string | null
           description_en: string | null
@@ -816,6 +817,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
@@ -834,6 +836,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cover_image_url?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
