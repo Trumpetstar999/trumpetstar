@@ -60,27 +60,30 @@ export function PdfBookCard({
         
         {/* Book */}
         <div className="relative">
-          {/* Book Spine */}
-          <div className={cn(
-            'absolute left-0 top-0 bottom-0 w-3 rounded-l-sm bg-gradient-to-r',
-            spineColor,
-            'shadow-inner'
-          )} />
+          {/* Book Spine - only show when no cover image */}
+          {!coverImageUrl && (
+            <div className={cn(
+              'absolute left-0 top-0 bottom-0 w-3 rounded-l-sm bg-gradient-to-r',
+              spineColor,
+              'shadow-inner'
+            )} />
+          )}
           
           {/* Book Cover */}
           <div className={cn(
-            'relative ml-2 aspect-[3/4] rounded-r-md rounded-l-sm overflow-hidden',
-            'bg-gradient-to-br shadow-lg',
-            !coverImageUrl && spineColor,
+            'relative aspect-[3/4] overflow-hidden shadow-lg',
             'transform perspective-1000',
-            'group-hover:shadow-xl group-hover:shadow-primary/20'
+            'group-hover:shadow-xl group-hover:shadow-primary/20',
+            coverImageUrl 
+              ? 'rounded-md' 
+              : cn('ml-2 rounded-r-md rounded-l-sm bg-gradient-to-br', spineColor)
           )}>
             {/* Cover Image or Default Design */}
             {coverImageUrl ? (
               <img 
                 src={coverImageUrl} 
                 alt={title}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover rounded-md"
               />
             ) : (
               /* Default Cover Design */
@@ -107,14 +110,14 @@ export function PdfBookCard({
 
             {/* Lock Overlay */}
             {!hasAccess && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px]">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-[2px] rounded-md">
                 <Lock className="w-8 h-8 text-white/80" />
               </div>
             )}
 
             {/* Download Progress Overlay */}
             {isDownloading && (
-              <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-3 backdrop-blur-sm rounded-md">
                 <Loader2 className="w-8 h-8 text-reward-gold animate-spin" />
                 <div className="w-4/5">
                   <Progress value={downloadProgress} className="h-2" />
@@ -138,9 +141,13 @@ export function PdfBookCard({
             )}
           </div>
           
-          {/* Book Pages Effect */}
-          <div className="absolute right-0 top-1 bottom-1 w-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-r-sm" />
-          <div className="absolute right-0.5 top-2 bottom-2 w-0.5 bg-gray-100/50" />
+          {/* Book Pages Effect - only show when no cover image */}
+          {!coverImageUrl && (
+            <>
+              <div className="absolute right-0 top-1 bottom-1 w-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-r-sm" />
+              <div className="absolute right-0.5 top-2 bottom-2 w-0.5 bg-gray-100/50" />
+            </>
+          )}
         </div>
       </div>
 
