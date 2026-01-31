@@ -29,7 +29,8 @@ import {
   AlertTriangle,
   Save,
   Circle,
-  Loader2
+  Loader2,
+  Printer
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -471,6 +472,107 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
   const handleZoomIn = () => setZoom(z => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
+
+  // Print current page only
+  const handlePrintCurrentPage = useCallback(() => {
+    const pdfCanvas = canvasRef.current;
+    const drawingCanvas = drawingCanvasRef.current;
+    
+    if (!pdfCanvas) {
+      toast.error('Seite konnte nicht gedruckt werden');
+      return;
+    }
+
+    // Create a temporary canvas to merge PDF and drawings
+    const printCanvas = document.createElement('canvas');
+    printCanvas.width = pdfCanvas.width;
+    printCanvas.height = pdfCanvas.height;
+    const ctx = printCanvas.getContext('2d');
+    
+    if (!ctx) {
+      toast.error('Druckfehler');
+      return;
+    }
+
+    // Draw PDF page
+    ctx.drawImage(pdfCanvas, 0, 0);
+    
+    // Draw annotations on top if they exist
+    if (drawingCanvas) {
+      ctx.drawImage(drawingCanvas, 0, 0);
+    }
+
+    // Convert to image data URL
+    const imageData = printCanvas.toDataURL('image/png', 1.0);
+
+    // Open print window with single page
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error('Popup wurde blockiert. Bitte erlauben Sie Popups für diese Seite.');
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${pdf.title} - Seite ${currentPage}</title>
+          <style>
+            @media print {
+              @page {
+                margin: 10mm;
+                size: auto;
+              }
+              body {
+                margin: 0;
+                padding: 0;
+              }
+            }
+            body {
+              margin: 0;
+              padding: 20px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              background: white;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100vh;
+              object-fit: contain;
+            }
+            .no-print {
+              position: fixed;
+              top: 10px;
+              right: 10px;
+              padding: 8px 16px;
+              background: #2563eb;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-family: system-ui, sans-serif;
+              font-size: 14px;
+            }
+            .no-print:hover {
+              background: #1d4ed8;
+            }
+            @media print {
+              .no-print {
+                display: none;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <button class="no-print" onclick="window.print()">Drucken</button>
+          <img src="${imageData}" alt="Seite ${currentPage}" />
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }, [pdf.title, currentPage]);
 
   // Drawing functions
   const getCanvasCoordinates = useCallback((e: React.TouchEvent | React.MouseEvent) => {
@@ -921,6 +1023,18 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span className="text-xs">Speichern</span>
+          </Button>
+
+          {/* Print current page button */}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handlePrintCurrentPage}
+            disabled={isLoading || !!loadError}
+            className="h-8 px-3 gap-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+          >
+            <Printer className="w-4 h-4" />
+            <span className="text-xs">Drucken</span>
           </Button>
 
           <div className="w-px h-6 bg-gray-300 mx-1" />
