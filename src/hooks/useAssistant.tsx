@@ -257,38 +257,43 @@ export function useAssistant() {
     try {
       setState(prev => ({ ...prev, isSpeaking: true }));
 
-      const response = await fetch(TTS_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({ text, language }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`TTS request failed: ${response.status}`);
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      
-      audioRef.current = new Audio(audioUrl);
-      audioRef.current.onended = () => {
+      // Use browser's built-in Web Speech API (free, no API key needed)
+      if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Map language codes to BCP 47 language tags
+        const langMap: Record<string, string> = {
+          de: 'de-DE',
+          en: 'en-US',
+          es: 'es-ES',
+        };
+        utterance.lang = langMap[language] || 'de-DE';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        
+        // Try to find a good voice for the language
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => v.lang.startsWith(language) && v.localService === false) 
+          || voices.find(v => v.lang.startsWith(language));
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+        
+        utterance.onend = () => {
+          setState(prev => ({ ...prev, isSpeaking: false }));
+        };
+        utterance.onerror = () => {
+          setState(prev => ({ ...prev, isSpeaking: false }));
+        };
+        
+        window.speechSynthesis.speak(utterance);
+      } else {
+        console.warn('[useAssistant] Web Speech API not supported');
         setState(prev => ({ ...prev, isSpeaking: false }));
-        URL.revokeObjectURL(audioUrl);
-      };
-      audioRef.current.onerror = () => {
-        setState(prev => ({ ...prev, isSpeaking: false }));
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      await audioRef.current.play();
+      }
     } catch (error) {
       console.error('[useAssistant] TTS Error:', error);
       setState(prev => ({ ...prev, isSpeaking: false }));
