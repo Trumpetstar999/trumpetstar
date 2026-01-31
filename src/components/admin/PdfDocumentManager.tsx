@@ -241,18 +241,25 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
 
       // Upload cover image if new file
       if (data.cover_image) {
+        console.log('Uploading cover image:', data.cover_image.name);
         const fileName = `${Date.now()}-${data.cover_image.name}`;
-        const { error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('pdf-covers')
-          .upload(fileName, data.cover_image, { upsert: true });
+          .upload(fileName, data.cover_image);
         
-        if (uploadError) throw uploadError;
-        
-        const { data: urlData } = supabase.storage
-          .from('pdf-covers')
-          .getPublicUrl(fileName);
-        
-        coverImageUrl = urlData.publicUrl;
+        if (uploadError) {
+          console.error('Cover image upload error:', uploadError);
+          toast.error(`Cover-Bild Upload fehlgeschlagen: ${uploadError.message}`);
+          // Don't throw - continue without cover image
+        } else {
+          console.log('Cover image uploaded successfully');
+          const { data: urlData } = supabase.storage
+            .from('pdf-covers')
+            .getPublicUrl(fileName);
+          
+          coverImageUrl = urlData.publicUrl;
+          console.log('Cover image URL:', coverImageUrl);
+        }
       }
 
       const payload = {
@@ -269,6 +276,8 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         page_count: data.page_count || 0,
         cover_image_url: coverImageUrl,
       };
+
+      console.log('Saving PDF with payload:', { ...payload, pdf_file_url: '...' });
 
       let docId = data.id;
 
@@ -391,6 +400,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   };
 
   const handleSubmit = () => {
+    console.log('handleSubmit called, formData.cover_image:', formData.cover_image?.name);
     if (!formData.title.trim()) {
       toast.error('Titel ist erforderlich');
       return;
@@ -680,16 +690,20 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
+                        console.log('Cover image selected:', file?.name, file?.size);
                         if (file) {
                           if (file.size > 5 * 1024 * 1024) {
                             toast.error('Bild ist größer als 5 MB');
                             return;
                           }
-                          setFormData(prev => ({
-                            ...prev,
-                            cover_image: file,
-                            cover_image_url: null,
-                          }));
+                          setFormData(prev => {
+                            console.log('Setting cover_image in formData');
+                            return {
+                              ...prev,
+                              cover_image: file,
+                              cover_image_url: null,
+                            };
+                          });
                         }
                       }}
                     />
