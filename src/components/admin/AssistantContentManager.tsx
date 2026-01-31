@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Plus, Upload, FileText, Trash2, Edit, Search, RefreshCw, Loader2, Check, X, Tag } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -226,10 +227,39 @@ export function AssistantContentManager() {
     setIsProcessing(true);
 
     try {
-      const text = await file.text();
-      
-      // Extract title from filename
-      const title = file.name.replace(/\.(txt|md|markdown)$/i, '');
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      let text = '';
+      let title = '';
+
+      if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+        // Handle Excel files
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        
+        // Get all sheet names and their content
+        const sheets: string[] = [];
+        workbook.SheetNames.forEach(sheetName => {
+          const worksheet = workbook.Sheets[sheetName];
+          const sheetData = XLSX.utils.sheet_to_csv(worksheet);
+          if (sheetData.trim()) {
+            sheets.push(`## ${sheetName}\n\n${sheetData}`);
+          }
+        });
+        
+        text = sheets.join('\n\n---\n\n');
+        title = file.name.replace(/\.(xlsx|xls)$/i, '');
+        toast.success(`Excel-Datei geladen (${workbook.SheetNames.length} Tabellenblätter)`);
+      } else if (fileExtension === 'csv') {
+        // Handle CSV files
+        text = await file.text();
+        title = file.name.replace(/\.csv$/i, '');
+        toast.success('CSV-Datei geladen');
+      } else {
+        // Handle text/markdown files
+        text = await file.text();
+        title = file.name.replace(/\.(txt|md|markdown)$/i, '');
+        toast.success('Datei geladen');
+      }
       
       setFormData(prev => ({
         ...prev,
@@ -238,8 +268,8 @@ export function AssistantContentManager() {
       }));
       
       setIsCreateOpen(true);
-      toast.success('Datei geladen');
     } catch (error) {
+      console.error('File upload error:', error);
       toast.error('Fehler beim Laden der Datei');
     } finally {
       setIsProcessing(false);
@@ -308,7 +338,7 @@ export function AssistantContentManager() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".txt,.md,.markdown"
+            accept=".txt,.md,.markdown,.xlsx,.xls,.csv"
             onChange={handleFileUpload}
             className="hidden"
           />
