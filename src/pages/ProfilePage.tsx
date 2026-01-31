@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -15,9 +14,11 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Button } from '@/components/ui/button';
-import { GripVertical, RotateCcw, Pencil, X } from 'lucide-react';
+import { GripVertical, RotateCcw, Pencil, X, Crown } from 'lucide-react';
 import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useMembership } from '@/hooks/useMembership';
+import { useNavigate } from 'react-router-dom';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
@@ -54,6 +55,8 @@ function WidgetContent({ id }: { id: WidgetId }) {
 
 export function ProfilePage() {
   const { t } = useLanguage();
+  const { planKey } = useMembership();
+  const navigate = useNavigate();
   const {
     visibleWidgets,
     isEditing,
@@ -66,6 +69,14 @@ export function ProfilePage() {
     const key = id.replace(/-/g, '');
     return t(`widgets.${id === 'stars-progress' ? 'starsProgress' : id === 'notes-todo' ? 'notesTodo' : id === 'feedback-chat' ? 'feedbackChat' : id === 'recent-videos' ? 'recentVideos' : id === 'weekly-goals' ? 'weeklyGoals' : id}`);
   };
+
+  const getUpgradeButtonText = () => {
+    if (planKey === 'PRO') return null;
+    if (planKey === 'BASIC') return 'Pro freischalten';
+    return 'Pricing';
+  };
+
+  const upgradeText = getUpgradeButtonText();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
@@ -106,9 +117,21 @@ export function ProfilePage() {
         </div>
       </div>
 
-      {/* Language Selector */}
-      <div className="mb-6 max-w-xs">
-        <LanguageSelector />
+      {/* Language Selector + Upgrade Button */}
+      <div className="mb-6 flex items-center gap-4">
+        <div className="max-w-xs">
+          <LanguageSelector />
+        </div>
+        {upgradeText && (
+          <Button
+            onClick={() => navigate('/pricing')}
+            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold"
+            size="sm"
+          >
+            <Crown className="w-4 h-4 mr-2" />
+            {upgradeText}
+          </Button>
+        )}
       </div>
 
       {isEditing && (
