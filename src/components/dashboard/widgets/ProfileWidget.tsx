@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMembership } from '@/hooks/useMembership';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit2, Settings, LogOut } from 'lucide-react';
+import { Edit2, Settings, LogOut, Crown } from 'lucide-react';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -21,6 +21,7 @@ interface Profile {
 export function ProfileWidget() {
   const { user, signOut } = useAuth();
   const { planKey } = useMembership();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -49,11 +50,31 @@ export function ProfileWidget() {
     toast.success('Erfolgreich abgemeldet');
   };
 
+  const getUpgradeButtonText = () => {
+    if (planKey === 'PRO') return null;
+    if (planKey === 'BASIC') return 'Pro freischalten';
+    return 'Upgrade';
+  };
+
+  const upgradeText = getUpgradeButtonText();
+
   return (
     <div className="flex flex-col items-center text-center">
+      {/* Upgrade Button at top */}
+      {upgradeText && (
+        <Button
+          onClick={() => navigate('/pricing')}
+          className="w-full mb-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold"
+          size="sm"
+        >
+          <Crown className="w-4 h-4 mr-2" />
+          {upgradeText}
+        </Button>
+      )}
+
       <Avatar className="w-24 h-24 mb-4 ring-4 ring-white/30">
         <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || 'Profil'} />
-        <AvatarFallback className="text-2xl bg-blue-500 text-white font-bold">
+        <AvatarFallback className="text-2xl bg-primary text-primary-foreground font-bold">
           {getInitials(profile?.display_name)}
         </AvatarFallback>
       </Avatar>
