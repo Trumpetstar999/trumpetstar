@@ -105,7 +105,7 @@ export function LiveRoom({ open, onClose, room }: LiveRoomProps) {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleLeave()}>
-      <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0">
+      <DialogContent className="max-w-6xl h-[85dvh] max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] p-0 gap-0 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export function LiveRoom({ open, onClose, room }: LiveRoomProps) {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-4 px-4 py-4 border-t border-border bg-card">
+        <div className="flex items-center justify-center gap-4 px-4 py-4 border-t border-border bg-card pb-[max(1rem,env(safe-area-inset-bottom))]">
           <Button
             variant={isMuted ? 'destructive' : 'secondary'}
             size="lg"
