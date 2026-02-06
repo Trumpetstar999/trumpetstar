@@ -68,7 +68,7 @@ export function useTeacherChat() {
         .select('teacher_id')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (assignmentError && assignmentError.code !== 'PGRST116') {
         throw assignmentError;
@@ -361,7 +361,7 @@ export function useTeacherStudentChats() {
             .eq('chat_id', chatId)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           // Get unread count
           const { count: unreadCount } = await supabase
