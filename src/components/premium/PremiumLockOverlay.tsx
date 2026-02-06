@@ -1,7 +1,8 @@
-import { Lock, ExternalLink, Sparkles } from 'lucide-react';
+import { Lock, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlanKey, PLAN_DISPLAY_NAMES, getRequiredUpgradePlans } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
+import { useNavigate } from 'react-router-dom';
 
 interface PremiumLockOverlayProps {
   requiredPlanKey: PlanKey;
@@ -9,15 +10,13 @@ interface PremiumLockOverlayProps {
 }
 
 export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverlayProps) {
-  const { planKey, getUpgradeLink, isLoading } = useMembership();
+  const { planKey } = useMembership();
+  const navigate = useNavigate();
   
   const upgradePlans = getRequiredUpgradePlans(planKey, requiredPlanKey);
   
-  const handleUpgrade = (targetPlan: PlanKey) => {
-    const link = getUpgradeLink(targetPlan);
-    if (link) {
-      window.open(link, '_blank', 'noopener,noreferrer');
-    }
+  const handleUpgrade = () => {
+    navigate('/pricing');
   };
 
   return (
@@ -41,32 +40,14 @@ export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverla
         </p>
 
         <div className="space-y-3">
-          {upgradePlans.map((plan) => {
-            const link = getUpgradeLink(plan);
-            const isPro = plan === 'PRO';
-            return (
-              <Button
-                key={plan}
-                onClick={() => handleUpgrade(plan)}
-                disabled={isLoading || !link}
-                className={`w-full gap-2 rounded-full text-base py-5 ${
-                  isPro 
-                    ? 'bg-accent-red hover:bg-accent-red/90 text-white shadow-lg' 
-                    : 'bg-brand-blue-mid hover:bg-brand-blue-mid/90 text-white'
-                }`}
-              >
-                {isPro && <Sparkles className="w-4 h-4" />}
-                <ExternalLink className="w-4 h-4" />
-                {PLAN_DISPLAY_NAMES[plan]} freischalten
-              </Button>
-            );
-          })}
-          
-          {upgradePlans.length === 0 && (
-            <p className="text-sm text-gray-500">
-              Kontaktiere den Support für Upgrade-Optionen.
-            </p>
-          )}
+          <Button
+            onClick={handleUpgrade}
+            className="w-full gap-2 rounded-full text-base py-5 bg-accent-red hover:bg-accent-red/90 text-white shadow-lg"
+          >
+            <Sparkles className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" />
+            {PLAN_DISPLAY_NAMES[requiredPlanKey]} freischalten
+          </Button>
         </div>
         
         <p className="text-xs text-gray-500 mt-4">
