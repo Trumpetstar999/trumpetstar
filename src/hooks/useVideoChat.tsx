@@ -120,7 +120,7 @@ export function useVideoChat() {
             .eq('chat_id', chat.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           const { count: unreadCount } = await supabase
             .from('video_chat_messages')
@@ -166,7 +166,7 @@ export function useVideoChat() {
         .select('*')
         .eq('user_id', user.id)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
 
