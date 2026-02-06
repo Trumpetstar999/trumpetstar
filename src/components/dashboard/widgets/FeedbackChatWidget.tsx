@@ -3,11 +3,11 @@ import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Lock, ArrowRight, Video, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
-import { UpgradeDialog } from '@/components/premium/UpgradeDialog';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface ChatSummary {
   id: string;
@@ -21,7 +21,7 @@ export function FeedbackChatWidget() {
   const { canAccessFeature } = useMembership();
   const { navigateToTab } = useTabNavigation();
   const { user } = useAuth();
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [chatSummary, setChatSummary] = useState<ChatSummary | null>(null);
   const [totalUnread, setTotalUnread] = useState(0);
@@ -100,19 +100,11 @@ export function FeedbackChatWidget() {
         </p>
         
         <Button
-          onClick={() => setUpgradeOpen(true)}
+          onClick={() => navigate('/pricing')}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
           Pro freischalten
         </Button>
-
-        <UpgradeDialog
-          open={upgradeOpen}
-          onOpenChange={setUpgradeOpen}
-          requiredPlanKey="PRO"
-          title="Persönliches Feedback zu deinen Aufnahmen"
-          description="Mit Pro kannst du deine Aufnahmen direkt an deinen Lehrer oder den Admin senden und gezieltes Feedback mit Zeitmarken und Antwort-Videos erhalten."
-        />
       </div>
     );
   }

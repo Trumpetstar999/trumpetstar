@@ -2,13 +2,12 @@ import { useMembership } from '@/hooks/useMembership';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { Button } from '@/components/ui/button';
 import { Users, Lock, Video, Calendar } from 'lucide-react';
-import { UpgradeDialog } from '@/components/premium/UpgradeDialog';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function ClassroomWidget() {
   const { canAccessFeature } = useMembership();
   const { navigateToTab } = useTabNavigation();
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const navigate = useNavigate();
   
   const hasPremium = canAccessFeature('PRO');
 
@@ -25,19 +24,11 @@ export function ClassroomWidget() {
         </p>
         
         <Button
-          onClick={() => setUpgradeOpen(true)}
+          onClick={() => navigate('/pricing')}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
           Pro freischalten
         </Button>
-
-        <UpgradeDialog
-          open={upgradeOpen}
-          onOpenChange={setUpgradeOpen}
-          requiredPlanKey="PRO"
-          title="Live-Unterricht & gemeinsames Musizieren"
-          description="Im Klassenzimmer triffst du deinen Lehrer und andere Musiker live. Ihr könnt gemeinsam spielen, Fragen klären und gezielt an deinem Fortschritt arbeiten. Diese Funktion ist Teil von Pro."
-        />
       </div>
     );
   }
