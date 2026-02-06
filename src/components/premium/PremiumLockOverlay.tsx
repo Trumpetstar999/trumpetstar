@@ -21,10 +21,7 @@ export function PremiumLockOverlay({ requiredPlanKey, title }: PremiumLockOverla
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-10 p-6"
-         style={{ 
-           background: 'linear-gradient(180deg, rgba(30, 134, 255, 0.95) 0%, rgba(15, 94, 219, 0.95) 40%, rgba(11, 46, 138, 0.95) 100%)'
-         }}>
+    <div className="flex items-center justify-center p-6">
       <div className="card-glass rounded-lg p-8 max-w-md text-center">
         {/* Lock icon with gold glow */}
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-reward-gold/30 to-reward-gold/10 flex items-center justify-center mx-auto mb-4 glow-gold animate-glow-pulse">
