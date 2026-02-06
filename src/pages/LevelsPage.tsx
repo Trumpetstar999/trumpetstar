@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
 import { useAuth } from '@/hooks/useAuth';
-import { useLanguage, useLocalizedContent, Language } from '@/hooks/useLanguage';
+import { useLanguage, useLocalizedContent, Language, SkillLevel } from '@/hooks/useLanguage';
 import { LanguageTabs } from '@/components/common/LanguageTabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -75,12 +75,26 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
+  const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
   const [contentLanguage, setContentLanguage] = useState<Language>('de');
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
   const { user } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, skillLevel } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
+
+  // Set initial difficulty filter based on user's skill level (only once)
+  useEffect(() => {
+    if (!hasSetInitialDifficulty && skillLevel) {
+      if (skillLevel === 'beginner') {
+        setDifficultyFilter('beginner');
+      } else {
+        // For intermediate users, show all levels
+        setDifficultyFilter('all');
+      }
+      setHasSetInitialDifficulty(true);
+    }
+  }, [skillLevel, hasSetInitialDifficulty]);
 
   // Difficulty options with translations
   const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [

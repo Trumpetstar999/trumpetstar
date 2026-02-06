@@ -14,12 +14,16 @@ type Translations = { [key: string]: TranslationValue };
 
 const translations: Record<Language, Translations> = { de, en, es };
 
+export type SkillLevel = 'beginner' | 'intermediate';
+
 interface LanguageContextType {
   language: Language;
+  skillLevel: SkillLevel;
   setLanguage: (lang: Language) => Promise<void>;
   t: (key: string, params?: Record<string, string | number>) => string;
   isLoading: boolean;
   hasCompletedLanguageSetup: boolean;
+  completeOnboarding: (lang: Language, skill: SkillLevel) => Promise<void>;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -60,12 +64,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     // Fall back to browser detection
     return detectBrowserLanguage();
   });
+  const [skillLevel, setSkillLevelState] = useState<SkillLevel>('beginner');
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedLanguageSetup, setHasCompletedLanguageSetup] = useState(true); // Default true to avoid flash
 
   // Load user preference from database when authenticated
   useEffect(() => {
-    async function loadUserLanguage() {
+    async function loadUserPreferences() {
       if (!user) {
         setIsLoading(false);
         return;
@@ -74,7 +79,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       try {
         const { data, error } = await supabase
           .from('user_preferences')
-          .select('language')
+          .select('language, skill_level')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -83,6 +88,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           setLanguageState(data.language as Language);
           localStorage.setItem('trumpetstar_language', data.language);
           setHasCompletedLanguageSetup(true);
+          
+          // Also load skill level if available
+          if (data.skill_level && ['beginner', 'intermediate'].includes(data.skill_level)) {
+            setSkillLevelState(data.skill_level as SkillLevel);
+          }
         } else {
           // No language preference exists - show language selection on first login
           setHasCompletedLanguageSetup(false);
@@ -95,7 +105,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    loadUserLanguage();
+    loadUserPreferences();
   }, [user]);
 
   const setLanguage = useCallback(async (lang: Language) => {
@@ -111,6 +121,28 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setHasCompletedLanguageSetup(true);
       } catch (error) {
         console.error('[useLanguage] Error saving language preference:', error);
+      }
+    }
+  }, [user]);
+
+  const completeOnboarding = useCallback(async (lang: Language, skill: SkillLevel) => {
+    setLanguageState(lang);
+    setSkillLevelState(skill);
+    localStorage.setItem('trumpetstar_language', lang);
+
+    if (user) {
+      try {
+        await supabase
+          .from('user_preferences')
+          .upsert({ 
+            user_id: user.id, 
+            language: lang,
+            skill_level: skill 
+          }, { onConflict: 'user_id' });
+        // Mark setup as complete after saving
+        setHasCompletedLanguageSetup(true);
+      } catch (error) {
+        console.error('[useLanguage] Error completing onboarding:', error);
       }
     }
   }, [user]);
@@ -153,7 +185,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isLoading, hasCompletedLanguageSetup }}>
+    <LanguageContext.Provider value={{ language, skillLevel, setLanguage, t, isLoading, hasCompletedLanguageSetup, completeOnboarding }}>
       {children}
     </LanguageContext.Provider>
   );

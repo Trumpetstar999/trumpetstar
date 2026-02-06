@@ -177,6 +177,18 @@
   "onboarding": {
     "welcome": "Willkommen!",
     "selectLanguage": "Wähle deine Sprache",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "letsStart": "Los geht's!",
+    "step1Title": "Wie heißt du?",
+    "step1Subtitle": "Gib deinen Namen ein",
+    "namePlaceholder": "Dein Name",
+    "step2Title": "Deine Sprache",
+    "step2Subtitle": "Wähle deine bevorzugte Sprache",
+    "step3Title": "Dein Level",
+    "step3Subtitle": "Wo stehst du gerade?",
+    "skillBeginner": "Anfänger",
+    "skillBeginnerDesc": "Ich fange gerade erst an",
+    "skillIntermediate": "Ich spiele bereits",
+    "skillIntermediateDesc": "Ich habe schon Erfahrung"
   }
 }
