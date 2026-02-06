@@ -11,8 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
 import { useAuth } from '@/hooks/useAuth';
-import { useLanguage, useLocalizedContent, Language, SkillLevel } from '@/hooks/useLanguage';
-import { LanguageTabs } from '@/components/common/LanguageTabs';
+import { useLanguage, useLocalizedContent, SkillLevel } from '@/hooks/useLanguage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -76,7 +75,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
   const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
-  const [contentLanguage, setContentLanguage] = useState<Language>('de');
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
   const { user } = useAuth();
@@ -305,27 +303,13 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return results;
   }, [searchQuery, levels]);
 
-  // Filter levels by difficulty and content language
+  // Filter levels by difficulty
   const filteredLevels = useMemo(() => {
-    let filtered = levels;
-    
-    // Filter by content language
-    if (contentLanguage !== 'de') {
-      // When filtering for EN/ES, only show levels tagged with that language or 'all'
-      filtered = filtered.filter(l => {
-        // For now show all levels since we don't have separate showcases yet
-        // This will be enhanced when content is added per language
-        return true;
-      });
+    if (difficultyFilter === 'all') {
+      return levels;
     }
-    
-    // Filter by difficulty
-    if (difficultyFilter !== 'all') {
-      filtered = filtered.filter(l => l.difficulty === difficultyFilter);
-    }
-    
-    return filtered;
-  }, [levels, difficultyFilter, contentLanguage]);
+    return levels.filter(l => l.difficulty === difficultyFilter);
+  }, [levels, difficultyFilter]);
 
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
   const isSearching = searchQuery.trim().length > 0;
@@ -358,13 +342,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     <div className="flex flex-col h-[calc(100vh-140px)]">
       <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in flex-wrap">
         <h2 className="text-lg font-semibold text-white shrink-0">{t('levels.title')}</h2>
-        
-        {/* Language Tabs */}
-        <LanguageTabs
-          selectedLanguage={contentLanguage}
-          onLanguageChange={setContentLanguage}
-          variant="compact"
-        />
         
         {/* Difficulty Filter */}
         <div className="flex items-center gap-2">
