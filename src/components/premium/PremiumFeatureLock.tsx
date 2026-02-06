@@ -1,6 +1,6 @@
-import { Lock, ExternalLink, Sparkles, Check } from 'lucide-react';
+import { Lock, Sparkles, Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useMembership } from '@/hooks/useMembership';
+import { useNavigate } from 'react-router-dom';
 
 type FeatureType = 'classroom' | 'feedback' | 'teacher';
 
@@ -39,14 +39,11 @@ interface PremiumFeatureLockProps {
 }
 
 export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLockProps) {
-  const { getUpgradeLink, isLoading } = useMembership();
+  const navigate = useNavigate();
   const content = FEATURE_CONTENT[feature];
-  const proLink = getUpgradeLink('PRO');
 
   const handleUpgrade = () => {
-    if (proLink) {
-      window.open(proLink, '_blank', 'noopener,noreferrer');
-    }
+    navigate('/pricing');
   };
 
   return (
@@ -81,24 +78,17 @@ export function PremiumFeatureLock({ feature, className = '' }: PremiumFeatureLo
 
         <Button
           onClick={handleUpgrade}
-          disabled={isLoading || !proLink}
           className="w-full gap-2 bg-accent-red hover:bg-accent-red/90 text-white shadow-lg rounded-full text-lg py-6"
           size="lg"
         >
           <Sparkles className="w-5 h-5" />
           Pro freischalten
-          <ExternalLink className="w-4 h-4 ml-1" />
+          <ArrowRight className="w-4 h-4 ml-1" />
         </Button>
         
         {content.hint && (
           <p className="text-xs text-muted-foreground mt-4">
             {content.hint}
-          </p>
-        )}
-        
-        {!proLink && !isLoading && (
-          <p className="text-xs text-muted-foreground mt-4">
-            Upgrade-Link nicht verfügbar. Bitte kontaktiere den Support.
           </p>
         )}
       </div>

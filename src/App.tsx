@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
 import { ChatsPage } from "./pages/ChatsPage";
+import { ClassroomPage } from "./pages/ClassroomPage";
 import { MusicXMLPage } from "./pages/MusicXMLPage";
 import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
 import PricingPage from "./pages/PricingPage";
@@ -43,6 +44,7 @@ const App = () => {
                       <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
                       <Route path="/admin" element={<AdminPage />} />
                       <Route path="/chats" element={<ChatsPage />} />
+                      <Route path="/classroom" element={<ClassroomPage />} />
                       <Route path="/pricing" element={<PricingPage />} />
                       <Route path="/musicxml" element={<MusicXMLPage />} />
                       <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
