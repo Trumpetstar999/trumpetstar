@@ -1,4 +1,43 @@
 {
+  "welcome": {
+    "next": "Next",
+    "skip": "Skip",
+    "start": "Let's go!",
+    "slides": {
+      "welcome": {
+        "title": "Welcome to TrumpetStar!",
+        "description": "Your personal trumpet learning platform. Let's give you a quick overview of all the features."
+      },
+      "levels": {
+        "title": "Video Lessons",
+        "description": "Structured courses from beginner to advanced. Learn at your own pace with professional video tutorials."
+      },
+      "pdfs": {
+        "title": "Sheet Music & PDFs",
+        "description": "Access an extensive collection of sheet music, practice books, and teaching materials to play along with."
+      },
+      "musicxml": {
+        "title": "Interactive Scores",
+        "description": "Play back scores interactively, change the tempo, and practice difficult passages with focus."
+      },
+      "practice": {
+        "title": "Practice Journal",
+        "description": "Document your progress, set goals, and keep track of your practice sessions."
+      },
+      "recordings": {
+        "title": "Recordings",
+        "description": "Record yourself, listen back to your playing, and track your development over time."
+      },
+      "chats": {
+        "title": "Teacher Feedback",
+        "description": "Share your recordings with your teacher and receive personal video feedback."
+      },
+      "classroom": {
+        "title": "Live Classroom",
+        "description": "Join live sessions or create your own virtual practice rooms."
+      }
+    }
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",

@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
+import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
 
 // Define tab order for determining slide direction
@@ -28,7 +29,7 @@ const Index = () => {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
   const previousTabRef = useRef<TabId>('levels');
   const { user, loading } = useAuth();
-  const { t, isLoading: languageLoading, hasCompletedLanguageSetup } = useLanguage();
+  const { t, isLoading: languageLoading, hasCompletedLanguageSetup, hasSeenWelcome, completeWelcome } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -156,6 +157,12 @@ const Index = () => {
       {/* Language Selection Dialog for first-time users */}
       <LanguageSelectionDialog 
         open={!languageLoading && !hasCompletedLanguageSetup} 
+      />
+
+      {/* Welcome Slideshow after onboarding is complete */}
+      <WelcomeSlideshow
+        open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
+        onComplete={completeWelcome}
       />
     </>
   );
