@@ -340,7 +340,7 @@ export default function AuthPage() {
             <Button 
               onClick={handleGoogleSignIn}
               variant="outline"
-              className="flex-1 h-12 text-base font-medium gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+              className="flex-1 h-12 text-base font-medium gap-2 border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900"
               disabled={isGoogleLoading}
             >
               {isGoogleLoading ? (
@@ -358,7 +358,7 @@ export default function AuthPage() {
             <Button 
               onClick={handleAppleSignIn}
               variant="outline"
-              className="flex-1 h-12 text-base font-medium gap-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+              className="flex-1 h-12 text-base font-medium gap-2 border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900"
               disabled={isAppleLoading}
             >
               {isAppleLoading ? (
