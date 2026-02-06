@@ -1,4 +1,43 @@
 {
+  "welcome": {
+    "next": "Weiter",
+    "skip": "Überspringen",
+    "start": "Los geht's!",
+    "slides": {
+      "welcome": {
+        "title": "Willkommen bei TrumpetStar!",
+        "description": "Deine persönliche Trompeten-Lernplattform. Lass uns einen kurzen Überblick über alle Features geben."
+      },
+      "levels": {
+        "title": "Video-Lektionen",
+        "description": "Strukturierte Kurse vom Anfänger bis zum Fortgeschrittenen. Lerne in deinem eigenen Tempo mit professionellen Video-Tutorials."
+      },
+      "pdfs": {
+        "title": "Noten & PDFs",
+        "description": "Zugriff auf eine umfangreiche Sammlung von Noten, Übungsheften und Lehrmaterialien zum Mitspielen."
+      },
+      "musicxml": {
+        "title": "Interaktive Partituren",
+        "description": "Spiele Noten interaktiv ab, ändere das Tempo und übe schwierige Stellen gezielt."
+      },
+      "practice": {
+        "title": "Übungstagebuch",
+        "description": "Dokumentiere deinen Fortschritt, setze Ziele und behalte deine Übungszeiten im Blick."
+      },
+      "recordings": {
+        "title": "Aufnahmen",
+        "description": "Nimm dich selbst auf, höre dein Spiel zurück und verfolge deine Entwicklung über die Zeit."
+      },
+      "chats": {
+        "title": "Lehrer-Feedback",
+        "description": "Teile deine Aufnahmen mit deinem Lehrer und erhalte persönliches Video-Feedback."
+      },
+      "classroom": {
+        "title": "Live-Klassenzimmer",
+        "description": "Nimm an Live-Sessions teil oder erstelle deine eigenen virtuellen Übungsräume."
+      }
+    }
+  },
   "common": {
     "loading": "Laden...",
     "save": "Speichern",

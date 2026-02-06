@@ -23,7 +23,9 @@ interface LanguageContextType {
   t: (key: string, params?: Record<string, string | number>) => string;
   isLoading: boolean;
   hasCompletedLanguageSetup: boolean;
+  hasSeenWelcome: boolean;
   completeOnboarding: (lang: Language, skill: SkillLevel) => Promise<void>;
+  completeWelcome: () => Promise<void>;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -67,6 +69,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [skillLevel, setSkillLevelState] = useState<SkillLevel>('beginner');
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedLanguageSetup, setHasCompletedLanguageSetup] = useState(true); // Default true to avoid flash
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(true); // Default true to avoid flash
 
   // Load user preference from database when authenticated
   useEffect(() => {
@@ -79,7 +82,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       try {
         const { data, error } = await supabase
           .from('user_preferences')
-          .select('language, skill_level')
+          .select('language, skill_level, has_seen_welcome')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -93,13 +96,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           if (data.skill_level && ['beginner', 'intermediate'].includes(data.skill_level)) {
             setSkillLevelState(data.skill_level as SkillLevel);
           }
+          
+          // Check if user has seen the welcome slideshow
+          setHasSeenWelcome(data.has_seen_welcome === true);
         } else {
           // No language preference exists - show language selection on first login
           setHasCompletedLanguageSetup(false);
+          setHasSeenWelcome(false);
         }
       } catch (error) {
         console.error('[useLanguage] Error loading language preference:', error);
         setHasCompletedLanguageSetup(true); // Default to true on error to avoid blocking
+        setHasSeenWelcome(true); // Default to true on error to avoid blocking
       } finally {
         setIsLoading(false);
       }
@@ -147,6 +155,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  const completeWelcome = useCallback(async () => {
+    setHasSeenWelcome(true);
+
+    if (user) {
+      try {
+        await supabase
+          .from('user_preferences')
+          .update({ has_seen_welcome: true })
+          .eq('user_id', user.id);
+      } catch (error) {
+        console.error('[useLanguage] Error completing welcome:', error);
+      }
+    }
+  }, [user]);
+
   // Translation function with interpolation support
   const t = useCallback((key: string, params?: Record<string, string | number>): string => {
     let translation = getNestedValue(translations[language], key);
@@ -185,7 +208,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   return (
-    <LanguageContext.Provider value={{ language, skillLevel, setLanguage, t, isLoading, hasCompletedLanguageSetup, completeOnboarding }}>
+    <LanguageContext.Provider value={{ language, skillLevel, setLanguage, t, isLoading, hasCompletedLanguageSetup, hasSeenWelcome, completeOnboarding, completeWelcome }}>
       {children}
     </LanguageContext.Provider>
   );
