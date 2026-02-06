@@ -135,7 +135,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
   // Save progress to database
   const saveProgress = useCallback(async (seconds: number, dur: number) => {
     if (!user || dur <= 0) return;
-    const progressPercent = (seconds / dur) * 100;
+    const progressPercent = Math.round((seconds / dur) * 100);
     
     await supabase
       .from('user_video_progress')
@@ -161,7 +161,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
         user_id: user.id,
         video_id: video.id,
         playback_speed: playbackRate,
-        progress_percent: duration > 0 ? (currentTime / duration) * 100 : 0,
+        progress_percent: duration > 0 ? Math.round((currentTime / duration) * 100) : 0,
         updated_at: new Date().toISOString(),
       }, {
         onConflict: 'user_id,video_id'
