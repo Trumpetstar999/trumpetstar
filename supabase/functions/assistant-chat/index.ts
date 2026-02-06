@@ -220,7 +220,7 @@ serve(async (req) => {
     // Get the last user message for context retrieval
     const lastUserMessage = messages.filter((m: Message) => m.role === "user").pop()?.content || "";
     // Extract keywords (min 2 chars to catch more, remove common stop words)
-    const stopWords = ['ist', 'der', 'die', 'das', 'ein', 'eine', 'und', 'oder', 'was', 'wie', 'kann', 'ich', 'mir', 'mich', 'bei', 'mit', 'für', 'auf', 'the', 'and', 'for', 'with'];
+    const stopWords = ['ist', 'der', 'die', 'das', 'ein', 'eine', 'und', 'oder', 'was', 'wie', 'kann', 'ich', 'mir', 'mich', 'bei', 'mit', 'für', 'auf', 'the', 'and', 'for', 'with', 'man', 'den'];
     const keywords = lastUserMessage.toLowerCase()
       .split(/\s+/)
       .map(w => w.replace(/[?!.,;:]/g, ''))
@@ -240,24 +240,99 @@ serve(async (req) => {
     };
     const allowedPlans = planHierarchy[userPlanKey] || ["FREE"];
 
+    // Detect special query types
+    // Note names pattern: c1, cis1, d1, dis1, e1, f1, fis1, g1, gis1, a1, b1, h1, c2, cis2, d2, dis2, e2, f2, fis2, g2, gis2, a2, b2, h2, c3
+    const notePattern = /\b([a-h](?:is|es)?[1-3])\b/i;
+    const noteMatch = lastUserMessage.match(notePattern);
+    const isNoteQuery = noteMatch !== null;
+    const queriedNote = noteMatch ? noteMatch[1].toLowerCase() : null;
+
+    // Check if asking about fingering/grip
+    const isFingeringQuery = /griff|greif|ventil|finger|spielen|tone?(?:\s|$)/i.test(lastUserMessage);
+    
+    // Check if asking about musical terms
+    const isMusicalTermQuery = /was\s+(?:ist|heißt|bedeutet|sind?)|definition|begriff/i.test(lastUserMessage);
+    
+    // Check if asking about composers
+    const isComposerQuery = /wer\s+war|komponist|biograph|leben|geboren|gestorben/i.test(lastUserMessage);
+
+    console.log("[assistant-chat] Query type detection:", { isNoteQuery, queriedNote, isFingeringQuery, isMusicalTermQuery, isComposerQuery });
+
     // Search in knowledge_sources directly (since chunks may be empty)
     const { data: sources } = await supabase
       .from("knowledge_sources")
       .select("id, title, content, type, tags")
       .in("visibility", allowedPlans)
-      .limit(50);
+      .limit(100);
 
     console.log("[assistant-chat] Knowledge sources found:", sources?.length || 0);
 
-    if (sources && sources.length > 0 && keywords.length > 0) {
+    if (sources && sources.length > 0) {
       const scoredSources = sources.map((source: any) => {
-        const searchText = `${source.title} ${source.content || ''} ${source.tags?.join(' ') || ''}`.toLowerCase();
-        // Score based on keyword matches (weighted: title matches are worth more)
+        const titleLower = source.title.toLowerCase();
+        const contentLower = (source.content || '').toLowerCase();
+        const tagsLower = (source.tags || []).join(' ').toLowerCase();
+        const searchText = `${titleLower} ${contentLower} ${tagsLower}`;
+        
         let score = 0;
-        for (const kw of keywords) {
-          if (source.title.toLowerCase().includes(kw)) score += 3;
-          if (searchText.includes(kw)) score += 1;
+        
+        // Special handling for note queries - prioritize Grifftabelle
+        if (isNoteQuery && queriedNote) {
+          // Check if this is a Grifftabelle source
+          if (titleLower.includes('grifftabelle') || tagsLower.includes('grifftabelle') || tagsLower.includes('griffe')) {
+            // Check if the specific note is mentioned in content
+            if (contentLower.includes(queriedNote)) {
+              score += 20; // High priority for exact note match in Grifftabelle
+            } else {
+              score += 10; // Still relevant as a fingering chart
+            }
+          }
+          // Also check Hilfsgriffe
+          if (titleLower.includes('hilfsgriff') || tagsLower.includes('hilfsgriffe')) {
+            if (contentLower.includes(queriedNote)) {
+              score += 15;
+            }
+          }
         }
+        
+        // Special handling for fingering queries
+        if (isFingeringQuery && !isNoteQuery) {
+          if (titleLower.includes('grifftabelle') || tagsLower.includes('grifftabelle')) {
+            score += 10;
+          }
+          if (titleLower.includes('hilfsgriff') || tagsLower.includes('hilfsgriffe')) {
+            score += 8;
+          }
+        }
+        
+        // Special handling for musical terms
+        if (isMusicalTermQuery) {
+          if (titleLower.includes('musikal') || titleLower.includes('begriffe') || tagsLower.includes('musikbegriffe')) {
+            score += 10;
+          }
+        }
+        
+        // Special handling for composer queries
+        if (isComposerQuery) {
+          if (titleLower.includes('komponist') || tagsLower.includes('komponist') || tagsLower.includes('musikgeschichte')) {
+            score += 10;
+          }
+          // Check if specific composer name is in query and content
+          const composerNames = ['bach', 'mozart', 'beethoven', 'haydn', 'vivaldi', 'händel', 'brahms', 'schumann'];
+          for (const composer of composerNames) {
+            if (lastUserMessage.toLowerCase().includes(composer) && contentLower.includes(composer)) {
+              score += 15;
+            }
+          }
+        }
+        
+        // Standard keyword matching (lower weight)
+        for (const kw of keywords) {
+          if (titleLower.includes(kw)) score += 2;
+          if (contentLower.includes(kw)) score += 1;
+          if (tagsLower.includes(kw)) score += 2;
+        }
+        
         return { ...source, score };
       }).filter((s: any) => s.score > 0).sort((a: any, b: any) => b.score - a.score).slice(0, 5);
 
