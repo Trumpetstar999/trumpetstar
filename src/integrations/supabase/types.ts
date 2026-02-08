@@ -300,6 +300,209 @@ export type Database = {
         }
         Relationships: []
       }
+      digistore24_entitlements: {
+        Row: {
+          active: boolean
+          created_at: string
+          entitlement_key: string
+          id: string
+          source: string
+          subscription_id: string | null
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          entitlement_key: string
+          id?: string
+          source?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          entitlement_key?: string
+          id?: string
+          source?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digistore24_entitlements_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "digistore24_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      digistore24_ipn_events: {
+        Row: {
+          created_at: string
+          email: string | null
+          error_message: string | null
+          event_type: Database["public"]["Enums"]["digistore24_event_type"]
+          id: string
+          idempotency_key: string
+          normalized_payload: Json | null
+          order_id: string | null
+          processed_at: string | null
+          product_id: string | null
+          raw_payload: Json
+          received_at: string
+          status: Database["public"]["Enums"]["digistore24_ipn_status"]
+          subscription_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          error_message?: string | null
+          event_type?: Database["public"]["Enums"]["digistore24_event_type"]
+          id?: string
+          idempotency_key: string
+          normalized_payload?: Json | null
+          order_id?: string | null
+          processed_at?: string | null
+          product_id?: string | null
+          raw_payload: Json
+          received_at?: string
+          status?: Database["public"]["Enums"]["digistore24_ipn_status"]
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          error_message?: string | null
+          event_type?: Database["public"]["Enums"]["digistore24_event_type"]
+          id?: string
+          idempotency_key?: string
+          normalized_payload?: Json | null
+          order_id?: string | null
+          processed_at?: string | null
+          product_id?: string | null
+          raw_payload?: Json
+          received_at?: string
+          status?: Database["public"]["Enums"]["digistore24_ipn_status"]
+          subscription_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      digistore24_products: {
+        Row: {
+          access_policy: Database["public"]["Enums"]["digistore24_access_policy"]
+          created_at: string
+          digistore_product_id: string
+          entitlement_key: string
+          id: string
+          is_active: boolean
+          name: string
+          plan_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_policy?: Database["public"]["Enums"]["digistore24_access_policy"]
+          created_at?: string
+          digistore_product_id: string
+          entitlement_key: string
+          id?: string
+          is_active?: boolean
+          name: string
+          plan_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_policy?: Database["public"]["Enums"]["digistore24_access_policy"]
+          created_at?: string
+          digistore_product_id?: string
+          entitlement_key?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          plan_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      digistore24_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      digistore24_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          digistore_order_id: string
+          digistore_product_id: string
+          digistore_subscription_id: string | null
+          id: string
+          status: Database["public"]["Enums"]["digistore24_subscription_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          digistore_order_id: string
+          digistore_product_id: string
+          digistore_subscription_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["digistore24_subscription_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          digistore_order_id?: string
+          digistore_product_id?: string
+          digistore_subscription_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["digistore24_subscription_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string
@@ -1809,6 +2012,26 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      digistore24_access_policy: "IMMEDIATE_REVOKE" | "REVOKE_AT_PERIOD_END"
+      digistore24_event_type:
+        | "PURCHASE"
+        | "RENEWAL"
+        | "CANCELLATION"
+        | "REFUND"
+        | "CHARGEBACK"
+        | "UNKNOWN"
+      digistore24_ipn_status:
+        | "received"
+        | "processing"
+        | "processed"
+        | "rejected"
+        | "error"
+      digistore24_subscription_status:
+        | "active"
+        | "cancelled"
+        | "refunded"
+        | "chargeback"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1937,6 +2160,29 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      digistore24_access_policy: ["IMMEDIATE_REVOKE", "REVOKE_AT_PERIOD_END"],
+      digistore24_event_type: [
+        "PURCHASE",
+        "RENEWAL",
+        "CANCELLATION",
+        "REFUND",
+        "CHARGEBACK",
+        "UNKNOWN",
+      ],
+      digistore24_ipn_status: [
+        "received",
+        "processing",
+        "processed",
+        "rejected",
+        "error",
+      ],
+      digistore24_subscription_status: [
+        "active",
+        "cancelled",
+        "refunded",
+        "chargeback",
+        "expired",
+      ],
     },
   },
 } as const
