@@ -20,13 +20,14 @@ import { PdfAudioManager } from '@/components/admin/PdfAudioManager';
 import { MusicXMLManager } from '@/components/admin/MusicXMLManager';
 import { MusicXMLAudioManager } from '@/components/admin/MusicXMLAudioManager';
 import { FeatureFlagManager } from '@/components/admin/FeatureFlagManager';
+import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -136,6 +137,7 @@ export default function AdminPage() {
       case 'pdfs': return 'PDFs / Noten';
       case 'musicxml': return 'MusicXML';
       case 'products': return 'Produkte & Pläne';
+      case 'digistore24': return 'Digistore24';
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
@@ -153,6 +155,7 @@ export default function AdminPage() {
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
+      case 'digistore24': return 'IPN-Webhooks, Produkt-Mapping und Event-Logs';
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
@@ -414,6 +417,8 @@ export default function AdminPage() {
           )}
 
           {activeTab === 'feedback' && <AdminFeedbackPanel />}
+
+          {activeTab === 'digistore24' && <Digistore24Manager />}
 
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'system' && (

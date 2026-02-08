@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.pdf-proxy]
 verify_jwt = false
+
+[functions.digistore24-ipn]
+verify_jwt = false
