@@ -6,6 +6,13 @@ const GOLD_GLOW = 'rgba(255, 204, 0, 0.4)';
 const RED = 'rgba(230, 57, 70, 0.8)';
 const LINE_COLOR = 'rgba(255, 204, 0, 0.6)';
 
+// Background image
+let bgImage: HTMLImageElement | null = null;
+let bgLoaded = false;
+const bgImg = new Image();
+bgImg.src = '/images/game-background.png';
+bgImg.onload = () => { bgImage = bgImg; bgLoaded = true; };
+
 // Treble clef SVG path (simplified)
 const TREBLE_CLEF_SCALE = 0.035;
 
@@ -19,32 +26,17 @@ export function renderGame(
 ) {
   ctx.clearRect(0, 0, width, height);
 
-  // Background gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, height);
-  grad.addColorStop(0, 'hsl(222, 86%, 20%)');
-  grad.addColorStop(0.5, 'hsl(218, 88%, 35%)');
-  grad.addColorStop(1, 'hsl(212, 100%, 45%)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-
-  // Stars (subtle)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-  const starSeed = [0.1, 0.3, 0.5, 0.7, 0.85, 0.15, 0.45, 0.65, 0.9, 0.25];
-  const starY = [0.05, 0.12, 0.08, 0.15, 0.03, 0.18, 0.1, 0.06, 0.14, 0.02];
-  for (let i = 0; i < starSeed.length; i++) {
-    const size = 1 + Math.sin(_time * 0.001 + i) * 0.5;
-    ctx.beginPath();
-    ctx.arc(starSeed[i] * width, starY[i] * height, size, 0, Math.PI * 2);
-    ctx.fill();
+  // Background image
+  if (bgLoaded && bgImage) {
+    ctx.drawImage(bgImage, 0, 0, width, height);
+  } else {
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, 'hsl(222, 86%, 20%)');
+    grad.addColorStop(0.5, 'hsl(218, 88%, 35%)');
+    grad.addColorStop(1, 'hsl(212, 100%, 45%)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
   }
-
-  // Clouds at bottom
-  const cloudGrad = ctx.createLinearGradient(0, height * 0.85, 0, height);
-  cloudGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-  cloudGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.03)');
-  cloudGrad.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
-  ctx.fillStyle = cloudGrad;
-  ctx.fillRect(0, height * 0.85, width, height * 0.15);
 
   // Staff area
   const staffTop = height * 0.35;
