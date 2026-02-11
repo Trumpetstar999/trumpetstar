@@ -67,15 +67,16 @@ export function renderGame(
   }
   ctx.shadowBlur = 0;
 
-  // Draw treble clef (text-based, large like reference)
+  // Draw treble clef — sized to span from just above top line to just below bottom line
   ctx.save();
-  const clefFontSize = staffHeight * 2.6;
+  const clefFontSize = staffHeight * 1.8;
   ctx.font = `${clefFontSize}px serif`;
   ctx.fillStyle = GOLD;
   ctx.shadowColor = GOLD_GLOW;
-  ctx.shadowBlur = 12;
+  ctx.shadowBlur = 10;
   ctx.textBaseline = 'middle';
-  ctx.fillText('𝄞', clefX - clefFontSize * 0.35, staffCenterY + lineSpacing * 0.15);
+  // The unicode glyph's visual center sits a bit high, nudge down to align curl on G line
+  ctx.fillText('𝄞', clefX - clefFontSize * 0.32, staffCenterY + lineSpacing * 0.25);
   ctx.shadowBlur = 0;
   ctx.restore();
 
