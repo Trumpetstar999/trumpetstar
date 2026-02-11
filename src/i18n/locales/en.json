@@ -183,8 +183,17 @@
     "feedbackChat": "Feedback & Chat",
     "classroom": "Classroom",
     "statistics": "Statistics",
+    "gameHighscore": "Game Highscore",
     "recentVideos": "Recently Played",
     "weeklyGoals": "Weekly Goals"
+  },
+  "game": {
+    "noHighscoresYet": "No highscores yet",
+    "playToScore": "Play NoteRunner to get your first score!",
+    "bestScore": "Best Score",
+    "bestStreak": "Best Streak",
+    "accuracy": "Accuracy",
+    "level": "Level"
   },
   "assistant": {
     "name": "Toni your Trumpet Coach",

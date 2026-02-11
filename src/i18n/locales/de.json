@@ -183,8 +183,17 @@
     "feedbackChat": "Feedback & Chat",
     "classroom": "Klassenzimmer",
     "statistics": "Statistik",
+    "gameHighscore": "Game Highscore",
     "recentVideos": "Zuletzt gespielt",
     "weeklyGoals": "Wochenziele"
+  },
+  "game": {
+    "noHighscoresYet": "Noch keine Highscores",
+    "playToScore": "Spiele NoteRunner, um deinen ersten Score zu erzielen!",
+    "bestScore": "Bester Score",
+    "bestStreak": "Beste Streak",
+    "accuracy": "Genauigkeit",
+    "level": "Level"
   },
   "assistant": {
     "name": "Toni dein Trompeten-Coach",
