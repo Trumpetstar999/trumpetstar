@@ -53,6 +53,20 @@
   --card-foreground: 215 28% 7%;
   --popover-foreground: 215 28% 7%;
   --muted-foreground: 215 16% 47%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --background: 210 40% 98%;
+  --card: 0 0% 100%;
+  --input: 214 32% 91%;
+  --border: 214 32% 91%;
+  --ring: 217 91% 60%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 215 28% 7%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --muted: 210 40% 96%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 215 28% 7%;
 }
 
 /* Override any white text that comes from the main app */
@@ -76,6 +90,91 @@
 
 .admin-layout .text-muted-foreground {
   color: var(--admin-text-secondary) !important;
+}
+
+/* Force readable inputs/selects in admin */
+.admin-layout input,
+.admin-layout select,
+.admin-layout textarea {
+  color: var(--admin-text-primary) !important;
+  background-color: var(--admin-surface) !important;
+  border-color: var(--admin-border) !important;
+}
+
+.admin-layout input::placeholder,
+.admin-layout textarea::placeholder {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-layout input:focus,
+.admin-layout select:focus,
+.admin-layout textarea:focus {
+  border-color: var(--admin-accent) !important;
+  box-shadow: 0 0 0 3px var(--admin-accent-glow) !important;
+  outline: none !important;
+}
+
+/* Checkbox overrides for admin */
+.admin-layout button[role="checkbox"] {
+  border-color: var(--admin-border) !important;
+  background-color: var(--admin-surface) !important;
+}
+
+.admin-layout button[role="checkbox"][data-state="checked"] {
+  background-color: var(--admin-accent) !important;
+  border-color: var(--admin-accent) !important;
+  color: white !important;
+}
+
+/* Switch overrides */
+.admin-layout button[role="switch"] {
+  background-color: var(--admin-border) !important;
+}
+
+.admin-layout button[role="switch"][data-state="checked"] {
+  background-color: var(--admin-accent) !important;
+}
+
+/* Badge overrides - make them readable */
+.admin-layout [class*="badge"] {
+  color: var(--admin-text-primary);
+}
+
+/* Button overrides - primary buttons */
+.admin-layout button.bg-primary,
+.admin-layout button[class*="bg-primary"] {
+  background-color: var(--admin-accent) !important;
+  color: white !important;
+}
+
+.admin-layout button.bg-primary:hover,
+.admin-layout button[class*="bg-primary"]:hover {
+  background-color: var(--admin-accent-light) !important;
+}
+
+/* Ghost button text */
+.admin-layout .text-destructive {
+  color: var(--admin-error) !important;
+}
+
+/* Table header background */
+.admin-layout thead tr {
+  background-color: var(--admin-surface-hover) !important;
+}
+
+.admin-layout thead th {
+  color: var(--admin-text-secondary) !important;
+  font-weight: 600 !important;
+}
+
+.admin-layout tbody td {
+  color: var(--admin-text-primary) !important;
+}
+
+/* Code blocks in admin */
+.admin-layout code {
+  background-color: var(--admin-surface-hover) !important;
+  color: var(--admin-text-primary) !important;
 }
 
 /* Admin Cards */
