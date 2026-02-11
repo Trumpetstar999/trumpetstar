@@ -50,6 +50,7 @@ export function useGameLoop(settings: GameSettings) {
   const rafRef = useRef<number | null>(null);
   const scaleNotesRef = useRef<number[]>([]);
   const stateRef = useRef<GameState>(INITIAL_STATE);
+  const lastSpawnedMidiRef = useRef<number | null>(null);
 
   // Sync stateRef
   useEffect(() => { stateRef.current = gameState; }, [gameState]);
@@ -68,11 +69,19 @@ export function useGameLoop(settings: GameSettings) {
 
   const spawnNote = useCallback(() => {
     if (scaleNotesRef.current.length === 0) return;
-    const midi = getWeightedNote(scaleNotesRef.current, settings.key);
+    // Avoid spawning the same note twice in a row
+    let midi: number;
+    let attempts = 0;
+    do {
+      midi = getWeightedNote(scaleNotesRef.current, settings.key);
+      attempts++;
+    } while (midi === lastSpawnedMidiRef.current && scaleNotesRef.current.length > 1 && attempts < 10);
+    lastSpawnedMidiRef.current = midi;
+
     notesRef.current.push({
       id: nextIdRef.current++,
       midi,
-      x: 1.1, // start off screen right
+      x: 1.1,
       active: true,
       hit: false,
       missed: false,
@@ -124,6 +133,12 @@ export function useGameLoop(settings: GameSettings) {
           level: newLevel,
         };
       });
+      // Immediately update stateRef so speed change takes effect on next frame (no pause)
+      stateRef.current = {
+        ...stateRef.current,
+        correctCount: stateRef.current.correctCount + 1,
+        level: 1 + Math.floor((stateRef.current.correctCount + 1) / SPEED_SETTINGS.levelUpInterval),
+      };
       return true;
     }
     return false;
@@ -188,6 +203,7 @@ export function useGameLoop(settings: GameSettings) {
     nextIdRef.current = 1;
     lastSpawnRef.current = 0;
     lastTimeRef.current = 0;
+    lastSpawnedMidiRef.current = null;
     const initial = { ...INITIAL_STATE, isRunning: true };
     stateRef.current = initial;
     setGameState(initial);
