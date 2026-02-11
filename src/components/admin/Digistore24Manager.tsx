@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { Settings, Package, FileText } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Settings, Package, FileText, Download } from 'lucide-react';
 import { Digistore24SettingsManager } from './Digistore24SettingsManager';
 import { Digistore24ProductsManager } from './Digistore24ProductsManager';
 import { Digistore24IPNLogs } from './Digistore24IPNLogs';
+import { Digistore24ImportPanel } from './Digistore24ImportPanel';
 
-type SubTab = 'settings' | 'products' | 'logs';
+type SubTab = 'settings' | 'products' | 'import' | 'logs';
 
 export function Digistore24Manager() {
   const [subTab, setSubTab] = useState<SubTab>('settings');
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleImportDone = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -19,6 +25,13 @@ export function Digistore24Manager() {
         >
           <Settings className="w-4 h-4" />
           Einstellungen
+        </button>
+        <button
+          onClick={() => setSubTab('import')}
+          className={`admin-tab ${subTab === 'import' ? 'admin-tab-active' : ''}`}
+        >
+          <Download className="w-4 h-4" />
+          Import
         </button>
         <button
           onClick={() => setSubTab('products')}
@@ -38,7 +51,8 @@ export function Digistore24Manager() {
 
       {/* Content */}
       {subTab === 'settings' && <Digistore24SettingsManager />}
-      {subTab === 'products' && <Digistore24ProductsManager />}
+      {subTab === 'import' && <Digistore24ImportPanel onImportDone={handleImportDone} />}
+      {subTab === 'products' && <Digistore24ProductsManager key={refreshKey} />}
       {subTab === 'logs' && <Digistore24IPNLogs />}
     </div>
   );

@@ -344,6 +344,42 @@ export type Database = {
           },
         ]
       }
+      digistore24_import_logs: {
+        Row: {
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          products_created: number | null
+          products_total: number | null
+          products_updated: number | null
+          started_at: string
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          products_created?: number | null
+          products_total?: number | null
+          products_updated?: number | null
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          products_created?: number | null
+          products_total?: number | null
+          products_updated?: number | null
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       digistore24_ipn_events: {
         Row: {
           created_at: string
@@ -401,35 +437,44 @@ export type Database = {
       digistore24_products: {
         Row: {
           access_policy: Database["public"]["Enums"]["digistore24_access_policy"]
+          checkout_url: string | null
           created_at: string
           digistore_product_id: string
           entitlement_key: string
           id: string
+          imported_at: string | null
           is_active: boolean
           name: string
           plan_key: string | null
+          raw_payload_json: Json | null
           updated_at: string
         }
         Insert: {
           access_policy?: Database["public"]["Enums"]["digistore24_access_policy"]
+          checkout_url?: string | null
           created_at?: string
           digistore_product_id: string
           entitlement_key: string
           id?: string
+          imported_at?: string | null
           is_active?: boolean
           name: string
           plan_key?: string | null
+          raw_payload_json?: Json | null
           updated_at?: string
         }
         Update: {
           access_policy?: Database["public"]["Enums"]["digistore24_access_policy"]
+          checkout_url?: string | null
           created_at?: string
           digistore_product_id?: string
           entitlement_key?: string
           id?: string
+          imported_at?: string | null
           is_active?: boolean
           name?: string
           plan_key?: string | null
+          raw_payload_json?: Json | null
           updated_at?: string
         }
         Relationships: []
