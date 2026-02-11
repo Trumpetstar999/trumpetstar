@@ -1,216 +1,130 @@
 
 
-# TrumpetStar NoteRunner -- Game Integration Plan
+# Digistore24 Produkt-Import im Adminbereich
 
 ## Uebersicht
 
-Eine neue Rubrik "Game" wird in die bestehende TrumpetStar-App integriert. Das Spiel "NoteRunner" ist ein Notenlese-Trainer mit Echtzeit-Pitch-Detection, bei dem Noten von rechts nach links ueber ein Notensystem wandern und der Spieler sie auf der Trompete spielen muss.
+Erweiterung des bestehenden Digistore24-Adminbereichs um eine API-basierte Import-Funktion, die Produkte direkt von Digistore24 abruft, idempotent in die Datenbank schreibt und eine komfortable Zuordnung zu den App-Plaenen (FREE/BASIC/PRO) ermoeglicht.
+
+## Voraussetzungen
+
+- Ein neues Secret `DIGISTORE24_API_KEY` muss gesetzt werden (Vendor API Key aus Digistore24 unter Einstellungen > Kontozugang > API Keys)
+- Die Digistore24 API nutzt das Format: `GET https://www.digistore24.com/api/call/listProducts` mit Header `X-DS-API-KEY`
 
 ---
 
-## 1. Navigation und Routing
+## Schritt 1: Secret einrichten
 
-### TabBar-Erweiterung
-- Neuer Tab `game` wird zum bestehenden `TabId`-Type hinzugefuegt
-- Icon: `Gamepad2` aus lucide-react
-- Feature-Flag `menu_game` wird in der DB angelegt (per Migration)
-- Position: zwischen "Recordings" und "Chats" in der Tab-Reihenfolge
+- `DIGISTORE24_API_KEY` als neues Secret anlegen (wird vom Nutzer eingegeben)
 
-### Routing-Aenderungen
-- `src/types/index.ts`: `TabId` erweitern um `'game'`
-- `src/pages/Index.tsx`: neuen Case `game` in `renderPage()` + `tabOrder` ergaenzen
-- `src/components/layout/TabBar.tsx`: `tabToFlagKey`, `tabIcons`, `allTabIds` erweitern
-- i18n-Dateien (de/en/es): `navigation.game` Key hinzufuegen
+## Schritt 2: Datenbank erweitern
 
-### Eigene Route fuer Fullscreen-Gameplay
-- `/game/play` als separate Route in `App.tsx` fuer den eigentlichen Game-Screen (ohne Header/TabBar)
-- Die Game Landing Page laeuft innerhalb des normalen AppShell-Layouts
-- Der Game-Screen selbst nutzt kein AppShell -- er rendert fullscreen
+Migration auf die bestehende Tabelle `digistore24_products`:
 
----
-
-## 2. Neue Seiten und Komponenten
-
-### Seiten
-| Datei | Zweck |
-|---|---|
-| `src/pages/GamePage.tsx` | Landing Page mit Start/Settings/Highscores Buttons |
-| `src/pages/GamePlayPage.tsx` | Fullscreen Game Screen (eigene Route `/game/play`) |
-
-### Komponenten (alle unter `src/components/game/`)
-| Komponente | Zweck |
-|---|---|
-| `GameLanding.tsx` | Titel, Beschreibung, Start/Settings/Highscores Buttons, Mikrofon-Hinweis |
-| `GameCanvas.tsx` | Canvas-basierter Game Loop (Notenlinien, Noten, Clef, Partikel-Effekte) |
-| `GameHUD.tsx` | Top-Bar: Level, Tempo, Score, Streak, Herzen |
-| `GameStatusBar.tsx` | Bottom-Bereich: Mic-Status, Detected Pitch, Mapped Note, SFX Toggle, Settings-Zahnrad |
-| `GameSettingsOverlay.tsx` | Overlay mit Skalen, Range, Vorzeichen, Gameplay-Einstellungen |
-| `GameOverOverlay.tsx` | Game Over Screen mit Score-Zusammenfassung und "Nochmal" / "Zurueck" |
-| `GameHighscores.tsx` | Highscore-Tabelle mit Filter (Heute/Woche/Allzeit) |
-| `RangeSelector.tsx` | Visueller Range-Picker auf Mini-Notenzeile mit draggbaren Noten |
-| `NoteRenderer.ts` | Utility: Noten-Rendering auf Canvas (Notenkoepfe, Vorzeichen, Hilfslinien) |
-| `GameSFX.ts` | Sound-Effekte (Hit-Shimmer, Miss, Game Over) -- abschaltbar |
-
-### Hooks
-| Hook | Zweck |
-|---|---|
-| `src/hooks/useGamePitchDetection.tsx` | Erweitert bestehenden `usePitchDetection` um Bb-Transposition (+2 Halbtoene), Confidence Gate, Stability-Window (100ms) |
-| `src/hooks/useGameLoop.tsx` | requestAnimationFrame-basierter Game Loop mit useRef-State-Trennung |
-| `src/hooks/useGameSettings.tsx` | Game-Settings State (Scale, Key, Range, Accidental Mode, Speed etc.) mit localStorage Persistenz |
-| `src/hooks/useGameHighscores.tsx` | Highscores laden/speichern (DB + localStorage Fallback) |
-
----
-
-## 3. Visuelles Design
-
-### Hintergrund (CSS/Canvas)
-- Kraeftiger Blau-Gradient (TrumpetStar Brand-Farben: `--brand-blue-start` bis `--brand-blue-end`)
-- Unterer Bereich: weiche Wolken (CSS-Gradient oder Canvas-gezeichnet)
-- Oberer Bereich: dezente Sterne (kleine weisse Punkte mit Glow, animiert)
-
-### Notensystem (Canvas)
-- 5 horizontale goldene Linien (`reward-gold` Farbe) mit leichtem Glow
-- Violinschluessel links: golden, gross, dezent leuchtend (SVG-Path auf Canvas gerendert)
-- Noten: goldene Notenkoepfe mit optionalen Vorzeichen und Hilfslinien
-
-### Treffer-Feedback
-- Korrekt: Note loest sich in goldenem Lichtschein auf (Halo-Expansion + weiche Partikel)
-- Miss (Note erreicht Clef): Note wird rot/transparent, Herz-Animation
-- Alle Animationen via Canvas-Partikel-System
-
----
-
-## 4. Game-Logik (Details)
-
-### Noten-Spawning
-- Noten erscheinen am rechten Rand, bewegen sich linear nach links
-- Geschwindigkeit basiert auf aktuellem Level/Tempo
-- Nur Noten aus der gewaehlten Tonart + Skala + Range werden generiert
-- Easy-Gewichtung: Tonika/Dominante/Terz 2x haeufiger
-
-### Treffer-Erkennung
-- Erkannter Konzertton + 2 Halbtoene = Written Pitch (Bb-Transposition)
-- Vergleich gegen alle aktiven Noten auf dem Spielfeld
-- Treffer gilt fuer die vorderste (naechste am Clef) passende Note
-- Confidence Threshold konfigurierbar (Low/Med/High)
-- Stability Window: Ton muss 80-120ms stabil erkannt werden
-
-### Herzen-System
-- 3 Herzen zu Beginn
-- Herz geht verloren wenn Note den Violinschluessel erreicht (Miss)
-- Animation: Herz wackelt und wird grau
-- Game Over bei 0 Herzen
-
-### Level-Progression
-- Alle 10 korrekte Noten: Level +1, Geschwindigkeit erhoehen
-- Start-Speed konfigurierbar (1-10)
-
-### Skalen und Tonarten
-- 15 Tonarten (C bis Cb)
-- 8 Skalen-Typen (Major, Natural/Harmonic/Melodic Minor, Major/Minor Pentatonic, Blues, Chromatic)
-- Vorzeichen-Modus: Generalvorzeichen ODER Einzelvorzeichen an der Note
-
----
-
-## 5. Datenmodell
-
-### Neue DB-Tabelle: `game_highscores`
-
-```text
-game_highscores
-  id              UUID PK
-  user_id         UUID NOT NULL (references profiles)
-  score           INTEGER NOT NULL
-  best_streak     INTEGER NOT NULL
-  level_reached   INTEGER NOT NULL
-  accuracy        DECIMAL(5,2) NOT NULL
-  notes_correct   INTEGER NOT NULL
-  notes_total     INTEGER NOT NULL
-  scale_key       TEXT NOT NULL
-  scale_type      TEXT NOT NULL
-  accidental_mode TEXT NOT NULL
-  range_min       TEXT NOT NULL
-  range_max       TEXT NOT NULL
-  created_at      TIMESTAMPTZ DEFAULT now()
+```sql
+ALTER TABLE digistore24_products
+  ADD COLUMN IF NOT EXISTS raw_payload_json jsonb DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS checkout_url text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS imported_at timestamptz DEFAULT now();
 ```
 
-- RLS: User kann nur eigene Highscores lesen/schreiben
-- Feature-Flag `menu_game` per Migration einfuegen
+Neue Tabelle fuer Import-Logs:
 
----
+```sql
+CREATE TABLE digistore24_import_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  started_at timestamptz NOT NULL DEFAULT now(),
+  finished_at timestamptz,
+  status text NOT NULL DEFAULT 'running',  -- running, success, error
+  products_total integer DEFAULT 0,
+  products_created integer DEFAULT 0,
+  products_updated integer DEFAULT 0,
+  error_message text,
+  triggered_by uuid REFERENCES auth.users(id)
+);
 
-## 6. Pitch Detection Pipeline
+ALTER TABLE digistore24_import_logs ENABLE ROW LEVEL SECURITY;
 
-Basierend auf dem bestehenden `usePitchDetection.tsx`:
-
-```text
-Mikrofon (getUserMedia)
-  --> AudioContext + AnalyserNode (fftSize 2048)
-  --> Autocorrelation (bestehender Algorithmus)
-  --> Frequenz --> Konzertton + Oktave + Cents
-  --> Bb-Transposition: +2 Halbtoene = Written Pitch
-  --> Confidence Gate (RMS-basiert)
-  --> Stability Window (100ms gleicher Ton)
-  --> Vergleich mit aktiven Noten
+CREATE POLICY "Admins can manage import logs"
+  ON digistore24_import_logs FOR ALL
+  USING (has_role(auth.uid(), 'admin'));
 ```
 
-Der bestehende `autoCorrelate`-Algorithmus wird wiederverwendet. Die Erweiterung erfolgt in einem neuen `useGamePitchDetection` Hook, der intern `usePitchDetection` nutzt und die Transpositions-/Stability-Logik ergaenzt.
+## Schritt 3: Edge Function `digistore24-import`
+
+Neue Backend-Funktion (`supabase/functions/digistore24-import/index.ts`):
+
+- Authentifizierung: Prueft ob anfragender User Admin-Rolle hat
+- Ruft `https://www.digistore24.com/api/call/listProducts` mit dem gespeicherten API Key auf
+- Retry-Logik: 1-2 Retries mit exponentiellem Backoff bei temporaeren Fehlern
+- Upsert-Logik pro Produkt:
+  - Existiert `digistore_product_id` bereits: Update von `name`, `is_active`, `raw_payload_json`, `updated_at`, `imported_at`
+  - Existiert nicht: Insert mit `plan_key = 'FREE'` als Default
+  - `plan_key` und `checkout_url` werden bei bestehenden Produkten NICHT ueberschrieben
+- Schreibt Import-Log (Anzahl total/created/updated, Status, Fehler)
+- Gibt Ergebnis als JSON zurueck
+
+## Schritt 4: Admin UI erweitern
+
+Neuer Sub-Tab "Import" im bestehenden `Digistore24Manager.tsx` (neben Settings, Produkte, Logs):
+
+### 4a) Import-Bereich (oben)
+- Button "Produkte importieren" mit Loading-Spinner und Erfolgsmeldung
+- Anzeige: Letzter Import (Zeitpunkt, Anzahl), API Key Status (nur letzte 4 Zeichen)
+- Kleines Import-Log der letzten 10 Imports als kompakte Tabelle
+
+### 4b) Erweiterte Produkt-Tabelle (bestehende `Digistore24ProductsManager`)
+- Neue Spalten: Checkout-Link (editierbares Textfeld), Importiert am
+- Plan-Dropdown direkt in der Zeile (FREE/BASIC/PRO) mit Sofort-Speicherung + Toast
+- Suchfeld/Filter nach Name, Produkt-ID, Plan
+- Multi-Select mit Checkbox + Bulk-Plan-Zuweisung
+- Sortierung nach Name/Plan klickbar
+
+### 4c) Sicherheit
+- API Key wird nie im Frontend angezeigt, nur maskiert (****...last4)
+- Alle API-Aufrufe laufen ueber die Edge Function
+
+## Schritt 5: Config
+
+- `supabase/config.toml` erhaelt Eintrag fuer die neue Funktion:
+  ```toml
+  [functions.digistore24-import]
+  verify_jwt = false
+  ```
 
 ---
 
-## 7. Performance-Strategie
+## Technische Details
 
-- **Canvas-Rendering**: Gesamtes Spielfeld auf einem HTML5 Canvas
-- **Game Loop**: `requestAnimationFrame` mit Delta-Time
-- **State-Trennung**: Game-State in `useRef` (Noten-Positionen, Partikel etc.) -- kein React-State fuer Frame-Updates
-- **Minimale Re-Renders**: Nur HUD-Werte (Score, Streak, Lives) als React-State, Update nur bei Aenderung
-- **Cleanup**: AudioContext und MediaStream werden bei Unmount / Game Over sauber geschlossen
+### Digistore24 API Aufruf
 
----
+```text
+GET https://www.digistore24.com/api/call/listProducts
+Header: X-DS-API-KEY: <api_key>
+Header: Accept: application/json
+```
 
-## 8. Implementierungsreihenfolge
+Erwartete Antwort-Struktur (vereinfacht):
+```json
+{
+  "api_version": "...",
+  "result": "success",
+  "data": {
+    "products": [
+      { "id": "12345", "name": "Basic Abo", "active": true, ... }
+    ]
+  }
+}
+```
 
-1. **Types und Navigation** -- TabId erweitern, Feature Flag, i18n, Routing
-2. **Game Landing Page** -- Einfache Seite mit Buttons, Mikrofon-Hinweis
-3. **Game Settings** -- useGameSettings Hook + Settings Overlay
-4. **Pitch Detection Erweiterung** -- useGamePitchDetection mit Bb-Mapping und Stability
-5. **Game Canvas und Loop** -- Notenlinien, Clef, Noten-Rendering, Bewegung
-6. **Treffer-Logik und HUD** -- Score, Streak, Herzen, Level-Progression
-7. **Partikel und Feedback** -- Goldener Halo bei Treffer, Miss-Animation
-8. **Highscores** -- DB-Tabelle, Hook, Highscores-Ansicht
-9. **Game Over und Polish** -- Game Over Screen, SFX, Feinschliff
+### Betroffene Dateien
 
----
-
-## 9. Technische Details
-
-### Dateien die geaendert werden
-- `src/types/index.ts` -- TabId um 'game' erweitern
-- `src/pages/Index.tsx` -- tabOrder + renderPage Case
-- `src/components/layout/TabBar.tsx` -- tabToFlagKey, tabIcons, allTabIds
-- `src/App.tsx` -- Route `/game/play` hinzufuegen
-- `src/i18n/locales/de.json`, `en.json`, `es.json` -- navigation.game Key
-
-### Neue Dateien
-- `src/pages/GamePage.tsx`
-- `src/pages/GamePlayPage.tsx`
-- `src/components/game/GameLanding.tsx`
-- `src/components/game/GameCanvas.tsx`
-- `src/components/game/GameHUD.tsx`
-- `src/components/game/GameStatusBar.tsx`
-- `src/components/game/GameSettingsOverlay.tsx`
-- `src/components/game/GameOverOverlay.tsx`
-- `src/components/game/GameHighscores.tsx`
-- `src/components/game/RangeSelector.tsx`
-- `src/components/game/NoteRenderer.ts`
-- `src/components/game/GameSFX.ts`
-- `src/components/game/constants.ts` (Skalen-Definitionen, Noten-Mapping)
-- `src/hooks/useGamePitchDetection.tsx`
-- `src/hooks/useGameLoop.tsx`
-- `src/hooks/useGameSettings.tsx`
-- `src/hooks/useGameHighscores.tsx`
-
-### DB-Migration
-- Tabelle `game_highscores` mit RLS
-- Feature-Flag `menu_game` in `feature_flags` Tabelle einfuegen
+| Datei | Aenderung |
+|-------|-----------|
+| `supabase/functions/digistore24-import/index.ts` | Neu: Edge Function |
+| `supabase/config.toml` | Neuer Function-Eintrag |
+| `src/components/admin/Digistore24Manager.tsx` | Neuer Sub-Tab "Import" |
+| `src/components/admin/Digistore24ProductsManager.tsx` | Erweitert: Filter, Bulk, Checkout-Link, Sortierung |
+| `src/components/admin/Digistore24ImportPanel.tsx` | Neu: Import-Button + Log-Anzeige |
+| DB Migration | Spalten + Import-Log Tabelle |
 
