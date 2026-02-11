@@ -1,34 +1,21 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { LanguageContext } from '@/contexts/LanguageContext';
+import type { Language, SkillLevel } from '@/contexts/LanguageContext';
+
+// Re-export types for consumers
+export type { Language, SkillLevel } from '@/contexts/LanguageContext';
 
 // Import translation files
 import de from '@/i18n/locales/de.json';
 import en from '@/i18n/locales/en.json';
 import es from '@/i18n/locales/es.json';
 
-export type Language = 'de' | 'en' | 'es';
-
 type TranslationValue = string | { [key: string]: TranslationValue };
 type Translations = { [key: string]: TranslationValue };
 
 const translations: Record<Language, Translations> = { de, en, es };
-
-export type SkillLevel = 'beginner' | 'intermediate';
-
-interface LanguageContextType {
-  language: Language;
-  skillLevel: SkillLevel;
-  setLanguage: (lang: Language) => Promise<void>;
-  t: (key: string, params?: Record<string, string | number>) => string;
-  isLoading: boolean;
-  hasCompletedLanguageSetup: boolean;
-  hasSeenWelcome: boolean;
-  completeOnboarding: (lang: Language, skill: SkillLevel) => Promise<void>;
-  completeWelcome: () => Promise<void>;
-}
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Detect browser language
 function detectBrowserLanguage(): Language {
