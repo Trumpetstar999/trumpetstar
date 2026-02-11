@@ -172,10 +172,10 @@ export const RANGE_PRESETS = {
 
 // Game difficulty settings
 export const SPEED_SETTINGS = {
-  baseSpeed: 60, // pixels per second at speed 1
-  speedMultiplier: 15, // additional px/s per speed level
-  levelUpInterval: 10, // correct notes before level up
-  speedUpPerLevel: 8, // additional px/s per level
+  baseSpeed: 60,
+  speedMultiplier: 15,
+  levelUpInterval: 10,
+  speedUpPerLevel: 18, // noticeable speed increase per level
 };
 
 export const CONFIDENCE_THRESHOLDS = {
