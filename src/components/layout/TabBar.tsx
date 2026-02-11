@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { TabId } from '@/types';
-import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic } from 'lucide-react';
+import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic, Gamepad2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
@@ -21,6 +21,7 @@ const tabToFlagKey: Record<TabId, string> = {
   musicxml: 'menu_musicxml',
   practice: 'menu_practice',
   recordings: 'menu_recordings',
+  game: 'menu_game',
   chats: 'menu_chats',
   classroom: 'menu_classroom',
   profile: 'menu_profile',
@@ -33,13 +34,14 @@ const tabIcons: Record<TabId, typeof Layers> = {
   musicxml: FileMusic,
   practice: Music,
   recordings: Video,
+  game: Gamepad2,
   chats: MessageSquare,
   classroom: Users,
   profile: User,
 };
 
 // All tab IDs in order
-const allTabIds: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'chats', 'classroom', 'profile'];
+const allTabIds: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'chats', 'classroom', 'profile'];
 
 export function TabBar({ activeTab, onTabChange, hidden = false }: TabBarProps) {
   const unreadCount = useUnreadMessages();

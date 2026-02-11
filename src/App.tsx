@@ -18,6 +18,7 @@ import { MusicXMLPage } from "./pages/MusicXMLPage";
 import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
 import PricingPage from "./pages/PricingPage";
 import WordPressCallbackPage from "./pages/WordPressCallbackPage";
+import GamePlayPage from "./pages/GamePlayPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => {
                       <Route path="/pricing" element={<PricingPage />} />
                       <Route path="/musicxml" element={<MusicXMLPage />} />
                       <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
+                      <Route path="/game/play" element={<GamePlayPage />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

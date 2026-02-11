@@ -9,6 +9,7 @@ import { RecordingsPage } from './RecordingsPage';
 import { ChatsPage } from './ChatsPage';
 import { ClassroomPage } from './ClassroomPage';
 import { ProfilePage } from './ProfilePage';
+import { GamePage } from './GamePage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -20,7 +21,7 @@ import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
 
 // Define tab order for determining slide direction
-const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'chats', 'classroom', 'profile'];
+const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'chats', 'classroom', 'profile'];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('levels');
@@ -121,6 +122,8 @@ const Index = () => {
         return <PracticePage />;
       case 'recordings':
         return <RecordingsPage />;
+      case 'game':
+        return <GamePage />;
       case 'chats':
         return <ChatsPage />;
       case 'classroom':
