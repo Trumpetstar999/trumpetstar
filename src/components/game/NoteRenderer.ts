@@ -67,14 +67,15 @@ export function renderGame(
   }
   ctx.shadowBlur = 0;
 
-  // Draw treble clef (text-based for simplicity)
+  // Draw treble clef (text-based, large like reference)
   ctx.save();
-  ctx.font = `${staffHeight * 1.3}px serif`;
+  const clefFontSize = staffHeight * 2.6;
+  ctx.font = `${clefFontSize}px serif`;
   ctx.fillStyle = GOLD;
   ctx.shadowColor = GOLD_GLOW;
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur = 12;
   ctx.textBaseline = 'middle';
-  ctx.fillText('𝄞', clefX - staffHeight * 0.45, staffCenterY + lineSpacing * 0.15);
+  ctx.fillText('𝄞', clefX - clefFontSize * 0.35, staffCenterY + lineSpacing * 0.15);
   ctx.shadowBlur = 0;
   ctx.restore();
 
