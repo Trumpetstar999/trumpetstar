@@ -76,7 +76,7 @@ export function renderGame(
   ctx.shadowBlur = 10;
   ctx.textBaseline = 'middle';
   // The unicode glyph's visual center sits a bit high, nudge down to align curl on G line
-  ctx.fillText('𝄞', clefX - clefFontSize * 0.32 + 50, staffCenterY + lineSpacing * 0.25 - 50);
+  ctx.fillText('𝄞', clefX - clefFontSize * 0.32 + 50, staffCenterY + lineSpacing * 0.25 - 10);
   ctx.shadowBlur = 0;
   ctx.restore();
 
