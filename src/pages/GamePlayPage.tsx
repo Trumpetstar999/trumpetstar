@@ -23,7 +23,7 @@ export default function GamePlayPage() {
   const { isListening, pitchData, error, startListening, stopListening } = useGamePitchDetection(
     settings.calibrationCents, threshold
   );
-  const { gameState, notesRef, particlesRef, startGame, stopGame, checkHit } = useGameLoop(settings);
+  const { gameState, notesRef, particlesRef, startGame, stopGame, pauseGame, resumeGame, checkHit } = useGameLoop(settings);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -95,6 +95,12 @@ export default function GamePlayPage() {
     else startListening();
   }, [isListening, startListening, stopListening]);
 
+  const handleTogglePause = useCallback(() => {
+    if (gameState.isGameOver) return;
+    if (gameState.isRunning) pauseGame();
+    else resumeGame();
+  }, [gameState.isRunning, gameState.isGameOver, pauseGame, resumeGame]);
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-[hsl(222,86%,29%)] flex items-center justify-center">
@@ -119,9 +125,12 @@ export default function GamePlayPage() {
         mappedNote={pitchData ? `${pitchData.writtenNote}${pitchData.writtenOctave}` : null}
         confidence={pitchData?.confidence ?? 0}
         sfxEnabled={settings.sfxEnabled}
+        isPaused={!gameState.isRunning && !gameState.isGameOver}
         onToggleMic={handleToggleMic}
         onToggleSfx={() => updateSettings({ sfxEnabled: !settings.sfxEnabled })}
         onOpenSettings={() => setSettingsOpen(true)}
+        onTogglePause={handleTogglePause}
+        onQuit={handleBack}
       />
 
       {error && (
