@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -20,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Pencil, Trash2, Loader2, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Package, Search, ArrowUpDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Product {
@@ -32,6 +33,8 @@ interface Product {
   plan_key: string | null;
   is_active: boolean;
   created_at: string;
+  checkout_url: string | null;
+  imported_at: string | null;
 }
 
 interface ProductFormData {
@@ -41,6 +44,7 @@ interface ProductFormData {
   access_policy: 'IMMEDIATE_REVOKE' | 'REVOKE_AT_PERIOD_END';
   plan_key: string;
   is_active: boolean;
+  checkout_url: string;
 }
 
 const defaultFormData: ProductFormData = {
@@ -50,7 +54,13 @@ const defaultFormData: ProductFormData = {
   access_policy: 'REVOKE_AT_PERIOD_END',
   plan_key: 'BASIC',
   is_active: true,
+  checkout_url: '',
 };
+
+const PLAN_OPTIONS = ['FREE', 'BASIC', 'PRO'];
+
+type SortField = 'name' | 'plan_key';
+type SortDir = 'asc' | 'desc';
 
 export function Digistore24ProductsManager() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -60,6 +70,11 @@ export function Digistore24ProductsManager() {
   const [formData, setFormData] = useState<ProductFormData>(defaultFormData);
   const [saving, setSaving] = useState(false);
   const [plans, setPlans] = useState<{ key: string; display_name: string }[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkPlan, setBulkPlan] = useState('FREE');
 
   useEffect(() => {
     loadProducts();
@@ -85,9 +100,98 @@ export function Digistore24ProductsManager() {
       toast.error('Fehler beim Laden der Produkte');
       console.error(error);
     } else {
-      setProducts(data || []);
+      setProducts((data as Product[]) || []);
     }
     setLoading(false);
+  }
+
+  // Filtering & sorting
+  const filtered = products
+    .filter((p) => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.digistore_product_id.toLowerCase().includes(q) ||
+        (p.plan_key || '').toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const valA = (sortField === 'name' ? a.name : a.plan_key || '').toLowerCase();
+      const valB = (sortField === 'name' ? b.name : b.plan_key || '').toLowerCase();
+      return sortDir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+    });
+
+  function toggleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((p) => p.id)));
+    }
+  }
+
+  async function handleBulkPlanAssign() {
+    if (selectedIds.size === 0) return;
+    const { error } = await supabase
+      .from('digistore24_products')
+      .update({ plan_key: bulkPlan })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast.error('Fehler beim Zuweisen');
+    } else {
+      toast.success(`${selectedIds.size} Produkte auf ${bulkPlan} gesetzt`);
+      setSelectedIds(new Set());
+      await loadProducts();
+    }
+  }
+
+  async function handleInlinePlanChange(productId: string, newPlan: string) {
+    // Optimistic update
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, plan_key: newPlan } : p))
+    );
+
+    const { error } = await supabase
+      .from('digistore24_products')
+      .update({ plan_key: newPlan })
+      .eq('id', productId);
+
+    if (error) {
+      toast.error('Fehler beim Speichern');
+      await loadProducts();
+    } else {
+      toast.success('Plan gespeichert');
+    }
+  }
+
+  async function handleCheckoutUrlChange(productId: string, url: string) {
+    const { error } = await supabase
+      .from('digistore24_products')
+      .update({ checkout_url: url })
+      .eq('id', productId);
+
+    if (error) {
+      toast.error('Fehler beim Speichern');
+    }
   }
 
   function openCreateDialog() {
@@ -105,6 +209,7 @@ export function Digistore24ProductsManager() {
       access_policy: product.access_policy,
       plan_key: product.plan_key || 'FREE',
       is_active: product.is_active,
+      checkout_url: product.checkout_url || '',
     });
     setDialogOpen(true);
   }
@@ -117,33 +222,27 @@ export function Digistore24ProductsManager() {
 
     setSaving(true);
     try {
+      const payload = {
+        digistore_product_id: formData.digistore_product_id,
+        name: formData.name,
+        entitlement_key: formData.entitlement_key,
+        access_policy: formData.access_policy,
+        plan_key: formData.plan_key,
+        is_active: formData.is_active,
+        checkout_url: formData.checkout_url || null,
+      };
+
       if (editingProduct) {
         const { error } = await supabase
           .from('digistore24_products')
-          .update({
-            digistore_product_id: formData.digistore_product_id,
-            name: formData.name,
-            entitlement_key: formData.entitlement_key,
-            access_policy: formData.access_policy,
-            plan_key: formData.plan_key,
-            is_active: formData.is_active,
-          })
+          .update(payload)
           .eq('id', editingProduct.id);
-
         if (error) throw error;
         toast.success('Produkt aktualisiert');
       } else {
         const { error } = await supabase
           .from('digistore24_products')
-          .insert({
-            digistore_product_id: formData.digistore_product_id,
-            name: formData.name,
-            entitlement_key: formData.entitlement_key,
-            access_policy: formData.access_policy,
-            plan_key: formData.plan_key,
-            is_active: formData.is_active,
-          });
-
+          .insert(payload);
         if (error) throw error;
         toast.success('Produkt erstellt');
       }
@@ -194,7 +293,7 @@ export function Digistore24ProductsManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -204,8 +303,8 @@ export function Digistore24ProductsManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Produkt-Mappings</h3>
-          <p className="text-sm text-slate-500">
+          <h3 className="text-lg font-semibold text-foreground">Produkt-Mappings</h3>
+          <p className="text-sm text-muted-foreground">
             Verknüpfe Digistore24-Produkte mit App-Berechtigungen
           </p>
         </div>
@@ -215,14 +314,44 @@ export function Digistore24ProductsManager() {
         </Button>
       </div>
 
+      {/* Search & Bulk */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Suche nach Name, ID oder Plan..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">{selectedIds.size} ausgewählt</span>
+            <select
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+              value={bulkPlan}
+              onChange={(e) => setBulkPlan(e.target.value)}
+            >
+              {PLAN_OPTIONS.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <Button size="sm" onClick={handleBulkPlanAssign}>
+              Plan zuweisen
+            </Button>
+          </div>
+        )}
+      </div>
+
       {/* Products Table */}
       <div className="admin-card overflow-hidden">
-        {products.length === 0 ? (
+        {filtered.length === 0 && !searchQuery ? (
           <div className="p-16 text-center">
-            <Package className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="font-medium text-slate-900 mb-2">Keine Produkte konfiguriert</h3>
-            <p className="text-sm text-slate-500 mb-4">
-              Füge Digistore24-Produkte hinzu, um Käufe automatisch zu verarbeiten
+            <Package className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-medium text-foreground mb-2">Keine Produkte konfiguriert</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Importiere Produkte über den Import-Tab oder füge sie manuell hinzu
             </p>
             <Button onClick={openCreateDialog}>
               <Plus className="w-4 h-4 mr-2" />
@@ -233,36 +362,61 @@ export function Digistore24ProductsManager() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Produktname</TableHead>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={selectedIds.size === filtered.length && filtered.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
+                <TableHead>
+                  <button className="flex items-center gap-1" onClick={() => toggleSort('name')}>
+                    Produktname <ArrowUpDown className="w-3 h-3" />
+                  </button>
+                </TableHead>
                 <TableHead>Digistore ID</TableHead>
-                <TableHead>Entitlement Key</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Zugriffs-Policy</TableHead>
+                <TableHead>
+                  <button className="flex items-center gap-1" onClick={() => toggleSort('plan_key')}>
+                    Plan <ArrowUpDown className="w-3 h-3" />
+                  </button>
+                </TableHead>
+                <TableHead>Checkout-Link</TableHead>
                 <TableHead>Aktiv</TableHead>
                 <TableHead className="text-right">Aktionen</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {filtered.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedIds.has(product.id)}
+                      onCheckedChange={() => toggleSelect(product.id)}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>
-                    <code className="text-xs bg-slate-100 px-2 py-1 rounded">
+                    <code className="text-xs bg-muted px-2 py-1 rounded">
                       {product.digistore_product_id}
                     </code>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{product.entitlement_key}</Badge>
+                    <select
+                      className="rounded-md border border-input bg-background px-2 py-1 text-sm"
+                      value={product.plan_key || 'FREE'}
+                      onChange={(e) => handleInlinePlanChange(product.id, e.target.value)}
+                    >
+                      {PLAN_OPTIONS.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{product.plan_key || 'FREE'}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-xs">
-                      {product.access_policy === 'IMMEDIATE_REVOKE' 
-                        ? 'Sofort entziehen' 
-                        : 'Bis Periodenende'}
-                    </span>
+                    <Input
+                      className="h-8 text-xs w-40"
+                      placeholder="https://..."
+                      defaultValue={product.checkout_url || ''}
+                      onBlur={(e) => handleCheckoutUrlChange(product.id, e.target.value)}
+                    />
                   </TableCell>
                   <TableCell>
                     <Switch
@@ -272,17 +426,13 @@ export function Digistore24ProductsManager() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => openEditDialog(product)}
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => openEditDialog(product)}>
                         <Pencil className="w-4 h-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-red-600 hover:text-red-700"
+                        className="text-destructive hover:text-destructive"
                         onClick={() => handleDelete(product)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -314,9 +464,6 @@ export function Digistore24ProductsManager() {
                 onChange={(e) => setFormData({ ...formData, digistore_product_id: e.target.value })}
                 placeholder="z.B. 123456"
               />
-              <p className="text-xs text-slate-500">
-                Die Produkt-ID aus Digistore24
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -337,16 +484,13 @@ export function Digistore24ProductsManager() {
                 onChange={(e) => setFormData({ ...formData, entitlement_key: e.target.value })}
                 placeholder="z.B. premium, course_basic"
               />
-              <p className="text-xs text-slate-500">
-                Eindeutiger Schlüssel für diese Berechtigung
-              </p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="plan_key">App-Plan</Label>
               <select
                 id="plan_key"
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={formData.plan_key}
                 onChange={(e) => setFormData({ ...formData, plan_key: e.target.value })}
               >
@@ -356,28 +500,34 @@ export function Digistore24ProductsManager() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-slate-500">
-                Welcher App-Plan bei Kauf aktiviert wird
-              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="checkout_url">Checkout-Link</Label>
+              <Input
+                id="checkout_url"
+                value={formData.checkout_url}
+                onChange={(e) => setFormData({ ...formData, checkout_url: e.target.value })}
+                placeholder="https://www.digistore24.com/..."
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="access_policy">Zugriffs-Policy</Label>
               <select
                 id="access_policy"
-                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={formData.access_policy}
-                onChange={(e) => setFormData({ 
-                  ...formData, 
-                  access_policy: e.target.value as 'IMMEDIATE_REVOKE' | 'REVOKE_AT_PERIOD_END' 
-                })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    access_policy: e.target.value as 'IMMEDIATE_REVOKE' | 'REVOKE_AT_PERIOD_END',
+                  })
+                }
               >
                 <option value="REVOKE_AT_PERIOD_END">Bis Periodenende (empfohlen)</option>
                 <option value="IMMEDIATE_REVOKE">Sofort entziehen</option>
               </select>
-              <p className="text-xs text-slate-500">
-                Wann bei Kündigung/Refund der Zugriff entzogen wird
-              </p>
             </div>
 
             <div className="flex items-center justify-between">

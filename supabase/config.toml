@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.digistore24-ipn]
 verify_jwt = false
+
+[functions.digistore24-import]
+verify_jwt = false
