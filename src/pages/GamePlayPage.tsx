@@ -70,6 +70,13 @@ export default function GamePlayPage() {
         range_min: settings.rangeMin,
         range_max: settings.rangeMax,
       }).then(() => {});
+
+      // Award a star for playing a game
+      supabase.from('video_completions').insert({
+        user_id: user.id,
+        video_id: null,
+        playback_speed: 1,
+      }).then(() => {});
     }
   }, [gameState.isGameOver, user, gameState, settings]);
 
