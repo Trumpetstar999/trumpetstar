@@ -120,15 +120,9 @@ export default function GamePlayPage() {
       />
 
       <GameStatusBar
-        isListening={isListening}
-        detectedNote={pitchData ? `${pitchData.concertNote}${pitchData.concertOctave}` : null}
-        mappedNote={pitchData ? `${pitchData.writtenNote}${pitchData.writtenOctave}` : null}
-        confidence={pitchData?.confidence ?? 0}
         sfxEnabled={settings.sfxEnabled}
         isPaused={!gameState.isRunning && !gameState.isGameOver}
-        onToggleMic={handleToggleMic}
         onToggleSfx={() => updateSettings({ sfxEnabled: !settings.sfxEnabled })}
-        onOpenSettings={() => setSettingsOpen(true)}
         onTogglePause={handleTogglePause}
         onQuit={handleBack}
       />
