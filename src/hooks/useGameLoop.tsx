@@ -210,6 +210,20 @@ export function useGameLoop(settings: GameSettings) {
     rafRef.current = requestAnimationFrame(tick);
   }, [tick]);
 
+  const pauseGame = useCallback(() => {
+    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    stateRef.current = { ...stateRef.current, isRunning: false };
+    setGameState(prev => ({ ...prev, isRunning: false }));
+  }, []);
+
+  const resumeGame = useCallback(() => {
+    if (stateRef.current.isGameOver) return;
+    lastTimeRef.current = 0; // reset dt so no jump
+    stateRef.current = { ...stateRef.current, isRunning: true };
+    setGameState(prev => ({ ...prev, isRunning: true }));
+    rafRef.current = requestAnimationFrame(tick);
+  }, [tick]);
+
   const stopGame = useCallback(() => {
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     setGameState(prev => ({ ...prev, isRunning: false }));
@@ -227,6 +241,8 @@ export function useGameLoop(settings: GameSettings) {
     particlesRef,
     startGame,
     stopGame,
+    pauseGame,
+    resumeGame,
     checkHit,
   };
 }
