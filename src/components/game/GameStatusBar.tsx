@@ -29,63 +29,59 @@ export function GameStatusBar({
   onQuit,
 }: GameStatusBarProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-between px-4 py-2 glass"
-      style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+    <div
+      className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-4 px-4 py-3"
+      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
-      {/* Left: Mic + Pause + Quit */}
-      <div className="flex items-center gap-1.5">
-        <button
-          onClick={onToggleMic}
-          className={cn(
-            'flex items-center gap-1 px-2 py-1.5 rounded-full text-xs transition-all',
-            isListening ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-          )}
-        >
-          {isListening ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
-        </button>
+      {/* Mic button */}
+      <button
+        onClick={onToggleMic}
+        className={cn(
+          'w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 active:scale-90',
+          isListening
+            ? 'bg-emerald-600/70 text-emerald-200 ring-2 ring-emerald-400/40'
+            : 'bg-red-600/60 text-red-200 ring-2 ring-red-400/30'
+        )}
+      >
+        {isListening ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+      </button>
 
-        <button
-          onClick={onTogglePause}
-          className="flex items-center gap-1 px-2 py-1.5 rounded-full text-xs bg-white/10 text-white/80 hover:bg-white/20 transition-all"
-        >
-          {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
-        </button>
+      {/* Pause / Play button */}
+      <button
+        onClick={onTogglePause}
+        className="w-14 h-14 rounded-full flex items-center justify-center bg-indigo-500/50 text-white/90 ring-2 ring-indigo-300/30 shadow-lg transition-all duration-200 active:scale-90"
+      >
+        {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
+      </button>
 
-        <button
-          onClick={onQuit}
-          className="flex items-center gap-1 px-2 py-1.5 rounded-full text-xs bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
-        >
-          <LogOut className="w-3.5 h-3.5" />
-        </button>
-      </div>
+      {/* SFX button */}
+      <button
+        onClick={onToggleSfx}
+        className={cn(
+          'w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 active:scale-90',
+          sfxEnabled
+            ? 'bg-amber-500/50 text-amber-100 ring-2 ring-amber-300/30'
+            : 'bg-gray-500/50 text-gray-300 ring-2 ring-gray-400/20'
+        )}
+      >
+        {sfxEnabled ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+      </button>
 
-      {/* Center: Detected pitch info */}
-      <div className="flex items-center gap-3 text-xs text-white/70">
-        <div className="text-center">
-          <div className="text-[9px] text-white/40 uppercase">Concert</div>
-          <div className="text-white font-mono font-bold">{detectedNote ?? '—'}</div>
-        </div>
-        <div className="text-center">
-          <div className="text-[9px] text-white/40 uppercase">Written</div>
-          <div className="text-gold-gradient font-mono font-bold">{mappedNote ?? '—'}</div>
-        </div>
-        <div className="w-10 h-1.5 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-400 rounded-full transition-all duration-100"
-            style={{ width: `${Math.min(100, confidence * 5000)}%` }}
-          />
-        </div>
-      </div>
+      {/* Settings button */}
+      <button
+        onClick={onOpenSettings}
+        className="w-14 h-14 rounded-full flex items-center justify-center bg-sky-500/50 text-sky-100 ring-2 ring-sky-300/30 shadow-lg transition-all duration-200 active:scale-90"
+      >
+        <Settings className="w-6 h-6" />
+      </button>
 
-      {/* Right: SFX + Settings */}
-      <div className="flex items-center gap-2">
-        <button onClick={onToggleSfx} className="p-1.5 text-white/60 hover:text-white transition-colors">
-          {sfxEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-        </button>
-        <button onClick={onOpenSettings} className="p-1.5 text-white/60 hover:text-white transition-colors">
-          <Settings className="w-4 h-4" />
-        </button>
-      </div>
+      {/* Quit button */}
+      <button
+        onClick={onQuit}
+        className="w-14 h-14 rounded-full flex items-center justify-center bg-rose-600/50 text-rose-200 ring-2 ring-rose-300/30 shadow-lg transition-all duration-200 active:scale-90"
+      >
+        <LogOut className="w-6 h-6" />
+      </button>
     </div>
   );
 }
