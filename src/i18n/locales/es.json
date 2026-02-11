@@ -183,8 +183,17 @@
     "feedbackChat": "Comentarios y Chat",
     "classroom": "Aula",
     "statistics": "Estadísticas",
+    "gameHighscore": "Puntuación del Juego",
     "recentVideos": "Reproducido Recientemente",
     "weeklyGoals": "Objetivos Semanales"
+  },
+  "game": {
+    "noHighscoresYet": "Sin puntuaciones aún",
+    "playToScore": "¡Juega NoteRunner para obtener tu primera puntuación!",
+    "bestScore": "Mejor Puntuación",
+    "bestStreak": "Mejor Racha",
+    "accuracy": "Precisión",
+    "level": "Nivel"
   },
   "assistant": {
     "name": "Toni tu Entrenador de Trompeta",

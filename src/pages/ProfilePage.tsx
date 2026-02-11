@@ -28,6 +28,7 @@ import { NotesTodosWidget } from '@/components/dashboard/widgets/NotesTodosWidge
 import { FeedbackChatWidget } from '@/components/dashboard/widgets/FeedbackChatWidget';
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
 import { StatisticsWidget } from '@/components/dashboard/widgets/StatisticsWidget';
+import { GameHighscoreWidget } from '@/components/dashboard/widgets/GameHighscoreWidget';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 function WidgetContent({ id }: { id: WidgetId }) {
@@ -48,6 +49,8 @@ function WidgetContent({ id }: { id: WidgetId }) {
       return <ClassroomWidget />;
     case 'statistics':
       return <StatisticsWidget />;
+    case 'game-highscore':
+      return <GameHighscoreWidget />;
     default:
       return <div className="text-white/50 text-center py-8">Widget kommt bald...</div>;
   }
@@ -66,8 +69,15 @@ export function ProfilePage() {
   } = useDashboardLayout();
 
   const getWidgetTitle = (id: WidgetId): string => {
-    const key = id.replace(/-/g, '');
-    return t(`widgets.${id === 'stars-progress' ? 'starsProgress' : id === 'notes-todo' ? 'notesTodo' : id === 'feedback-chat' ? 'feedbackChat' : id === 'recent-videos' ? 'recentVideos' : id === 'weekly-goals' ? 'weeklyGoals' : id}`);
+    const keyMap: Record<string, string> = {
+      'stars-progress': 'starsProgress',
+      'notes-todo': 'notesTodo',
+      'feedback-chat': 'feedbackChat',
+      'recent-videos': 'recentVideos',
+      'weekly-goals': 'weeklyGoals',
+      'game-highscore': 'gameHighscore',
+    };
+    return t(`widgets.${keyMap[id] || id}`);
   };
 
   const getUpgradeButtonText = () => {
