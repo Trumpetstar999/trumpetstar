@@ -10,7 +10,7 @@ const LINE_COLOR = 'rgba(255, 204, 0, 0.6)';
 let bgImage: HTMLImageElement | null = null;
 let bgLoaded = false;
 const bgImg = new Image();
-bgImg.src = '/images/game-background.png';
+bgImg.src = '/images/game-background.png?v=' + Date.now();
 bgImg.onload = () => { bgImage = bgImg; bgLoaded = true; };
 
 // Treble clef SVG path (simplified)
