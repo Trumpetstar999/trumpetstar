@@ -61,7 +61,7 @@ export function renderGame(
   for (let i = 0; i < 5; i++) {
     const y = staffTop + i * lineSpacing;
     ctx.beginPath();
-    ctx.moveTo(clefX - 10, y);
+    ctx.moveTo(0, y);
     ctx.lineTo(width, y);
     ctx.stroke();
   }
@@ -76,7 +76,7 @@ export function renderGame(
   ctx.shadowBlur = 10;
   ctx.textBaseline = 'middle';
   // The unicode glyph's visual center sits a bit high, nudge down to align curl on G line
-  ctx.fillText('𝄞', clefX - clefFontSize * 0.32, staffCenterY + lineSpacing * 0.25);
+  ctx.fillText('𝄞', clefX - clefFontSize * 0.32 + 50, staffCenterY + lineSpacing * 0.25 - 50);
   ctx.shadowBlur = 0;
   ctx.restore();
 
