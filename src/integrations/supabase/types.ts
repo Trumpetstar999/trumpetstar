@@ -563,6 +563,57 @@ export type Database = {
         }
         Relationships: []
       }
+      game_highscores: {
+        Row: {
+          accidental_mode: string
+          accuracy: number
+          best_streak: number
+          created_at: string
+          id: string
+          level_reached: number
+          notes_correct: number
+          notes_total: number
+          range_max: string
+          range_min: string
+          scale_key: string
+          scale_type: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          accidental_mode?: string
+          accuracy?: number
+          best_streak?: number
+          created_at?: string
+          id?: string
+          level_reached?: number
+          notes_correct?: number
+          notes_total?: number
+          range_max?: string
+          range_min?: string
+          scale_key?: string
+          scale_type?: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          accidental_mode?: string
+          accuracy?: number
+          best_streak?: number
+          created_at?: string
+          id?: string
+          level_reached?: number
+          notes_correct?: number
+          notes_total?: number
+          range_max?: string
+          range_min?: string
+          scale_key?: string
+          scale_type?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           created_at: string
