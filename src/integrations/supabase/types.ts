@@ -548,6 +548,45 @@ export type Database = {
         }
         Relationships: []
       }
+      drum_beats: {
+        Row: {
+          category: string | null
+          created_at: string
+          file_url: string
+          id: string
+          is_active: boolean
+          native_bpm: number | null
+          sort_order: number
+          time_signature_bottom: number | null
+          time_signature_top: number | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          file_url: string
+          id?: string
+          is_active?: boolean
+          native_bpm?: number | null
+          sort_order?: number
+          time_signature_bottom?: number | null
+          time_signature_top?: number | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          file_url?: string
+          id?: string
+          is_active?: boolean
+          native_bpm?: number | null
+          sort_order?: number
+          time_signature_bottom?: number | null
+          time_signature_top?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string
