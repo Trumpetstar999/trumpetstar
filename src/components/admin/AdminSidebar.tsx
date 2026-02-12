@@ -12,7 +12,8 @@ import {
   Music,
   FileText,
   ToggleRight,
-  CreditCard
+  CreditCard,
+  Music2
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -30,6 +31,7 @@ const menuItems = [
   { id: 'musicxml', label: 'MusicXML', icon: Music },
   { id: 'products', label: 'Produkte & Pläne', icon: Package },
   { id: 'digistore24', label: 'Digistore24', icon: CreditCard },
+  { id: 'beats', label: 'Drum Beats', icon: Music2 },
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
