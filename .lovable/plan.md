@@ -1,64 +1,98 @@
 
-# Fix: Pitch-Detection iPad — Fehlende kritische Einstellungen
 
-## Ursachen (3 Probleme identifiziert)
+# Fix: iPad Pitch Detection - ScriptProcessorNode + AudioContext-Konfiguration
 
-### 1. `smoothingTimeConstant` fehlt (KRITISCHSTER FIX)
-Der `AnalyserNode` hat einen Default von `smoothingTimeConstant = 0.8`. Das bedeutet: Safari glaettet 80% des vorherigen Audio-Frames in den aktuellen. Das Signal wird "verwaschen", die Autocorrelation findet keinen scharfen Peak. Auf Desktop reicht die Signalstaerke trotzdem — auf iPad nicht.
+## Kernproblem
 
-**Fix:** `analyser.smoothingTimeConstant = 0` setzen — sowohl in `startListening` als auch in `reinitAudioContext`.
+Die bisherige Implementierung nutzt `AnalyserNode.getFloatTimeDomainData()` in einer `requestAnimationFrame`-Schleife. Auf iPad/iOS Safari hat das zwei fundamentale Probleme:
 
-### 2. Autocorrelation startet bei Offset 0
-Offset 0 vergleicht das Signal mit sich selbst (perfekte Korrelation = 1.0). Die nachfolgenden niedrigen Offsets erzeugen hohe Korrelationswerte fuer nicht-existente Ultraschall-Frequenzen. Der Algorithmus muss erst ab einem Mindest-Offset starten, der der hoechsten erwarteten Frequenz entspricht.
+1. **rAF-Timing ist unzuverlaessig**: Safari auf iPad drosselt rAF-Callbacks, besonders wenn der Tab nicht im Vordergrund ist oder bei hoher Last. Das fuehrt zu inkonsistenten Abtastintervallen.
+2. **AnalyserNode liefert auf iOS oft leere/veraltete Daten**: Die `getFloatTimeDomainData`-Methode gibt auf manchen Safari-Versionen nur Nullen zurueck, selbst mit dem Byte-Fallback.
 
-**Fix:** Minimum-Offset = `floor(sampleRate / 2000)` (~22 bei 44.1kHz, ~24 bei 48kHz). Damit werden nur Frequenzen bis 2000 Hz gesucht.
+## Loesung: ScriptProcessorNode statt AnalyserNode + rAF
 
-### 3. STABILITY_MS zu hoch fuer iPad
-100ms Stabilitaet bedeutet: der erkannte MIDI-Wert muss sich 100ms lang nicht aendern. Auf iPad mit verrauschtem Signal springt der Wert oefter — 100ms wird selten erreicht.
+Statt den AnalyserNode in einer rAF-Schleife abzufragen, wird ein `ScriptProcessorNode` verwendet. Dieser wird direkt vom Audio-Thread aufgerufen und liefert zuverlaessig PCM-Samples -- unabhaengig von rAF-Timing.
 
-**Fix:** iOS: `STABILITY_MS = 60` (statt 100).
-
-### 4. Zusaetzliche Robustheit: getByteTimeDomainData Fallback
-Manche Safari-Versionen liefern bei `getFloatTimeDomainData` nur Nullen. Als Fallback wird geprueft, ob die Daten alle 0 sind, und dann `getByteTimeDomainData` verwendet (Wertebereich 0-255, konvertiert zu -1..1).
+**Warum nicht AudioWorklet?** AudioWorklet wird erst ab iOS 14.5+ unterstuetzt und hat auf aelteren iPads Probleme. ScriptProcessorNode ist zwar deprecated, funktioniert aber zuverlaessig auf allen iOS-Versionen.
 
 ## Aenderungen
 
 ### Datei: `src/hooks/useGamePitchDetection.tsx`
 
-**a) smoothingTimeConstant = 0 setzen**
-An zwei Stellen (startListening + reinitAudioContext):
+**1. AudioContext mit latencyHint und sampleRate**
+```typescript
+const ctx = new ACtor({
+  latencyHint: 'playback',
+  sampleRate: 48000,  // Hint - iOS may ignore this
+});
 ```
-analyser.smoothingTimeConstant = 0;
+Hinweis: iOS ignoriert moeglicherweise die sampleRate-Vorgabe und nutzt die Hardware-Rate. Darum wird weiterhin `ctx.sampleRate` fuer die Pitch-Berechnung verwendet.
+
+**2. getUserMedia mit channelCount + sampleRate**
+```typescript
+stream = await navigator.mediaDevices.getUserMedia({
+  audio: {
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+    channelCount: 1,
+    sampleRate: { ideal: 48000 },
+  },
+});
 ```
 
-**b) Autocorrelation: Minimum-Offset**
-Die `autoCorrelate`-Funktion erhaelt `sampleRate` bereits. Der Start-Offset wird auf `floor(sampleRate / 2000)` gesetzt statt 0.
+**3. ScriptProcessorNode ersetzt AnalyserNode + rAF (NUR auf iOS)**
+Auf iOS:
+- Ein `ScriptProcessorNode` (bufferSize = 4096) sammelt PCM-Samples
+- Alle ~200ms (je nach sampleRate ca. 9600 Samples) wird ein Analyse-Frame gebildet
+- Autocorrelation laeuft auf diesem gesammelten Frame
+- Kein rAF noetig -- der Audio-Thread triggert die Analyse
 
-**c) Adaptive STABILITY_MS**
+Auf Desktop:
+- Bisheriges Verhalten (AnalyserNode + rAF) bleibt erhalten, da es dort zuverlaessig funktioniert
+
+**4. Audio-Chain auf iOS**
 ```
-Desktop: 100ms
-iOS:      60ms
+MicSource -> GainNode(1.0) -> ScriptProcessorNode -> (silent output)
+```
+Der ScriptProcessorNode muss an `ctx.destination` angeschlossen werden (auch wenn kein Audio ausgegeben wird), damit er auf iOS aktiv bleibt.
+
+**5. Analyse-Logik im ScriptProcessor-Callback**
+```typescript
+scriptProcessor.onaudioprocess = (event) => {
+  const input = event.inputBuffer.getChannelData(0);
+  // Samples in Ring-Buffer sammeln
+  // Wenn genug Samples (~200ms), Autocorrelation ausfuehren
+  // Pitch-Ergebnis in State schreiben
+};
 ```
 
-**d) Byte-Data Fallback**
-Nach `getFloatTimeDomainData`: Wenn alle Werte exakt 0 sind, wird `getByteTimeDomainData` versucht und die Byte-Werte zu Float konvertiert (`(byte - 128) / 128`).
+**6. Stability-Window auf 120ms erhoehen (iOS)**
+Wie angefordert: `STABILITY_MS = 120` auf iOS (statt 60). Da die Frame-basierte Analyse weniger Rauschen produziert, kann die Stabilitaet hoeher sein.
 
-**e) Erweitertes Debug-Logging**
-Beim Start wird zusaetzlich `smoothingTimeConstant: 0` geloggt. Bei den ersten 5 Frames wird der RMS-Wert geloggt, damit man auf dem iPad sofort sieht ob ueberhaupt Signal ankommt.
+**7. Kein aubiojs**
+aubiojs (WASM) wuerde eine neue Abhaengigkeit einfuehren und hat eigene iOS-Kompatibilitaetsprobleme. Die bestehende Autocorrelation mit den optimierten Parametern ist ausreichend, wenn sie zuverlaessig Daten bekommt -- was der ScriptProcessorNode sicherstellt.
 
 ## Aktualisierte Parameter-Tabelle
 
 ```text
-Parameter                | Desktop  | iPad/iOS
--------------------------|----------|----------
-smoothingTimeConstant    | 0        | 0
-Korrelations-Schwelle    | 0.9      | 0.75
-RMS Silence Threshold    | 0.005    | 0.002
-fftSize                  | 4096     | 8192
-Confidence-Faktor        | 1.0x     | 0.6x
-Stability MS             | 100      | 60
-Min Autocorr Offset      | ~22      | ~24
-Byte-Data Fallback       | nein     | ja (wenn Float=0)
+Parameter                | Desktop           | iPad/iOS
+-------------------------|-------------------|---------------------------
+AudioContext sampleRate   | default (44100)   | 48000 (hint)
+latencyHint              | default           | "playback"
+getUserMedia channelCount| default           | 1
+getUserMedia sampleRate  | default           | ideal: 48000
+Analyse-Methode          | AnalyserNode+rAF  | ScriptProcessorNode
+Analyse-Intervall        | ~16ms (rAF)       | ~200ms (frame collection)
+fftSize / bufferSize     | 4096              | 4096 (ScriptProcessor)
+Korrelations-Schwelle    | 0.9               | 0.75
+RMS Silence Threshold    | 0.005             | 0.002
+Confidence-Faktor        | 1.0x              | 0.6x
+Stability MS             | 100               | 120
+Audio-Chain              | Mic->Gain->Analyser | Mic->Gain->ScriptProc->dest
 ```
 
-Keine Aenderungen an anderen Dateien noetig.
+## Betroffene Dateien
+
+Nur `src/hooks/useGamePitchDetection.tsx` -- keine anderen Dateien muessen geaendert werden.
+
