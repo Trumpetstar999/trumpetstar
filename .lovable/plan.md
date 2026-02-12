@@ -1,98 +1,169 @@
+# Metronom & DrumMachine -- Implementierungsplan
+
+## Uebersicht
+
+Eine neue Tab-Seite "Metronom" wird das Stimmgerät oben in der gleichen Zeile. Sie bietet zwei Modi: **Metronom** (WebAudio-basierter Klick) und **DrumMachine** (Loop-Player fuer MP3-Beats aus der Datenbank).
+
+---
+
+## 1. Navigation & Routing
+
+### TabId erweitern
+
+- In `src/types/index.ts`: `'metronome'` zum `TabId`-Union hinzufuegen
+- In `src/components/layout/TabBar.tsx`: Icon (z.B. `Timer` von lucide), Feature-Flag-Key `menu_metronome`, Position in `allTabIds`
+- In `src/pages/Index.tsx`: `tabOrder` erweitern, `renderPage()` um `case 'metronome'` ergaenzen
+- Feature-Flag `menu_metronome` in der Datenbank anlegen (per INSERT)
+
+### Uebersetzungen
+
+- `src/i18n/locales/de.json`: `"navigation.metronome": "Metronom"`
+- `src/i18n/locales/en.json`: `"navigation.metronome": "Metronome"`
+- `src/i18n/locales/es.json`: `"navigation.metronome": "Metronomo"`
+
+---
+
+## 2. Datenbank
+
+### Neue Tabelle: `drum_beats`
 
 
-# Fix: iPad Pitch Detection - ScriptProcessorNode + AudioContext-Konfiguration
+| Spalte                | Typ         | Details                         |
+| --------------------- | ----------- | ------------------------------- |
+| id                    | uuid        | PK, default `gen_random_uuid()` |
+| title                 | text        | NOT NULL                        |
+| category              | text        | optional                        |
+| native_bpm            | integer     | optional                        |
+| time_signature_top    | integer     | optional                        |
+| time_signature_bottom | integer     | optional                        |
+| file_url              | text        | NOT NULL                        |
+| is_active             | boolean     | default true                    |
+| sort_order            | integer     | default 0                       |
+| created_at            | timestamptz | default now()                   |
 
-## Kernproblem
 
-Die bisherige Implementierung nutzt `AnalyserNode.getFloatTimeDomainData()` in einer `requestAnimationFrame`-Schleife. Auf iPad/iOS Safari hat das zwei fundamentale Probleme:
+### RLS
 
-1. **rAF-Timing ist unzuverlaessig**: Safari auf iPad drosselt rAF-Callbacks, besonders wenn der Tab nicht im Vordergrund ist oder bei hoher Last. Das fuehrt zu inkonsistenten Abtastintervallen.
-2. **AnalyserNode liefert auf iOS oft leere/veraltete Daten**: Die `getFloatTimeDomainData`-Methode gibt auf manchen Safari-Versionen nur Nullen zurueck, selbst mit dem Byte-Fallback.
+- SELECT: `is_active = true` (alle User)
+- ALL: Admins via `has_role(auth.uid(), 'admin')`
 
-## Loesung: ScriptProcessorNode statt AnalyserNode + rAF
+### Storage Bucket
 
-Statt den AnalyserNode in einer rAF-Schleife abzufragen, wird ein `ScriptProcessorNode` verwendet. Dieser wird direkt vom Audio-Thread aufgerufen und liefert zuverlaessig PCM-Samples -- unabhaengig von rAF-Timing.
+- Neues Bucket `drum-beats` (public), damit die MP3s direkt per URL abspielbar sind
 
-**Warum nicht AudioWorklet?** AudioWorklet wird erst ab iOS 14.5+ unterstuetzt und hat auf aelteren iPads Probleme. ScriptProcessorNode ist zwar deprecated, funktioniert aber zuverlaessig auf allen iOS-Versionen.
+---
 
-## Aenderungen
+## 3. Seiten-Komponente: `MetronomePage`
 
-### Datei: `src/hooks/useGamePitchDetection.tsx`
-
-**1. AudioContext mit latencyHint und sampleRate**
-```typescript
-const ctx = new ACtor({
-  latencyHint: 'playback',
-  sampleRate: 48000,  // Hint - iOS may ignore this
-});
-```
-Hinweis: iOS ignoriert moeglicherweise die sampleRate-Vorgabe und nutzt die Hardware-Rate. Darum wird weiterhin `ctx.sampleRate` fuer die Pitch-Berechnung verwendet.
-
-**2. getUserMedia mit channelCount + sampleRate**
-```typescript
-stream = await navigator.mediaDevices.getUserMedia({
-  audio: {
-    echoCancellation: false,
-    noiseSuppression: false,
-    autoGainControl: false,
-    channelCount: 1,
-    sampleRate: { ideal: 48000 },
-  },
-});
-```
-
-**3. ScriptProcessorNode ersetzt AnalyserNode + rAF (NUR auf iOS)**
-Auf iOS:
-- Ein `ScriptProcessorNode` (bufferSize = 4096) sammelt PCM-Samples
-- Alle ~200ms (je nach sampleRate ca. 9600 Samples) wird ein Analyse-Frame gebildet
-- Autocorrelation laeuft auf diesem gesammelten Frame
-- Kein rAF noetig -- der Audio-Thread triggert die Analyse
-
-Auf Desktop:
-- Bisheriges Verhalten (AnalyserNode + rAF) bleibt erhalten, da es dort zuverlaessig funktioniert
-
-**4. Audio-Chain auf iOS**
-```
-MicSource -> GainNode(1.0) -> ScriptProcessorNode -> (silent output)
-```
-Der ScriptProcessorNode muss an `ctx.destination` angeschlossen werden (auch wenn kein Audio ausgegeben wird), damit er auf iOS aktiv bleibt.
-
-**5. Analyse-Logik im ScriptProcessor-Callback**
-```typescript
-scriptProcessor.onaudioprocess = (event) => {
-  const input = event.inputBuffer.getChannelData(0);
-  // Samples in Ring-Buffer sammeln
-  // Wenn genug Samples (~200ms), Autocorrelation ausfuehren
-  // Pitch-Ergebnis in State schreiben
-};
-```
-
-**6. Stability-Window auf 120ms erhoehen (iOS)**
-Wie angefordert: `STABILITY_MS = 120` auf iOS (statt 60). Da die Frame-basierte Analyse weniger Rauschen produziert, kann die Stabilitaet hoeher sein.
-
-**7. Kein aubiojs**
-aubiojs (WASM) wuerde eine neue Abhaengigkeit einfuehren und hat eigene iOS-Kompatibilitaetsprobleme. Die bestehende Autocorrelation mit den optimierten Parametern ist ausreichend, wenn sie zuverlaessig Daten bekommt -- was der ScriptProcessorNode sicherstellt.
-
-## Aktualisierte Parameter-Tabelle
+### Struktur
 
 ```text
-Parameter                | Desktop           | iPad/iOS
--------------------------|-------------------|---------------------------
-AudioContext sampleRate   | default (44100)   | 48000 (hint)
-latencyHint              | default           | "playback"
-getUserMedia channelCount| default           | 1
-getUserMedia sampleRate  | default           | ideal: 48000
-Analyse-Methode          | AnalyserNode+rAF  | ScriptProcessorNode
-Analyse-Intervall        | ~16ms (rAF)       | ~200ms (frame collection)
-fftSize / bufferSize     | 4096              | 4096 (ScriptProcessor)
-Korrelations-Schwelle    | 0.9               | 0.75
-RMS Silence Threshold    | 0.005             | 0.002
-Confidence-Faktor        | 1.0x              | 0.6x
-Stability MS             | 100               | 120
-Audio-Chain              | Mic->Gain->Analyser | Mic->Gain->ScriptProc->dest
+MetronomePage
+  +-- ModeToggle (Metronom | DrumMachine)
+  +-- SharedControls (BPM, Tap Tempo, Time Signature, Volume, Start/Stop)
+  +-- MetronomeMode (Sound Style, Accent, Subdivision)
+  +-- DrumMachineMode (Beat Dropdown, Tempo-Info)
+  +-- useMetronomeEngine (WebAudio Scheduler)
+  +-- useDrumMachineEngine (WebAudio Buffer Loop)
 ```
 
-## Betroffene Dateien
+### Neue Dateien
 
-Nur `src/hooks/useGamePitchDetection.tsx` -- keine anderen Dateien muessen geaendert werden.
+- `src/pages/MetronomePage.tsx` -- Haupt-UI
+- `src/hooks/useMetronomeEngine.tsx` -- WebAudio Scheduler (lookahead-basiert, kein setInterval)
+- `src/hooks/useDrumMachineEngine.tsx` -- MP3-Loader, Buffer-Loop, Crossfade
 
+---
+
+## 4. Metronom-Engine (WebAudio Scheduler)
+
+- `AudioContext` mit `latencyHint: 'playback'`
+- Scheduler-Loop: `setInterval` 25ms prueft, ob Noten innerhalb `scheduleAheadTime` (0.1s) liegen
+- Sounds: `OscillatorNode` (Beep) oder kurze synthetische Clicks via `AudioBuffer`
+- Sound-Optionen: Click, Woodblock, Rim, Beep (min. 3 Varianten via synthetische Buffers)
+- Akzent auf Beat 1: hoehere Frequenz/Lautstaerke
+- Subdivision: Off, 8th, Triplet
+- iOS: `audioContext.resume()` beim Start-Klick
+- Drift-frei durch Vorausplanung (nicht per setTimeout/rAF)
+
+---
+
+## 5. DrumMachine-Engine (WebAudio Buffer Loop)
+
+- MP3 laden via `fetch` -> `decodeAudioData` -> `AudioBufferSourceNode` mit `loop = true`
+- Tempo: `playbackRate = userBPM / nativeBPM` (falls `nativeBPM` vorhanden)
+- Live BPM-Aenderung: `source.playbackRate.linearRampToValueAtTime(newRate, ctx.currentTime + 0.05)`
+- Beat-Wechsel: Crossfade ueber 200ms (`GainNode` fade-out alt, fade-in neu)
+- Start/Stop: 100ms Fade-In/Fade-Out via `GainNode` (kein Knacksen)
+
+---
+
+## 6. Admin UI
+
+- Neuer Tab `beats` in `AdminSidebar` (Icon: `Drum` oder `Music2`)
+- Neue Komponente `src/components/admin/DrumBeatManager.tsx`:
+  - Upload MP3 in Bucket `drum-beats`
+  - Metadaten bearbeiten (title, category, native_bpm, time_signature, active)
+  - Preview-Play im Admin
+  - Deaktivieren/Loeschen
+- In `AdminPage.tsx`: neuen Tab `beats` im Switch ergaenzen
+
+---
+
+## 7. Persistenz (localStorage)
+
+Gespeichert unter Key `trumpetstar_metronome_settings`:
+
+- `bpm`, `timeSignatureTop`, `timeSignatureBottom`, `volume`
+- `soundStyle` (Metronom)
+- `accentBeat1`, `subdivision`
+- `lastBeatId` (DrumMachine)
+- `mode` ("metronome" | "drummachine")
+
+---
+
+## 8. Modus-Wechsel Logik
+
+Beim Umschalten:
+
+1. Aktuell laufenden Modus stoppen (Engine.stop())
+2. `isRunning = false` setzen
+3. UI wechselt -- kein automatischer Start des neuen Modus
+
+Regel: Nie gleichzeitig Audio aus beiden Engines.
+
+---
+
+## Technische Details
+
+### Betroffene bestehende Dateien (Aenderungen)
+
+
+| Datei                                   | Aenderung                     |
+| --------------------------------------- | ----------------------------- |
+| `src/types/index.ts`                    | `'metronome'` zu `TabId`      |
+| `src/components/layout/TabBar.tsx`      | Icon, Flag-Key, Tab-Eintrag   |
+| `src/pages/Index.tsx`                   | `tabOrder`, `renderPage` Case |
+| `src/i18n/locales/de.json`              | Navigation-Label              |
+| `src/i18n/locales/en.json`              | Navigation-Label              |
+| `src/i18n/locales/es.json`              | Navigation-Label              |
+| `src/pages/AdminPage.tsx`               | Neuer Admin-Tab               |
+| `src/components/admin/AdminSidebar.tsx` | Neuer Sidebar-Eintrag         |
+
+
+### Neue Dateien
+
+
+| Datei                                      | Zweck                               |
+| ------------------------------------------ | ----------------------------------- |
+| `src/pages/MetronomePage.tsx`              | Haupt-UI mit Mode Toggle + Controls |
+| `src/hooks/useMetronomeEngine.tsx`         | WebAudio Scheduler Engine           |
+| `src/hooks/useDrumMachineEngine.tsx`       | Buffer-Loop Engine                  |
+| `src/components/admin/DrumBeatManager.tsx` | Admin: Beats verwalten              |
+
+
+### Datenbank-Migration
+
+- CREATE TABLE `drum_beats` mit RLS
+- INSERT Storage Bucket `drum-beats`
+- INSERT Feature Flag `menu_metronome`
