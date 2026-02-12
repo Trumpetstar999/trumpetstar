@@ -49,18 +49,16 @@ const CONFIDENCE_FACTOR = IOS ? 0.6 : 1.0;
 const CORRELATION_THRESHOLD = IOS ? 0.75 : 0.9;
 const RMS_SILENCE = IOS ? 0.002 : 0.005;
 const STABILITY_MS = IOS ? 120 : 100;
-const SILENT_WARN_FRAMES = 60;
-const SILENT_REINIT_FRAMES = 120;
 
 /** On iOS we collect ~200ms of samples before running autocorrelation */
 const IOS_FRAME_MS = 200;
 const IOS_SCRIPT_BUFFER = 4096;
 
 // ---------------------------------------------------------------------------
-// Autocorrelation pitch detection
+// Autocorrelation pitch detection (AMDF-based)
 // ---------------------------------------------------------------------------
 function autoCorrelate(
-  buffer: Float32Array<any>,
+  buffer: Float32Array,
   sampleRate: number,
 ): { frequency: number; rms: number } {
   const SIZE = buffer.length;
@@ -77,6 +75,7 @@ function autoCorrelate(
 
   if (rms < RMS_SILENCE) return { frequency: -1, rms };
 
+  // Skip offsets that correspond to frequencies > 2000 Hz
   const MIN_OFFSET = Math.floor(sampleRate / 2000);
   let lastCorrelation = 1;
   for (let offset = MIN_OFFSET; offset < MAX_SAMPLES; offset++) {
@@ -137,42 +136,53 @@ export function useGamePitchDetection(
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
   const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
+  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
   // iOS ring-buffer for frame collection
   const ringBufferRef = useRef<Float32Array | null>(null);
   const ringWriteRef = useRef<number>(0);
-  const ringTargetRef = useRef<number>(0); // samples needed for one analysis frame
+  const ringTargetRef = useRef<number>(0);
 
   // Stability tracking
   const stableNoteRef = useRef<number | null>(null);
   const stableStartRef = useRef<number>(0);
 
-  // Silent-frame tracking
-  const silentFramesRef = useRef<number>(0);
-  const reinitCountRef = useRef<number>(0);
+  // Debug frame counter
+  const frameCountRef = useRef<number>(0);
+  const scriptFireCountRef = useRef<number>(0);
 
   const effectiveThreshold = confidenceThreshold * CONFIDENCE_FACTOR;
 
+  // Use refs for values needed inside audio callbacks to avoid stale closures
+  const calibrationCentsRef = useRef(calibrationCents);
+  calibrationCentsRef.current = calibrationCents;
+  const effectiveThresholdRef = useRef(effectiveThreshold);
+  effectiveThresholdRef.current = effectiveThreshold;
+
   // -----------------------------------------------------------------------
-  // Shared pitch processing logic
+  // Shared pitch processing logic – uses REFS to avoid stale closures
   // -----------------------------------------------------------------------
-  const processPitch = useCallback((frequency: number, rms: number, sampleRate: number) => {
+  const processPitchRef = useRef<(frequency: number, rms: number, sampleRate: number) => void>(() => {});
+
+  processPitchRef.current = (frequency: number, rms: number, sampleRate: number) => {
+    frameCountRef.current++;
+
+    // Debug: log first 10 frames
+    if (frameCountRef.current <= 10) {
+      console.log(`[PitchDetect] frame=${frameCountRef.current} rms=${rms.toFixed(4)} freq=${frequency.toFixed(1)} platform=${IOS ? 'iOS' : 'desktop'}`);
+    }
+
     // Silent detection
     if (rms < 0.001) {
-      silentFramesRef.current++;
       setIsMicActive(false);
-      if (silentFramesRef.current === SILENT_WARN_FRAMES) {
-        setError('🎤 Bitte näher ins Mikrofon spielen');
-      }
       return;
     }
 
-    silentFramesRef.current = 0;
     setIsMicActive(true);
     setError(prev => prev === '🎤 Bitte näher ins Mikrofon spielen' ? null : prev);
 
-    if (frequency > 50 && frequency < 2000 && rms >= effectiveThreshold) {
-      const { midi: concertMidi, cents } = frequencyToMidi(frequency, calibrationCents);
+    if (frequency > 50 && frequency < 2000 && rms >= effectiveThresholdRef.current) {
+      const { midi: concertMidi, cents } = frequencyToMidi(frequency, calibrationCentsRef.current);
       const writtenMidi = concertMidi + 2;
 
       const now = performance.now();
@@ -197,7 +207,7 @@ export function useGamePitchDetection(
         });
       }
     }
-  }, [calibrationCents, effectiveThreshold]);
+  };
 
   // -----------------------------------------------------------------------
   // Desktop: AnalyserNode + rAF loop
@@ -205,12 +215,27 @@ export function useGamePitchDetection(
   const analyzeDesktop = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
 
-    analyserRef.current.getFloatTimeDomainData(bufferRef.current);
-    const { frequency, rms } = autoCorrelate(bufferRef.current as Float32Array<ArrayBufferLike>, audioContextRef.current.sampleRate);
-    processPitch(frequency, rms, audioContextRef.current.sampleRate);
+    analyserRef.current.getFloatTimeDomainData(bufferRef.current!);
+
+    // Byte-data fallback for Safari
+    const data: Float32Array = bufferRef.current! as any;
+    let allZero = true;
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] !== 0) { allZero = false; break; }
+    }
+    if (allZero && analyserRef.current) {
+      const byteData = new Uint8Array(analyserRef.current.fftSize);
+      analyserRef.current.getByteTimeDomainData(byteData);
+      for (let i = 0; i < byteData.length; i++) {
+        data[i] = (byteData[i] - 128) / 128;
+      }
+    }
+
+    const { frequency, rms } = autoCorrelate(data, audioContextRef.current.sampleRate);
+    processPitchRef.current(frequency, rms, audioContextRef.current.sampleRate);
 
     rafIdRef.current = requestAnimationFrame(analyzeDesktop);
-  }, [processPitch]);
+  }, []);
 
   // -----------------------------------------------------------------------
   // Start listening
@@ -219,35 +244,48 @@ export function useGamePitchDetection(
     try {
       setError(null);
       stableNoteRef.current = null;
-      silentFramesRef.current = 0;
-      reinitCountRef.current = 0;
+      frameCountRef.current = 0;
+      scriptFireCountRef.current = 0;
+
+      console.log('[PitchDetect] Starting...', { IOS, ua: navigator.userAgent.substring(0, 80) });
 
       // --- getUserMedia ---
-      const audioConstraints: MediaTrackConstraints = IOS
-        ? {
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-            channelCount: 1,
-            sampleRate: { ideal: 48000 } as any,
-          }
-        : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+        ...(IOS ? { channelCount: 1, sampleRate: { ideal: 48000 } as any } : {}),
+      };
 
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-      } catch {
+        console.log('[PitchDetect] getUserMedia OK with constraints');
+      } catch (e) {
+        console.warn('[PitchDetect] getUserMedia with constraints failed, trying basic', e);
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('[PitchDetect] getUserMedia OK with basic audio');
       }
       mediaStreamRef.current = stream;
+
+      // Log actual track settings
+      const trackSettings = stream.getAudioTracks()[0]?.getSettings();
+      console.log('[PitchDetect] Track settings:', JSON.stringify(trackSettings));
 
       // --- AudioContext ---
       const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
       const ctxOptions: AudioContextOptions = IOS
-        ? { latencyHint: 'playback', sampleRate: 48000 }
+        ? { latencyHint: 'playback' as AudioContextLatencyCategory, sampleRate: 48000 }
         : {};
       const ctx = new ACtor(ctxOptions);
-      await ctx.resume();
+
+      console.log('[PitchDetect] AudioContext created, state:', ctx.state, 'sampleRate:', ctx.sampleRate);
+
+      // Resume AudioContext (critical for iOS)
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+        console.log('[PitchDetect] AudioContext resumed, state:', ctx.state);
+      }
 
       const gain = ctx.createGain();
       gain.gain.value = 1.0;
@@ -257,31 +295,45 @@ export function useGamePitchDetection(
 
       audioContextRef.current = ctx;
       gainNodeRef.current = gain;
+      sourceNodeRef.current = source;
 
       if (IOS) {
         // ---- iOS: ScriptProcessorNode path ----
         const scriptNode = ctx.createScriptProcessor(IOS_SCRIPT_BUFFER, 1, 1);
         const samplesPerFrame = Math.ceil((ctx.sampleRate * IOS_FRAME_MS) / 1000);
-        const ringSize = samplesPerFrame * 2; // double-buffer
-        ringBufferRef.current = new Float32Array(ringSize);
+
+        // Allocate ring buffer
+        const ring = new Float32Array(samplesPerFrame + IOS_SCRIPT_BUFFER); // extra space
+        ringBufferRef.current = ring;
         ringWriteRef.current = 0;
         ringTargetRef.current = samplesPerFrame;
 
         scriptNode.onaudioprocess = (event: AudioProcessingEvent) => {
           const input = event.inputBuffer.getChannelData(0);
-          const ring = ringBufferRef.current!;
           const len = input.length;
+
+          scriptFireCountRef.current++;
+
+          // Debug: log first 5 script processor fires
+          if (scriptFireCountRef.current <= 5) {
+            let maxVal = 0;
+            for (let i = 0; i < len; i++) {
+              const abs = Math.abs(input[i]);
+              if (abs > maxVal) maxVal = abs;
+            }
+            console.log(`[PitchDetect:iOS] scriptFire=${scriptFireCountRef.current} inputLen=${len} maxAbs=${maxVal.toFixed(6)}`);
+          }
 
           // Copy incoming samples into ring buffer
           for (let i = 0; i < len; i++) {
             ring[ringWriteRef.current] = input[i];
             ringWriteRef.current++;
 
-            if (ringWriteRef.current >= ringTargetRef.current) {
+            if (ringWriteRef.current >= samplesPerFrame) {
               // We have enough samples – run analysis
-              const frame = new Float32Array(ring.buffer.slice(0, ringWriteRef.current * 4));
+              const frame = ring.slice(0, ringWriteRef.current);
               const { frequency, rms } = autoCorrelate(frame, ctx.sampleRate);
-              processPitch(frequency, rms, ctx.sampleRate);
+              processPitchRef.current(frequency, rms, ctx.sampleRate);
               ringWriteRef.current = 0;
             }
           }
@@ -292,13 +344,17 @@ export function useGamePitchDetection(
         };
 
         gain.connect(scriptNode);
-        scriptNode.connect(ctx.destination); // must connect to destination on iOS
+        scriptNode.connect(ctx.destination); // MUST connect to destination on iOS
         scriptNodeRef.current = scriptNode;
 
-        console.log('[PitchDetection] iOS ScriptProcessor started', {
-          sampleRate: ctx.sampleRate, bufferSize: IOS_SCRIPT_BUFFER,
-          frameSamples: samplesPerFrame, frameMs: IOS_FRAME_MS,
-          stabilityMs: STABILITY_MS, correlationThreshold: CORRELATION_THRESHOLD,
+        console.log('[PitchDetect] iOS ScriptProcessor started', {
+          sampleRate: ctx.sampleRate,
+          bufferSize: IOS_SCRIPT_BUFFER,
+          frameSamples: samplesPerFrame,
+          frameMs: IOS_FRAME_MS,
+          stabilityMs: STABILITY_MS,
+          correlationThreshold: CORRELATION_THRESHOLD,
+          rmsSilence: RMS_SILENCE,
         });
       } else {
         // ---- Desktop: AnalyserNode + rAF path ----
@@ -309,19 +365,22 @@ export function useGamePitchDetection(
         analyserRef.current = analyser;
         bufferRef.current = new Float32Array(analyser.fftSize);
 
-        console.log('[PitchDetection] Desktop AnalyserNode started', {
-          sampleRate: ctx.sampleRate, fftSize: FFT_SIZE,
-          stabilityMs: STABILITY_MS, correlationThreshold: CORRELATION_THRESHOLD,
+        console.log('[PitchDetect] Desktop AnalyserNode started', {
+          sampleRate: ctx.sampleRate,
+          fftSize: FFT_SIZE,
+          stabilityMs: STABILITY_MS,
+          correlationThreshold: CORRELATION_THRESHOLD,
         });
 
         analyzeDesktop();
       }
 
       setIsListening(true);
-    } catch {
+    } catch (err: any) {
+      console.error('[PitchDetect] Error:', err);
       setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff.');
     }
-  }, [analyzeDesktop, processPitch]);
+  }, [analyzeDesktop]);
 
   // -----------------------------------------------------------------------
   // Stop listening
@@ -335,12 +394,16 @@ export function useGamePitchDetection(
       scriptNodeRef.current.disconnect();
       scriptNodeRef.current = null;
     }
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.disconnect();
+      sourceNodeRef.current = null;
+    }
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach(t => t.stop());
       mediaStreamRef.current = null;
     }
     if (audioContextRef.current) {
-      audioContextRef.current.close();
+      audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
     analyserRef.current = null;
@@ -349,7 +412,6 @@ export function useGamePitchDetection(
     ringBufferRef.current = null;
     ringWriteRef.current = 0;
     stableNoteRef.current = null;
-    silentFramesRef.current = 0;
     setIsListening(false);
     setIsMicActive(false);
     setPitchData(null);
