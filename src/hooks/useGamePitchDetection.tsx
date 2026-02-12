@@ -6,7 +6,6 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 export function isIOSDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
-  // iPad in desktop mode reports "Macintosh" but has touch support
   if (/iPad|iPhone|iPod/.test(ua)) return true;
   if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
   return false;
@@ -40,12 +39,28 @@ interface UseGamePitchDetectionResult {
 // ---------------------------------------------------------------------------
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-/**
- * Autocorrelation-based pitch detection.
- * `sampleRate` is passed explicitly so it works with any rate (44100 / 48000).
- */
+const IOS = isIOSDevice();
+
+// ---------------------------------------------------------------------------
+// Adaptive constants per platform
+// ---------------------------------------------------------------------------
+const FFT_SIZE = IOS ? 8192 : 4096;
+const CONFIDENCE_FACTOR = IOS ? 0.6 : 1.0;
+const CORRELATION_THRESHOLD = IOS ? 0.75 : 0.9;
+const RMS_SILENCE = IOS ? 0.002 : 0.005;
+const STABILITY_MS = IOS ? 120 : 100;
+const SILENT_WARN_FRAMES = 60;
+const SILENT_REINIT_FRAMES = 120;
+
+/** On iOS we collect ~200ms of samples before running autocorrelation */
+const IOS_FRAME_MS = 200;
+const IOS_SCRIPT_BUFFER = 4096;
+
+// ---------------------------------------------------------------------------
+// Autocorrelation pitch detection
+// ---------------------------------------------------------------------------
 function autoCorrelate(
-  buffer: Float32Array<ArrayBufferLike>,
+  buffer: Float32Array<any>,
   sampleRate: number,
 ): { frequency: number; rms: number } {
   const SIZE = buffer.length;
@@ -62,7 +77,6 @@ function autoCorrelate(
 
   if (rms < RMS_SILENCE) return { frequency: -1, rms };
 
-  // Start at minimum offset corresponding to max expected frequency (2000 Hz)
   const MIN_OFFSET = Math.floor(sampleRate / 2000);
   let lastCorrelation = 1;
   for (let offset = MIN_OFFSET; offset < MAX_SAMPLES; offset++) {
@@ -105,24 +119,6 @@ function frequencyToMidi(
 }
 
 // ---------------------------------------------------------------------------
-// Adaptive constants per platform
-// ---------------------------------------------------------------------------
-const IOS = isIOSDevice();
-/** iOS needs bigger buffers for stable pitch detection */
-const FFT_SIZE = IOS ? 8192 : 4096;
-/** On iOS the confidence threshold is multiplied by this factor (softer) */
-const CONFIDENCE_FACTOR = IOS ? 0.6 : 1.0;
-/** Autocorrelation quality threshold – iPad mics are noisier, so we accept lower correlation */
-const CORRELATION_THRESHOLD = IOS ? 0.75 : 0.9;
-/** RMS below this is considered silence – iPad mics produce quieter signals */
-const RMS_SILENCE = IOS ? 0.002 : 0.005;
-const STABILITY_MS = IOS ? 60 : 100;
-/** After this many silent frames (~1 s at 60 fps) show a warning */
-const SILENT_WARN_FRAMES = 60;
-/** After this many silent frames (~2 s) reinitialise the AudioContext */
-const SILENT_REINIT_FRAMES = 120;
-
-// ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
 export function useGamePitchDetection(
@@ -140,109 +136,46 @@ export function useGamePitchDetection(
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
+  const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
 
-  // Stability tracking – prevent note flicker (hysteresis)
+  // iOS ring-buffer for frame collection
+  const ringBufferRef = useRef<Float32Array | null>(null);
+  const ringWriteRef = useRef<number>(0);
+  const ringTargetRef = useRef<number>(0); // samples needed for one analysis frame
+
+  // Stability tracking
   const stableNoteRef = useRef<number | null>(null);
   const stableStartRef = useRef<number>(0);
 
-  // Silent-frame tracking (Safari failsafe)
+  // Silent-frame tracking
   const silentFramesRef = useRef<number>(0);
   const reinitCountRef = useRef<number>(0);
 
-  // Effective threshold: softer on iOS
   const effectiveThreshold = confidenceThreshold * CONFIDENCE_FACTOR;
 
   // -----------------------------------------------------------------------
-  // Internal: reinitialise AudioContext (Safari failsafe)
+  // Shared pitch processing logic
   // -----------------------------------------------------------------------
-  const reinitAudioContext = useCallback(async () => {
-    if (!mediaStreamRef.current) return;
-    // Tear down old context
-    if (audioContextRef.current) {
-      try { audioContextRef.current.close(); } catch { /* ignore */ }
-    }
-
-    const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-    const ctx = new ACtor();
-    await ctx.resume(); // mandatory on iOS
-
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = FFT_SIZE;
-    analyser.smoothingTimeConstant = 0;
-
-    const gain = ctx.createGain();
-    gain.gain.value = 1.0;
-
-    const source = ctx.createMediaStreamSource(mediaStreamRef.current);
-    // Chain: Mic → GainNode → AnalyserNode (GainNode stabilises iOS pipeline)
-    source.connect(gain);
-    gain.connect(analyser);
-
-    audioContextRef.current = ctx;
-    analyserRef.current = analyser;
-    gainNodeRef.current = gain;
-      bufferRef.current = new Float32Array(analyser.fftSize) as Float32Array<ArrayBuffer>;
-    silentFramesRef.current = 0;
-  }, []);
-
-  // -----------------------------------------------------------------------
-  // Analysis loop
-  // -----------------------------------------------------------------------
-  const analyze = useCallback(() => {
-    if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
-
-    analyserRef.current.getFloatTimeDomainData(bufferRef.current);
-
-    // Safari fallback: if getFloatTimeDomainData returns all zeros, use byte data
-    if (IOS) {
-      let allZero = true;
-      for (let i = 0; i < bufferRef.current.length; i++) {
-        if (bufferRef.current[i] !== 0) { allZero = false; break; }
-      }
-      if (allZero) {
-        const byteBuffer = new Uint8Array(analyserRef.current.fftSize);
-        analyserRef.current.getByteTimeDomainData(byteBuffer);
-        for (let i = 0; i < byteBuffer.length; i++) {
-          bufferRef.current[i] = (byteBuffer[i] - 128) / 128;
-        }
-      }
-    }
-
-    const { frequency, rms } = autoCorrelate(
-      bufferRef.current,
-      audioContextRef.current.sampleRate, // always use actual rate (44100 / 48000)
-    );
-
-    // --- Silent-frame detection (Safari failsafe) ---
+  const processPitch = useCallback((frequency: number, rms: number, sampleRate: number) => {
+    // Silent detection
     if (rms < 0.001) {
       silentFramesRef.current++;
       setIsMicActive(false);
-
       if (silentFramesRef.current === SILENT_WARN_FRAMES) {
         setError('🎤 Bitte näher ins Mikrofon spielen');
       }
-
-      if (silentFramesRef.current >= SILENT_REINIT_FRAMES && reinitCountRef.current < 3) {
-        reinitCountRef.current++;
-        silentFramesRef.current = 0;
-        reinitAudioContext();
-      }
-    } else {
-      silentFramesRef.current = 0;
-      setIsMicActive(true);
-      // Clear the "play closer" warning once signal is back
-      setError(prev => prev === '🎤 Bitte näher ins Mikrofon spielen' ? null : prev);
+      return;
     }
 
-    // --- Pitch detection ---
+    silentFramesRef.current = 0;
+    setIsMicActive(true);
+    setError(prev => prev === '🎤 Bitte näher ins Mikrofon spielen' ? null : prev);
+
     if (frequency > 50 && frequency < 2000 && rms >= effectiveThreshold) {
       const { midi: concertMidi, cents } = frequencyToMidi(frequency, calibrationCents);
-
-      // Bb transposition: written = concert + 2 semitones
       const writtenMidi = concertMidi + 2;
 
       const now = performance.now();
-      // Hysteresis: note must be stable for STABILITY_MS before it counts
       if (stableNoteRef.current !== writtenMidi) {
         stableNoteRef.current = writtenMidi;
         stableStartRef.current = now;
@@ -264,12 +197,23 @@ export function useGamePitchDetection(
         });
       }
     }
-
-    rafIdRef.current = requestAnimationFrame(analyze);
-  }, [calibrationCents, effectiveThreshold, reinitAudioContext]);
+  }, [calibrationCents, effectiveThreshold]);
 
   // -----------------------------------------------------------------------
-  // Start listening – MUST be called from a user gesture on iOS
+  // Desktop: AnalyserNode + rAF loop
+  // -----------------------------------------------------------------------
+  const analyzeDesktop = useCallback(() => {
+    if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
+
+    analyserRef.current.getFloatTimeDomainData(bufferRef.current);
+    const { frequency, rms } = autoCorrelate(bufferRef.current as Float32Array<ArrayBufferLike>, audioContextRef.current.sampleRate);
+    processPitch(frequency, rms, audioContextRef.current.sampleRate);
+
+    rafIdRef.current = requestAnimationFrame(analyzeDesktop);
+  }, [processPitch]);
+
+  // -----------------------------------------------------------------------
+  // Start listening
   // -----------------------------------------------------------------------
   const startListening = useCallback(async () => {
     try {
@@ -278,53 +222,106 @@ export function useGamePitchDetection(
       silentFramesRef.current = 0;
       reinitCountRef.current = 0;
 
+      // --- getUserMedia ---
+      const audioConstraints: MediaTrackConstraints = IOS
+        ? {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+            channelCount: 1,
+            sampleRate: { ideal: 48000 } as any,
+          }
+        : { echoCancellation: false, noiseSuppression: false, autoGainControl: false };
+
       let stream: MediaStream;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       } catch {
-        // Fallback for Safari which may reject strict constraints
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       }
       mediaStreamRef.current = stream;
 
-      // Use webkitAudioContext fallback for older Safari
+      // --- AudioContext ---
       const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-      const ctx = new ACtor();
-      // Explicit resume – mandatory on iOS to leave "suspended" state
+      const ctxOptions: AudioContextOptions = IOS
+        ? { latencyHint: 'playback', sampleRate: 48000 }
+        : {};
+      const ctx = new ACtor(ctxOptions);
       await ctx.resume();
 
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = FFT_SIZE;
-      analyser.smoothingTimeConstant = 0;
-
-      // GainNode stabilises the audio pipeline on iOS even at gain=1
       const gain = ctx.createGain();
       gain.gain.value = 1.0;
 
       const source = ctx.createMediaStreamSource(stream);
       source.connect(gain);
-      gain.connect(analyser);
 
       audioContextRef.current = ctx;
-      analyserRef.current = analyser;
       gainNodeRef.current = gain;
-      bufferRef.current = new Float32Array(analyser.fftSize) as Float32Array<ArrayBuffer>;
 
-      // Debug logging – helps diagnose iPad issues via Safari Web Inspector
-      console.log('[PitchDetection] started', {
-        ios: IOS, sampleRate: ctx.sampleRate, fftSize: FFT_SIZE,
-        smoothingTimeConstant: 0, stabilityMs: STABILITY_MS,
-        correlationThreshold: CORRELATION_THRESHOLD, rmsSilence: RMS_SILENCE,
-      });
+      if (IOS) {
+        // ---- iOS: ScriptProcessorNode path ----
+        const scriptNode = ctx.createScriptProcessor(IOS_SCRIPT_BUFFER, 1, 1);
+        const samplesPerFrame = Math.ceil((ctx.sampleRate * IOS_FRAME_MS) / 1000);
+        const ringSize = samplesPerFrame * 2; // double-buffer
+        ringBufferRef.current = new Float32Array(ringSize);
+        ringWriteRef.current = 0;
+        ringTargetRef.current = samplesPerFrame;
+
+        scriptNode.onaudioprocess = (event: AudioProcessingEvent) => {
+          const input = event.inputBuffer.getChannelData(0);
+          const ring = ringBufferRef.current!;
+          const len = input.length;
+
+          // Copy incoming samples into ring buffer
+          for (let i = 0; i < len; i++) {
+            ring[ringWriteRef.current] = input[i];
+            ringWriteRef.current++;
+
+            if (ringWriteRef.current >= ringTargetRef.current) {
+              // We have enough samples – run analysis
+              const frame = new Float32Array(ring.buffer.slice(0, ringWriteRef.current * 4));
+              const { frequency, rms } = autoCorrelate(frame, ctx.sampleRate);
+              processPitch(frequency, rms, ctx.sampleRate);
+              ringWriteRef.current = 0;
+            }
+          }
+
+          // Output silence
+          const output = event.outputBuffer.getChannelData(0);
+          for (let i = 0; i < output.length; i++) output[i] = 0;
+        };
+
+        gain.connect(scriptNode);
+        scriptNode.connect(ctx.destination); // must connect to destination on iOS
+        scriptNodeRef.current = scriptNode;
+
+        console.log('[PitchDetection] iOS ScriptProcessor started', {
+          sampleRate: ctx.sampleRate, bufferSize: IOS_SCRIPT_BUFFER,
+          frameSamples: samplesPerFrame, frameMs: IOS_FRAME_MS,
+          stabilityMs: STABILITY_MS, correlationThreshold: CORRELATION_THRESHOLD,
+        });
+      } else {
+        // ---- Desktop: AnalyserNode + rAF path ----
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = FFT_SIZE;
+        analyser.smoothingTimeConstant = 0;
+        gain.connect(analyser);
+        analyserRef.current = analyser;
+        bufferRef.current = new Float32Array(analyser.fftSize);
+
+        console.log('[PitchDetection] Desktop AnalyserNode started', {
+          sampleRate: ctx.sampleRate, fftSize: FFT_SIZE,
+          stabilityMs: STABILITY_MS, correlationThreshold: CORRELATION_THRESHOLD,
+        });
+
+        analyzeDesktop();
+      }
 
       setIsListening(true);
-      analyze();
     } catch {
       setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff.');
     }
-  }, [analyze]);
+  }, [analyzeDesktop, processPitch]);
 
   // -----------------------------------------------------------------------
   // Stop listening
@@ -333,6 +330,10 @@ export function useGamePitchDetection(
     if (rafIdRef.current) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
+    }
+    if (scriptNodeRef.current) {
+      scriptNodeRef.current.disconnect();
+      scriptNodeRef.current = null;
     }
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach(t => t.stop());
@@ -345,6 +346,8 @@ export function useGamePitchDetection(
     analyserRef.current = null;
     gainNodeRef.current = null;
     bufferRef.current = null;
+    ringBufferRef.current = null;
+    ringWriteRef.current = 0;
     stableNoteRef.current = null;
     silentFramesRef.current = 0;
     setIsListening(false);
