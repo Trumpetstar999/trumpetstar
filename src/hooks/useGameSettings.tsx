@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { isIOSDevice } from '@/hooks/useGamePitchDetection';
 
 export interface GameSettings {
   key: string;
@@ -24,7 +25,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   accidentalMode: 'key_signature',
   startSpeed: 3,
   confidenceThreshold: 'medium',
-  sfxEnabled: false,
+  // SFX default: OFF on iOS (interferes with mic), ON on desktop
+  sfxEnabled: !isIOSDevice(),
   calibrationCents: 0,
 };
 
