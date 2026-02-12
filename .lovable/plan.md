@@ -1,47 +1,64 @@
 
-# Fix: Pitch-Detection auf iPad zum Laufen bringen
+# Fix: Pitch-Detection iPad — Fehlende kritische Einstellungen
 
-## Ursachenanalyse
+## Ursachen (3 Probleme identifiziert)
 
-Das Hauptproblem liegt in der `autoCorrelate`-Funktion (Zeile 73 in `useGamePitchDetection.tsx`):
+### 1. `smoothingTimeConstant` fehlt (KRITISCHSTER FIX)
+Der `AnalyserNode` hat einen Default von `smoothingTimeConstant = 0.8`. Das bedeutet: Safari glaettet 80% des vorherigen Audio-Frames in den aktuellen. Das Signal wird "verwaschen", die Autocorrelation findet keinen scharfen Peak. Auf Desktop reicht die Signalstaerke trotzdem — auf iPad nicht.
 
-```text
-if (correlation > 0.9 && correlation > lastCorrelation)
-```
+**Fix:** `analyser.smoothingTimeConstant = 0` setzen — sowohl in `startListening` als auch in `reinitAudioContext`.
 
-Dieser Schwellwert von **0.9** ist fuer iPad-Mikrofone zu streng. Das iPad-Mikrofon liefert ein verrauschteres Signal als ein Laptop-Mikrofon, sodass die Korrelation diesen Wert praktisch nie erreicht. Ergebnis: **kein Pitch wird erkannt**.
+### 2. Autocorrelation startet bei Offset 0
+Offset 0 vergleicht das Signal mit sich selbst (perfekte Korrelation = 1.0). Die nachfolgenden niedrigen Offsets erzeugen hohe Korrelationswerte fuer nicht-existente Ultraschall-Frequenzen. Der Algorithmus muss erst ab einem Mindest-Offset starten, der der hoechsten erwarteten Frequenz entspricht.
+
+**Fix:** Minimum-Offset = `floor(sampleRate / 2000)` (~22 bei 44.1kHz, ~24 bei 48kHz). Damit werden nur Frequenzen bis 2000 Hz gesucht.
+
+### 3. STABILITY_MS zu hoch fuer iPad
+100ms Stabilitaet bedeutet: der erkannte MIDI-Wert muss sich 100ms lang nicht aendern. Auf iPad mit verrauschtem Signal springt der Wert oefter — 100ms wird selten erreicht.
+
+**Fix:** iOS: `STABILITY_MS = 60` (statt 100).
+
+### 4. Zusaetzliche Robustheit: getByteTimeDomainData Fallback
+Manche Safari-Versionen liefern bei `getFloatTimeDomainData` nur Nullen. Als Fallback wird geprueft, ob die Daten alle 0 sind, und dann `getByteTimeDomainData` verwendet (Wertebereich 0-255, konvertiert zu -1..1).
 
 ## Aenderungen
 
 ### Datei: `src/hooks/useGamePitchDetection.tsx`
 
-**1. Adaptive Autocorrelation-Schwelle (KRITISCHER FIX)**
-- Desktop: Korrelationsschwelle bleibt bei `0.9`
-- iOS: Korrelationsschwelle wird auf `0.75` gesenkt
-- Die Konstante wird wie `FFT_SIZE` und `CONFIDENCE_FACTOR` plattformabhaengig gesetzt
-
-**2. Niedrigere RMS-Stille-Schwelle fuer iOS**
-- Desktop: `rms < 0.005` gilt als zu leise (wie bisher)
-- iOS: `rms < 0.002` -- iPad-Mikrofone liefern leisere Signale
-
-**3. getUserMedia mit Fallback**
-- Erster Versuch: mit `echoCancellation: false, noiseSuppression: false, autoGainControl: false`
-- Falls das fehlschlaegt (Safari unterstuetzt nicht alle Constraints): Fallback auf `{ audio: true }`
-
-**4. Debug-Logging fuer iPad**
-- Temporaeres `console.log` bei Audio-Start: Sample Rate, fftSize, iOS-Erkennung
-- Hilft bei zukuenftiger Fehlersuche direkt auf dem iPad (Safari Web Inspector)
-
-## Zusammenfassung der adaptiven Parameter (aktualisiert)
-
-```text
-Parameter              | Desktop  | iPad/iOS
------------------------|----------|----------
-Korrelations-Schwelle  | 0.9      | 0.75
-RMS Silence Threshold  | 0.005    | 0.002
-fftSize                | 4096     | 8192
-Confidence-Faktor      | 1.0x     | 0.6x
-getUserMedia           | strict   | mit Fallback
+**a) smoothingTimeConstant = 0 setzen**
+An zwei Stellen (startListening + reinitAudioContext):
+```
+analyser.smoothingTimeConstant = 0;
 ```
 
-Keine Aenderungen an `GamePlayPage.tsx` oder `useGameSettings.tsx` noetig -- das Problem liegt rein in der Pitch-Detection-Logik.
+**b) Autocorrelation: Minimum-Offset**
+Die `autoCorrelate`-Funktion erhaelt `sampleRate` bereits. Der Start-Offset wird auf `floor(sampleRate / 2000)` gesetzt statt 0.
+
+**c) Adaptive STABILITY_MS**
+```
+Desktop: 100ms
+iOS:      60ms
+```
+
+**d) Byte-Data Fallback**
+Nach `getFloatTimeDomainData`: Wenn alle Werte exakt 0 sind, wird `getByteTimeDomainData` versucht und die Byte-Werte zu Float konvertiert (`(byte - 128) / 128`).
+
+**e) Erweitertes Debug-Logging**
+Beim Start wird zusaetzlich `smoothingTimeConstant: 0` geloggt. Bei den ersten 5 Frames wird der RMS-Wert geloggt, damit man auf dem iPad sofort sieht ob ueberhaupt Signal ankommt.
+
+## Aktualisierte Parameter-Tabelle
+
+```text
+Parameter                | Desktop  | iPad/iOS
+-------------------------|----------|----------
+smoothingTimeConstant    | 0        | 0
+Korrelations-Schwelle    | 0.9      | 0.75
+RMS Silence Threshold    | 0.005    | 0.002
+fftSize                  | 4096     | 8192
+Confidence-Faktor        | 1.0x     | 0.6x
+Stability MS             | 100      | 60
+Min Autocorr Offset      | ~22      | ~24
+Byte-Data Fallback       | nein     | ja (wenn Float=0)
+```
+
+Keine Aenderungen an anderen Dateien noetig.
