@@ -60,7 +60,7 @@ function autoCorrelate(
   }
   rms = Math.sqrt(rms / SIZE);
 
-  if (rms < 0.005) return { frequency: -1, rms };
+  if (rms < RMS_SILENCE) return { frequency: -1, rms };
 
   let lastCorrelation = 1;
   for (let offset = 0; offset < MAX_SAMPLES; offset++) {
@@ -70,7 +70,7 @@ function autoCorrelate(
     }
     correlation = 1 - correlation / MAX_SAMPLES;
 
-    if (correlation > 0.9 && correlation > lastCorrelation) {
+    if (correlation > CORRELATION_THRESHOLD && correlation > lastCorrelation) {
       foundGoodCorrelation = true;
       if (correlation > bestCorrelation) {
         bestCorrelation = correlation;
@@ -110,6 +110,10 @@ const IOS = isIOSDevice();
 const FFT_SIZE = IOS ? 8192 : 4096;
 /** On iOS the confidence threshold is multiplied by this factor (softer) */
 const CONFIDENCE_FACTOR = IOS ? 0.6 : 1.0;
+/** Autocorrelation quality threshold – iPad mics are noisier, so we accept lower correlation */
+const CORRELATION_THRESHOLD = IOS ? 0.75 : 0.9;
+/** RMS below this is considered silence – iPad mics produce quieter signals */
+const RMS_SILENCE = IOS ? 0.002 : 0.005;
 const STABILITY_MS = 100;
 /** After this many silent frames (~1 s at 60 fps) show a warning */
 const SILENT_WARN_FRAMES = 60;
@@ -255,9 +259,15 @@ export function useGamePitchDetection(
       silentFramesRef.current = 0;
       reinitCountRef.current = 0;
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-      });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+        });
+      } catch {
+        // Fallback for Safari which may reject strict constraints
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
       mediaStreamRef.current = stream;
 
       // Use webkitAudioContext fallback for older Safari
@@ -281,6 +291,12 @@ export function useGamePitchDetection(
       analyserRef.current = analyser;
       gainNodeRef.current = gain;
       bufferRef.current = new Float32Array(analyser.fftSize) as Float32Array<ArrayBuffer>;
+
+      // Debug logging – helps diagnose iPad issues via Safari Web Inspector
+      console.log('[PitchDetection] started', {
+        ios: IOS, sampleRate: ctx.sampleRate, fftSize: FFT_SIZE,
+        correlationThreshold: CORRELATION_THRESHOLD, rmsSilence: RMS_SILENCE,
+      });
 
       setIsListening(true);
       analyze();
