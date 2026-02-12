@@ -62,8 +62,10 @@ function autoCorrelate(
 
   if (rms < RMS_SILENCE) return { frequency: -1, rms };
 
+  // Start at minimum offset corresponding to max expected frequency (2000 Hz)
+  const MIN_OFFSET = Math.floor(sampleRate / 2000);
   let lastCorrelation = 1;
-  for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+  for (let offset = MIN_OFFSET; offset < MAX_SAMPLES; offset++) {
     let correlation = 0;
     for (let i = 0; i < MAX_SAMPLES; i++) {
       correlation += Math.abs(buffer[i] - buffer[i + offset]);
@@ -114,7 +116,7 @@ const CONFIDENCE_FACTOR = IOS ? 0.6 : 1.0;
 const CORRELATION_THRESHOLD = IOS ? 0.75 : 0.9;
 /** RMS below this is considered silence – iPad mics produce quieter signals */
 const RMS_SILENCE = IOS ? 0.002 : 0.005;
-const STABILITY_MS = 100;
+const STABILITY_MS = IOS ? 60 : 100;
 /** After this many silent frames (~1 s at 60 fps) show a warning */
 const SILENT_WARN_FRAMES = 60;
 /** After this many silent frames (~2 s) reinitialise the AudioContext */
@@ -166,6 +168,7 @@ export function useGamePitchDetection(
 
     const analyser = ctx.createAnalyser();
     analyser.fftSize = FFT_SIZE;
+    analyser.smoothingTimeConstant = 0;
 
     const gain = ctx.createGain();
     gain.gain.value = 1.0;
@@ -189,6 +192,22 @@ export function useGamePitchDetection(
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
 
     analyserRef.current.getFloatTimeDomainData(bufferRef.current);
+
+    // Safari fallback: if getFloatTimeDomainData returns all zeros, use byte data
+    if (IOS) {
+      let allZero = true;
+      for (let i = 0; i < bufferRef.current.length; i++) {
+        if (bufferRef.current[i] !== 0) { allZero = false; break; }
+      }
+      if (allZero) {
+        const byteBuffer = new Uint8Array(analyserRef.current.fftSize);
+        analyserRef.current.getByteTimeDomainData(byteBuffer);
+        for (let i = 0; i < byteBuffer.length; i++) {
+          bufferRef.current[i] = (byteBuffer[i] - 128) / 128;
+        }
+      }
+    }
+
     const { frequency, rms } = autoCorrelate(
       bufferRef.current,
       audioContextRef.current.sampleRate, // always use actual rate (44100 / 48000)
@@ -278,6 +297,7 @@ export function useGamePitchDetection(
 
       const analyser = ctx.createAnalyser();
       analyser.fftSize = FFT_SIZE;
+      analyser.smoothingTimeConstant = 0;
 
       // GainNode stabilises the audio pipeline on iOS even at gain=1
       const gain = ctx.createGain();
@@ -295,6 +315,7 @@ export function useGamePitchDetection(
       // Debug logging – helps diagnose iPad issues via Safari Web Inspector
       console.log('[PitchDetection] started', {
         ios: IOS, sampleRate: ctx.sampleRate, fftSize: FFT_SIZE,
+        smoothingTimeConstant: 0, stabilityMs: STABILITY_MS,
         correlationThreshold: CORRELATION_THRESHOLD, rmsSilence: RMS_SILENCE,
       });
 
