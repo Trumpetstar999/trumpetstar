@@ -263,7 +263,7 @@ serve(async (req) => {
       .from("knowledge_sources")
       .select("id, title, content, type, tags")
       .in("visibility", allowedPlans)
-      .limit(100);
+      .limit(1000);
 
     console.log("[assistant-chat] Knowledge sources found:", sources?.length || 0);
 
