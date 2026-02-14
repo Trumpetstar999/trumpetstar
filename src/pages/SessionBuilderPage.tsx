@@ -45,14 +45,14 @@ interface LibraryItem {
   thumbnail?: string | null;
 }
 
-const SECTION_COLORS: Record<string, { border: string; bg: string; text: string; dot: string }> = {
-  buzzing:   { border: 'border-l-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-400', dot: 'bg-orange-500' },
-  warmup:    { border: 'border-l-blue-500',   bg: 'bg-blue-500/10',   text: 'text-blue-400',   dot: 'bg-blue-500' },
-  tongue:    { border: 'border-l-green-500',   bg: 'bg-green-500/10',  text: 'text-green-400',  dot: 'bg-green-500' },
-  range:     { border: 'border-l-violet-500',  bg: 'bg-violet-500/10', text: 'text-violet-400', dot: 'bg-violet-500' },
-  technique: { border: 'border-l-teal-500',    bg: 'bg-teal-500/10',   text: 'text-teal-400',   dot: 'bg-teal-500' },
-  songs:     { border: 'border-l-pink-500',    bg: 'bg-pink-500/10',   text: 'text-pink-400',   dot: 'bg-pink-500' },
-  custom:    { border: 'border-l-slate-400',   bg: 'bg-slate-500/10',  text: 'text-slate-400',  dot: 'bg-slate-400' },
+const SECTION_COLORS: Record<string, { border: string; bg: string; bgSubtle: string; text: string; dot: string; headerBg: string }> = {
+  buzzing:   { border: 'border-l-orange-400', bg: 'bg-orange-400/8',  bgSubtle: 'bg-orange-400/4', text: 'text-orange-400', dot: 'bg-orange-400', headerBg: 'bg-orange-400/6' },
+  warmup:    { border: 'border-l-blue-400',   bg: 'bg-blue-400/8',    bgSubtle: 'bg-blue-400/4',   text: 'text-blue-400',   dot: 'bg-blue-400',   headerBg: 'bg-blue-400/6' },
+  tongue:    { border: 'border-l-emerald-400', bg: 'bg-emerald-400/8', bgSubtle: 'bg-emerald-400/4', text: 'text-emerald-400', dot: 'bg-emerald-400', headerBg: 'bg-emerald-400/6' },
+  range:     { border: 'border-l-violet-400',  bg: 'bg-violet-400/8',  bgSubtle: 'bg-violet-400/4', text: 'text-violet-400', dot: 'bg-violet-400', headerBg: 'bg-violet-400/6' },
+  technique: { border: 'border-l-cyan-400',    bg: 'bg-cyan-400/8',    bgSubtle: 'bg-cyan-400/4',   text: 'text-cyan-400',   dot: 'bg-cyan-400',   headerBg: 'bg-cyan-400/6' },
+  songs:     { border: 'border-l-pink-400',    bg: 'bg-pink-400/8',    bgSubtle: 'bg-pink-400/4',   text: 'text-pink-400',   dot: 'bg-pink-400',   headerBg: 'bg-pink-400/6' },
+  custom:    { border: 'border-l-slate-400',   bg: 'bg-slate-400/8',   bgSubtle: 'bg-slate-400/4',  text: 'text-slate-400',  dot: 'bg-slate-400',  headerBg: 'bg-slate-400/6' },
 };
 
 function getSectionColor(key: string) {
@@ -409,11 +409,11 @@ export default function SessionBuilderPage() {
           {(() => {
             const sc = selectedSection ? getSectionColor(selectedSection.section_key) : null;
             return (
-          <div className={cn("px-5 py-3 border-b border-border flex items-center justify-between", sc && `border-t-[3px] ${sc.border.replace('border-l-', 'border-t-')} ${sc.bg}`)}>
-            <div className="flex items-center gap-2.5">
-              {sc && <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', sc.dot)} />}
+          <div className={cn("px-5 py-3 border-b border-border/50 flex items-center justify-between", sc && sc.headerBg)}>
+            <div className="flex items-center gap-3">
+              {sc && <div className={cn('w-1 h-8 rounded-full shrink-0', sc.dot)} />}
               <div>
-                <h2 className="text-base font-semibold text-foreground">
+                <h2 className={cn("text-base font-semibold", sc ? sc.text : 'text-foreground')}>
                   {selectedSection?.title || 'Rubrik wählen'}
                 </h2>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -424,7 +424,7 @@ export default function SessionBuilderPage() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 border-border bg-secondary text-foreground hover:bg-secondary/80 rounded-xl"
+              className="gap-1.5 border-border/50 bg-secondary/50 text-foreground hover:bg-secondary/80 rounded-xl"
               onClick={addPause}
             >
               <Timer className="w-4 h-4" /> Pause einfügen
@@ -514,16 +514,17 @@ function SortableSectionItem({ id, title, sectionKey, itemCount, isSelected, onC
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all group border-l-[3px]',
+        'flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-all group border-l-[3px]',
         isSelected
           ? `${sc.border} ${sc.bg} shadow-sm`
-          : `${sc.border} border-opacity-30 hover:${sc.bg}`
+          : 'border-l-transparent hover:bg-secondary/40'
       )}
       onClick={onClick}
     >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none">
-        <GripVertical className="w-4 h-4 text-muted-foreground" />
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none opacity-30 group-hover:opacity-60">
+        <GripVertical className="w-3.5 h-3.5 text-foreground" />
       </div>
+      <div className={cn('w-2 h-2 rounded-full shrink-0', sc.dot, !isSelected && 'opacity-50')} />
       {editing ? (
         <Input
           value={editTitle}
@@ -536,23 +537,25 @@ function SortableSectionItem({ id, title, sectionKey, itemCount, isSelected, onC
         />
       ) : (
         <span
-          className="text-sm flex-1 truncate font-medium text-foreground"
+          className={cn('text-sm flex-1 truncate font-medium', isSelected ? 'text-foreground' : 'text-foreground/70')}
           onDoubleClick={(e) => { e.stopPropagation(); setEditing(true); }}
         >
           {title}
         </span>
       )}
-      <span className={cn(
-        'text-xs tabular-nums min-w-[20px] text-center rounded-full px-1.5 py-0.5',
-        itemCount > 0 ? `${sc.bg} ${sc.text} font-semibold` : 'text-muted-foreground'
-      )}>
-        {itemCount}
-      </span>
+      {itemCount > 0 && (
+        <span className={cn(
+          'text-[10px] tabular-nums rounded-full px-1.5 py-0.5 font-semibold',
+          isSelected ? `${sc.bg} ${sc.text}` : 'bg-foreground/5 text-muted-foreground'
+        )}>
+          {itemCount}
+        </span>
+      )}
       <button
         onClick={(e) => { e.stopPropagation(); onDelete(); }}
         className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5"
       >
-        <X className="w-3.5 h-3.5 text-muted-foreground hover:text-accent" />
+        <X className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
       </button>
     </div>
   );
@@ -575,40 +578,47 @@ function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationCha
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-3 p-3 rounded-2xl card-glass group transition-all border-l-[3px]',
-        isPause ? 'bg-accent/5 border border-accent/20 border-l-accent' : `${sc.border} ${sc.bg}`
+        'flex items-center gap-3 px-3 py-2.5 rounded-xl group transition-all border-l-[3px]',
+        'bg-card/40 backdrop-blur-sm hover:bg-card/60',
+        isPause ? 'border-l-muted-foreground/30 bg-muted/20' : sc.border
       )}
     >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0">
-        <GripVertical className="w-5 h-5 text-card-foreground/30" />
+      {/* Drag handle */}
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0 opacity-30 group-hover:opacity-60 transition-opacity">
+        <GripVertical className="w-4 h-4 text-foreground" />
       </div>
+
+      {/* Index number */}
+      <span className={cn('text-[10px] font-bold tabular-nums shrink-0 w-4 text-center', isPause ? 'text-muted-foreground' : sc.text)}>
+        {index}
+      </span>
 
       {/* Thumbnail or Icon */}
       {isPause ? (
-        <div className="w-14 h-10 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
-          <Timer className="w-5 h-5 text-accent" />
+        <div className="w-12 h-8 rounded-md flex items-center justify-center shrink-0 bg-muted/30 border border-border/30">
+          <Timer className="w-4 h-4 text-muted-foreground" />
         </div>
       ) : item.thumbnail ? (
         <img
           src={item.thumbnail}
           alt=""
-          className="w-14 h-10 rounded-lg object-cover shrink-0 bg-secondary"
+          className="w-12 h-8 rounded-md object-cover shrink-0 shadow-sm"
         />
       ) : (
-        <div className={cn('w-14 h-10 rounded-lg flex items-center justify-center shrink-0', isVideo ? 'bg-primary/10' : 'bg-gold/10')}>
-          {isVideo && <Video className="w-5 h-5 text-primary" />}
-          {isPdf && <FileText className="w-5 h-5" style={{ color: 'hsl(48, 100%, 40%)' }} />}
+        <div className={cn('w-12 h-8 rounded-md flex items-center justify-center shrink-0 border border-border/30', sc.bgSubtle)}>
+          {isVideo && <Video className="w-4 h-4 text-muted-foreground" />}
+          {isPdf && <FileText className="w-4 h-4 text-muted-foreground" />}
         </div>
       )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-card-foreground truncate">
+        <p className="text-sm font-medium text-foreground truncate">
           {item.title_cache || item.item_type}
         </p>
-        <p className="text-xs text-card-foreground/50">
-          {isVideo && 'Spielt bis Ende'}
-          {isPdf && 'Timer-Modus'}
+        <p className="text-[11px] text-muted-foreground">
+          {isVideo && 'Video · bis Ende'}
+          {isPdf && 'PDF · Timer'}
           {isPause && 'Pause'}
         </p>
       </div>
@@ -616,37 +626,37 @@ function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationCha
       {/* Duration Control */}
       {(isPdf || isPause) && (
         <div className="flex items-center gap-1 shrink-0">
-          <div className="relative flex items-center bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
+          <div className="relative flex items-center bg-background/40 rounded-lg border border-border/30 overflow-hidden">
             <Input
               type="number"
               min={10}
               max={600}
               value={item.duration_seconds || 60}
               onChange={e => onDurationChange(Number(e.target.value))}
-              className="w-16 h-9 text-sm text-center border-0 bg-transparent text-card-foreground font-medium tabular-nums p-0"
+              className="w-14 h-8 text-xs text-center border-0 bg-transparent text-foreground font-medium tabular-nums p-0"
               onClick={e => e.stopPropagation()}
             />
-            <div className="flex flex-col border-l border-border/50">
+            <div className="flex flex-col border-l border-border/30">
               <button
                 onClick={(e) => { e.stopPropagation(); onDurationChange(Math.min(600, (item.duration_seconds || 60) + 10)); }}
-                className="px-1.5 py-0 hover:bg-accent/10 transition-colors"
+                className="px-1 py-0 hover:bg-foreground/5 transition-colors"
               >
-                <ChevronUp className="w-3 h-3 text-card-foreground/50" />
+                <ChevronUp className="w-3 h-3 text-muted-foreground" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDurationChange(Math.max(10, (item.duration_seconds || 60) - 10)); }}
-                className="px-1.5 py-0 hover:bg-accent/10 transition-colors"
+                className="px-1 py-0 hover:bg-foreground/5 transition-colors"
               >
-                <ChevronDown className="w-3 h-3 text-card-foreground/50" />
+                <ChevronDown className="w-3 h-3 text-muted-foreground" />
               </button>
             </div>
           </div>
-          <span className="text-xs text-card-foreground/40 ml-0.5">s</span>
+          <span className="text-[10px] text-muted-foreground ml-0.5">s</span>
         </div>
       )}
 
       {isVideo && (
-        <span className="text-xs text-card-foreground/40 bg-muted/30 px-2.5 py-1 rounded-lg shrink-0">
+        <span className="text-[11px] text-muted-foreground bg-background/30 px-2 py-0.5 rounded-md shrink-0 border border-border/20">
           bis Ende
         </span>
       )}
@@ -654,9 +664,9 @@ function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationCha
       {/* Remove */}
       <button
         onClick={onRemove}
-        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-accent/10 shrink-0"
+        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md hover:bg-foreground/5 shrink-0"
       >
-        <Trash2 className="w-4 h-4 text-card-foreground/30 hover:text-accent" />
+        <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
       </button>
     </div>
   );
