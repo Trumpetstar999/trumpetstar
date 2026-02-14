@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { JournalEntryCard } from '@/components/practice/JournalEntry';
 import { TodoItem } from '@/components/practice/TodoItem';
 import { JournalEntryDialog } from '@/components/practice/JournalEntryDialog';
@@ -6,10 +7,11 @@ import { TodoDialog } from '@/components/practice/TodoDialog';
 import { mockJournalEntries, mockTodos } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus, BookOpen, CheckSquare, Clock, Target, TrendingUp, Calendar } from 'lucide-react';
+import { Plus, BookOpen, CheckSquare, Clock, Target, TrendingUp, Calendar, Play, ListMusic } from 'lucide-react';
 import { JournalEntry, Todo } from '@/types';
 
 export function PracticePage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('journal');
   const [journalEntries, setJournalEntries] = useState(mockJournalEntries);
   const [todos, setTodos] = useState(mockTodos);
@@ -58,6 +60,32 @@ export function PracticePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      {/* Session Tile */}
+      <div 
+        className="glass rounded-2xl p-5 opacity-0 animate-fade-in"
+        style={{ animationFillMode: 'forwards' }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <ListMusic className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-bold text-lg">Übesession starten</h2>
+              <p className="text-sm text-muted-foreground">Stelle deine Übe-Playlist zusammen</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/practice/sessions')} className="gap-2">
+              <ListMusic className="w-4 h-4" /> Meine Sessions
+            </Button>
+            <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2">
+              <Plus className="w-4 h-4" /> Neue Übesession
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Header Stats with staggered animations */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[

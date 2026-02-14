@@ -1312,6 +1312,169 @@ export type Database = {
         }
         Relationships: []
       }
+      practice_session_items: {
+        Row: {
+          created_at: string
+          duration_mode: string
+          duration_seconds: number | null
+          id: string
+          item_type: string
+          order_index: number
+          ref_id: string | null
+          section_id: string | null
+          session_id: string
+          title_cache: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_mode?: string
+          duration_seconds?: number | null
+          id?: string
+          item_type: string
+          order_index?: number
+          ref_id?: string | null
+          section_id?: string | null
+          session_id: string
+          title_cache?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_mode?: string
+          duration_seconds?: number | null
+          id?: string
+          item_type?: string
+          order_index?: number
+          ref_id?: string | null
+          section_id?: string | null
+          session_id?: string
+          title_cache?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_session_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "practice_session_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_session_items_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "practice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practice_session_sections: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          section_key: string
+          session_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          section_key?: string
+          session_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          section_key?: string
+          session_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_session_sections_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "practice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practice_session_shares: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          share_link: string | null
+          shared_by_user_id: string
+          shared_with_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          share_link?: string | null
+          shared_by_user_id: string
+          shared_with_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          share_link?: string | null
+          shared_by_user_id?: string
+          shared_with_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_session_shares_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "practice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practice_sessions: {
+        Row: {
+          break_enabled: boolean
+          break_seconds_default: number
+          created_at: string
+          id: string
+          is_public: boolean
+          last_used_at: string | null
+          name: string
+          owner_user_id: string
+          share_slug: string | null
+          updated_at: string
+        }
+        Insert: {
+          break_enabled?: boolean
+          break_seconds_default?: number
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          last_used_at?: string | null
+          name: string
+          owner_user_id: string
+          share_slug?: string | null
+          updated_at?: string
+        }
+        Update: {
+          break_enabled?: boolean
+          break_seconds_default?: number
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          last_used_at?: string | null
+          name?: string
+          owner_user_id?: string
+          share_slug?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_plan_mapping: {
         Row: {
           checkout_url: string | null
