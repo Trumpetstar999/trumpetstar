@@ -41,6 +41,21 @@ interface LibraryItem {
   type: 'video' | 'pdf';
   duration?: number | null;
   level_title?: string;
+  thumbnail?: string | null;
+}
+
+const SECTION_COLORS: Record<string, { border: string; bg: string; text: string; dot: string }> = {
+  buzzing:   { border: 'border-l-orange-500', bg: 'bg-orange-500/10', text: 'text-orange-400', dot: 'bg-orange-500' },
+  warmup:    { border: 'border-l-blue-500',   bg: 'bg-blue-500/10',   text: 'text-blue-400',   dot: 'bg-blue-500' },
+  tongue:    { border: 'border-l-green-500',   bg: 'bg-green-500/10',  text: 'text-green-400',  dot: 'bg-green-500' },
+  range:     { border: 'border-l-violet-500',  bg: 'bg-violet-500/10', text: 'text-violet-400', dot: 'bg-violet-500' },
+  technique: { border: 'border-l-teal-500',    bg: 'bg-teal-500/10',   text: 'text-teal-400',   dot: 'bg-teal-500' },
+  songs:     { border: 'border-l-pink-500',    bg: 'bg-pink-500/10',   text: 'text-pink-400',   dot: 'bg-pink-500' },
+  custom:    { border: 'border-l-slate-400',   bg: 'bg-slate-500/10',  text: 'text-slate-400',  dot: 'bg-slate-400' },
+};
+
+function getSectionColor(key: string) {
+  return SECTION_COLORS[key] || SECTION_COLORS.custom;
 }
 
 function genId() {
@@ -94,16 +109,16 @@ export default function SessionBuilderPage() {
     queryFn: async (): Promise<LibraryItem[]> => {
       const results: LibraryItem[] = [];
       if (typeFilter !== 'pdf') {
-        let q = (supabase as any).from('videos').select('id, title, duration_seconds, level_id').eq('is_active', true);
+        let q = (supabase as any).from('videos').select('id, title, duration_seconds, level_id, thumbnail_url').eq('is_active', true);
         if (searchQuery) q = q.ilike('title', `%${searchQuery}%`);
         const { data } = await q.limit(50);
-        if (data) results.push(...data.map((v: any) => ({ id: v.id, title: v.title, type: 'video' as const, duration: v.duration_seconds })));
+        if (data) results.push(...data.map((v: any) => ({ id: v.id, title: v.title, type: 'video' as const, duration: v.duration_seconds, thumbnail: v.thumbnail_url })));
       }
       if (typeFilter !== 'video') {
-        let q = (supabase as any).from('pdf_documents').select('id, title').eq('is_active', true);
+        let q = (supabase as any).from('pdf_documents').select('id, title, cover_image_url').eq('is_active', true);
         if (searchQuery) q = q.ilike('title', `%${searchQuery}%`);
         const { data } = await q.limit(50);
-        if (data) results.push(...data.map((p: any) => ({ id: p.id, title: p.title, type: 'pdf' as const })));
+        if (data) results.push(...data.map((p: any) => ({ id: p.id, title: p.title, type: 'pdf' as const, thumbnail: p.cover_image_url })));
       }
       return results;
     },
@@ -316,15 +331,23 @@ export default function SessionBuilderPage() {
                 onClick={() => addLibraryItem(lib)}
                 className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-secondary/80 active:scale-[0.98] transition-all flex items-center gap-3 group"
               >
-                <div className={cn(
-                  'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
-                  lib.type === 'video' ? 'bg-primary/20' : 'bg-gold/20'
-                )}>
-                  {lib.type === 'video'
-                    ? <Video className="w-4 h-4 text-primary-foreground" />
-                    : <FileText className="w-4 h-4 text-foreground" />
-                  }
-                </div>
+                {lib.thumbnail ? (
+                  <img
+                    src={lib.thumbnail}
+                    alt=""
+                    className="w-10 h-7 rounded-md object-cover shrink-0 bg-secondary"
+                  />
+                ) : (
+                  <div className={cn(
+                    'w-10 h-7 rounded-md flex items-center justify-center shrink-0',
+                    lib.type === 'video' ? 'bg-primary/20' : 'bg-gold/20'
+                  )}>
+                    {lib.type === 'video'
+                      ? <Video className="w-4 h-4 text-primary-foreground" />
+                      : <FileText className="w-4 h-4 text-foreground" />
+                    }
+                  </div>
+                )}
                 <span className="text-sm truncate flex-1 text-foreground">{lib.title}</span>
                 {lib.duration && (
                   <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
@@ -356,6 +379,7 @@ export default function SessionBuilderPage() {
                     key={sec.tempId}
                     id={sec.tempId}
                     title={sec.title}
+                    sectionKey={sec.section_key}
                     itemCount={sec.items.length}
                     isSelected={idx === selectedSectionIdx}
                     onClick={() => setSelectedSectionIdx(idx)}
@@ -380,14 +404,20 @@ export default function SessionBuilderPage() {
 
         {/* RIGHT: Items */}
         <div className="flex-1 flex flex-col glass">
-          <div className="px-5 py-3 border-b border-border flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">
-                {selectedSection?.title || 'Rubrik wählen'}
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {selectedSection?.items.length || 0} Items
-              </p>
+          {(() => {
+            const sc = selectedSection ? getSectionColor(selectedSection.section_key) : null;
+            return (
+          <div className={cn("px-5 py-3 border-b border-border flex items-center justify-between", sc && `border-t-2 ${sc.border.replace('border-l-', 'border-t-')} ${sc.bg}`)}>
+            <div className="flex items-center gap-2.5">
+              {sc && <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', sc.dot)} />}
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  {selectedSection?.title || 'Rubrik wählen'}
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {selectedSection?.items.length || 0} Items
+                </p>
+              </div>
             </div>
             <Button
               variant="outline"
@@ -398,6 +428,8 @@ export default function SessionBuilderPage() {
               <Timer className="w-4 h-4" /> Pause einfügen
             </Button>
           </div>
+            );
+          })()}
           {selectedSection && (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleItemDragEnd}>
               <SortableContext items={selectedSection.items.map(i => i.tempId)} strategy={verticalListSortingStrategy}>
@@ -408,6 +440,7 @@ export default function SessionBuilderPage() {
                       id={item.tempId}
                       item={item}
                       index={idx + 1}
+                      sectionKey={selectedSection.section_key}
                       onRemove={() => removeItem(item.tempId)}
                       onDurationChange={(s) => updateItemDuration(item.tempId, s)}
                     />
@@ -464,24 +497,25 @@ export default function SessionBuilderPage() {
 }
 
 /* ─── Sortable Section Item ─── */
-function SortableSectionItem({ id, title, itemCount, isSelected, onClick, onRename, onDelete }: {
-  id: string; title: string; itemCount: number; isSelected: boolean;
+function SortableSectionItem({ id, title, sectionKey, itemCount, isSelected, onClick, onRename, onDelete }: {
+  id: string; title: string; sectionKey: string; itemCount: number; isSelected: boolean;
   onClick: () => void; onRename: (t: string) => void; onDelete: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition };
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
+  const sc = getSectionColor(sectionKey);
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all group',
+        'flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all group border-l-3',
         isSelected
-          ? 'bg-foreground/15 shadow-sm'
-          : 'hover:bg-secondary/60'
+          ? `${sc.border} ${sc.bg} shadow-sm`
+          : `border-l-transparent hover:bg-secondary/60`
       )}
       onClick={onClick}
     >
@@ -523,8 +557,8 @@ function SortableSectionItem({ id, title, itemCount, isSelected, onClick, onRena
 }
 
 /* ─── Sortable Item Card ─── */
-function SortableItemCard({ id, item, index, onRemove, onDurationChange }: {
-  id: string; item: LocalItem; index: number; onRemove: () => void; onDurationChange: (s: number) => void;
+function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationChange }: {
+  id: string; item: LocalItem; index: number; sectionKey: string; onRemove: () => void; onDurationChange: (s: number) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
   const style = { transform: CSS.Transform.toString(transform), transition };
@@ -532,31 +566,32 @@ function SortableItemCard({ id, item, index, onRemove, onDurationChange }: {
   const isVideo = item.item_type === 'vimeo_video';
   const isPdf = item.item_type === 'pdf';
   const isPause = item.item_type === 'pause';
+  const sc = getSectionColor(sectionKey);
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-3 p-3 rounded-2xl card-glass group transition-all',
-        isPause && 'bg-accent/5 border border-accent/20'
+        'flex items-center gap-3 p-3 rounded-2xl card-glass group transition-all border-l-2',
+        isPause ? 'bg-accent/5 border border-accent/20 border-l-accent' : sc.border
       )}
     >
       <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0">
         <GripVertical className="w-5 h-5 text-card-foreground/30" />
       </div>
 
-      {/* Icon */}
-      <div className={cn(
-        'w-9 h-9 rounded-xl flex items-center justify-center shrink-0',
-        isVideo && 'bg-primary/10',
-        isPdf && 'bg-gold/10',
-        isPause && 'bg-accent/10'
-      )}>
-        {isVideo && <Video className="w-4 h-4 text-primary" />}
-        {isPdf && <FileText className="w-4 h-4" style={{ color: 'hsl(48, 100%, 40%)' }} />}
-        {isPause && <Timer className="w-4 h-4 text-accent" />}
-      </div>
+      {/* Thumbnail or Icon */}
+      {isPause ? (
+        <div className="w-12 h-8 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+          <Timer className="w-4 h-4 text-accent" />
+        </div>
+      ) : (
+        <div className={cn('w-12 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden', isVideo ? 'bg-primary/10' : 'bg-gold/10')}>
+          {isVideo && <Video className="w-4 h-4 text-primary" />}
+          {isPdf && <FileText className="w-4 h-4" style={{ color: 'hsl(48, 100%, 40%)' }} />}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
