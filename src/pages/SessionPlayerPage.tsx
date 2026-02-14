@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePracticeSessions } from '@/hooks/usePracticeSessions';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { useSessionPlayer } from '@/hooks/useSessionPlayer';
 import { Button } from '@/components/ui/button';
 import { SessionWithDetails } from '@/types/sessions';
@@ -12,6 +14,7 @@ export default function SessionPlayerPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { fetchSessionById, markUsed } = usePracticeSessions();
+  const { user } = useAuth();
   const [session, setSession] = useState<SessionWithDetails | null>(null);
   const [showOverview, setShowOverview] = useState(false);
   const [autoPauseRemaining, setAutoPauseRemaining] = useState(0);
@@ -26,10 +29,22 @@ export default function SessionPlayerPage() {
     if (id) {
       fetchSessionById(id).then(s => {
         setSession(s);
-        if (s) markUsed(s.id);
+        if (s) {
+          markUsed(s.id);
+          // Award a star for starting a practice session
+          if (user) {
+            supabase.from('video_completions').insert([{
+              user_id: user.id,
+              video_id: null,
+              playback_speed: 100,
+            }]).then(({ error }) => {
+              if (!error) console.log('[Session] Star awarded for starting session');
+            });
+          }
+        }
       });
     }
-  }, [id, fetchSessionById, markUsed]);
+  }, [id, fetchSessionById, markUsed, user]);
 
   const currentItem = player.currentQueueItem?.item;
   const currentSection = player.currentQueueItem?.sectionTitle;
