@@ -12,7 +12,8 @@ export type WidgetId =
   | 'statistics'
   | 'game-highscore'
   | 'recent-videos'
-  | 'weekly-goals';
+  | 'weekly-goals'
+  | 'practice-sessions';
 
 export interface WidgetConfig {
   id: WidgetId;
@@ -31,9 +32,10 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'feedback-chat', visible: true, order: 5, isPremium: true },
   { id: 'classroom', visible: true, order: 6, isPremium: true },
   { id: 'statistics', visible: true, order: 7, isOptional: true },
-  { id: 'game-highscore', visible: true, order: 8 },
-  { id: 'recent-videos', visible: false, order: 9, isOptional: true },
-  { id: 'weekly-goals', visible: false, order: 10, isOptional: true },
+  { id: 'practice-sessions', visible: true, order: 8 },
+  { id: 'game-highscore', visible: true, order: 9 },
+  { id: 'recent-videos', visible: false, order: 10, isOptional: true },
+  { id: 'weekly-goals', visible: false, order: 11, isOptional: true },
 ];
 
 const STORAGE_KEY = 'dashboard_layout';
