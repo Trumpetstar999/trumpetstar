@@ -293,7 +293,7 @@ export default function AuthPage() {
             Willkommen
           </h1>
           <p className="text-white/80 text-lg">
-            Melde dich an, um deine Lernreise fortzusetzen
+            Trompete lernen? Kinderleicht – auch für Erwachsene.
           </p>
         </div>
 
