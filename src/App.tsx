@@ -19,6 +19,10 @@ import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
 import PricingPage from "./pages/PricingPage";
 import WordPressCallbackPage from "./pages/WordPressCallbackPage";
 import GamePlayPage from "./pages/GamePlayPage";
+import SessionBuilderPage from "./pages/SessionBuilderPage";
+import SessionListPage from "./pages/SessionListPage";
+import SessionPlayerPage from "./pages/SessionPlayerPage";
+import SharedSessionPage from "./pages/SharedSessionPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +54,11 @@ const App = () => {
                       <Route path="/musicxml" element={<MusicXMLPage />} />
                       <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
                       <Route path="/game/play" element={<GamePlayPage />} />
+                      <Route path="/practice/sessions" element={<SessionListPage />} />
+                      <Route path="/practice/sessions/new" element={<SessionBuilderPage />} />
+                      <Route path="/practice/sessions/:id/edit" element={<SessionBuilderPage />} />
+                      <Route path="/practice/sessions/:id/play" element={<SessionPlayerPage />} />
+                      <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
