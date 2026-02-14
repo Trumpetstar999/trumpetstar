@@ -290,9 +290,29 @@ export function usePracticeSessions() {
       .select('*')
       .eq('session_id', s.id)
       .order('order_index');
+    // Resolve vimeo_video_id for video items
+    const videoRefIds = (items || [])
+      .filter((it: any) => it.item_type === 'vimeo_video' && it.ref_id)
+      .map((it: any) => it.ref_id);
+    let videoMap: Record<string, string> = {};
+    if (videoRefIds.length > 0) {
+      const { data: videos } = await (supabase as any)
+        .from('videos')
+        .select('id, vimeo_video_id')
+        .in('id', videoRefIds);
+      if (videos) {
+        for (const v of videos) {
+          videoMap[v.id] = v.vimeo_video_id;
+        }
+      }
+    }
+    const enrichedItems = (items || []).map((it: any) => ({
+      ...it,
+      vimeo_video_id: it.item_type === 'vimeo_video' && it.ref_id ? videoMap[it.ref_id] || null : null,
+    }));
     const secs = (sections || []).map((sec: any) => ({
       ...sec,
-      items: (items || []).filter((it: any) => it.section_id === sec.id),
+      items: enrichedItems.filter((it: any) => it.section_id === sec.id),
     }));
     return {
       ...s,
