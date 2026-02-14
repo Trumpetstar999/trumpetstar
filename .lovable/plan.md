@@ -1,48 +1,38 @@
 
+## Auth-Seite: WordPress-Button entfernen und "Angemeldet bleiben" hinzufuegen
 
-# Session Builder -- Vorschaubilder und Rubrikfarben
+### Aenderungen
 
-## Aenderungen
+**1. "Mit Trumpetstar-Konto anmelden" Button entfernen (Zeilen 313-336)**
+- Den gesamten WordPress-SSO-Block entfernen (Button + Beschreibungstext)
+- Den `useWordPressMembership`-Import und zugehoerige State-Variable (`isWpLoading`, `wpError`, `startOAuthFlow`) entfernen
+- Den `handleWordPressLogin`-Handler entfernen
+- Import von `ExternalLink` und `Sparkles` Icons entfernen (nicht mehr benoetigt)
 
-### 1. Thumbnails in Bibliothek und Items laden
+**2. "Angemeldet bleiben"-Checkbox hinzufuegen**
+- Neue State-Variable `rememberMe` (default: `true`, damit Kinder standardmaessig angemeldet bleiben)
+- Checkbox mit Label "Angemeldet bleiben" im Login-Tab und im Magic-Link-Tab anzeigen
+- Beim Login (`handleSignIn`) und Magic-Link: Wenn `rememberMe` aktiviert ist, bleibt die Standard-Supabase-Persistenz (`localStorage`) aktiv -- das ist bereits der Fall
+- Wenn `rememberMe` NICHT aktiviert ist, nach dem Login die Session auf `sessionStorage` umstellen, sodass sie beim Schliessen des Browsers endet
 
-Die Datenbankabfrage wird erweitert, um Vorschaubilder mitzuladen:
-- **Videos**: Feld `thumbnail_url` aus der `videos`-Tabelle
-- **PDFs**: Feld `cover_image_url` aus der `pdf_documents`-Tabelle
+**3. Maximale Session-Dauer sicherstellen**
+- Der Supabase-Client ist bereits mit `persistSession: true` und `autoRefreshToken: true` konfiguriert
+- Sessions werden automatisch per Refresh-Token erneuert, solange der Browser `localStorage` nutzt
+- Das bedeutet: Kinder bleiben praktisch unbegrenzt angemeldet, solange sie den Browser-Cache nicht loeschen
 
-Das `LibraryItem`-Interface erhaelt ein neues Feld `thumbnail?: string | null`.
+### Technische Details
 
-### 2. Vorschaubilder anzeigen
+**Datei: `src/pages/AuthPage.tsx`**
+- Zeilen 4, 10-11, 24: Imports von `lovable` (bleibt), `Sparkles`/`ExternalLink` (entfernen), `useWordPressMembership` (entfernen)
+- Zeilen 191-201: `handleWordPressLogin` entfernen
+- Zeilen 313-336: WordPress-SSO-Button-Block entfernen
+- Neue State: `const [rememberMe, setRememberMe] = useState(true);`
+- Checkbox-UI im Login-Tab (vor dem Submit-Button) und im Magic-Link-Tab einfuegen
+- In `handleSignIn`: wenn `!rememberMe`, nach erfolgreichem Login die Session-Daten aus `localStorage` entfernen und in `sessionStorage` verschieben
 
-**Bibliothek (links)**: Die Icon-Box (aktuell 32x32px mit Video/PDF-Icon) wird durch ein kleines Thumbnail (z.B. 40x28px, abgerundete Ecken) ersetzt. Falls kein Thumbnail vorhanden ist, wird das bisherige Icon als Fallback gezeigt.
+**Datei: `src/pages/WordPressCallbackPage.tsx` und `src/hooks/useWordPressMembership.tsx`**
+- Diese Dateien bleiben vorerst bestehen (koennen spaeter aufgeraeumt werden), werden aber nicht mehr von der Auth-Seite referenziert
 
-**Items (rechts)**: Die Item-Cards erhalten ebenfalls ein Thumbnail-Bild anstelle des einfachen Icons. Groesse etwas groesser (z.B. 48x32px) mit abgerundeten Ecken. Fallback bleibt das Typ-Icon.
-
-### 3. Rubrikfarben-System
-
-Jeder Rubrik wird eine Akzentfarbe zugewiesen, die sowohl die Rubrik in der Mitte als auch die rechte Spalte (Items) farblich verbindet:
-
-| Rubrik | Farbe |
-|---|---|
-| Buzzing | Orange |
-| Einspielen | Blau |
-| Zungenübungen | Grün |
-| Höhe | Violett |
-| Technik | Cyan/Teal |
-| Lieder | Pink/Rose |
-| Custom | Slate/Grau |
-
-**Umsetzung:**
-- Die ausgewaehlte Rubrik in der Mitte erhaelt einen farbigen linken Rand (left border) oder dezenten Hintergrund in der Rubrikfarbe
-- Die rechte Spalte (Items-Header) zeigt die Rubrikfarbe als Akzent (farbiger Top-Border oder Hintergrund-Toenung)
-- Die Item-Cards koennen einen subtilen farbigen Seitenstreifen oder Icon-Hintergrund in der Rubrikfarbe erhalten
-
-### 4. Betroffene Datei
-
-Nur `src/pages/SessionBuilderPage.tsx` wird geaendert:
-- Erweiterung der Datenbankabfrage (thumbnail_url / cover_image_url)
-- Erweiterung des LibraryItem-Interfaces um `thumbnail`
-- Farbzuordnungs-Map basierend auf `section_key`
-- Thumbnail-Rendering in Library-Items und Item-Cards
-- Farbliche Akzente in Sektions-Liste und rechter Spalte
-
+**Datei: `src/App.tsx`**
+- Route `/auth/wordpress/callback` und Import von `WordPressCallbackPage` koennen entfernt werden
+- `WordPressMembershipProvider` Wrapper kann entfernt werden
