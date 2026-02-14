@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip, FolderOpen, Film } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ArrowLeft, Video, Upload, Paperclip, FolderOpen, Film, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,6 +14,8 @@ import { VideoRecordDialog } from './VideoRecordDialog';
 import { SelectRecordingDialog } from './SelectRecordingDialog';
 import { SelectLevelVideoDialog } from './SelectLevelVideoDialog';
 import { LevelVideoMessageCard, isLevelVideoContent } from './LevelVideoMessageCard';
+import { SessionMessageCard, isSessionContent } from './SessionMessageCard';
+import { CreateSessionChatDialog } from './CreateSessionChatDialog';
 import { Recording } from '@/hooks/useRecordings';
 import { toast } from 'sonner';
 import {
@@ -41,6 +43,7 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
   const [videoDialogOpen, setVideoDialogOpen] = useState(false);
   const [selectRecordingDialogOpen, setSelectRecordingDialogOpen] = useState(false);
   const [selectLevelVideoDialogOpen, setSelectLevelVideoDialogOpen] = useState(false);
+  const [createSessionDialogOpen, setCreateSessionDialogOpen] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // For student view, use the standard hook
@@ -427,6 +430,97 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
     }
   };
 
+  // Handle creating and sending a practice session
+  const handleSendSession = async (sessionData: { name: string; items: { type: string; ref_id: string; title: string }[] }) => {
+    if (!user || !currentChatId) return;
+
+    setUploadingVideo(true);
+    try {
+      // Create a new session owned by the teacher
+      const { data: session, error: sessionErr } = await supabase
+        .from('practice_sessions')
+        .insert({
+          owner_user_id: user.id,
+          name: sessionData.name,
+          is_public: true, // Make public so student can access
+        })
+        .select()
+        .single();
+
+      if (sessionErr) throw sessionErr;
+
+      // Create a single "Übungen" section
+      const { data: section, error: secErr } = await supabase
+        .from('practice_session_sections')
+        .insert({
+          session_id: session.id,
+          title: 'Übungen',
+          section_key: 'exercises',
+          order_index: 0,
+        })
+        .select()
+        .single();
+
+      if (secErr) throw secErr;
+
+      // Insert items
+      const itemRows = sessionData.items.map((item, idx) => ({
+        session_id: session.id,
+        section_id: section.id,
+        order_index: idx,
+        item_type: 'vimeo_video',
+        ref_id: item.ref_id,
+        title_cache: item.title,
+        duration_mode: 'until_end',
+      }));
+
+      await supabase.from('practice_session_items').insert(itemRows);
+
+      // Estimate duration (3min per video)
+      const estimatedDuration = sessionData.items.length * 180;
+
+      // Send as chat message
+      const messageData = JSON.stringify({
+        type: 'practice_session',
+        sessionId: session.id,
+        name: sessionData.name,
+        itemCount: sessionData.items.length,
+        estimatedDuration,
+      });
+
+      const { error } = await supabase
+        .from('video_chat_messages')
+        .insert({
+          chat_id: currentChatId,
+          sender_user_id: user.id,
+          sender_role: 'teacher',
+          message_type: 'text',
+          content: messageData,
+        });
+
+      if (error) throw error;
+
+      await supabase
+        .from('video_chats')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentChatId);
+
+      toast.success('Übesession gesendet');
+      setCreateSessionDialogOpen(false);
+
+      if (isTeacherView && chatId) {
+        fetchMessages(chatId);
+      } else {
+        studentChat.fetchMessages();
+      }
+    } catch (err) {
+      console.error('Error sending session:', err);
+      toast.error('Session konnte nicht gesendet werden');
+    } finally {
+      setUploadingVideo(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const displayName = isTeacherView 
@@ -552,6 +646,9 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
               // Check if this is a level video card message
               const levelVideoData = message.content ? isLevelVideoContent(message.content) : null;
               const isLevelVideoMessage = !!levelVideoData;
+              // Check if this is a session message
+              const sessionData = message.content ? isSessionContent(message.content) : null;
+              const isSessionMessage = !!sessionData;
 
               return (
                 <div key={message.id}>
@@ -581,11 +678,11 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                         isCurrentUser 
                           ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
                           : 'bg-white text-[#111B21] rounded-tl-none',
-                        (isVideoMessage || isLevelVideoMessage) ? 'p-1' : 'px-3 py-2'
+                        (isVideoMessage || isLevelVideoMessage || isSessionMessage) ? 'p-1' : 'px-3 py-2'
                       )}
                     >
                       {/* Message tail */}
-                      {!isVideoMessage && !isLevelVideoMessage && (
+                      {!isVideoMessage && !isLevelVideoMessage && !isSessionMessage && (
                         <div 
                           className={cn(
                             'absolute top-0 w-3 h-3',
@@ -605,6 +702,8 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                       {/* Content */}
                       {isVideoMessage && message.video_storage_path ? (
                         <VideoMessageContent storagePath={message.video_storage_path} />
+                      ) : isSessionMessage && sessionData ? (
+                        <SessionMessageCard data={sessionData} isOwnMessage={isCurrentUser} />
                       ) : isLevelVideoMessage && levelVideoData ? (
                         <LevelVideoMessageCard data={levelVideoData} />
                       ) : (
@@ -678,6 +777,10 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
                     <Film className="h-4 w-4 text-purple-500" />
                     Video aus Levels
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCreateSessionDialogOpen(true)} className="gap-2 cursor-pointer">
+                    <Music className="h-4 w-4 text-[#25D366]" />
+                    Übesession erstellen
+                  </DropdownMenuItem>
                 </>
               )}
             </DropdownMenuContent>
@@ -741,6 +844,14 @@ export function TeacherChatPanel({ isOpen, onClose, embedded = false, studentId 
         open={selectLevelVideoDialogOpen}
         onOpenChange={setSelectLevelVideoDialogOpen}
         onSelect={handleSelectLevelVideo}
+      />
+
+      {/* Create Session Dialog (Teacher only) */}
+      <CreateSessionChatDialog
+        open={createSessionDialogOpen}
+        onOpenChange={setCreateSessionDialogOpen}
+        onSend={handleSendSession}
+        sending={uploadingVideo}
       />
     </div>
   );
