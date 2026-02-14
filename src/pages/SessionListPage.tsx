@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { usePracticeSessions } from '@/hooks/usePracticeSessions';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, Play, Edit, Copy, Trash2, Share2, Clock, Music, Video, FileText, Timer, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Play, Edit, Copy, Trash2, Share2, Clock, Music, Video, FileText, Timer } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { ShareSessionDialog } from '@/components/sessions/ShareSessionDialog';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { cn } from '@/lib/utils';
 import type { SessionWithDetails } from '@/types/sessions';
+import { Header } from '@/components/layout/Header';
+import { TabBar } from '@/components/layout/TabBar';
+import { TabId } from '@/types';
 
 function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, onShare, onDelete }: {
   session: SessionWithDetails;
@@ -188,67 +190,77 @@ export default function SessionListPage() {
     enabled: videoRefIds.length > 0,
   });
 
+  const handleTabChange = (tab: TabId) => {
+    navigate('/', { state: { activeTab: tab } });
+  };
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="shrink-0">
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold text-foreground">Meine Übesessions</h1>
-          {sessions.length > 0 && (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {sessions.length} {sessions.length === 1 ? 'Session' : 'Sessions'}
-            </p>
+    <div className="flex flex-col min-h-screen">
+      <Header title="Übesessions" stars={0} />
+      <main className="flex-1 overflow-auto pb-24">
+        <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+          {/* Header */}
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/', { state: { activeTab: 'practice' } })} className="shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold text-foreground">Meine Übesessions</h1>
+              {sessions.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {sessions.length} {sessions.length === 1 ? 'Session' : 'Sessions'}
+                </p>
+              )}
+            </div>
+            <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
+              <Plus className="w-4 h-4" /> Neue Session
+            </Button>
+          </div>
+
+          {isLoading && (
+            <div className="flex items-center justify-center py-16">
+              <div className="w-8 h-8 rounded-full border-3 border-primary border-t-transparent animate-spin" />
+            </div>
+          )}
+
+          {!isLoading && sessions.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Music className="w-8 h-8 text-primary/50" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Noch keine Sessions</h3>
+              <p className="text-muted-foreground mb-6 text-sm">Erstelle deine erste Übesession und starte strukturiert!</p>
+              <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
+                <Plus className="w-4 h-4" /> Neue Übesession
+              </Button>
+            </div>
+          )}
+
+          <div className="grid gap-4">
+            {sessions.map((session, i) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                index={i}
+                thumbnails={thumbnails}
+                onPlay={() => navigate(`/practice/sessions/${session.id}/play`)}
+                onEdit={() => navigate(`/practice/sessions/${session.id}/edit`)}
+                onDuplicate={() => duplicateSession.mutate(session.id)}
+                onShare={() => setShareSessionId(session.id)}
+                onDelete={() => { if (confirm('Session löschen?')) deleteSession.mutate(session.id); }}
+              />
+            ))}
+          </div>
+
+          {shareSessionId && (
+            <ShareSessionDialog
+              sessionId={shareSessionId}
+              onClose={() => setShareSessionId(null)}
+            />
           )}
         </div>
-        <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
-          <Plus className="w-4 h-4" /> Neue Session
-        </Button>
-      </div>
-
-      {isLoading && (
-        <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 rounded-full border-3 border-primary border-t-transparent animate-spin" />
-        </div>
-      )}
-
-      {!isLoading && sessions.length === 0 && (
-        <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Music className="w-8 h-8 text-primary/50" />
-          </div>
-          <h3 className="font-semibold text-lg mb-2">Noch keine Sessions</h3>
-          <p className="text-muted-foreground mb-6 text-sm">Erstelle deine erste Übesession und starte strukturiert!</p>
-          <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
-            <Plus className="w-4 h-4" /> Neue Übesession
-          </Button>
-        </div>
-      )}
-
-      <div className="grid gap-4">
-        {sessions.map((session, i) => (
-          <SessionCard
-            key={session.id}
-            session={session}
-            index={i}
-            thumbnails={thumbnails}
-            onPlay={() => navigate(`/practice/sessions/${session.id}/play`)}
-            onEdit={() => navigate(`/practice/sessions/${session.id}/edit`)}
-            onDuplicate={() => duplicateSession.mutate(session.id)}
-            onShare={() => setShareSessionId(session.id)}
-            onDelete={() => { if (confirm('Session löschen?')) deleteSession.mutate(session.id); }}
-          />
-        ))}
-      </div>
-
-      {shareSessionId && (
-        <ShareSessionDialog
-          sessionId={shareSessionId}
-          onClose={() => setShareSessionId(null)}
-        />
-      )}
+      </main>
+      <TabBar activeTab="practice" onTabChange={handleTabChange} hidden={false} />
     </div>
   );
 }
