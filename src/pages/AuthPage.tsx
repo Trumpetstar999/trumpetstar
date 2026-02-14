@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Mail, Lock, User, Loader2, ExternalLink, Sparkles } from 'lucide-react';
-import { useWordPressMembership } from '@/hooks/useWordPressMembership';
+import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 export default function AuthPage() {
@@ -21,7 +21,7 @@ export default function AuthPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { startOAuthFlow, isLoading: isWpLoading, error: wpError } = useWordPressMembership();
+  const [rememberMe, setRememberMe] = useState(true);
 
   // Check if already logged in
   useEffect(() => {
@@ -188,17 +188,6 @@ export default function AuthPage() {
     }
   };
 
-  const handleWordPressLogin = async () => {
-    try {
-      await startOAuthFlow();
-    } catch (error) {
-      toast({
-        title: 'WordPress Login fehlgeschlagen',
-        description: wpError || 'Ein Fehler ist aufgetreten.',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -310,31 +299,6 @@ export default function AuthPage() {
 
         {/* Auth Card */}
         <div className="card-glass rounded-2xl p-6 shadow-xl">
-          {/* WordPress SSO Button - Primary CTA */}
-          <div className="mb-6">
-            <Button 
-              onClick={handleWordPressLogin} 
-              className="w-full h-14 text-base font-semibold gap-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-lg hover:shadow-xl transition-all"
-              size="lg"
-              disabled={isWpLoading}
-            >
-              {isWpLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Verbinde...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-5 w-5" />
-                  Mit Trumpetstar-Konto anmelden
-                </>
-              )}
-            </Button>
-            <p className="text-sm text-slate-500 text-center mt-2">
-              Nutze dein bestehendes Konto mit allen Mitgliedschaftsvorteilen
-            </p>
-          </div>
-
           {/* Social Login Buttons */}
           <div className="flex gap-3 mb-6">
             <Button 
@@ -425,6 +389,16 @@ export default function AuthPage() {
                     />
                   </div>
                 </div>
+                <div className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id="rememberMe-magic" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
+                  />
+                  <Label htmlFor="rememberMe-magic" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
+                    Angemeldet bleiben
+                  </Label>
+                </div>
                 <Button 
                   type="submit" 
                   className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md" 
@@ -481,6 +455,16 @@ export default function AuthPage() {
                       disabled={isLoading}
                     />
                   </div>
+                </div>
+                <div className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id="rememberMe-login" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
+                  />
+                  <Label htmlFor="rememberMe-login" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
+                    Angemeldet bleiben
+                  </Label>
                 </div>
                 <Button 
                   type="submit" 
