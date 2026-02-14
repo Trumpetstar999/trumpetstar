@@ -38,7 +38,12 @@ export function TabNavigationProvider({
 export function useTabNavigation() {
   const context = useContext(TabNavigationContext);
   if (context === undefined) {
-    throw new Error('useTabNavigation must be used within a TabNavigationProvider');
+    // Return a safe fallback for pages rendered outside TabNavigationProvider
+    return {
+      activeTab: 'levels' as TabId,
+      setActiveTab: (() => {}) as (tab: TabId) => void,
+      navigateToTab: (() => {}) as (tab: TabId) => void,
+    };
   }
   return context;
 }
