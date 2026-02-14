@@ -33,6 +33,7 @@ interface LocalItem {
   title_cache: string | null;
   duration_mode: 'until_end' | 'timer';
   duration_seconds: number | null;
+  thumbnail?: string | null;
 }
 
 interface LibraryItem {
@@ -163,6 +164,7 @@ export default function SessionBuilderPage() {
       title_cache: lib.title,
       duration_mode: lib.type === 'video' ? 'until_end' : 'timer',
       duration_seconds: lib.type === 'pdf' ? 120 : null,
+      thumbnail: lib.thumbnail,
     };
     setSections(prev => prev.map((s, i) => i === selectedSectionIdx ? { ...s, items: [...s.items, newItem] } : s));
   };
@@ -407,7 +409,7 @@ export default function SessionBuilderPage() {
           {(() => {
             const sc = selectedSection ? getSectionColor(selectedSection.section_key) : null;
             return (
-          <div className={cn("px-5 py-3 border-b border-border flex items-center justify-between", sc && `border-t-2 ${sc.border.replace('border-l-', 'border-t-')} ${sc.bg}`)}>
+          <div className={cn("px-5 py-3 border-b border-border flex items-center justify-between", sc && `border-t-[3px] ${sc.border.replace('border-l-', 'border-t-')} ${sc.bg}`)}>
             <div className="flex items-center gap-2.5">
               {sc && <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', sc.dot)} />}
               <div>
@@ -512,10 +514,10 @@ function SortableSectionItem({ id, title, sectionKey, itemCount, isSelected, onC
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all group border-l-3',
+        'flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all group border-l-[3px]',
         isSelected
           ? `${sc.border} ${sc.bg} shadow-sm`
-          : `border-l-transparent hover:bg-secondary/60`
+          : `${sc.border} border-opacity-30 hover:${sc.bg}`
       )}
       onClick={onClick}
     >
@@ -542,7 +544,7 @@ function SortableSectionItem({ id, title, sectionKey, itemCount, isSelected, onC
       )}
       <span className={cn(
         'text-xs tabular-nums min-w-[20px] text-center rounded-full px-1.5 py-0.5',
-        itemCount > 0 ? 'bg-foreground/10 text-foreground font-medium' : 'text-muted-foreground'
+        itemCount > 0 ? `${sc.bg} ${sc.text} font-semibold` : 'text-muted-foreground'
       )}>
         {itemCount}
       </span>
@@ -573,8 +575,8 @@ function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationCha
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center gap-3 p-3 rounded-2xl card-glass group transition-all border-l-2',
-        isPause ? 'bg-accent/5 border border-accent/20 border-l-accent' : sc.border
+        'flex items-center gap-3 p-3 rounded-2xl card-glass group transition-all border-l-[3px]',
+        isPause ? 'bg-accent/5 border border-accent/20 border-l-accent' : `${sc.border} ${sc.bg}`
       )}
     >
       <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0">
@@ -583,13 +585,19 @@ function SortableItemCard({ id, item, index, sectionKey, onRemove, onDurationCha
 
       {/* Thumbnail or Icon */}
       {isPause ? (
-        <div className="w-12 h-8 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
-          <Timer className="w-4 h-4 text-accent" />
+        <div className="w-14 h-10 rounded-lg flex items-center justify-center shrink-0 bg-accent/10">
+          <Timer className="w-5 h-5 text-accent" />
         </div>
+      ) : item.thumbnail ? (
+        <img
+          src={item.thumbnail}
+          alt=""
+          className="w-14 h-10 rounded-lg object-cover shrink-0 bg-secondary"
+        />
       ) : (
-        <div className={cn('w-12 h-8 rounded-lg flex items-center justify-center shrink-0 overflow-hidden', isVideo ? 'bg-primary/10' : 'bg-gold/10')}>
-          {isVideo && <Video className="w-4 h-4 text-primary" />}
-          {isPdf && <FileText className="w-4 h-4" style={{ color: 'hsl(48, 100%, 40%)' }} />}
+        <div className={cn('w-14 h-10 rounded-lg flex items-center justify-center shrink-0', isVideo ? 'bg-primary/10' : 'bg-gold/10')}>
+          {isVideo && <Video className="w-5 h-5 text-primary" />}
+          {isPdf && <FileText className="w-5 h-5" style={{ color: 'hsl(48, 100%, 40%)' }} />}
         </div>
       )}
 
