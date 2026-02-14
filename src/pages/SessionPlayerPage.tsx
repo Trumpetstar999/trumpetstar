@@ -140,7 +140,7 @@ export default function SessionPlayerPage() {
             <div className="w-full max-w-4xl aspect-video">
               <iframe
                 key={`video-${player.currentIndex}`}
-                src={`https://player.vimeo.com/video/${currentItem.ref_id}?autoplay=1&title=0&byline=0&portrait=0`}
+                src={`https://player.vimeo.com/video/${(currentItem as any).vimeo_video_id || currentItem.ref_id}?autoplay=1&title=0&byline=0&portrait=0`}
                 className="w-full h-full rounded-xl"
                 allow="autoplay; fullscreen"
                 allowFullScreen
