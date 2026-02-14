@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
-import { WordPressMembershipProvider } from "@/hooks/useWordPressMembership";
+
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import Index from "./pages/Index";
@@ -17,7 +17,7 @@ import { ClassroomPage } from "./pages/ClassroomPage";
 import { MusicXMLPage } from "./pages/MusicXMLPage";
 import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
 import PricingPage from "./pages/PricingPage";
-import WordPressCallbackPage from "./pages/WordPressCallbackPage";
+
 import GamePlayPage from "./pages/GamePlayPage";
 import SessionBuilderPage from "./pages/SessionBuilderPage";
 import SessionListPage from "./pages/SessionListPage";
@@ -36,7 +36,6 @@ const App = () => {
     <TooltipProvider>
       <AuthProvider>
         <LanguageProvider>
-          <WordPressMembershipProvider>
             <MembershipProvider>
               <VideoPlayerProvider>
                 <PdfViewerProvider>
@@ -46,7 +45,7 @@ const App = () => {
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route path="/auth" element={<AuthPage />} />
-                      <Route path="/auth/wordpress/callback" element={<WordPressCallbackPage />} />
+                      
                       <Route path="/admin" element={<AdminPage />} />
                       <Route path="/chats" element={<ChatsPage />} />
                       <Route path="/classroom" element={<ClassroomPage />} />
@@ -66,7 +65,6 @@ const App = () => {
                 </PdfViewerProvider>
               </VideoPlayerProvider>
             </MembershipProvider>
-          </WordPressMembershipProvider>
         </LanguageProvider>
       </AuthProvider>
     </TooltipProvider>
