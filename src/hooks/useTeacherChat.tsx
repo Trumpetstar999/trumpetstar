@@ -373,11 +373,26 @@ export function useTeacherStudentChats() {
 
           const profile = profiles?.find(p => p.id === studentId);
 
+          // Sanitize last message preview for special content types
+          let lastMessagePreview = lastMsg?.content || null;
+          if (lastMessagePreview) {
+            try {
+              const parsed = JSON.parse(lastMessagePreview);
+              if (parsed?.type === 'practice_session') {
+                lastMessagePreview = `📋 Übesession: ${parsed.name}`;
+              } else if (parsed?.type === 'level_video') {
+                lastMessagePreview = `🎬 Video: ${parsed.title}`;
+              }
+            } catch {
+              // Not JSON, keep as is
+            }
+          }
+
           chats.push({
             chatId,
             studentId,
             studentProfile: profile || null,
-            lastMessage: lastMsg?.content || null,
+            lastMessage: lastMessagePreview,
             lastMessageTime: lastMsg?.created_at || null,
             unreadCount: unreadCount || 0
           });
