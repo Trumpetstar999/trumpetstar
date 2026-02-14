@@ -279,5 +279,95 @@
     "skillBeginnerDesc": "Estoy empezando",
     "skillIntermediate": "Ya toco",
     "skillIntermediateDesc": "Tengo algo de experiencia"
+  },
+  "sessionCard": {
+    "start": "Iniciar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copySuccess": "¡Sesión copiada a tu lista!",
+    "copyError": "Error al copiar",
+    "notFound": "Sesión no encontrada"
+  },
+  "sessionChat": {
+    "title": "Crear sesión de práctica",
+    "namePlaceholder": "Nombre de la sesión...",
+    "selected": "Seleccionados",
+    "searchVideos": "Buscar videos...",
+    "noVideosFound": "No se encontraron videos",
+    "sendButton": "Enviar sesión ({{count}} videos)"
+  },
+  "classroom": {
+    "createRoom": "Crear nueva sala",
+    "createRoomDesc": "Crea una sala de práctica con video para hasta 6 participantes.",
+    "roomName": "Nombre de la sala (opcional)",
+    "roomNamePlaceholder": "Mi sala de práctica",
+    "visibility": "Visibilidad",
+    "inviteOnly": "Solo por invitación",
+    "inviteOnlyDesc": "Solo usuarios invitados pueden unirse",
+    "friends": "Amigos",
+    "friendsDesc": "Todos tus amigos pueden unirse",
+    "withLink": "Con enlace",
+    "withLinkDesc": "Cualquiera con el enlace puede unirse",
+    "enableRecording": "Activar grabación",
+    "autoRecord": "La sesión se grabará automáticamente",
+    "startRoom": "Iniciar sala"
+  },
+  "recording": {
+    "recordVideo": "Grabar video",
+    "recordVideoDesc": "Graba tu interpretación y guárdala en tu biblioteca.",
+    "cameraError": "No se puede acceder a la cámara. Permite el acceso en tu navegador.",
+    "noVideoSupport": "Tu navegador no soporta grabación de video.",
+    "startError": "Error al iniciar la grabación.",
+    "retry": "Reintentar",
+    "titleOptional": "Título (opcional)",
+    "defaultTitle": "Grabación del {{date}}",
+    "startRecording": "Iniciar grabación",
+    "stopRecording": "Detener grabación",
+    "reRecord": "Grabar de nuevo"
+  },
+  "feedbackWidget": {
+    "title": "Comentarios y Chat",
+    "premiumRequired": "Los comentarios personales son parte de Pro",
+    "unlockPro": "Desbloquear Pro",
+    "new": "nuevo",
+    "videoMessage": "Mensaje de video",
+    "textMessage": "Mensaje de texto",
+    "unreadMessages": "{{count}} mensaje sin leer",
+    "unreadMessages_other": "{{count}} mensajes sin leer",
+    "allRead": "Todo leído",
+    "noChats": "Aún no hay chats",
+    "startChat": "Inicia un chat sobre tus grabaciones",
+    "viewMessages": "Ver mensajes",
+    "openChat": "Abrir chat"
+  },
+  "notesWidget": {
+    "notes": "Notas",
+    "todo": "Tareas",
+    "noNotes": "Sin notas aún",
+    "allDone": "¡Todo hecho! 🎉",
+    "due": "Vence: {{date}}",
+    "newNote": "Nueva nota"
+  },
+  "editProfile": {
+    "title": "Editar Perfil",
+    "description": "Personaliza tu perfil y sube una foto de perfil.",
+    "uploading": "Subiendo...",
+    "changePhoto": "Cambiar foto",
+    "imageOnly": "Por favor selecciona una imagen",
+    "maxSize": "La imagen debe ser de 5MB o menos",
+    "uploadSuccess": "¡Imagen subida!",
+    "uploadError": "Error al subir",
+    "displayName": "Nombre para mostrar",
+    "namePlaceholder": "Tu nombre",
+    "saveSuccess": "¡Perfil guardado!",
+    "saveError": "Error al guardar",
+    "saving": "Guardando..."
+  },
+  "sharedSession": {
+    "notFound": "Sesión no encontrada o no es pública.",
+    "loginRequired": "Inicia sesión para copiar esta sesión",
+    "createCopy": "Crear copia",
+    "copySuccess": "¡Sesión copiada!",
+    "endSession": "¿Finalizar sesión?"
   }
 }

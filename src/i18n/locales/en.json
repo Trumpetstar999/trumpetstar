@@ -279,5 +279,95 @@
     "skillBeginnerDesc": "I'm just starting out",
     "skillIntermediate": "I already play",
     "skillIntermediateDesc": "I have some experience"
+  },
+  "sessionCard": {
+    "start": "Start",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copySuccess": "Session copied to your list!",
+    "copyError": "Copy failed",
+    "notFound": "Session not found"
+  },
+  "sessionChat": {
+    "title": "Create practice session",
+    "namePlaceholder": "Session name...",
+    "selected": "Selected",
+    "searchVideos": "Search videos...",
+    "noVideosFound": "No videos found",
+    "sendButton": "Send session ({{count}} videos)"
+  },
+  "classroom": {
+    "createRoom": "Create new room",
+    "createRoomDesc": "Create a video practice room for up to 6 participants.",
+    "roomName": "Room name (optional)",
+    "roomNamePlaceholder": "My practice room",
+    "visibility": "Visibility",
+    "inviteOnly": "Invite only",
+    "inviteOnlyDesc": "Only invited users can join",
+    "friends": "Friends",
+    "friendsDesc": "All your friends can join",
+    "withLink": "With link",
+    "withLinkDesc": "Anyone with the link can join",
+    "enableRecording": "Enable recording",
+    "autoRecord": "Session will be recorded automatically",
+    "startRoom": "Start room"
+  },
+  "recording": {
+    "recordVideo": "Record video",
+    "recordVideoDesc": "Record yourself playing and save it to your library.",
+    "cameraError": "Camera access denied. Please allow access in your browser.",
+    "noVideoSupport": "Your browser does not support video recording.",
+    "startError": "Error starting recording.",
+    "retry": "Try again",
+    "titleOptional": "Title (optional)",
+    "defaultTitle": "Recording from {{date}}",
+    "startRecording": "Start recording",
+    "stopRecording": "Stop recording",
+    "reRecord": "Re-record"
+  },
+  "feedbackWidget": {
+    "title": "Feedback & Chat",
+    "premiumRequired": "Personal feedback is part of Pro",
+    "unlockPro": "Unlock Pro",
+    "new": "new",
+    "videoMessage": "Video message",
+    "textMessage": "Text message",
+    "unreadMessages": "{{count}} unread message",
+    "unreadMessages_other": "{{count}} unread messages",
+    "allRead": "All read",
+    "noChats": "No chats yet",
+    "startChat": "Start a chat about your recordings",
+    "viewMessages": "View messages",
+    "openChat": "Open chat"
+  },
+  "notesWidget": {
+    "notes": "Notes",
+    "todo": "To-Do",
+    "noNotes": "No notes yet",
+    "allDone": "All done! 🎉",
+    "due": "Due: {{date}}",
+    "newNote": "New note"
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "description": "Customize your profile and upload a profile picture.",
+    "uploading": "Uploading...",
+    "changePhoto": "Change photo",
+    "imageOnly": "Please select an image",
+    "maxSize": "Image must be 5MB or less",
+    "uploadSuccess": "Image uploaded!",
+    "uploadError": "Upload failed",
+    "displayName": "Display name",
+    "namePlaceholder": "Your name",
+    "saveSuccess": "Profile saved!",
+    "saveError": "Error saving",
+    "saving": "Saving..."
+  },
+  "sharedSession": {
+    "notFound": "Session not found or not public.",
+    "loginRequired": "Please log in to copy this session",
+    "createCopy": "Create copy",
+    "copySuccess": "Session copied!",
+    "endSession": "End session?"
   }
 }

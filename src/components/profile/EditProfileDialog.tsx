@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface EditProfileDialogProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface EditProfileDialogProps {
 }
 
 export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: EditProfileDialogProps) {
+  const { t } = useLanguage();
   const [displayName, setDisplayName] = useState(profile.display_name || '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
   const [uploading, setUploading] = useState(false);
@@ -30,15 +32,13 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Bitte wähle ein Bild aus');
+      toast.error(t('editProfile.imageOnly'));
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Das Bild darf maximal 5MB groß sein');
+      toast.error(t('editProfile.maxSize'));
       return;
     }
 
@@ -48,24 +48,21 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
       const fileExt = file.name.split('.').pop();
       const fileName = `${profile.id}/avatar.${fileExt}`;
 
-      // Upload file to storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Add cache buster
       setAvatarUrl(`${publicUrl}?t=${Date.now()}`);
-      toast.success('Bild hochgeladen!');
+      toast.success(t('editProfile.uploadSuccess'));
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Fehler beim Hochladen: ' + error.message);
+      toast.error(`${t('editProfile.uploadError')}: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -85,12 +82,12 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
 
       if (error) throw error;
 
-      toast.success('Profil gespeichert!');
+      toast.success(t('editProfile.saveSuccess'));
       onUpdate();
       onOpenChange(false);
     } catch (error: any) {
       console.error('Save error:', error);
-      toast.error('Fehler beim Speichern: ' + error.message);
+      toast.error(`${t('editProfile.saveError')}: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -105,14 +102,13 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Profil bearbeiten</DialogTitle>
+          <DialogTitle>{t('editProfile.title')}</DialogTitle>
           <DialogDescription>
-            Passe dein Profil an und lade ein Profilbild hoch.
+            {t('editProfile.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 pt-4">
-          {/* Avatar Upload */}
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <Avatar className="w-24 h-24">
@@ -149,33 +145,32 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
-              {uploading ? 'Wird hochgeladen...' : 'Foto ändern'}
+              {uploading ? t('editProfile.uploading') : t('editProfile.changePhoto')}
             </Button>
           </div>
 
-          {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="displayName">Anzeigename</Label>
+            <Label htmlFor="displayName">{t('editProfile.displayName')}</Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Dein Name"
+              placeholder={t('editProfile.namePlaceholder')}
             />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Abbrechen
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Speichern...
+                  {t('editProfile.saving')}
                 </>
               ) : (
-                'Speichern'
+                t('common.save')
               )}
             </Button>
           </div>

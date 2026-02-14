@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { Users, Lock, Link2, UserPlus } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface CreateRoomDialogProps {
   open: boolean;
@@ -19,6 +20,7 @@ interface CreateRoomDialogProps {
 }
 
 export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoomDialogProps) {
+  const { t } = useLanguage();
   const [title, setTitle] = useState('');
   const [visibility, setVisibility] = useState<'invite-only' | 'friends' | 'link-only'>('invite-only');
   const [isRecording, setIsRecording] = useState(false);
@@ -27,13 +29,12 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
     e.preventDefault();
     
     onCreateRoom({
-      title: title.trim() || 'Mein Übungsraum',
+      title: title.trim() || t('classroom.roomNamePlaceholder'),
       visibility,
       maxParticipants: 6,
       isRecording,
     });
 
-    // Reset form
     setTitle('');
     setVisibility('invite-only');
     setIsRecording(false);
@@ -44,24 +45,24 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Neuen Raum erstellen</DialogTitle>
+          <DialogTitle>{t('classroom.createRoom')}</DialogTitle>
           <DialogDescription>
-            Erstelle einen Video-Übungsraum für bis zu 6 Teilnehmer.
+            {t('classroom.createRoomDesc')}
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-2">
-            <Label>Raumname (optional)</Label>
+            <Label>{t('classroom.roomName')}</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Mein Übungsraum"
+              placeholder={t('classroom.roomNamePlaceholder')}
             />
           </div>
 
           <div className="space-y-3">
-            <Label>Sichtbarkeit</Label>
+            <Label>{t('classroom.visibility')}</Label>
             <RadioGroup 
               value={visibility} 
               onValueChange={(v) => setVisibility(v as typeof visibility)}
@@ -72,8 +73,8 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
                 <Label htmlFor="invite-only" className="flex items-center gap-2 cursor-pointer flex-1">
                   <Lock className="w-4 h-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Nur auf Einladung</p>
-                    <p className="text-sm text-muted-foreground">Nur eingeladene Nutzer können beitreten</p>
+                    <p className="font-medium">{t('classroom.inviteOnly')}</p>
+                    <p className="text-sm text-muted-foreground">{t('classroom.inviteOnlyDesc')}</p>
                   </div>
                 </Label>
               </div>
@@ -83,8 +84,8 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
                 <Label htmlFor="friends" className="flex items-center gap-2 cursor-pointer flex-1">
                   <UserPlus className="w-4 h-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Freunde</p>
-                    <p className="text-sm text-muted-foreground">Alle deine Freunde können beitreten</p>
+                    <p className="font-medium">{t('classroom.friends')}</p>
+                    <p className="text-sm text-muted-foreground">{t('classroom.friendsDesc')}</p>
                   </div>
                 </Label>
               </div>
@@ -94,8 +95,8 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
                 <Label htmlFor="link-only" className="flex items-center gap-2 cursor-pointer flex-1">
                   <Link2 className="w-4 h-4 text-muted-foreground" />
                   <div>
-                    <p className="font-medium">Mit Link</p>
-                    <p className="text-sm text-muted-foreground">Jeder mit dem Link kann beitreten</p>
+                    <p className="font-medium">{t('classroom.withLink')}</p>
+                    <p className="text-sm text-muted-foreground">{t('classroom.withLinkDesc')}</p>
                   </div>
                 </Label>
               </div>
@@ -104,18 +105,18 @@ export function CreateRoomDialog({ open, onOpenChange, onCreateRoom }: CreateRoo
 
           <div className="flex items-center justify-between p-3 rounded-lg border border-border">
             <div>
-              <p className="font-medium">Aufnahme aktivieren</p>
-              <p className="text-sm text-muted-foreground">Session wird automatisch aufgenommen</p>
+              <p className="font-medium">{t('classroom.enableRecording')}</p>
+              <p className="text-sm text-muted-foreground">{t('classroom.autoRecord')}</p>
             </div>
             <Switch checked={isRecording} onCheckedChange={setIsRecording} />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Abbrechen
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              Raum starten
+              {t('classroom.startRoom')}
             </Button>
           </div>
         </form>

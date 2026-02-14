@@ -1,12 +1,13 @@
 import { useMembership } from '@/hooks/useMembership';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Lock, ArrowRight, Video, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, es, enUS } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 
 interface ChatSummary {
@@ -21,12 +22,18 @@ export function FeedbackChatWidget() {
   const { canAccessFeature } = useMembership();
   const { navigateToTab } = useTabNavigation();
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [chatSummary, setChatSummary] = useState<ChatSummary | null>(null);
   const [totalUnread, setTotalUnread] = useState(0);
   
   const hasPremium = canAccessFeature('PRO');
+
+  const getDateLocale = () => {
+    const localeMap: Record<string, typeof de> = { de, en: enUS, es };
+    return localeMap[language] || de;
+  };
 
   useEffect(() => {
     if (!user || !hasPremium) {
@@ -36,7 +43,6 @@ export function FeedbackChatWidget() {
 
     async function fetchChatData() {
       try {
-        // Get chats where user is a participant
         const { data: participations } = await supabase
           .from('video_chat_participants')
           .select('chat_id')
@@ -49,7 +55,6 @@ export function FeedbackChatWidget() {
 
         const chatIds = participations.map(p => p.chat_id);
 
-        // Get latest message from any chat
         const { data: messages } = await supabase
           .from('video_chat_messages')
           .select('*')
@@ -57,7 +62,6 @@ export function FeedbackChatWidget() {
           .order('created_at', { ascending: false })
           .limit(1);
 
-        // Count unread messages (not sent by current user)
         const { count: unreadCount } = await supabase
           .from('video_chat_messages')
           .select('*', { count: 'exact', head: true })
@@ -94,32 +98,31 @@ export function FeedbackChatWidget() {
           <Lock className="w-7 h-7 text-white/50" />
         </div>
         
-        <h3 className="text-white font-semibold mb-2">Feedback & Chat</h3>
+        <h3 className="text-white font-semibold mb-2">{t('feedbackWidget.title')}</h3>
         <p className="text-white/70 text-sm mb-4">
-          Persönliches Feedback ist Teil von Pro
+          {t('feedbackWidget.premiumRequired')}
         </p>
         
         <Button
           onClick={() => navigate('/pricing')}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium"
         >
-          Pro freischalten
+          {t('feedbackWidget.unlockPro')}
         </Button>
       </div>
     );
   }
 
-  // Premium user - show actual content
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-blue-400" />
-          <h3 className="text-white font-semibold">Feedback & Chat</h3>
+          <h3 className="text-white font-semibold">{t('feedbackWidget.title')}</h3>
         </div>
         {totalUnread > 0 && (
           <span className="px-2 py-0.5 bg-[#25D366] text-white text-xs font-bold rounded-full">
-            {totalUnread} neu
+            {totalUnread} {t('feedbackWidget.new')}
           </span>
         )}
       </div>
@@ -139,14 +142,14 @@ export function FeedbackChatWidget() {
                 <MessageSquare className="w-4 h-4 text-white/50" />
               )}
               <span className="text-white/70 text-sm">
-                {chatSummary.hasVideo ? 'Video-Nachricht' : 'Textnachricht'}
+                {chatSummary.hasVideo ? t('feedbackWidget.videoMessage') : t('feedbackWidget.textMessage')}
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-white/50 text-xs">
               <Clock className="w-3 h-3" />
               {formatDistanceToNow(new Date(chatSummary.lastMessageAt), { 
                 addSuffix: true, 
-                locale: de 
+                locale: getDateLocale() 
               })}
             </div>
           </div>
@@ -161,13 +164,13 @@ export function FeedbackChatWidget() {
             <div className="flex items-center gap-2 text-[#25D366]">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">
-                {chatSummary.unreadCount} ungelesene Nachricht{chatSummary.unreadCount > 1 ? 'en' : ''}
+                {t('feedbackWidget.unreadMessages', { count: chatSummary.unreadCount })}
               </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 text-white/40">
               <CheckCircle2 className="w-4 h-4" />
-              <span className="text-sm">Alles gelesen</span>
+              <span className="text-sm">{t('feedbackWidget.allRead')}</span>
             </div>
           )}
         </div>
@@ -175,10 +178,10 @@ export function FeedbackChatWidget() {
         <div className="p-4 bg-white/5 rounded-xl mb-4 text-center">
           <MessageSquare className="w-8 h-8 text-white/20 mx-auto mb-2" />
           <p className="text-white/50 text-sm">
-            Noch keine Chats vorhanden
+            {t('feedbackWidget.noChats')}
           </p>
           <p className="text-white/30 text-xs mt-1">
-            Starte einen Chat über deine Aufnahmen
+            {t('feedbackWidget.startChat')}
           </p>
         </div>
       )}
@@ -188,7 +191,7 @@ export function FeedbackChatWidget() {
         variant="ghost"
         className="w-full text-white hover:text-white hover:bg-white/20 bg-white/10 group"
       >
-        {totalUnread > 0 ? 'Nachrichten ansehen' : 'Chat öffnen'}
+        {totalUnread > 0 ? t('feedbackWidget.viewMessages') : t('feedbackWidget.openChat')}
         <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
       </Button>
     </div>

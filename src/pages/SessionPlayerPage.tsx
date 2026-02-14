@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePracticeSessions } from '@/hooks/usePracticeSessions';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import { useSessionPlayer } from '@/hooks/useSessionPlayer';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { SessionVideoPlayer } from '@/components/sessions/SessionVideoPlayer';
 import { cn } from '@/lib/utils';
 
 export default function SessionPlayerPage() {
+  const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { fetchSessionById, markUsed } = usePracticeSessions();
@@ -107,15 +109,15 @@ export default function SessionPlayerPage() {
     player.goNext();
   }, [player]);
 
-  if (!session) return <div className="flex items-center justify-center h-full text-muted-foreground">Laden...</div>;
+  if (!session) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('common.loading')}</div>;
   if (player.phase === 'finished') {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6">
-        <h2 className="text-2xl font-bold">🎺 Session beendet!</h2>
-        <p className="text-muted-foreground">Du hast alle {player.totalItems} Items abgeschlossen.</p>
+        <h2 className="text-2xl font-bold">🎺 {t('practice.sessions.sessionFinished')}</h2>
+        <p className="text-muted-foreground">{t('practice.sessions.allItemsDone')}</p>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => player.restart()}>Nochmal</Button>
-          <Button onClick={() => navigate('/practice/sessions')}>Zurück</Button>
+          <Button variant="outline" onClick={() => player.restart()}>{t('practice.sessions.again')}</Button>
+          <Button onClick={() => navigate('/practice/sessions')}>{t('common.back')}</Button>
         </div>
       </div>
     );
@@ -125,14 +127,14 @@ export default function SessionPlayerPage() {
     <div className="h-full flex flex-col bg-background">
       {/* Top Bar */}
       <div className="flex items-center gap-3 p-3 border-b border-border/50 bg-card/50">
-        <Button variant="ghost" size="icon" onClick={() => { if (confirm('Session beenden?')) navigate('/practice/sessions'); }}>
+        <Button variant="ghost" size="icon" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/practice/sessions'); }}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <h1 className="font-semibold truncate flex-1">{session.name}</h1>
         <span className="text-sm text-muted-foreground">Item {player.currentIndex + 1}/{player.totalItems}</span>
         <span className="text-sm text-muted-foreground">• {currentSection}</span>
         <Button variant="ghost" size="sm" onClick={() => setShowOverview(!showOverview)} className="gap-1">
-          <List className="w-4 h-4" /> Übersicht
+          <List className="w-4 h-4" /> {t('practice.sessions.overview')}
         </Button>
       </div>
 
@@ -147,7 +149,7 @@ export default function SessionPlayerPage() {
                 <Button variant="outline" onClick={() => addPauseTime(30)}>
                   <Plus className="w-4 h-4 mr-1" /> 30s
                 </Button>
-                <Button onClick={() => player.skipPause()}>Überspringen</Button>
+                <Button onClick={() => player.skipPause()}>{t('practice.sessions.skipPause')}</Button>
               </div>
             </div>
           )}
@@ -170,12 +172,12 @@ export default function SessionPlayerPage() {
               </p>
               <div className="flex gap-3 justify-center">
                 <Button variant="outline" onClick={() => setPdfTimerRunning(!pdfTimerRunning)}>
-                  {pdfTimerRunning ? 'Pausieren' : 'Timer starten'}
+                  {pdfTimerRunning ? t('practice.sessions.pauseTimer') : t('practice.sessions.startTimer')}
                 </Button>
                 <Button variant="outline" onClick={() => { setPdfTimerRemaining(currentItem.duration_seconds || 120); setPdfTimerRunning(false); }}>
-                  Reset
+                  {t('practice.sessions.resetTimer')}
                 </Button>
-                <Button onClick={() => player.goNext()}>Weiter</Button>
+                <Button onClick={() => player.goNext()}>{t('common.next')}</Button>
               </div>
             </div>
           )}
@@ -183,13 +185,13 @@ export default function SessionPlayerPage() {
           {player.phase === 'playing' && currentItem?.item_type === 'pause' && (
             <div className="text-center space-y-6">
               <Timer className="w-16 h-16 text-accent mx-auto" />
-              <p className="text-lg text-muted-foreground">Erhol dich…</p>
+              <p className="text-lg text-muted-foreground">{t('practice.sessions.restUp')}</p>
               <p className="text-6xl font-bold tabular-nums">{pauseRemaining}s</p>
               <div className="flex gap-3 justify-center">
                 <Button variant="outline" onClick={() => addPauseTime(30)}>
                   <Plus className="w-4 h-4 mr-1" /> 30s
                 </Button>
-                <Button onClick={() => player.goNext()}>Überspringen</Button>
+                <Button onClick={() => player.goNext()}>{t('practice.sessions.skipPause')}</Button>
               </div>
             </div>
           )}
@@ -198,7 +200,7 @@ export default function SessionPlayerPage() {
         {/* Overview Panel */}
         {showOverview && (
           <div className="w-72 border-l border-border/50 overflow-y-auto bg-card/30 p-3">
-            <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Ablauf</h3>
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">{t('practice.sessions.overview')}</h3>
             {session.sections.map((sec, si) => (
               <div key={sec.id} className="mb-3">
                 <p className="text-xs font-bold text-muted-foreground mb-1">{sec.title}</p>
@@ -230,16 +232,16 @@ export default function SessionPlayerPage() {
       {/* Bottom Controls */}
       <div className="flex items-center justify-center gap-4 p-3 border-t border-border/50 bg-card/50">
         <Button variant="outline" size="sm" onClick={() => player.goPrev()} disabled={player.currentIndex === 0}>
-          <SkipBack className="w-4 h-4 mr-1" /> Zurück
+          <SkipBack className="w-4 h-4 mr-1" /> {t('common.back')}
         </Button>
         <Button variant="outline" size="sm" onClick={() => player.replay()}>
-          <RotateCcw className="w-4 h-4 mr-1" /> Replay
+          <RotateCcw className="w-4 h-4 mr-1" /> {t('practice.sessions.replay')}
         </Button>
         <Button variant="outline" size="sm" onClick={() => player.goNext()}>
-          Weiter <SkipForward className="w-4 h-4 ml-1" />
+          {t('common.next')} <SkipForward className="w-4 h-4 ml-1" />
         </Button>
-        <Button variant="destructive" size="sm" onClick={() => { if (confirm('Session beenden?')) navigate('/practice/sessions'); }}>
-          <X className="w-4 h-4 mr-1" /> Ende
+        <Button variant="destructive" size="sm" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/practice/sessions'); }}>
+          <X className="w-4 h-4 mr-1" /> {t('practice.sessions.endSession')}
         </Button>
       </div>
     </div>

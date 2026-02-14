@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Video, Square, Circle, Download, RotateCcw, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RecordingDialogProps {
   open: boolean;
@@ -15,6 +16,7 @@ interface RecordingDialogProps {
 type RecordingState = 'idle' | 'recording' | 'recorded';
 
 export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogProps) {
+  const { t, language } = useLanguage();
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
@@ -27,6 +29,11 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const getDateLocale = () => {
+    const localeMap: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES' };
+    return localeMap[language] || 'de-DE';
+  };
 
   const stopStream = useCallback(() => {
     if (streamRef.current) {
@@ -52,9 +59,9 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
       }
     } catch (err) {
       console.error('Camera access error:', err);
-      setError('Kamera-Zugriff nicht möglich. Bitte erlaube den Zugriff in deinem Browser.');
+      setError(t('recording.cameraError'));
     }
-  }, []);
+  }, [t]);
 
   const startRecording = useCallback(() => {
     if (!streamRef.current) return;
@@ -62,7 +69,6 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     chunksRef.current = [];
     setDuration(0);
     
-    // Check for supported mimeTypes
     const mimeTypes = [
       'video/webm;codecs=vp9,opus',
       'video/webm;codecs=vp8,opus',
@@ -81,7 +87,7 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     }
     
     if (!selectedMimeType) {
-      setError('Dein Browser unterstützt keine Videoaufnahme.');
+      setError(t('recording.noVideoSupport'));
       return;
     }
     
@@ -113,9 +119,9 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
       }, 1000);
     } catch (err) {
       console.error('MediaRecorder error:', err);
-      setError('Fehler beim Starten der Aufnahme.');
+      setError(t('recording.startError'));
     }
-  }, [stopStream]);
+  }, [stopStream, t]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -137,10 +143,10 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
   const handleSave = useCallback(() => {
     if (!recordedBlob) return;
     
-    const finalTitle = title.trim() || `Aufnahme vom ${new Date().toLocaleDateString('de-DE')}`;
+    const dateStr = new Date().toLocaleDateString(getDateLocale());
+    const finalTitle = title.trim() || t('recording.defaultTitle', { date: dateStr });
     onSave({ title: finalTitle, blob: recordedBlob, duration });
     
-    // Reset state
     if (recordedUrl) {
       URL.revokeObjectURL(recordedUrl);
     }
@@ -150,7 +156,7 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     setTitle('');
     setDuration(0);
     onOpenChange(false);
-  }, [recordedBlob, recordedUrl, title, duration, onSave, onOpenChange]);
+  }, [recordedBlob, recordedUrl, title, duration, onSave, onOpenChange, t, getDateLocale]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -173,7 +179,6 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     };
   }, [open, recordingState, recordedBlob, startCamera, stopStream, recordedUrl]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopStream();
@@ -182,6 +187,8 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
       }
     };
   }, [stopStream, recordedUrl]);
+
+  const dateStr = new Date().toLocaleDateString(getDateLocale());
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -193,9 +200,9 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
     }}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Video aufnehmen</DialogTitle>
+          <DialogTitle>{t('recording.recordVideo')}</DialogTitle>
           <DialogDescription>
-            Nimm dein Spiel auf und speichere es in deiner Bibliothek.
+            {t('recording.recordVideoDesc')}
           </DialogDescription>
         </DialogHeader>
         
@@ -206,7 +213,7 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
                 <Video className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-sm text-muted-foreground">{error}</p>
                 <Button variant="outline" className="mt-4" onClick={startCamera}>
-                  Erneut versuchen
+                  {t('recording.retry')}
                 </Button>
               </div>
             </div>
@@ -236,11 +243,11 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
 
           {recordingState === 'recorded' && (
             <div className="space-y-2">
-              <Label>Titel (optional)</Label>
+              <Label>{t('recording.titleOptional')}</Label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={`Aufnahme vom ${new Date().toLocaleDateString('de-DE')}`}
+                placeholder={t('recording.defaultTitle', { date: dateStr })}
               />
             </div>
           )}
@@ -253,7 +260,7 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
                 disabled={!!error}
               >
                 <Circle className="w-4 h-4" />
-                Aufnahme starten
+                {t('recording.startRecording')}
               </Button>
             )}
             
@@ -264,7 +271,7 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
                 className="gap-2"
               >
                 <Square className="w-4 h-4" />
-                Aufnahme beenden
+                {t('recording.stopRecording')}
               </Button>
             )}
             
@@ -276,14 +283,14 @@ export function RecordingDialog({ open, onOpenChange, onSave }: RecordingDialogP
                   className="gap-2"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Neu aufnehmen
+                  {t('recording.reRecord')}
                 </Button>
                 <Button 
                   onClick={handleSave} 
                   className="gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  Speichern
+                  {t('common.save')}
                 </Button>
               </>
             )}

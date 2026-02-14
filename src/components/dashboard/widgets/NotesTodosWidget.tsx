@@ -4,14 +4,21 @@ import { FileText, CheckSquare, Plus, Circle, CheckCircle } from 'lucide-react';
 import { mockJournalEntries, mockTodos } from '@/data/mockData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function NotesTodosWidget() {
   const { navigateToTab } = useTabNavigation();
+  const { t, language } = useLanguage();
   const entries = mockJournalEntries.slice(0, 2);
   const todos = mockTodos.filter(t => !t.completed).slice(0, 3);
 
+  const getDateLocale = () => {
+    const localeMap: Record<string, string> = { de: 'de-DE', en: 'en-US', es: 'es-ES' };
+    return localeMap[language] || 'de-DE';
+  };
+
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('de-DE', {
+    return new Date(dateStr).toLocaleDateString(getDateLocale(), {
       day: 'numeric',
       month: 'short',
     });
@@ -46,14 +53,14 @@ export function NotesTodosWidget() {
             className="flex-1 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 rounded-lg"
           >
             <FileText className="w-4 h-4 mr-2" />
-            Notizen
+            {t('notesWidget.notes')}
           </TabsTrigger>
           <TabsTrigger 
             value="todos"
             className="flex-1 data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 rounded-lg"
           >
             <CheckSquare className="w-4 h-4 mr-2" />
-            To-Do
+            {t('notesWidget.todo')}
           </TabsTrigger>
         </TabsList>
 
@@ -87,7 +94,7 @@ export function NotesTodosWidget() {
           ) : (
             <div className="py-6 text-center">
               <FileText className="w-8 h-8 mx-auto mb-2 text-white/40" />
-              <p className="text-white/70 text-sm">Keine Notizen vorhanden</p>
+              <p className="text-white/70 text-sm">{t('notesWidget.noNotes')}</p>
             </div>
           )}
         </TabsContent>
@@ -106,7 +113,7 @@ export function NotesTodosWidget() {
                     <p className="text-white text-sm">{todo.title}</p>
                     {todo.dueDate && (
                       <p className="text-white/60 text-xs mt-1">
-                        Fällig: {formatDate(todo.dueDate)}
+                        {t('notesWidget.due', { date: formatDate(todo.dueDate) })}
                       </p>
                     )}
                   </div>
@@ -116,7 +123,7 @@ export function NotesTodosWidget() {
           ) : (
             <div className="py-6 text-center">
               <CheckSquare className="w-8 h-8 mx-auto mb-2 text-white/40" />
-              <p className="text-white/70 text-sm">Alles erledigt! 🎉</p>
+              <p className="text-white/70 text-sm">{t('notesWidget.allDone')}</p>
             </div>
           )}
         </TabsContent>
@@ -129,7 +136,7 @@ export function NotesTodosWidget() {
         className="w-full mt-4 text-white hover:text-white hover:bg-white/20 bg-white/10"
       >
         <Plus className="w-4 h-4 mr-2" />
-        Neue Notiz
+        {t('notesWidget.newNote')}
       </Button>
     </div>
   );
