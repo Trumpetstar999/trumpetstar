@@ -34,7 +34,7 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
   };
 
   const handlePlay = () => {
-    navigate(`/practice/session/${data.sessionId}/play`);
+    navigate(`/practice/sessions/${data.sessionId}/play`);
   };
 
   const handleClone = async () => {
