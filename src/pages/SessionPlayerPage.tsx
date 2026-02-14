@@ -5,6 +5,7 @@ import { useSessionPlayer } from '@/hooks/useSessionPlayer';
 import { Button } from '@/components/ui/button';
 import { SessionWithDetails } from '@/types/sessions';
 import { ArrowLeft, SkipBack, RotateCcw, SkipForward, FastForward, X, List, Video, FileText, Timer, Plus } from 'lucide-react';
+import { SessionVideoPlayer } from '@/components/sessions/SessionVideoPlayer';
 import { cn } from '@/lib/utils';
 
 export default function SessionPlayerPage() {
@@ -137,18 +138,12 @@ export default function SessionPlayerPage() {
           )}
 
           {player.phase === 'playing' && currentItem?.item_type === 'vimeo_video' && (
-            <div className="w-full max-w-4xl aspect-video">
-              <iframe
-                key={`video-${player.currentIndex}`}
-                src={`https://player.vimeo.com/video/${(currentItem as any).vimeo_video_id || currentItem.ref_id}?autoplay=1&title=0&byline=0&portrait=0`}
-                className="w-full h-full rounded-xl"
-                allow="autoplay; fullscreen"
-                allowFullScreen
-              />
-              <p className="text-center text-sm text-muted-foreground mt-2">
-                {currentItem.title_cache} — spielt bis Ende, dann automatisch weiter
-              </p>
-            </div>
+            <SessionVideoPlayer
+              key={`video-${player.currentIndex}`}
+              vimeoVideoId={(currentItem as any).vimeo_video_id || currentItem.ref_id || ''}
+              title={currentItem.title_cache || undefined}
+              onEnded={handleVideoEnd}
+            />
           )}
 
           {player.phase === 'playing' && currentItem?.item_type === 'pdf' && (
