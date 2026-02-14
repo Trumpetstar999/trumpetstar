@@ -29,6 +29,7 @@ import { FeedbackChatWidget } from '@/components/dashboard/widgets/FeedbackChatW
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
 import { StatisticsWidget } from '@/components/dashboard/widgets/StatisticsWidget';
 import { GameHighscoreWidget } from '@/components/dashboard/widgets/GameHighscoreWidget';
+import { PracticeSessionsWidget } from '@/components/dashboard/widgets/PracticeSessionsWidget';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 function WidgetContent({ id }: { id: WidgetId }) {
@@ -51,6 +52,8 @@ function WidgetContent({ id }: { id: WidgetId }) {
       return <StatisticsWidget />;
     case 'game-highscore':
       return <GameHighscoreWidget />;
+    case 'practice-sessions':
+      return <PracticeSessionsWidget />;
     default:
       return <div className="text-white/50 text-center py-8">Widget kommt bald...</div>;
   }
@@ -76,6 +79,7 @@ export function ProfilePage() {
       'recent-videos': 'recentVideos',
       'weekly-goals': 'weeklyGoals',
       'game-highscore': 'gameHighscore',
+      'practice-sessions': 'practiceSessions',
     };
     return t(`widgets.${keyMap[id] || id}`);
   };
