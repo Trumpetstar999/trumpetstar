@@ -265,11 +265,14 @@ export default function SessionBuilderPage() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-lg font-bold text-foreground tracking-tight">
-            {editId ? 'Session bearbeiten' : 'Neue Übesession'}
-          </h1>
-          <p className="text-xs text-muted-foreground">
+        <div className="flex-1 min-w-0">
+          <input
+            value={sessionName}
+            onChange={e => setSessionName(e.target.value)}
+            placeholder={editId ? 'Session-Name…' : 'Neue Übesession…'}
+            className="bg-transparent text-lg font-bold text-foreground tracking-tight w-full outline-none placeholder:text-muted-foreground/60 border-b border-transparent focus:border-primary/40 transition-colors pb-0.5"
+          />
+          <p className="text-xs text-muted-foreground mt-0.5">
             {totalItems} {totalItems === 1 ? 'Item' : 'Items'} in {sections.length} Rubriken
           </p>
         </div>
@@ -467,15 +470,7 @@ export default function SessionBuilderPage() {
 
       {/* Bottom Settings Bar */}
       <div className="glass-strong px-5 py-3 flex items-center gap-6">
-        <div className="flex items-center gap-3 flex-1 min-w-[200px]">
-          <label className="text-sm font-medium text-foreground whitespace-nowrap">Session Name</label>
-          <Input
-            value={sessionName}
-            onChange={e => setSessionName(e.target.value)}
-            placeholder="z.B. Tägliches Warmup"
-            className="h-10 max-w-sm bg-secondary border-border text-foreground placeholder:text-muted-foreground rounded-xl"
-          />
-        </div>
+        <div className="flex-1" />
         <div className="flex items-center gap-3">
           <label className="text-sm text-foreground whitespace-nowrap">Auto-Pause</label>
           <Switch checked={breakEnabled} onCheckedChange={setBreakEnabled} />
