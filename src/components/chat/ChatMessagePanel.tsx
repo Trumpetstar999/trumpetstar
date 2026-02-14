@@ -9,6 +9,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { VideoRecordDialog } from './VideoRecordDialog';
+import { SessionMessageCard, isSessionContent } from './SessionMessageCard';
+import { LevelVideoMessageCard, isLevelVideoContent } from './LevelVideoMessageCard';
 import { Send, Video, Clock, Play, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -137,8 +139,11 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
               Noch keine Nachrichten. Starte die Konversation!
             </div>
           ) : (
-            messages.map((message) => {
+              messages.map((message) => {
               const isOwnMessage = message.sender_user_id === user?.id;
+              const sessionData = message.content ? isSessionContent(message.content) : null;
+              const levelVideoData = message.content ? isLevelVideoContent(message.content) : null;
+              const isSpecialCard = !!sessionData || !!levelVideoData;
 
               return (
                 <div
@@ -158,13 +163,18 @@ export function ChatMessagePanel({ chat, currentVideoTime, onSeekToTime }: ChatM
                   <div className={cn('max-w-[75%] space-y-1', isOwnMessage && 'items-end')}>
                     <div
                       className={cn(
-                        'rounded-2xl px-4 py-2',
+                        'rounded-2xl',
+                        isSpecialCard ? 'p-1 overflow-hidden' : 'px-4 py-2',
                         isOwnMessage
                           ? 'bg-primary text-primary-foreground rounded-br-md'
                           : 'bg-muted rounded-bl-md'
                       )}
                     >
-                      {message.message_type === 'marker' ? (
+                      {sessionData ? (
+                        <SessionMessageCard data={sessionData} isOwnMessage={isOwnMessage} />
+                      ) : levelVideoData ? (
+                        <LevelVideoMessageCard data={levelVideoData} />
+                      ) : message.message_type === 'marker' ? (
                         <button
                           onClick={() => onSeekToTime(message.timestamp_seconds!)}
                           className={cn(

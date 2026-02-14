@@ -11,6 +11,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { SessionMessageCard, isSessionContent } from './SessionMessageCard';
+import { LevelVideoMessageCard, isLevelVideoContent } from './LevelVideoMessageCard';
 
 interface TeacherStudentListProps {
   isOpen: boolean;
@@ -168,11 +170,10 @@ function TeacherChatView({ student, onBack, onClose, embedded = false }: Teacher
   // Fetch messages
   const fetchMessages = async () => {
     try {
-      const { data, error } = await supabase
+    const { data, error } = await supabase
         .from('video_chat_messages')
         .select('*')
         .eq('chat_id', student.chatId)
-        .eq('message_type', 'text')
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -383,27 +384,44 @@ function TeacherChatView({ student, onBack, onClose, embedded = false }: Teacher
                           </AvatarFallback>
                         </Avatar>
                       )}
-                      <div
-                        className={cn(
-                          'max-w-[75%] rounded-lg px-3 py-2 shadow-sm relative transition-transform hover:scale-[1.02]',
-                          isTeacher 
-                            ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
-                            : 'bg-white text-[#111B21] rounded-tl-none'
-                        )}
-                      >
-                        <div 
-                          className={cn('absolute top-0 w-3 h-3', isTeacher ? 'right-[-6px]' : 'left-[-6px]')}
-                          style={{ 
-                            borderLeft: isTeacher ? '12px solid #DCF8C6' : 'none', 
-                            borderRight: !isTeacher ? '12px solid white' : 'none',
-                            borderTop: '6px solid transparent',
-                            borderBottom: '6px solid transparent'
-                          }}
-                        />
-                        <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
-                          {message.content}
-                        </p>
-                      </div>
+                      {(() => {
+                        const sessionData = message.content ? isSessionContent(message.content) : null;
+                        const levelVideoData = message.content ? isLevelVideoContent(message.content) : null;
+                        const isSpecialMessage = !!sessionData || !!levelVideoData || message.message_type === 'video';
+
+                        return (
+                          <div
+                            className={cn(
+                              'max-w-[80%] rounded-lg shadow-sm relative overflow-hidden',
+                              isTeacher 
+                                ? 'bg-[#DCF8C6] text-[#111B21] rounded-tr-none' 
+                                : 'bg-white text-[#111B21] rounded-tl-none',
+                              isSpecialMessage ? 'p-1' : 'px-3 py-2'
+                            )}
+                          >
+                            {!isSpecialMessage && (
+                              <div 
+                                className={cn('absolute top-0 w-3 h-3', isTeacher ? 'right-[-6px]' : 'left-[-6px]')}
+                                style={{ 
+                                  borderLeft: isTeacher ? '12px solid #DCF8C6' : 'none', 
+                                  borderRight: !isTeacher ? '12px solid white' : 'none',
+                                  borderTop: '6px solid transparent',
+                                  borderBottom: '6px solid transparent'
+                                }}
+                              />
+                            )}
+                            {sessionData ? (
+                              <SessionMessageCard data={sessionData} isOwnMessage={isTeacher} />
+                            ) : levelVideoData ? (
+                              <LevelVideoMessageCard data={levelVideoData} />
+                            ) : (
+                              <p className="text-[14px] leading-[1.4] whitespace-pre-wrap break-words">
+                                {message.content}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 );
