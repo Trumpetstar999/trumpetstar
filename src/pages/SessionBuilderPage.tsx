@@ -260,7 +260,7 @@ export default function SessionBuilderPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/practice/sessions')}
           className="text-foreground hover:bg-secondary rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />
