@@ -7,11 +7,13 @@ import { SessionWithDetails } from '@/types/sessions';
 import { ArrowLeft, Copy, Video, FileText, Timer, Clock, Music } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export default function SharedSessionPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { fetchSessionBySlug, createSession } = usePracticeSessions();
   const [session, setSession] = useState<SessionWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function SharedSessionPage() {
 
   const handleCopy = async () => {
     if (!session || !user) {
-      toast({ title: 'Bitte melde dich an, um die Session zu kopieren', variant: 'destructive' });
+      toast({ title: t('sharedSession.loginRequired'), variant: 'destructive' });
       return;
     }
     setCopying(true);
@@ -47,21 +49,21 @@ export default function SharedSessionPage() {
           })),
         })),
       });
-      toast({ title: 'Session kopiert!' });
+      toast({ title: t('sharedSession.copySuccess') });
       navigate('/practice/sessions');
     } catch (e: any) {
-      toast({ title: 'Fehler', description: e.message, variant: 'destructive' });
+      toast({ title: t('common.error'), description: e.message, variant: 'destructive' });
     } finally {
       setCopying(false);
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center h-full text-muted-foreground">Laden...</div>;
+  if (loading) return <div className="flex items-center justify-center h-full text-muted-foreground">{t('common.loading')}</div>;
   if (!session) return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <Music className="w-12 h-12 text-muted-foreground/50" />
-      <p className="text-muted-foreground">Session nicht gefunden oder nicht öffentlich.</p>
-      <Button variant="outline" onClick={() => navigate('/')}>Zurück</Button>
+      <p className="text-muted-foreground">{t('sharedSession.notFound')}</p>
+      <Button variant="outline" onClick={() => navigate('/')}>{t('common.back')}</Button>
     </div>
   );
 
@@ -81,7 +83,7 @@ export default function SharedSessionPage() {
           </p>
         </div>
         <Button onClick={handleCopy} disabled={copying} className="gap-2">
-          <Copy className="w-4 h-4" /> Kopie erstellen
+          <Copy className="w-4 h-4" /> {t('sharedSession.createCopy')}
         </Button>
       </div>
 

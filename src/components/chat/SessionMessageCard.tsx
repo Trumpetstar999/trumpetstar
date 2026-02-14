@@ -4,6 +4,7 @@ import { Play, Copy, Music, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { toast } from 'sonner';
 
 export interface SessionMessageData {
@@ -22,6 +23,7 @@ interface SessionMessageCardProps {
 export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [cloning, setCloning] = useState(false);
   const [cloned, setCloned] = useState(false);
 
@@ -41,14 +43,13 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
     if (!user || cloning) return;
     setCloning(true);
     try {
-      // Fetch the session details
       const { data: sessions } = await supabase
         .from('practice_sessions')
         .select('*')
         .eq('id', data.sessionId)
         .limit(1);
 
-      if (!sessions || sessions.length === 0) throw new Error('Session nicht gefunden');
+      if (!sessions || sessions.length === 0) throw new Error(t('sessionCard.notFound'));
       const session = sessions[0];
 
       const { data: sections } = await supabase
@@ -63,7 +64,6 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
         .eq('session_id', session.id)
         .order('order_index');
 
-      // Create clone owned by current user
       const { data: newSession, error: sessionErr } = await supabase
         .from('practice_sessions')
         .insert({
@@ -77,7 +77,6 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
 
       if (sessionErr) throw sessionErr;
 
-      // Clone sections and items
       for (const sec of (sections || [])) {
         const { data: newSec, error: secErr } = await supabase
           .from('practice_session_sections')
@@ -110,10 +109,10 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
       }
 
       setCloned(true);
-      toast.success('Session in deine Liste kopiert!');
+      toast.success(t('sessionCard.copySuccess'));
     } catch (err) {
       console.error('Clone error:', err);
-      toast.error('Kopieren fehlgeschlagen');
+      toast.error(t('sessionCard.copyError'));
     } finally {
       setCloning(false);
     }
@@ -121,7 +120,6 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
 
   return (
     <div className="w-[260px] rounded-lg overflow-hidden">
-      {/* Header */}
       <div className="bg-gradient-to-r from-[#075E54] to-[#128C7E] p-3 flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
           <Music className="w-5 h-5 text-white" />
@@ -134,7 +132,6 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
         </div>
       </div>
 
-      {/* Actions */}
       <div className="bg-white p-2 flex gap-2">
         <Button
           size="sm"
@@ -142,7 +139,7 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
           className="flex-1 bg-[#25D366] hover:bg-[#1DAF5A] text-white text-xs h-8"
         >
           <Play className="w-3.5 h-3.5 mr-1" fill="currentColor" />
-          Starten
+          {t('sessionCard.start')}
         </Button>
         {!isOwnMessage && (
           <Button
@@ -159,7 +156,7 @@ export function SessionMessageCard({ data, isOwnMessage }: SessionMessageCardPro
             ) : (
               <Copy className="w-3.5 h-3.5 mr-1" />
             )}
-            {cloned ? 'Kopiert' : 'Kopieren'}
+            {cloned ? t('sessionCard.copied') : t('sessionCard.copy')}
           </Button>
         )}
       </div>

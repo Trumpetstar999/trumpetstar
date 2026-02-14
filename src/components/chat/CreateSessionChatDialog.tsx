@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Plus, X, Music, Film, Search, GripVertical } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface VideoItem {
   id: string;
@@ -30,6 +31,7 @@ interface CreateSessionChatDialogProps {
 }
 
 export function CreateSessionChatDialog({ open, onOpenChange, onSend, sending }: CreateSessionChatDialogProps) {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -104,24 +106,22 @@ export function CreateSessionChatDialog({ open, onOpenChange, onSend, sending }:
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Music className="w-5 h-5 text-[#25D366]" />
-            Übesession erstellen
+            {t('sessionChat.title')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 min-h-0 flex flex-col">
-          {/* Session Name */}
           <Input
-            placeholder="Name der Übesession..."
+            placeholder={t('sessionChat.namePlaceholder')}
             value={name}
             onChange={e => setName(e.target.value)}
             className="font-medium"
           />
 
-          {/* Selected Items */}
           {selectedItems.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground font-medium">
-                Ausgewählt ({selectedItems.length})
+                {t('sessionChat.selected')} ({selectedItems.length})
               </p>
               <div className="space-y-1 max-h-[120px] overflow-y-auto">
                 {selectedItems.map((item, index) => (
@@ -143,18 +143,16 @@ export function CreateSessionChatDialog({ open, onOpenChange, onSend, sending }:
             </div>
           )}
 
-          {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Videos durchsuchen..."
+              placeholder={t('sessionChat.searchVideos')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9"
             />
           </div>
 
-          {/* Video Library */}
           <ScrollArea className="flex-1 min-h-0 max-h-[250px] border rounded-lg">
             {loadingVideos ? (
               <div className="flex items-center justify-center py-8">
@@ -198,13 +196,12 @@ export function CreateSessionChatDialog({ open, onOpenChange, onSend, sending }:
                   );
                 })}
                 {filteredVideos.length === 0 && (
-                  <p className="text-center text-sm text-muted-foreground py-4">Keine Videos gefunden</p>
+                  <p className="text-center text-sm text-muted-foreground py-4">{t('sessionChat.noVideosFound')}</p>
                 )}
               </div>
             )}
           </ScrollArea>
 
-          {/* Send Button */}
           <Button
             onClick={handleSend}
             disabled={!canSend}
@@ -215,7 +212,7 @@ export function CreateSessionChatDialog({ open, onOpenChange, onSend, sending }:
             ) : (
               <Music className="w-4 h-4 mr-2" />
             )}
-            Session senden ({selectedItems.length} Videos)
+            {t('sessionChat.sendButton', { count: selectedItems.length })}
           </Button>
         </div>
       </DialogContent>

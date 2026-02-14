@@ -279,5 +279,95 @@
     "skillBeginnerDesc": "Ich fange gerade erst an",
     "skillIntermediate": "Ich spiele bereits",
     "skillIntermediateDesc": "Ich habe schon Erfahrung"
+  },
+  "sessionCard": {
+    "start": "Starten",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "copySuccess": "Session in deine Liste kopiert!",
+    "copyError": "Kopieren fehlgeschlagen",
+    "notFound": "Session nicht gefunden"
+  },
+  "sessionChat": {
+    "title": "Übesession erstellen",
+    "namePlaceholder": "Name der Übesession...",
+    "selected": "Ausgewählt",
+    "searchVideos": "Videos durchsuchen...",
+    "noVideosFound": "Keine Videos gefunden",
+    "sendButton": "Session senden ({{count}} Videos)"
+  },
+  "classroom": {
+    "createRoom": "Neuen Raum erstellen",
+    "createRoomDesc": "Erstelle einen Video-Übungsraum für bis zu 6 Teilnehmer.",
+    "roomName": "Raumname (optional)",
+    "roomNamePlaceholder": "Mein Übungsraum",
+    "visibility": "Sichtbarkeit",
+    "inviteOnly": "Nur auf Einladung",
+    "inviteOnlyDesc": "Nur eingeladene Nutzer können beitreten",
+    "friends": "Freunde",
+    "friendsDesc": "Alle deine Freunde können beitreten",
+    "withLink": "Mit Link",
+    "withLinkDesc": "Jeder mit dem Link kann beitreten",
+    "enableRecording": "Aufnahme aktivieren",
+    "autoRecord": "Session wird automatisch aufgenommen",
+    "startRoom": "Raum starten"
+  },
+  "recording": {
+    "recordVideo": "Video aufnehmen",
+    "recordVideoDesc": "Nimm dein Spiel auf und speichere es in deiner Bibliothek.",
+    "cameraError": "Kamera-Zugriff nicht möglich. Bitte erlaube den Zugriff in deinem Browser.",
+    "noVideoSupport": "Dein Browser unterstützt keine Videoaufnahme.",
+    "startError": "Fehler beim Starten der Aufnahme.",
+    "retry": "Erneut versuchen",
+    "titleOptional": "Titel (optional)",
+    "defaultTitle": "Aufnahme vom {{date}}",
+    "startRecording": "Aufnahme starten",
+    "stopRecording": "Aufnahme beenden",
+    "reRecord": "Neu aufnehmen"
+  },
+  "feedbackWidget": {
+    "title": "Feedback & Chat",
+    "premiumRequired": "Persönliches Feedback ist Teil von Pro",
+    "unlockPro": "Pro freischalten",
+    "new": "neu",
+    "videoMessage": "Video-Nachricht",
+    "textMessage": "Textnachricht",
+    "unreadMessages": "{{count}} ungelesene Nachricht",
+    "unreadMessages_other": "{{count}} ungelesene Nachrichten",
+    "allRead": "Alles gelesen",
+    "noChats": "Noch keine Chats vorhanden",
+    "startChat": "Starte einen Chat über deine Aufnahmen",
+    "viewMessages": "Nachrichten ansehen",
+    "openChat": "Chat öffnen"
+  },
+  "notesWidget": {
+    "notes": "Notizen",
+    "todo": "To-Do",
+    "noNotes": "Keine Notizen vorhanden",
+    "allDone": "Alles erledigt! 🎉",
+    "due": "Fällig: {{date}}",
+    "newNote": "Neue Notiz"
+  },
+  "editProfile": {
+    "title": "Profil bearbeiten",
+    "description": "Passe dein Profil an und lade ein Profilbild hoch.",
+    "uploading": "Wird hochgeladen...",
+    "changePhoto": "Foto ändern",
+    "imageOnly": "Bitte wähle ein Bild aus",
+    "maxSize": "Das Bild darf maximal 5MB groß sein",
+    "uploadSuccess": "Bild hochgeladen!",
+    "uploadError": "Fehler beim Hochladen",
+    "displayName": "Anzeigename",
+    "namePlaceholder": "Dein Name",
+    "saveSuccess": "Profil gespeichert!",
+    "saveError": "Fehler beim Speichern",
+    "saving": "Speichern..."
+  },
+  "sharedSession": {
+    "notFound": "Session nicht gefunden oder nicht öffentlich.",
+    "loginRequired": "Bitte melde dich an, um die Session zu kopieren",
+    "createCopy": "Kopie erstellen",
+    "copySuccess": "Session kopiert!",
+    "endSession": "Session beenden?"
   }
 }
