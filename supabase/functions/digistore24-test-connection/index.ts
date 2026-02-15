@@ -18,13 +18,17 @@ Deno.serve(async (req) => {
   // Auth check
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const token = authHeader.replace("Bearer ", "");
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
   if (claimsError || !claimsData?.claims) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
   const userId = claimsData.claims.sub;
 
@@ -37,7 +41,9 @@ Deno.serve(async (req) => {
     .maybeSingle();
 
   if (!roleData) {
-    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   const apiKey = Deno.env.get("DIGISTORE24_API_KEY");
@@ -48,11 +54,20 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const url = `https://www.digistore24.com/api/v1/listProducts?token=${encodeURIComponent(apiKey)}&items_per_page=1`;
-    const res = await fetch(url);
+    const res = await fetch(
+      "https://www.digistore24.com/api/call/listProducts?items_per_page=1",
+      {
+        method: "GET",
+        headers: {
+          "X-DS-API-KEY": apiKey,
+          Accept: "application/json",
+        },
+      }
+    );
+
     const json = await res.json();
 
-    if (json.result === "success" || json.retval) {
+    if (json.result === "success") {
       return new Response(JSON.stringify({
         valid: true,
         message: "Verbindung erfolgreich",
