@@ -26,3 +26,9 @@ verify_jwt = false
 
 [functions.digistore24-import]
 verify_jwt = false
+
+[functions.digistore24-sync]
+verify_jwt = false
+
+[functions.digistore24-test-connection]
+verify_jwt = false

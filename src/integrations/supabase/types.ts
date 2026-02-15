@@ -300,6 +300,57 @@ export type Database = {
         }
         Relationships: []
       }
+      digistore24_customers: {
+        Row: {
+          company: string | null
+          country: string | null
+          created_at: string
+          digistore_customer_id: string | null
+          email: string
+          first_name: string | null
+          first_purchase_at: string | null
+          id: string
+          last_name: string | null
+          last_purchase_at: string | null
+          phone: string | null
+          total_purchases: number
+          total_revenue: number
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          digistore_customer_id?: string | null
+          email: string
+          first_name?: string | null
+          first_purchase_at?: string | null
+          id?: string
+          last_name?: string | null
+          last_purchase_at?: string | null
+          phone?: string | null
+          total_purchases?: number
+          total_revenue?: number
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          digistore_customer_id?: string | null
+          email?: string
+          first_name?: string | null
+          first_purchase_at?: string | null
+          id?: string
+          last_name?: string | null
+          last_purchase_at?: string | null
+          phone?: string | null
+          total_purchases?: number
+          total_revenue?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       digistore24_entitlements: {
         Row: {
           active: boolean
@@ -547,6 +598,98 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      digistore24_sync_log: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          records_imported: number
+          records_updated: number
+          started_at: string
+          status: string
+          sync_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_imported?: number
+          records_updated?: number
+          started_at?: string
+          status?: string
+          sync_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_imported?: number
+          records_updated?: number
+          started_at?: string
+          status?: string
+          sync_type?: string
+        }
+        Relationships: []
+      }
+      digistore24_transactions: {
+        Row: {
+          amount: number | null
+          created_at: string
+          currency: string
+          customer_id: string | null
+          digistore_transaction_id: string
+          id: string
+          pay_date: string | null
+          payment_method: string | null
+          product_id: string | null
+          product_name: string | null
+          raw_data: Json | null
+          refund_date: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          digistore_transaction_id: string
+          id?: string
+          pay_date?: string | null
+          payment_method?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          raw_data?: Json | null
+          refund_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          digistore_transaction_id?: string
+          id?: string
+          pay_date?: string | null
+          payment_method?: string | null
+          product_id?: string | null
+          product_name?: string | null
+          raw_data?: Json | null
+          refund_date?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "digistore24_transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "digistore24_customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       drum_beats: {
         Row: {

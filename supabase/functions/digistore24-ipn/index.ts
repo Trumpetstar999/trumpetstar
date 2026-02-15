@@ -162,7 +162,8 @@ async function processIpnEvent(
   supabase: any,
   eventId: string,
   normalized: NormalizedPayload,
-  settings: { appBaseUrl: string; defaultLocale: string }
+  settings: { appBaseUrl: string; defaultLocale: string },
+  rawPayload: Record<string, any>
 ): Promise<void> {
   console.log(`Processing IPN event ${eventId}:`, normalized.event_type);
   
@@ -389,6 +390,75 @@ async function processIpnEvent(
       }
     }
     
+    // 7. Upsert into digistore24_customers
+    try {
+      const customerData: Record<string, any> = {
+        email: normalized.email,
+        first_name: normalized.first_name || null,
+        last_name: normalized.last_name || null,
+      };
+
+      const { data: existingCust } = await supabase
+        .from('digistore24_customers')
+        .select('id, total_purchases, total_revenue')
+        .eq('email', normalized.email)
+        .maybeSingle();
+
+      if (existingCust) {
+        const newPurchases = ['PURCHASE'].includes(normalized.event_type) ? 1 : 0;
+        const newRevenue = ['PURCHASE', 'RENEWAL'].includes(normalized.event_type) ? (normalized.amount || 0) : 0;
+        await supabase
+          .from('digistore24_customers')
+          .update({
+            ...customerData,
+            total_purchases: existingCust.total_purchases + newPurchases,
+            total_revenue: parseFloat(String(existingCust.total_revenue)) + newRevenue,
+            last_purchase_at: new Date().toISOString(),
+          })
+          .eq('id', existingCust.id);
+      } else {
+        await supabase
+          .from('digistore24_customers')
+          .insert({
+            ...customerData,
+            total_purchases: ['PURCHASE'].includes(normalized.event_type) ? 1 : 0,
+            total_revenue: ['PURCHASE', 'RENEWAL'].includes(normalized.event_type) ? (normalized.amount || 0) : 0,
+            first_purchase_at: new Date().toISOString(),
+            last_purchase_at: new Date().toISOString(),
+          });
+      }
+
+      // 8. Upsert into digistore24_transactions
+      const { data: cust } = await supabase
+        .from('digistore24_customers')
+        .select('id')
+        .eq('email', normalized.email)
+        .maybeSingle();
+
+      const txStatus = normalized.event_type === 'REFUND' ? 'refunded' 
+        : normalized.event_type === 'CHARGEBACK' ? 'chargeback'
+        : normalized.event_type === 'CANCELLATION' ? 'cancelled'
+        : 'completed';
+
+      await supabase
+        .from('digistore24_transactions')
+        .upsert({
+          digistore_transaction_id: normalized.order_id + '_' + normalized.event_type,
+          customer_id: cust?.id || null,
+          product_id: normalized.product_id,
+          product_name: product.name,
+          amount: normalized.amount,
+          currency: normalized.currency,
+          status: txStatus,
+          pay_date: normalized.purchase_time ? new Date(normalized.purchase_time).toISOString() : new Date().toISOString(),
+          refund_date: ['REFUND', 'CHARGEBACK'].includes(normalized.event_type) ? new Date().toISOString() : null,
+          raw_data: rawPayload,
+        }, { onConflict: 'digistore_transaction_id' });
+    } catch (custError) {
+      console.error('Error writing to customers/transactions tables:', custError);
+      // Don't fail the main flow
+    }
+
     // Mark as processed
     await supabase
       .from('digistore24_ipn_events')
@@ -695,7 +765,7 @@ Deno.serve(async (req) => {
     
     // Fire and forget processing
     EdgeRuntime.waitUntil(
-      processIpnEvent(supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale })
+      processIpnEvent(supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload)
         .catch(err => console.error('Background processing failed:', err))
     );
     
