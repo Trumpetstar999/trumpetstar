@@ -1,38 +1,111 @@
 
-## Auth-Seite: WordPress-Button entfernen und "Angemeldet bleiben" hinzufuegen
 
-### Aenderungen
+## Digistore24: Kunden-, Transaktions- und Abo-Import
 
-**1. "Mit Trumpetstar-Konto anmelden" Button entfernen (Zeilen 313-336)**
-- Den gesamten WordPress-SSO-Block entfernen (Button + Beschreibungstext)
-- Den `useWordPressMembership`-Import und zugehoerige State-Variable (`isWpLoading`, `wpError`, `startOAuthFlow`) entfernen
-- Den `handleWordPressLogin`-Handler entfernen
-- Import von `ExternalLink` und `Sparkles` Icons entfernen (nicht mehr benoetigt)
+### Bestandsaufnahme
 
-**2. "Angemeldet bleiben"-Checkbox hinzufuegen**
-- Neue State-Variable `rememberMe` (default: `true`, damit Kinder standardmaessig angemeldet bleiben)
-- Checkbox mit Label "Angemeldet bleiben" im Login-Tab und im Magic-Link-Tab anzeigen
-- Beim Login (`handleSignIn`) und Magic-Link: Wenn `rememberMe` aktiviert ist, bleibt die Standard-Supabase-Persistenz (`localStorage`) aktiv -- das ist bereits der Fall
-- Wenn `rememberMe` NICHT aktiviert ist, nach dem Login die Session auf `sessionStorage` umstellen, sodass sie beim Schliessen des Browsers endet
+Es existiert bereits eine solide Digistore24-Infrastruktur:
+- **Tabellen**: `digistore24_settings`, `digistore24_products`, `digistore24_subscriptions`, `digistore24_entitlements`, `digistore24_ipn_events`, `digistore24_import_logs`
+- **Edge Functions**: `digistore24-ipn` (Webhook), `digistore24-import` (Produkt-Import)
+- **Admin-UI**: Settings, Import, Produkte, IPN-Logs Tabs
 
-**3. Maximale Session-Dauer sicherstellen**
-- Der Supabase-Client ist bereits mit `persistSession: true` und `autoRefreshToken: true` konfiguriert
-- Sessions werden automatisch per Refresh-Token erneuert, solange der Browser `localStorage` nutzt
-- Das bedeutet: Kinder bleiben praktisch unbegrenzt angemeldet, solange sie den Browser-Cache nicht loeschen
+Was fehlt: **Kunden-Stammdaten**, **Transaktionshistorie** und ein **Vollimport** aller Bestellungen/Abos via API.
+
+---
+
+### 1. Neue Datenbank-Tabellen
+
+**Tabelle `digistore24_customers`**
+- Deduplizierte Kundendaten (nach E-Mail)
+- Felder: `digistore_customer_id`, `email` (unique), `first_name`, `last_name`, `company`, `country`, `phone`, `total_purchases`, `total_revenue`, `first_purchase_at`, `last_purchase_at`
+- RLS: Nur Admins
+
+**Tabelle `digistore24_transactions`**
+- Einzelne Kaufvorgaenge
+- Felder: `digistore_transaction_id` (unique), `customer_id` (FK), `product_id`, `product_name`, `amount`, `currency`, `status`, `payment_method`, `pay_date`, `refund_date`, `raw_data` (jsonb)
+- RLS: Nur Admins
+
+**Tabelle `digistore24_sync_log`**
+- Protokoll aller Sync-Vorgaenge (manuell + webhook)
+- Felder: `sync_type`, `status`, `records_imported`, `records_updated`, `error_message`, `started_at`, `completed_at`
+- RLS: Nur Admins
+
+---
+
+### 2. Neue Edge Functions
+
+**`digistore24-sync`** (Manueller Vollimport)
+- Liest API-Key aus Supabase Secret `DIGISTORE24_API_KEY`
+- Ruft `listTransactions` paginiert ab (alle Seiten)
+- Dedupliziert Kunden nach E-Mail, fuehrt UPSERT durch
+- Berechnet `total_purchases` und `total_revenue` pro Kunde
+- Aktualisiert bestehende `digistore24_subscriptions` mit Abo-Daten
+- Schreibt Log in `digistore24_sync_log`
+- Admin-Auth-Check via `getClaims()` + `user_roles`
+
+**`digistore24-test-connection`** (API-Verbindungstest)
+- Nimmt keinen API-Key als Parameter (nutzt den gespeicherten Secret)
+- Macht einen Minimal-Call (`listProducts` mit `items_per_page=1`)
+- Gibt `{ valid: true/false, message: "..." }` zurueck
+- Admin-Auth-Check
+
+---
+
+### 3. Erweiterung der Admin-UI
+
+Neuer Sub-Tab **"Kunden"** im bestehenden `Digistore24Manager`:
+
+```
+Einstellungen | Import | Produkte | Kunden | IPN Logs
+```
+
+**Sektion: Statistik-Karten** (oben, 4 Cards)
+- Gesamtkunden (Users-Icon)
+- Gesamtumsatz in EUR (Euro-Icon, formatiert)
+- Aktive Abos (CreditCard-Icon)
+- Transaktionen (Receipt-Icon)
+
+**Sektion: Import-Steuerung**
+- "Alle Daten jetzt importieren" Button (ruft `digistore24-sync` auf)
+- "Verbindung testen" Button (ruft `digistore24-test-connection` auf)
+- Letzte 10 Sync-Logs als Tabelle
+
+**Sektion: Kunden-Tabelle**
+- Suche nach Name/E-Mail
+- Sortierung nach Name, Umsatz, letztem Kauf
+- Spalten: Name, E-Mail, Kaeufe, Umsatz (EUR), Aktive Abos, Letzter Kauf
+- Detail-Button pro Zeile
+
+**Kunden-Detail Sheet**
+- Header: Initialen-Avatar, Name, E-Mail, Land, Umsatz
+- Tab "Transaktionen": Alle Kaeufe mit Datum, Produkt, Betrag, Status (farbcodiert)
+- Tab "Abonnements": Alle Abos mit Status-Badge, Betrag, Intervall
+- Tab "Rohdaten": JSON-Viewer
+
+---
+
+### 4. Anpassung bestehender IPN-Function
+
+Die bestehende `digistore24-ipn` wird erweitert, um bei jedem Event auch `digistore24_customers` und `digistore24_transactions` zu befuellen -- so wachsen die Daten auch zwischen manuellen Imports automatisch mit.
+
+---
 
 ### Technische Details
 
-**Datei: `src/pages/AuthPage.tsx`**
-- Zeilen 4, 10-11, 24: Imports von `lovable` (bleibt), `Sparkles`/`ExternalLink` (entfernen), `useWordPressMembership` (entfernen)
-- Zeilen 191-201: `handleWordPressLogin` entfernen
-- Zeilen 313-336: WordPress-SSO-Button-Block entfernen
-- Neue State: `const [rememberMe, setRememberMe] = useState(true);`
-- Checkbox-UI im Login-Tab (vor dem Submit-Button) und im Magic-Link-Tab einfuegen
-- In `handleSignIn`: wenn `!rememberMe`, nach erfolgreichem Login die Session-Daten aus `localStorage` entfernen und in `sessionStorage` verschieben
+**Neue Dateien:**
+- `supabase/functions/digistore24-sync/index.ts`
+- `supabase/functions/digistore24-test-connection/index.ts`
+- `src/components/admin/Digistore24CustomersPanel.tsx` (Kunden-Tab mit Stats, Tabelle, Detail-Sheet)
 
-**Datei: `src/pages/WordPressCallbackPage.tsx` und `src/hooks/useWordPressMembership.tsx`**
-- Diese Dateien bleiben vorerst bestehen (koennen spaeter aufgeraeumt werden), werden aber nicht mehr von der Auth-Seite referenziert
+**Geaenderte Dateien:**
+- `src/components/admin/Digistore24Manager.tsx` -- neuer "Kunden" Sub-Tab
+- `supabase/functions/digistore24-ipn/index.ts` -- zusaetzliche Writes in `customers` + `transactions`
+- `supabase/config.toml` -- neue Edge Functions registrieren
+- Migration: 3 neue Tabellen mit RLS-Policies
 
-**Datei: `src/App.tsx`**
-- Route `/auth/wordpress/callback` und Import von `WordPressCallbackPage` koennen entfernt werden
-- `WordPressMembershipProvider` Wrapper kann entfernt werden
+**Sicherheit:**
+- Alle neuen Tabellen: RLS mit `has_role(auth.uid(), 'admin')` fuer ALL
+- Edge Functions: `verify_jwt = false`, Auth-Check im Code
+- API-Key wird nur serverseitig in Edge Functions verwendet (aus Secret)
+- Webhook-Endpoints antworten immer HTTP 200
+
