@@ -730,6 +730,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          body_html_de: string
+          body_html_en: string
+          body_html_es: string
+          created_at: string
+          description: string | null
+          display_name: string
+          id: string
+          subject_de: string
+          subject_en: string
+          subject_es: string
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          body_html_de?: string
+          body_html_en?: string
+          body_html_es?: string
+          created_at?: string
+          description?: string | null
+          display_name: string
+          id?: string
+          subject_de?: string
+          subject_en?: string
+          subject_es?: string
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          body_html_de?: string
+          body_html_en?: string
+          body_html_es?: string
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          id?: string
+          subject_de?: string
+          subject_en?: string
+          subject_es?: string
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string

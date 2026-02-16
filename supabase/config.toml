@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.digistore24-test-connection]
 verify_jwt = false
+
+[functions.send-magic-link]
+verify_jwt = false

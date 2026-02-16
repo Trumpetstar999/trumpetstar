@@ -13,7 +13,8 @@ import {
   FileText,
   ToggleRight,
   CreditCard,
-  Music2
+  Music2,
+  Mail
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -35,6 +36,7 @@ const menuItems = [
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
+  { id: 'emails', label: 'E-Mail Templates', icon: Mail },
   { id: 'features', label: 'Feature Flags', icon: ToggleRight },
   { id: 'system', label: 'Einstellungen', icon: Settings },
 ];
