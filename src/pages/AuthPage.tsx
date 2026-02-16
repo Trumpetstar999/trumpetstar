@@ -53,14 +53,20 @@ export default function AuthPage() {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
+      // Detect browser language
+      const browserLang = navigator.language?.substring(0, 2) || 'de';
+      const locale = ['de', 'en', 'es'].includes(browserLang) ? browserLang : 'de';
+
+      const { data, error } = await supabase.functions.invoke('send-magic-link', {
+        body: {
+          email: email.trim().toLowerCase(),
+          locale,
+          redirectTo: `${window.location.origin}/`,
         },
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       setMagicLinkSent(true);
       toast({

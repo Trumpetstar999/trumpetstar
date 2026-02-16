@@ -22,13 +22,14 @@ import { MusicXMLAudioManager } from '@/components/admin/MusicXMLAudioManager';
 import { FeatureFlagManager } from '@/components/admin/FeatureFlagManager';
 import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { DrumBeatManager } from '@/components/admin/DrumBeatManager';
+import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -144,6 +145,7 @@ export default function AdminPage() {
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
       case 'features': return 'Feature Flags';
+      case 'emails': return 'E-Mail Templates';
       case 'system': return 'Systemstatus';
       default: return 'Admin';
     }
@@ -163,6 +165,7 @@ export default function AdminPage() {
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
       case 'features': return 'Menüpunkte und Features ein-/ausblenden';
+      case 'emails': return 'E-Mail-Vorlagen bearbeiten und verwalten';
       case 'system': return 'Systemstatus und Einstellungen';
       default: return '';
     }
@@ -426,6 +429,7 @@ export default function AdminPage() {
           {activeTab === 'beats' && <DrumBeatManager />}
 
           {activeTab === 'features' && <FeatureFlagManager />}
+          {activeTab === 'emails' && <EmailTemplateManager />}
           {activeTab === 'system' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Status Cards */}
