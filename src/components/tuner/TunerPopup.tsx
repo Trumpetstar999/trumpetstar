@@ -17,17 +17,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
   const [referenceA4, setReferenceA4] = useState(440);
   const { isListening, pitchData, smoothedCents, error, startListening, stopListening } = usePitchDetection(referenceA4);
 
-  useEffect(() => {
-    if (isOpen && !isListening) {
-      startListening();
-    }
-    return () => {
-      if (!isOpen) {
-        stopListening();
-      }
-    };
-  }, [isOpen, isListening, startListening, stopListening]);
-
+  // Stop listening when popup closes (no auto-start — iOS requires user gesture)
   useEffect(() => {
     if (!isOpen) {
       stopListening();
