@@ -14,7 +14,9 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Button } from '@/components/ui/button';
-import { GripVertical, RotateCcw, Pencil, X, Crown } from 'lucide-react';
+import { GripVertical, RotateCcw, Pencil, X, Crown, Scale } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMembership } from '@/hooks/useMembership';
@@ -177,6 +179,67 @@ export function ProfilePage() {
       </DndContext>
 
       <p className="text-center text-white/40 text-xs mt-8">{t('profile.premiumHint')}</p>
+
+      {/* Impressum */}
+      <div className="flex justify-center mt-4 mb-8">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm" className="text-white/30 hover:text-white/60 text-xs gap-1.5">
+              <Scale className="w-3 h-3" />
+              Impressum
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[80vh]">
+            <DialogHeader>
+              <DialogTitle>Impressum</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] pr-4">
+              <div className="space-y-4 text-sm text-muted-foreground">
+                <div>
+                  <p className="font-semibold text-foreground">Trumpetstar GmbH</p>
+                  <p>Verlag für Buch, Kunst und Musikalien</p>
+                  <p>Geschäftsführer: Mario Schulter, MA</p>
+                  <p>Mogersdorf 253, 8382 Mogersdorf, Österreich</p>
+                </div>
+                <div>
+                  <p>UID-Nr. (AT): ATU81038878</p>
+                  <p>UID-Nr. (DE): DE442429470</p>
+                  <p>Firmenbuch: FN 633951g</p>
+                </div>
+                <div>
+                  <p>Tel.: +43 677 / 628 053 57</p>
+                  <p>E-Mail: info@trumpetstar.com</p>
+                  <p>Web: www.trumpetstar.com</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">Online-Streitbeilegung</p>
+                  <p>
+                    Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
+                    <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                      ec.europa.eu/consumers/odr
+                    </a>. Beschwerden können auch direkt per E-Mail an uns gerichtet werden.
+                  </p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">Haftungshinweis</p>
+                  <p>
+                    Trotz sorgfältiger Prüfung übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte. Für verlinkte externe Seiten sind ausschließlich deren Betreiber verantwortlich. Bei Bekanntwerden von Rechtsverletzungen werden betroffene Inhalte umgehend entfernt.
+                  </p>
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">Urheberrecht</p>
+                  <p>
+                    Sämtliche Inhalte dieser Anwendung – insbesondere Texte, Bilder, Grafiken und Videos – sind urheberrechtlich geschützt. Jede nicht autorisierte Verwendung wird verfolgt.
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground/60 pt-2">
+                  Angaben gemäß §5 ECG, §14 UGB, §63 GewO, §25 MedienG
+                </p>
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
