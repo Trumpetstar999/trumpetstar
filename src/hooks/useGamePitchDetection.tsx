@@ -25,11 +25,22 @@ interface GamePitchData {
   confidence: number;
 }
 
+export interface GamePitchDebugInfo {
+  audioContextState: string;
+  sampleRate: number;
+  trackState: string;
+  trackMuted: boolean;
+  rms: number;
+  frequency: number;
+  frameCount: number;
+}
+
 interface UseGamePitchDetectionResult {
   isListening: boolean;
   isMicActive: boolean;
   pitchData: GamePitchData | null;
   error: string | null;
+  debugInfo: GamePitchDebugInfo;
   startListening: () => Promise<void>;
   stopListening: () => void;
 }
@@ -129,14 +140,25 @@ export function useGamePitchDetection(
   const [pitchData, setPitchData] = useState<GamePitchData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Debug info state
+  const [debugInfo, setDebugInfo] = useState<GamePitchDebugInfo>({
+    audioContextState: 'closed',
+    sampleRate: 0,
+    trackState: 'none',
+    trackMuted: false,
+    rms: 0,
+    frequency: 0,
+    frameCount: 0,
+  });
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
   const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
   const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const startedRef = useRef(false);
 
   // iOS ring-buffer for frame collection
   const ringBufferRef = useRef<Float32Array | null>(null);
@@ -150,6 +172,8 @@ export function useGamePitchDetection(
   // Debug frame counter
   const frameCountRef = useRef<number>(0);
   const scriptFireCountRef = useRef<number>(0);
+  const lastRmsRef = useRef<number>(0);
+  const lastFreqRef = useRef<number>(0);
 
   const effectiveThreshold = confidenceThreshold * CONFIDENCE_FACTOR;
 
@@ -166,6 +190,23 @@ export function useGamePitchDetection(
 
   processPitchRef.current = (frequency: number, rms: number, sampleRate: number) => {
     frameCountRef.current++;
+    lastRmsRef.current = rms;
+    lastFreqRef.current = frequency > 0 ? frequency : 0;
+
+    // Update debug info every 10 frames
+    if (frameCountRef.current % 10 === 0) {
+      const ctx = audioContextRef.current;
+      const track = mediaStreamRef.current?.getAudioTracks()[0];
+      setDebugInfo({
+        audioContextState: ctx?.state ?? 'closed',
+        sampleRate: ctx?.sampleRate ?? 0,
+        trackState: track?.readyState ?? 'none',
+        trackMuted: track?.muted ?? false,
+        rms: lastRmsRef.current,
+        frequency: lastFreqRef.current,
+        frameCount: frameCountRef.current,
+      });
+    }
 
     // Debug: log first 10 frames
     if (frameCountRef.current <= 10) {
@@ -210,37 +251,27 @@ export function useGamePitchDetection(
   };
 
   // -----------------------------------------------------------------------
-  // Desktop: AnalyserNode + rAF loop
+  // Desktop: AnalyserNode + rAF loop (Float32 ONLY – no byte fallback)
   // -----------------------------------------------------------------------
   const analyzeDesktop = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
 
     analyserRef.current.getFloatTimeDomainData(bufferRef.current!);
 
-    // Byte-data fallback for Safari
-    const data: Float32Array = bufferRef.current! as any;
-    let allZero = true;
-    for (let i = 0; i < data.length; i++) {
-      if (data[i] !== 0) { allZero = false; break; }
-    }
-    if (allZero && analyserRef.current) {
-      const byteData = new Uint8Array(analyserRef.current.fftSize);
-      analyserRef.current.getByteTimeDomainData(byteData);
-      for (let i = 0; i < byteData.length; i++) {
-        data[i] = (byteData[i] - 128) / 128;
-      }
-    }
-
-    const { frequency, rms } = autoCorrelate(data, audioContextRef.current.sampleRate);
+    const { frequency, rms } = autoCorrelate(bufferRef.current!, audioContextRef.current.sampleRate);
     processPitchRef.current(frequency, rms, audioContextRef.current.sampleRate);
 
     rafIdRef.current = requestAnimationFrame(analyzeDesktop);
   }, []);
 
   // -----------------------------------------------------------------------
-  // Start listening
+  // Start listening – PROVEN iOS Safari unlock sequence
   // -----------------------------------------------------------------------
   const startListening = useCallback(async () => {
+    // Prevent double initialization
+    if (startedRef.current) return;
+    startedRef.current = true;
+
     try {
       setError(null);
       stableNoteRef.current = null;
@@ -249,7 +280,37 @@ export function useGamePitchDetection(
 
       console.log('[PitchDetect] Starting...', { IOS, ua: navigator.userAgent.substring(0, 80) });
 
-      // --- getUserMedia ---
+      // STEP 1: Create AudioContext FIRST (with webkit fallback)
+      const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      const ctx = new ACtor();
+
+      console.log('[PitchDetect] AudioContext created, state:', ctx.state, 'sampleRate:', ctx.sampleRate);
+
+      // STEP 2: Play silent buffer to unlock iOS audio hardware
+      const silentBuf = ctx.createBuffer(1, 1, ctx.sampleRate);
+      const silentSrc = ctx.createBufferSource();
+      silentSrc.buffer = silentBuf;
+      silentSrc.connect(ctx.destination);
+      silentSrc.start(0);
+      console.log('[PitchDetect] Silent buffer played');
+
+      // STEP 3: Resume AudioContext and WAIT
+      if (ctx.state !== 'running') {
+        await ctx.resume();
+        console.log('[PitchDetect] AudioContext resumed, state:', ctx.state);
+      }
+
+      // Handle iOS re-suspending the context (e.g. tab switch, screen lock)
+      ctx.onstatechange = () => {
+        console.log('[PitchDetect] AudioContext state changed:', ctx.state);
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      };
+
+      audioContextRef.current = ctx;
+
+      // STEP 4: ONLY NOW request microphone – minimal constraints
       const audioConstraints: MediaTrackConstraints = {
         echoCancellation: false,
         noiseSuppression: false,
@@ -267,50 +328,26 @@ export function useGamePitchDetection(
       }
       mediaStreamRef.current = stream;
 
-      // Log actual track settings
-      const trackSettings = stream.getAudioTracks()[0]?.getSettings();
-      console.log('[PitchDetect] Track settings:', JSON.stringify(trackSettings));
-
-      // --- AudioContext ---
-      const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-      const ctxOptions: AudioContextOptions = IOS
-        ? { latencyHint: 'playback' as AudioContextLatencyCategory }
-        : {};
-      const ctx = new ACtor(ctxOptions);
-
-      console.log('[PitchDetect] AudioContext created, state:', ctx.state, 'sampleRate:', ctx.sampleRate);
-
-      // Resume AudioContext (critical for iOS)
-      if (ctx.state === 'suspended') {
-        await ctx.resume();
-        console.log('[PitchDetect] AudioContext resumed, state:', ctx.state);
+      // STEP 5: Verify the audio track is live
+      const track = stream.getAudioTracks()[0];
+      if (!track || track.readyState !== 'live') {
+        throw new Error('Microphone track is not live');
       }
 
-      // Handle iOS re-suspending the context (e.g. tab switch, screen lock)
-      ctx.onstatechange = () => {
-        console.log('[PitchDetect] AudioContext state changed:', ctx.state);
-        if (ctx.state === 'suspended') {
-          ctx.resume().catch(() => {});
-        }
-      };
+      const trackSettings = track.getSettings();
+      console.log('[PitchDetect] Track settings:', JSON.stringify(trackSettings));
 
-      const gain = ctx.createGain();
-      gain.gain.value = 1.0;
-
+      // STEP 6: Create source and analyser – source → analyser ONLY (no destination)
       const source = ctx.createMediaStreamSource(stream);
-      source.connect(gain);
-
-      audioContextRef.current = ctx;
-      gainNodeRef.current = gain;
       sourceNodeRef.current = source;
 
       if (IOS) {
         // ---- iOS: ScriptProcessorNode path ----
+        // source → scriptProcessor → destination (outputting silence)
         const scriptNode = ctx.createScriptProcessor(IOS_SCRIPT_BUFFER, 1, 1);
         const samplesPerFrame = Math.ceil((ctx.sampleRate * IOS_FRAME_MS) / 1000);
 
-        // Allocate ring buffer
-        const ring = new Float32Array(samplesPerFrame + IOS_SCRIPT_BUFFER); // extra space
+        const ring = new Float32Array(samplesPerFrame + IOS_SCRIPT_BUFFER);
         ringBufferRef.current = ring;
         ringWriteRef.current = 0;
         ringTargetRef.current = samplesPerFrame;
@@ -321,7 +358,6 @@ export function useGamePitchDetection(
 
           scriptFireCountRef.current++;
 
-          // Debug: log first 5 script processor fires
           if (scriptFireCountRef.current <= 5) {
             let maxVal = 0;
             for (let i = 0; i < len; i++) {
@@ -331,13 +367,11 @@ export function useGamePitchDetection(
             console.log(`[PitchDetect:iOS] scriptFire=${scriptFireCountRef.current} inputLen=${len} maxAbs=${maxVal.toFixed(6)}`);
           }
 
-          // Copy incoming samples into ring buffer
           for (let i = 0; i < len; i++) {
             ring[ringWriteRef.current] = input[i];
             ringWriteRef.current++;
 
             if (ringWriteRef.current >= samplesPerFrame) {
-              // We have enough samples – run analysis
               const frame = ring.slice(0, ringWriteRef.current);
               const { frequency, rms } = autoCorrelate(frame, ctx.sampleRate);
               processPitchRef.current(frequency, rms, ctx.sampleRate);
@@ -350,7 +384,7 @@ export function useGamePitchDetection(
           for (let i = 0; i < output.length; i++) output[i] = 0;
         };
 
-        gain.connect(scriptNode);
+        source.connect(scriptNode);
         scriptNode.connect(ctx.destination); // MUST connect to destination on iOS
         scriptNodeRef.current = scriptNode;
 
@@ -358,34 +392,37 @@ export function useGamePitchDetection(
           sampleRate: ctx.sampleRate,
           bufferSize: IOS_SCRIPT_BUFFER,
           frameSamples: samplesPerFrame,
-          frameMs: IOS_FRAME_MS,
-          stabilityMs: STABILITY_MS,
-          correlationThreshold: CORRELATION_THRESHOLD,
-          rmsSilence: RMS_SILENCE,
         });
       } else {
-        // ---- Desktop: AnalyserNode + rAF path ----
+        // ---- Desktop: source → analyser ONLY (no destination) ----
         const analyser = ctx.createAnalyser();
         analyser.fftSize = FFT_SIZE;
         analyser.smoothingTimeConstant = 0;
-        gain.connect(analyser);
+        source.connect(analyser);
         analyserRef.current = analyser;
         bufferRef.current = new Float32Array(analyser.fftSize);
 
         console.log('[PitchDetect] Desktop AnalyserNode started', {
           sampleRate: ctx.sampleRate,
           fftSize: FFT_SIZE,
-          stabilityMs: STABILITY_MS,
-          correlationThreshold: CORRELATION_THRESHOLD,
         });
 
         analyzeDesktop();
+      }
+
+      // STEP 7: Verify data is flowing
+      if (!IOS && analyserRef.current) {
+        const testBuf = new Float32Array(analyserRef.current.fftSize);
+        analyserRef.current.getFloatTimeDomainData(testBuf);
+        const hasSignal = testBuf.some(v => v !== 0);
+        console.log('[PitchDetect] Signal check:', hasSignal, 'Sample rate:', ctx.sampleRate);
       }
 
       setIsListening(true);
     } catch (err: any) {
       console.error('[PitchDetect] Error:', err);
       setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff.');
+      startedRef.current = false;
     }
   }, [analyzeDesktop]);
 
@@ -414,11 +451,11 @@ export function useGamePitchDetection(
       audioContextRef.current = null;
     }
     analyserRef.current = null;
-    gainNodeRef.current = null;
     bufferRef.current = null;
     ringBufferRef.current = null;
     ringWriteRef.current = 0;
     stableNoteRef.current = null;
+    startedRef.current = false;
     setIsListening(false);
     setIsMicActive(false);
     setPitchData(null);
@@ -443,5 +480,5 @@ export function useGamePitchDetection(
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  return { isListening, isMicActive, pitchData, error, startListening, stopListening };
+  return { isListening, isMicActive, pitchData, error, debugInfo, startListening, stopListening };
 }

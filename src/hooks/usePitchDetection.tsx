@@ -29,20 +29,17 @@ function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
   let rms = 0;
   let foundGoodCorrelation = false;
 
-  // Calculate RMS
   for (let i = 0; i < SIZE; i++) {
     const val = buffer[i];
     rms += val * val;
   }
   rms = Math.sqrt(rms / SIZE);
 
-  // Not enough signal
   if (rms < 0.01) return -1;
 
   let lastCorrelation = 1;
   for (let offset = 0; offset < MAX_SAMPLES; offset++) {
     let correlation = 0;
-
     for (let i = 0; i < MAX_SAMPLES; i++) {
       correlation += Math.abs(buffer[i] - buffer[i + offset]);
     }
@@ -55,7 +52,6 @@ function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
         bestOffset = offset;
       }
     } else if (foundGoodCorrelation) {
-      // Parabolic interpolation
       const shift = (lastCorrelation - correlation) / 
         (2 * (lastCorrelation - 2 * bestCorrelation + correlation));
       return sampleRate / (bestOffset + shift);
@@ -70,22 +66,13 @@ function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
 }
 
 function frequencyToNote(frequency: number, referenceA4: number): PitchData {
-  // Calculate semitones from A4
   const semitones = 12 * Math.log2(frequency / referenceA4);
   const roundedSemitones = Math.round(semitones);
   const cents = Math.round((semitones - roundedSemitones) * 100);
-  
-  // A4 is note index 9 (0 = C, 9 = A)
   const noteIndex = ((roundedSemitones % 12) + 12 + 9) % 12;
   const octave = Math.floor((roundedSemitones + 9) / 12) + 4;
   
-  return {
-    frequency,
-    note: NOTE_NAMES[noteIndex],
-    octave,
-    cents,
-    noteIndex
-  };
+  return { frequency, note: NOTE_NAMES[noteIndex], octave, cents, noteIndex };
 }
 
 // Smoothing class for stable needle movement
@@ -105,10 +92,6 @@ class ExponentialSmoothing {
   reset() {
     this.value = 0;
   }
-  
-  getValue(): number {
-    return this.value;
-  }
 }
 
 export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionResult {
@@ -120,10 +103,12 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
   const smootherRef = useRef<ExponentialSmoothing>(new ExponentialSmoothing(0.12));
   const lastNoteRef = useRef<string | null>(null);
+  const startedRef = useRef(false);
 
   const analyze = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
@@ -134,7 +119,6 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
     if (frequency > 0 && frequency < 2000) {
       const data = frequencyToNote(frequency, referenceA4);
       
-      // Reset smoother if note changed significantly
       if (lastNoteRef.current !== data.note) {
         smootherRef.current.reset();
         lastNoteRef.current = data.note;
@@ -148,26 +132,30 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
     rafIdRef.current = requestAnimationFrame(analyze);
   }, [referenceA4]);
 
+  // -----------------------------------------------------------------------
+  // Start listening – PROVEN iOS Safari unlock sequence
+  // -----------------------------------------------------------------------
   const startListening = useCallback(async () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+
     try {
       setError(null);
       smootherRef.current.reset();
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: { 
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
-        } 
-      });
-      
-      mediaStreamRef.current = stream;
-
+      // STEP 1: Create AudioContext with webkit fallback
       const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
       const ctx = new ACtor();
 
-      // Resume AudioContext (critical for iOS Safari user-gesture requirement)
-      if (ctx.state === 'suspended') {
+      // STEP 2: Play silent buffer to unlock iOS audio
+      const silentBuf = ctx.createBuffer(1, 1, ctx.sampleRate);
+      const silentSrc = ctx.createBufferSource();
+      silentSrc.buffer = silentBuf;
+      silentSrc.connect(ctx.destination);
+      silentSrc.start(0);
+
+      // STEP 3: Resume and WAIT
+      if (ctx.state !== 'running') {
         await ctx.resume();
       }
 
@@ -179,20 +167,46 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       };
 
       audioContextRef.current = ctx;
-      analyserRef.current = ctx.createAnalyser();
-      analyserRef.current.fftSize = 4096;
-      analyserRef.current.smoothingTimeConstant = 0.8;
-      
+
+      // STEP 4: ONLY NOW request microphone
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: { 
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          } 
+        });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+      mediaStreamRef.current = stream;
+
+      // STEP 5: Verify the track is live
+      const track = stream.getAudioTracks()[0];
+      if (!track || track.readyState !== 'live') {
+        throw new Error('Microphone track is not live');
+      }
+
+      // STEP 6: source → analyser ONLY (no destination connection)
       const source = ctx.createMediaStreamSource(stream);
-      source.connect(analyserRef.current);
+      sourceNodeRef.current = source;
+
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 4096;
+      analyser.smoothingTimeConstant = 0.8;
+      source.connect(analyser);
+      analyserRef.current = analyser;
       
-      bufferRef.current = new Float32Array(analyserRef.current.fftSize) as Float32Array<ArrayBuffer>;
+      bufferRef.current = new Float32Array(analyser.fftSize) as Float32Array<ArrayBuffer>;
       
       setIsListening(true);
       analyze();
     } catch (err) {
       setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff auf dein Mikrofon.');
       console.error('Pitch detection error:', err);
+      startedRef.current = false;
     }
   }, [analyze]);
 
@@ -201,33 +215,32 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
     }
-    
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.disconnect();
+      sourceNodeRef.current = null;
+    }
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach(track => track.stop());
       mediaStreamRef.current = null;
     }
-    
     if (audioContextRef.current) {
-      audioContextRef.current.close();
+      audioContextRef.current.close().catch(() => {});
       audioContextRef.current = null;
     }
-    
     analyserRef.current = null;
     bufferRef.current = null;
     smootherRef.current.reset();
+    startedRef.current = false;
     setIsListening(false);
     setPitchData(null);
     setSmoothedCents(0);
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      stopListening();
-    };
+    return () => { stopListening(); };
   }, [stopListening]);
 
-  // Visibility change: suspend/resume AudioContext when tab hidden or iPad locks
+  // Visibility change: suspend/resume AudioContext
   useEffect(() => {
     const handleVisibility = () => {
       const ctx = audioContextRef.current;
@@ -242,12 +255,5 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, []);
 
-  return {
-    isListening,
-    pitchData,
-    smoothedCents,
-    error,
-    startListening,
-    stopListening
-  };
+  return { isListening, pitchData, smoothedCents, error, startListening, stopListening };
 }
