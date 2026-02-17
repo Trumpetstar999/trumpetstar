@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Volume2, VolumeX } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -24,11 +24,19 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
     }
   }, [isOpen, stopListening]);
 
-  const handleToggleListening = () => {
+  // Guard for dual touchend + click
+  const handledRef = useRef(false);
+
+  const handleToggleListening = (e?: React.TouchEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (isListening) {
       stopListening();
+      handledRef.current = false;
     } else {
+      if (handledRef.current) return;
+      handledRef.current = true;
       startListening();
+      setTimeout(() => { handledRef.current = false; }, 500);
     }
   };
 
@@ -49,7 +57,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           <DialogTitle>Bb Trumpet Tuner</DialogTitle>
         </VisuallyHidden>
         
-        {/* Header - compact */}
+        {/* Header */}
         <div 
           className="flex items-center justify-between px-4 py-2"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
@@ -80,7 +88,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           </div>
         </div>
 
-        {/* Main Content - compact spacing */}
+        {/* Main Content */}
         <div className="px-3 py-3 space-y-3">
           {error && (
             <div 
@@ -95,7 +103,6 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
             </div>
           )}
 
-          {/* Tuner Dial with integrated note display */}
           <TunerDial 
             cents={smoothedCents} 
             isActive={isListening && !!pitchData}
@@ -103,15 +110,15 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
             octave={pitchData?.octave ?? 0}
           />
 
-          {/* Note Wheel - compact */}
           <NoteWheel 
             currentNoteIndex={pitchData?.noteIndex ?? -1}
             isActive={isListening && !!pitchData}
           />
 
-          {/* Listening Toggle - inline */}
+          {/* Listening Toggle – dual touchend + click for iPad */}
           <div className="flex justify-center">
             <button
+              onTouchEnd={handleToggleListening}
               onClick={handleToggleListening}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full transition-all"
               style={{
@@ -140,7 +147,6 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           </div>
         </div>
 
-        {/* Footer Controls - compact */}
         <TunerControls 
           referenceA4={referenceA4}
           onReferenceChange={setReferenceA4}
