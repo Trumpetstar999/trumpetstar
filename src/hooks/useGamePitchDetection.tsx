@@ -254,7 +254,6 @@ export function useGamePitchDetection(
         echoCancellation: false,
         noiseSuppression: false,
         autoGainControl: false,
-        ...(IOS ? { channelCount: 1, sampleRate: { ideal: 48000 } as any } : {}),
       };
 
       let stream: MediaStream;
@@ -275,7 +274,7 @@ export function useGamePitchDetection(
       // --- AudioContext ---
       const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
       const ctxOptions: AudioContextOptions = IOS
-        ? { latencyHint: 'playback' as AudioContextLatencyCategory, sampleRate: 48000 }
+        ? { latencyHint: 'playback' as AudioContextLatencyCategory }
         : {};
       const ctx = new ACtor(ctxOptions);
 
@@ -286,6 +285,14 @@ export function useGamePitchDetection(
         await ctx.resume();
         console.log('[PitchDetect] AudioContext resumed, state:', ctx.state);
       }
+
+      // Handle iOS re-suspending the context (e.g. tab switch, screen lock)
+      ctx.onstatechange = () => {
+        console.log('[PitchDetect] AudioContext state changed:', ctx.state);
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      };
 
       const gain = ctx.createGain();
       gain.gain.value = 1.0;
@@ -420,6 +427,21 @@ export function useGamePitchDetection(
   useEffect(() => {
     return () => { stopListening(); };
   }, [stopListening]);
+
+  // Visibility change: suspend/resume AudioContext when tab hidden or iPad locks
+  useEffect(() => {
+    const handleVisibility = () => {
+      const ctx = audioContextRef.current;
+      if (!ctx) return;
+      if (document.hidden) {
+        ctx.suspend().catch(() => {});
+      } else if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   return { isListening, isMicActive, pitchData, error, startListening, stopListening };
 }

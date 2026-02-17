@@ -162,11 +162,28 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       });
       
       mediaStreamRef.current = stream;
-      audioContextRef.current = new AudioContext();
-      analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 2048;
+
+      const ACtor = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      const ctx = new ACtor();
+
+      // Resume AudioContext (critical for iOS Safari user-gesture requirement)
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+
+      // Handle iOS re-suspending the context
+      ctx.onstatechange = () => {
+        if (ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      };
+
+      audioContextRef.current = ctx;
+      analyserRef.current = ctx.createAnalyser();
+      analyserRef.current.fftSize = 4096;
+      analyserRef.current.smoothingTimeConstant = 0.8;
       
-      const source = audioContextRef.current.createMediaStreamSource(stream);
+      const source = ctx.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
       
       bufferRef.current = new Float32Array(analyserRef.current.fftSize) as Float32Array<ArrayBuffer>;
@@ -209,6 +226,21 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       stopListening();
     };
   }, [stopListening]);
+
+  // Visibility change: suspend/resume AudioContext when tab hidden or iPad locks
+  useEffect(() => {
+    const handleVisibility = () => {
+      const ctx = audioContextRef.current;
+      if (!ctx) return;
+      if (document.hidden) {
+        ctx.suspend().catch(() => {});
+      } else if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   return {
     isListening,
