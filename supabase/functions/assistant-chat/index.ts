@@ -388,9 +388,36 @@ serve(async (req) => {
     }
 
     // Build context string
-    const contextString = contextChunks.length > 0
+    const noContextFound = contextChunks.length === 0;
+    const contextString = !noContextFound
       ? `\n\nRELEVANTE WISSENSBASIS-INHALTE:\n${contextChunks.join("\n\n---\n\n")}\n\n`
       : "\n\n(Keine relevanten Inhalte in der Wissensbasis gefunden.)\n\n";
+
+    // Save unanswered question if no knowledge base match was found
+    if (noContextFound && lastUserMessage.trim().length > 0) {
+      try {
+        // Extract user_id from auth header
+        const authHeader = req.headers.get("authorization");
+        let userId: string | null = null;
+        if (authHeader) {
+          const token = authHeader.replace("Bearer ", "");
+          const { data: { user } } = await supabase.auth.getUser(token);
+          userId = user?.id || null;
+        }
+        if (userId) {
+          await supabase.from("assistant_unanswered_questions").insert({
+            user_id: userId,
+            question: lastUserMessage,
+            detected_intent: mode !== "mixed" ? mode : null,
+            language: language,
+            status: "pending",
+          });
+          console.log("[assistant-chat] Saved unanswered question to DB");
+        }
+      } catch (e) {
+        console.error("[assistant-chat] Failed to save unanswered question:", e);
+      }
+    }
 
     // Build recording context if requested
     let recordingInfo = "";

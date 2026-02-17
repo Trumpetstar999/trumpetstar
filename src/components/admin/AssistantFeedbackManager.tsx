@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ThumbsUp, ThumbsDown, MessageSquare, Check, X, Search, Loader2, HelpCircle } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MessageSquare, Check, X, Search, Loader2, HelpCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -100,6 +100,26 @@ export function AssistantFeedbackManager() {
     q.question.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const downloadCSV = () => {
+    const rows = questions.map(q => ({
+      Datum: new Date(q.created_at).toLocaleDateString('de-DE'),
+      Frage: q.question,
+      Status: q.status,
+      Intent: q.detected_intent || '',
+      Sprache: q.language || '',
+      Antwort: q.admin_response || '',
+    }));
+    const header = Object.keys(rows[0] || {}).join(';');
+    const csv = [header, ...rows.map(r => Object.values(r).map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'))].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `unbeantwortete-fragen-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Stats */}
@@ -145,15 +165,26 @@ export function AssistantFeedbackManager() {
 
       {activeTab === 'unanswered' && (
         <div className="space-y-4">
-          {/* Search */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Fragen durchsuchen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+          {/* Search + Download */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Fragen durchsuchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadCSV}
+              disabled={questions.length === 0}
+            >
+              <Download className="w-4 h-4 mr-1" />
+              CSV Download
+            </Button>
           </div>
 
           {/* Questions List */}
