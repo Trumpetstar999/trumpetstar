@@ -183,7 +183,7 @@ export default function GamePlayPage() {
 
       {/* Debug overlay */}
       {showDebug && micActivated && (
-        <div className="absolute top-12 right-3 z-30 bg-black/80 rounded-lg p-3 text-xs font-mono text-white/80 space-y-1 min-w-[200px]">
+        <div className="absolute top-12 right-3 z-30 bg-black/80 rounded-lg p-3 text-xs font-mono text-white/80 space-y-1 min-w-[220px]">
           <div>🔊 Ctx: <span className={debugInfo.audioContextState === 'running' ? 'text-emerald-400' : 'text-red-400'}>{debugInfo.audioContextState}</span></div>
           <div>📊 Rate: {debugInfo.sampleRate}Hz</div>
           <div>🎤 Track: <span className={debugInfo.trackState === 'live' ? 'text-emerald-400' : 'text-red-400'}>{debugInfo.trackState}</span> {debugInfo.trackMuted ? '🔇' : ''}</div>
@@ -191,6 +191,9 @@ export default function GamePlayPage() {
           <div>🎵 Freq: {debugInfo.frequency.toFixed(1)}Hz</div>
           <div>🔢 Frames: {debugInfo.frameCount}</div>
           <div>📱 Platform: {IS_IOS ? 'iOS' : 'Desktop'}</div>
+          <div>🛤️ iOS Path: <span className={debugInfo.iosPath === 'Worklet' ? 'text-emerald-400' : debugInfo.iosPath === 'AnalyserFallback' ? 'text-amber-400' : 'text-white/60'}>{debugInfo.iosPath}</span></div>
+          <div>🔥 ScriptFire: {debugInfo.scriptFireCount}</div>
+          <div>📶 MaxAmp: {debugInfo.maxAmplitude.toFixed(6)}</div>
         </div>
       )}
 
