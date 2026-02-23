@@ -451,7 +451,7 @@ Deno.serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Trumpetstar <noreply@trumpetstar.app>',
+          from: Deno.env.get('RESEND_FROM_EMAIL') || 'Trumpetstar <onboarding@resend.dev>',
           to: [email],
           subject,
           html: htmlBody,
