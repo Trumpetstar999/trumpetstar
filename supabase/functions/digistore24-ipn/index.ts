@@ -763,13 +763,14 @@ Deno.serve(async (req) => {
     // In production, this would ideally be a background job
     // For now, we process inline but return quickly to Digistore
     
-    // Fire and forget processing
-    EdgeRuntime.waitUntil(
-      processIpnEvent(supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload)
-        .catch(err => console.error('Background processing failed:', err))
-    );
+    // Process inline before returning
+    try {
+      await processIpnEvent(supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload);
+    } catch (err) {
+      console.error('IPN processing failed:', err);
+    }
     
-    // Return immediately
+    // Return
     return new Response(JSON.stringify({ status: "ok", event_id: ipnEvent.id }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
