@@ -102,6 +102,16 @@ Deno.serve(async (req) => {
       </div>
     `;
 
+    // Build from address - ensure proper format
+    const resendFromRaw = Deno.env.get('RESEND_FROM_EMAIL') || '';
+    let fromAddress: string;
+    if (resendFromRaw && resendFromRaw.includes('@')) {
+      // If it already has "Name <email>" format, use as-is; otherwise wrap it
+      fromAddress = resendFromRaw.includes('<') ? resendFromRaw : `Trumpetstar <${resendFromRaw}>`;
+    } else {
+      fromAddress = 'Trumpetstar <onboarding@resend.dev>';
+    }
+
     const resendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -109,7 +119,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: Deno.env.get('RESEND_FROM_EMAIL') || 'Trumpetstar <onboarding@resend.dev>',
+        from: fromAddress,
         to: [email],
         subject: `${inviterName} hat dich zu Trumpetstar eingeladen! 🎺`,
         html: htmlBody,
