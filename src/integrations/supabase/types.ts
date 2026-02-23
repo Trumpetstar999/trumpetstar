@@ -1752,6 +1752,30 @@ export type Database = {
           },
         ]
       }
+      referral_invitations: {
+        Row: {
+          created_at: string
+          id: string
+          invited_email: string
+          inviter_user_id: string
+          stars_awarded: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_email: string
+          inviter_user_id: string
+          stars_awarded?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_email?: string
+          inviter_user_id?: string
+          stars_awarded?: boolean
+        }
+        Relationships: []
+      }
       repertoire_items: {
         Row: {
           common_pitfalls: string | null

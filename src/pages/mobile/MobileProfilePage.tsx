@@ -10,7 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
-import { LogOut, Edit2, Lock, Scale } from 'lucide-react';
+import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
+import { LogOut, Edit2, Lock, Scale, UserPlus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
@@ -67,6 +68,7 @@ export default function MobileProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const t = TEXTS[language] || TEXTS.de;
 
@@ -131,6 +133,24 @@ export default function MobileProfilePage() {
               <Lock className="w-4 h-4" />
               {t.changePassword}
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Invite Friends */}
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-5">
+            <Button
+              variant="outline"
+              className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 gap-2 font-semibold"
+              onClick={() => setInviteDialogOpen(true)}
+            >
+              <UserPlus className="w-4 h-4" />
+              {language === 'en' ? 'Invite friends' : language === 'es' ? 'Invitar amigos' : 'Freunde einladen'}
+              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 ml-1" />
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              {language === 'en' ? 'Earn 5 stars per invitation!' : language === 'es' ? '¡Gana 5 estrellas por invitación!' : 'Erhalte 5 Sterne pro Einladung!'}
+            </p>
           </CardContent>
         </Card>
 
@@ -228,6 +248,10 @@ export default function MobileProfilePage() {
         <ChangePasswordDialog
           open={passwordDialogOpen}
           onOpenChange={setPasswordDialogOpen}
+        />
+        <InviteFriendDialog
+          open={inviteDialogOpen}
+          onOpenChange={setInviteDialogOpen}
         />
       </div>
     </MobileLayout>
