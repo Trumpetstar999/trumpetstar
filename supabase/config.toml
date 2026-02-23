@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.send-magic-link]
 verify_jwt = false
+
+[functions.send-app-link]
+verify_jwt = false
