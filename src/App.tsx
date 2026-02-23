@@ -24,6 +24,7 @@ import SessionListPage from "./pages/SessionListPage";
 import SessionPlayerPage from "./pages/SessionPlayerPage";
 import SharedSessionPage from "./pages/SharedSessionPage";
 import TrompeteLernenPage from "./pages/TrompeteLernenPage";
+import TrompeteLernenErwachsenePage from "./pages/TrompeteLernenErwachsenePage";
 import NotFound from "./pages/NotFound";
 
 // Mobile Mini-Mode pages
@@ -78,6 +79,7 @@ const App = () => {
                         
                         {/* SEO Pillar Pages */}
                         <Route path="/trompete-lernen" element={<TrompeteLernenPage />} />
+                        <Route path="/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsenePage />} />
                         
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
