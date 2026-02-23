@@ -23,6 +23,7 @@ import SessionBuilderPage from "./pages/SessionBuilderPage";
 import SessionListPage from "./pages/SessionListPage";
 import SessionPlayerPage from "./pages/SessionPlayerPage";
 import SharedSessionPage from "./pages/SharedSessionPage";
+import TrompeteLernenPage from "./pages/TrompeteLernenPage";
 import NotFound from "./pages/NotFound";
 
 // Mobile Mini-Mode pages
@@ -74,6 +75,10 @@ const App = () => {
                         <Route path="/practice/sessions/:id/edit" element={<SessionBuilderPage />} />
                         <Route path="/practice/sessions/:id/play" element={<SessionPlayerPage />} />
                         <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
+                        
+                        {/* SEO Pillar Pages */}
+                        <Route path="/trompete-lernen" element={<TrompeteLernenPage />} />
+                        
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
