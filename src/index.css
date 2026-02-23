@@ -110,6 +110,12 @@
     @apply border-border;
   }
 
+  /* Fix muted-foreground contrast inside cards (white bg needs dark text) */
+  .bg-card, [class*="bg-card"] {
+    --muted-foreground: 215 16% 47%;
+    --border: 220 13% 91%;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
