@@ -34,6 +34,7 @@ import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { CreateUserDialog } from './CreateUserDialog';
+import { InviteUserDialog } from './InviteUserDialog';
 import type { Database } from '@/integrations/supabase/types';
 
 type AppRole = Database['public']['Enums']['app_role'];
@@ -74,6 +75,7 @@ export function UserList() {
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
   const [updatingPlan, setUpdatingPlan] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   
   // Delete user state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -619,6 +621,14 @@ export function UserList() {
                 <Download className="w-4 h-4" />
               </Button>
               <Button
+                onClick={() => setInviteDialogOpen(true)}
+                size="sm"
+                className="h-8 px-4 text-xs font-medium bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-sm"
+              >
+                <Mail className="w-3.5 h-3.5 mr-1.5" />
+                Einladen
+              </Button>
+              <Button
                 onClick={() => setCreateDialogOpen(true)}
                 size="sm"
                 className="h-8 px-4 text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-sm"
@@ -1026,6 +1036,12 @@ export function UserList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <InviteUserDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        onUserInvited={fetchUsers}
+      />
     </>
   );
 }
