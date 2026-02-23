@@ -26,6 +26,9 @@ import SharedSessionPage from "./pages/SharedSessionPage";
 import TrompeteLernenPage from "./pages/TrompeteLernenPage";
 import TrompeteLernenErwachsenePage from "./pages/TrompeteLernenErwachsenePage";
 import TrompeteLernenKinderPage from "./pages/TrompeteLernenKinderPage";
+import TrompeteAnsatzAtmungPage from "./pages/TrompeteAnsatzAtmungPage";
+import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
+import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import NotFound from "./pages/NotFound";
 
 // Mobile Mini-Mode pages
@@ -82,6 +85,9 @@ const App = () => {
                         <Route path="/trompete-lernen" element={<TrompeteLernenPage />} />
                         <Route path="/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsenePage />} />
                         <Route path="/trompete-lernen-kinder" element={<TrompeteLernenKinderPage />} />
+                        <Route path="/trompete-ansatz-atmung" element={<TrompeteAnsatzAtmungPage />} />
+                        <Route path="/trompete-erster-ton" element={<TrompeteErsterTonPage />} />
+                        <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
