@@ -225,7 +225,8 @@
     "statistics": "Estadísticas",
     "gameHighscore": "Puntuación del Juego",
     "recentVideos": "Reproducido Recientemente",
-    "weeklyGoals": "Objetivos Semanales"
+    "weeklyGoals": "Objetivos Semanales",
+    "practiceSessions": "Sesiones de Práctica"
   },
   "game": {
     "noHighscoresYet": "Sin puntuaciones aún",
@@ -369,5 +370,16 @@
     "createCopy": "Crear copia",
     "copySuccess": "¡Sesión copiada!",
     "endSession": "¿Finalizar sesión?"
+  },
+  "review": {
+    "title": "Valora Trumpetstar",
+    "description": "Si Trumpetstar te ayuda, nos encantaría una breve y honesta valoración.",
+    "ctaButton": "Valorar en Google",
+    "promptTitle": "Valora Trumpetstar",
+    "promptDescription": "Tu opinión ayuda a otros a descubrir Trumpetstar.",
+    "later": "Más tarde",
+    "optout": "No mostrar más",
+    "showQR": "Mostrar código QR",
+    "hideQR": "Ocultar código QR"
   }
 }

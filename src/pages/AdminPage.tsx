@@ -23,13 +23,14 @@ import { FeatureFlagManager } from '@/components/admin/FeatureFlagManager';
 import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { DrumBeatManager } from '@/components/admin/DrumBeatManager';
 import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
+import { ReviewSettingsManager } from '@/components/admin/ReviewSettingsManager';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -146,6 +147,7 @@ export default function AdminPage() {
       case 'feedback': return 'Feedback & Chats';
       case 'features': return 'Feature Flags';
       case 'emails': return 'E-Mail Templates';
+      case 'reviews': return 'Google Reviews';
       case 'system': return 'Systemstatus';
       default: return 'Admin';
     }
@@ -166,6 +168,7 @@ export default function AdminPage() {
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
       case 'features': return 'Menüpunkte und Features ein-/ausblenden';
       case 'emails': return 'E-Mail-Vorlagen bearbeiten und verwalten';
+      case 'reviews': return 'Google Review Link und Prompt-Regeln konfigurieren';
       case 'system': return 'Systemstatus und Einstellungen';
       default: return '';
     }
@@ -430,6 +433,7 @@ export default function AdminPage() {
 
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'emails' && <EmailTemplateManager />}
+          {activeTab === 'reviews' && <ReviewSettingsManager />}
           {activeTab === 'system' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Status Cards */}

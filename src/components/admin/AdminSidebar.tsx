@@ -14,7 +14,8 @@ import {
   ToggleRight,
   CreditCard,
   Music2,
-  Mail
+  Mail,
+  Star
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -37,6 +38,7 @@ const menuItems = [
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
   { id: 'emails', label: 'E-Mail Templates', icon: Mail },
+  { id: 'reviews', label: 'Google Reviews', icon: Star },
   { id: 'features', label: 'Feature Flags', icon: ToggleRight },
   { id: 'system', label: 'Einstellungen', icon: Settings },
 ];
