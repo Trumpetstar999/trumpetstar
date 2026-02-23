@@ -13,7 +13,8 @@ export type WidgetId =
   | 'game-highscore'
   | 'recent-videos'
   | 'weekly-goals'
-  | 'practice-sessions';
+  | 'practice-sessions'
+  | 'review';
 
 export interface WidgetConfig {
   id: WidgetId;
@@ -34,8 +35,9 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'statistics', visible: true, order: 7, isOptional: true },
   { id: 'practice-sessions', visible: true, order: 8 },
   { id: 'game-highscore', visible: true, order: 9 },
-  { id: 'recent-videos', visible: false, order: 10, isOptional: true },
-  { id: 'weekly-goals', visible: false, order: 11, isOptional: true },
+  { id: 'review', visible: true, order: 10 },
+  { id: 'recent-videos', visible: false, order: 11, isOptional: true },
+  { id: 'weekly-goals', visible: false, order: 12, isOptional: true },
 ];
 
 const STORAGE_KEY = 'dashboard_layout';

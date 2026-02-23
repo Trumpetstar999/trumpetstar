@@ -7,7 +7,6 @@ import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
-import { ReviewCard } from '@/components/review/ReviewCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -103,10 +102,7 @@ export function ProfileWidget() {
         </Button>
       </div>
 
-      {/* Google Review Card */}
-      <div className="mt-4 w-full">
-        <ReviewCard />
-      </div>
+
 
       <EditProfileDialog
         open={editDialogOpen}
