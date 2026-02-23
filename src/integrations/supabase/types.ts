@@ -1866,6 +1866,42 @@ export type Database = {
         }
         Relationships: []
       }
+      review_settings: {
+        Row: {
+          cooldown_days: number
+          created_at: string
+          enable_review_prompt: boolean
+          google_review_qr_image: string | null
+          google_review_url: string
+          id: string
+          min_days_since_signup: number
+          min_videos_completed: number
+          updated_at: string
+        }
+        Insert: {
+          cooldown_days?: number
+          created_at?: string
+          enable_review_prompt?: boolean
+          google_review_qr_image?: string | null
+          google_review_url?: string
+          id?: string
+          min_days_since_signup?: number
+          min_videos_completed?: number
+          updated_at?: string
+        }
+        Update: {
+          cooldown_days?: number
+          created_at?: string
+          enable_review_prompt?: boolean
+          google_review_qr_image?: string | null
+          google_review_url?: string
+          id?: string
+          min_days_since_signup?: number
+          min_videos_completed?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sections: {
         Row: {
           created_at: string
@@ -2100,6 +2136,33 @@ export type Database = {
           id?: string
           storage_path?: string
           title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_review_tracking: {
+        Row: {
+          created_at: string
+          last_review_prompt_at: string | null
+          review_cta_clicked_at: string | null
+          review_prompt_optout: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_review_prompt_at?: string | null
+          review_cta_clicked_at?: string | null
+          review_prompt_optout?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_review_prompt_at?: string | null
+          review_cta_clicked_at?: string | null
+          review_prompt_optout?: boolean
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

@@ -225,7 +225,8 @@
     "statistics": "Statistics",
     "gameHighscore": "Game Highscore",
     "recentVideos": "Recently Played",
-    "weeklyGoals": "Weekly Goals"
+    "weeklyGoals": "Weekly Goals",
+    "practiceSessions": "Practice Sessions"
   },
   "game": {
     "noHighscoresYet": "No highscores yet",
@@ -369,5 +370,16 @@
     "createCopy": "Create copy",
     "copySuccess": "Session copied!",
     "endSession": "End session?"
+  },
+  "review": {
+    "title": "Rate Trumpetstar",
+    "description": "If Trumpetstar helps you, we'd appreciate a short, honest review.",
+    "ctaButton": "Review on Google",
+    "promptTitle": "Rate Trumpetstar",
+    "promptDescription": "Your feedback helps others discover Trumpetstar.",
+    "later": "Later",
+    "optout": "Don't show again",
+    "showQR": "Show QR code",
+    "hideQR": "Hide QR code"
   }
 }
