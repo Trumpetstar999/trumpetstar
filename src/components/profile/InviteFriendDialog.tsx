@@ -53,19 +53,37 @@ export function InviteFriendDialog({ open, onOpenChange }: InviteFriendDialogPro
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('invite-friend', {
-        body: { email: email.trim() },
-      });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Bitte melde dich zuerst an');
+        return;
+      }
 
-      if (error) throw error;
-      if (data?.error) {
-        toast.error(data.error);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const apikey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/invite-friend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': apikey,
+        },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+      
+      const result = await response.json();
+      console.log('[InviteFriend] Response:', response.status, result);
+
+      if (!response.ok || result.error) {
+        toast.error(result.error || 'Fehler beim Senden der Einladung');
       } else {
-        toast.success(data?.message || 'Einladung gesendet!');
+        toast.success(result.message || 'Einladung gesendet! ⭐');
         setEmail('');
         onOpenChange(false);
       }
     } catch (err: any) {
+      console.error('[InviteFriend] Error:', err);
       toast.error(err.message || 'Fehler beim Senden der Einladung');
     } finally {
       setLoading(false);
