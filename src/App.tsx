@@ -25,6 +25,14 @@ import SessionPlayerPage from "./pages/SessionPlayerPage";
 import SharedSessionPage from "./pages/SharedSessionPage";
 import NotFound from "./pages/NotFound";
 
+// Mobile Mini-Mode pages
+import MobileHomePage from "./pages/mobile/MobileHomePage";
+import MobilePlanPage from "./pages/mobile/MobilePlanPage";
+import MobileHelpPage from "./pages/mobile/MobileHelpPage";
+import MobileProfilePage from "./pages/mobile/MobileProfilePage";
+import MobileLockedPage from "./pages/mobile/MobileLockedPage";
+import { MobileRouteGuard } from "./components/mobile/MobileRouteGuard";
+
 const queryClient = new QueryClient();
 
 console.log('[App.tsx] App component loading...');
@@ -42,25 +50,34 @@ const App = () => {
                   <Toaster />
                   <Sonner />
                   <BrowserRouter>
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/auth" element={<AuthPage />} />
-                      
-                      <Route path="/admin" element={<AdminPage />} />
-                      <Route path="/chats" element={<ChatsPage />} />
-                      <Route path="/classroom" element={<ClassroomPage />} />
-                      <Route path="/pricing" element={<PricingPage />} />
-                      <Route path="/musicxml" element={<MusicXMLPage />} />
-                      <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
-                      <Route path="/game/play" element={<GamePlayPage />} />
-                      <Route path="/practice/sessions" element={<SessionListPage />} />
-                      <Route path="/practice/sessions/new" element={<SessionBuilderPage />} />
-                      <Route path="/practice/sessions/:id/edit" element={<SessionBuilderPage />} />
-                      <Route path="/practice/sessions/:id/play" element={<SessionPlayerPage />} />
-                      <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
+                    <MobileRouteGuard>
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/auth" element={<AuthPage />} />
+                        
+                        {/* Mobile Mini-Mode Routes */}
+                        <Route path="/mobile/home" element={<MobileHomePage />} />
+                        <Route path="/mobile/plan" element={<MobilePlanPage />} />
+                        <Route path="/mobile/help" element={<MobileHelpPage />} />
+                        <Route path="/mobile/profile" element={<MobileProfilePage />} />
+                        <Route path="/mobile/locked" element={<MobileLockedPage />} />
+                        
+                        <Route path="/admin" element={<AdminPage />} />
+                        <Route path="/chats" element={<ChatsPage />} />
+                        <Route path="/classroom" element={<ClassroomPage />} />
+                        <Route path="/pricing" element={<PricingPage />} />
+                        <Route path="/musicxml" element={<MusicXMLPage />} />
+                        <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
+                        <Route path="/game/play" element={<GamePlayPage />} />
+                        <Route path="/practice/sessions" element={<SessionListPage />} />
+                        <Route path="/practice/sessions/new" element={<SessionBuilderPage />} />
+                        <Route path="/practice/sessions/:id/edit" element={<SessionBuilderPage />} />
+                        <Route path="/practice/sessions/:id/play" element={<SessionPlayerPage />} />
+                        <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
+                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </MobileRouteGuard>
                   </BrowserRouter>
                 </PdfViewerProvider>
               </VideoPlayerProvider>
