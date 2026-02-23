@@ -3,7 +3,7 @@ import { HowToSchema } from "@/components/SEO/HowToSchema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { BookOpen, Video, Smartphone, Award, Clock, Users, Child, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
+import { BookOpen, Video, Smartphone, Award, Clock, Users, Baby, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 
 const faqs = [
   {
@@ -131,7 +131,7 @@ export default function TrompeteLernenPage() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Child className="h-8 w-8 text-primary" />
+                  <Baby className="h-8 w-8 text-primary" />
                   <h3 className="text-xl font-semibold">Kinder & Jugendliche</h3>
                 </div>
                 <ul className="space-y-2 text-muted-foreground">

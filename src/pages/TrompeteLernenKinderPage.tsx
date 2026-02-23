@@ -2,7 +2,7 @@ import { FAQSchema } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { Child, Clock, Heart, Music, HelpCircle, CheckCircle, Star, ArrowRight, AlertTriangle } from "lucide-react";
+import { Baby, Clock, Heart, Music, HelpCircle, CheckCircle, Star, ArrowRight, AlertTriangle } from "lucide-react";
 
 const faqs = [
   {
@@ -77,7 +77,7 @@ export default function TrompeteLernenKinderPage() {
       <section className="py-20 px-4 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Child className="h-4 w-4" />
+            <Baby className="h-4 w-4" />
             Für Eltern und ihre Musikstars
           </div>
           
