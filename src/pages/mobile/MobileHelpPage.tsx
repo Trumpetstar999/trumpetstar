@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
 import { useLanguage } from '@/hooks/useLanguage';
+import { FAQSchema } from '@/components/SEO';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,8 +60,11 @@ export default function MobileHelpPage() {
     setIsSending(false);
   };
 
+  const faqSchemaItems = faq.map(item => ({ question: item.q, answer: item.a }));
+
   return (
     <MobileLayout>
+      <FAQSchema faqs={faqSchemaItems} />
       <div className="px-5 py-6 space-y-6">
         <h1 className="text-2xl font-bold text-white">{t.title}</h1>
 

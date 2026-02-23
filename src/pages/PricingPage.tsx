@@ -2,12 +2,20 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { PricingTable } from '@/components/pricing/PricingTable';
+import { FAQSchema } from '@/components/SEO';
 
 export function PricingPage() {
   const navigate = useNavigate();
 
+  const pricingFaqs = [
+    { question: 'Kann ich jederzeit kündigen?', answer: 'Ja, du kannst dein Abo jederzeit kündigen. Bei Jahresabos läuft dein Zugang bis zum Ende der bezahlten Periode weiter.' },
+    { question: 'Kann ich zwischen Plänen wechseln?', answer: 'Klar! Du kannst jederzeit upgraden. Beim Wechsel zu einem höheren Plan wird der restliche Zeitraum anteilig verrechnet.' },
+    { question: 'Gibt es eine Geld-zurück-Garantie?', answer: 'Ja, innerhalb der ersten 14 Tage kannst du dein Abo ohne Angabe von Gründen kündigen und erhältst dein Geld zurück.' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <FAQSchema faqs={pricingFaqs} />
       {/* Header */}
       <div className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
