@@ -4,7 +4,7 @@ import { useMiniMode } from '@/hooks/useMiniMode';
 import { useAuth } from '@/hooks/useAuth';
 
 // Routes that are allowed on mobile (auth, onboarding, mobile routes)
-const MOBILE_ALLOWED_ROUTES = [
+const MOBILE_ALLOWED_PREFIXES = [
   '/auth',
   '/mobile/',
   '/mobile/home',
@@ -12,6 +12,7 @@ const MOBILE_ALLOWED_ROUTES = [
   '/mobile/help',
   '/mobile/profile',
   '/mobile/locked',
+  '/pricing',
 ];
 
 // Desktop app routes that should redirect to locked on mobile
@@ -43,7 +44,7 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
 
     if (isMiniMode && user) {
       // On mobile + logged in: redirect desktop routes to mobile
-      const isOnMobileRoute = MOBILE_ALLOWED_ROUTES.some(r => path.startsWith(r));
+      const isOnMobileRoute = MOBILE_ALLOWED_PREFIXES.some(r => path === r || path.startsWith(r));
       const isAuthRoute = path === '/auth';
 
       if (!isOnMobileRoute && !isAuthRoute) {

@@ -14,6 +14,7 @@ import { MetronomePage } from './MetronomePage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useMiniMode } from '@/hooks/useMiniMode';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
@@ -32,6 +33,7 @@ const Index = () => {
   const previousTabRef = useRef<TabId>('levels');
   const { user, loading } = useAuth();
   const { t, isLoading: languageLoading, hasCompletedLanguageSetup, hasSeenWelcome, completeWelcome } = useLanguage();
+  const isMiniMode = useMiniMode();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,12 +52,14 @@ const Index = () => {
     }
   }, [location.state]);
 
-  // Redirect to auth if not logged in
+  // Redirect to auth if not logged in, or to mobile if mini mode
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+    } else if (!loading && user && isMiniMode) {
+      navigate('/mobile/home', { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, isMiniMode]);
 
   // Fetch user's total stars
   useEffect(() => {

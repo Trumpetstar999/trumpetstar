@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMiniMode } from '@/hooks/useMiniMode';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,8 @@ export default function AuthPage() {
   const [displayName, setDisplayName] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
+  const isMiniMode = useMiniMode();
+  const getRedirectPath = () => isMiniMode ? '/mobile/home' : '/';
   const { toast } = useToast();
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -27,13 +30,13 @@ export default function AuthPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate('/');
+        navigate(getRedirectPath());
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate('/');
+        navigate(getRedirectPath());
       }
     });
 
@@ -133,7 +136,7 @@ export default function AuthPage() {
           title: 'Registrierung erfolgreich!',
           description: 'Du bist jetzt eingeloggt.',
         });
-        navigate('/');
+        navigate(getRedirectPath());
       }
     } catch (error) {
       console.error('Signup error:', error);
@@ -180,7 +183,7 @@ export default function AuthPage() {
           title: 'Willkommen zurück!',
           description: 'Du bist jetzt eingeloggt.',
         });
-        navigate('/');
+        navigate(getRedirectPath());
       }
     } catch (error) {
       console.error('Signin error:', error);
