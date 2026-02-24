@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, WifiOff, LogOut, User, Settings } from 'lucide-react';
+import { Star, WifiOff, LogOut, User, Settings, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
@@ -141,6 +141,11 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
                   </DropdownMenuItem>
                 </>
               )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/hilfe')}>
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Hilfe-Center
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-accent-red">
                 <LogOut className="w-4 h-4 mr-2" />
