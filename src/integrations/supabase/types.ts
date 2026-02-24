@@ -261,6 +261,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_usage: {
+        Row: {
+          date_key: string
+          games_started: number
+          id: string
+          updated_at: string
+          user_id: string
+          videos_started: number
+        }
+        Insert: {
+          date_key: string
+          games_started?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+          videos_started?: number
+        }
+        Update: {
+          date_key?: string
+          games_started?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+          videos_started?: number
+        }
+        Relationships: []
+      }
       digimember_products: {
         Row: {
           app_plan: string | null
@@ -2568,6 +2595,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_daily_usage: {
+        Args: { p_date_key: string; p_type: string; p_user_id: string }
+        Returns: number
       }
       is_chat_creator: {
         Args: { _chat_id: string; _user_id: string }

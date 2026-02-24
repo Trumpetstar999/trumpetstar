@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
@@ -10,6 +11,7 @@ import { Loader2, Search, X, Film, Clock, ChevronRight, Filter } from 'lucide-re
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage, useLocalizedContent, SkillLevel } from '@/hooks/useLanguage';
 import { Input } from '@/components/ui/input';
@@ -69,17 +71,33 @@ interface SelectedVideo {
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [levels, setLevels] = useState<LocalizedLevel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeLevel, setActiveLevel] = useState<string>('recent'); // Default to 'recent'
+  const [activeLevel, setActiveLevel] = useState<string>('recent');
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
   const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
+  const [limitOverlayOpen, setLimitOverlayOpen] = useState(false);
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
+  const { canStartVideo, recordVideoStart } = useDailyUsage();
   const { user } = useAuth();
   const { t, language, skillLevel } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
+
+  // Gated video start handler
+  const handleVideoClick = useCallback(async (videoData: SelectedVideo) => {
+    if (!canStartVideo()) {
+      setLimitOverlayOpen(true);
+      return;
+    }
+    const allowed = await recordVideoStart();
+    if (allowed) {
+      setSelectedVideo(videoData);
+    } else {
+      setLimitOverlayOpen(true);
+    }
+  }, [canStartVideo, recordVideoStart]);
 
   // Set initial difficulty filter based on user's skill level (only once)
   useEffect(() => {
@@ -445,7 +463,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                           <VideoCard
                             key={video.id}
                             video={video}
-                            onClick={() => setSelectedVideo({ video, levelId, levelTitle })}
+                            onClick={() => handleVideoClick({ video, levelId, levelTitle })}
                             index={videoIndex}
                           />
                         ))}
@@ -497,7 +515,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                     >
                       <VideoCard
                         video={video}
-                        onClick={() => setSelectedVideo({ video, levelTitle: video.levelTitle })}
+                        onClick={() => handleVideoClick({ video, levelTitle: video.levelTitle })}
                         index={0}
                       />
                       <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
@@ -529,7 +547,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                     <SectionRow
                       key={section.id}
                       section={section}
-                      onVideoClick={(video) => setSelectedVideo({ 
+                      onVideoClick={(video) => handleVideoClick({ 
                         video, 
                         levelId: currentLevel.id, 
                         levelTitle: currentLevel.title 
@@ -554,6 +572,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           onComplete={onStarEarned}
         />
       )}
+
+      <DailyLimitOverlay
+        open={limitOverlayOpen}
+        type="video"
+        onClose={() => setLimitOverlayOpen(false)}
+      />
     </div>
   );
 }
