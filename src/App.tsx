@@ -30,6 +30,7 @@ import TrompeteAnsatzAtmungPage from "./pages/TrompeteAnsatzAtmungPage";
 import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
 import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
 
 // Mobile Mini-Mode pages
@@ -89,6 +90,7 @@ const App = () => {
                         <Route path="/trompete-ansatz-atmung" element={<TrompeteAnsatzAtmungPage />} />
                         <Route path="/trompete-erster-ton" element={<TrompeteErsterTonPage />} />
                         <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
+                        <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
