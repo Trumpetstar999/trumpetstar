@@ -59,7 +59,7 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
     } else if (!isMiniMode && user) {
       // On desktop: redirect mobile routes back to main app
       if (path.startsWith('/mobile/')) {
-        navigate('/', { replace: true });
+        navigate('/app', { replace: true });
       }
     }
   }, [isMiniMode, user, loading, location.pathname, navigate]);

@@ -23,7 +23,7 @@ const TrompeteErsterTonPage = () => {
             So gelingt dir der erste Ton – einfach, entspannt und mit Spaß.
           </p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Jetzt starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/signup">Jetzt starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </section>
@@ -54,7 +54,7 @@ const TrompeteErsterTonPage = () => {
           <h2 className="text-2xl font-bold text-white mb-4">Bereit für deinen ersten Ton?</h2>
           <p className="text-white/70 mb-6">Starte jetzt kostenlos und lerne Schritt für Schritt mit Video-Begleitung.</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/signup">Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </section>

@@ -25,7 +25,7 @@ export function GameLanding() {
     }
     const allowed = await recordGameStart();
     if (allowed) {
-      navigate('/game/play');
+      navigate('/app/game/play');
     } else {
       setLimitOpen(true);
     }

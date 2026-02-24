@@ -76,10 +76,10 @@ export function PracticePage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/practice/sessions')} className="gap-2">
+            <Button variant="outline" onClick={() => navigate('/app/practice/sessions')} className="gap-2">
               <ListMusic className="w-4 h-4" /> Meine Sessions
             </Button>
-            <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2">
+            <Button onClick={() => navigate('/app/practice/sessions/new')} className="gap-2">
               <Plus className="w-4 h-4" /> Neue Übesession
             </Button>
           </div>

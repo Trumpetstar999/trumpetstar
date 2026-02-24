@@ -132,7 +132,7 @@ export default function HelpCenterPage() {
         {/* Header */}
         <div className="sticky top-0 z-40 glass safe-top">
           <div className="max-w-4xl mx-auto flex items-center justify-between px-6 py-3">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 gap-2" onClick={() => navigate('/')}>
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/10 gap-2" onClick={() => navigate('/app')}>
               <ArrowLeft className="w-4 h-4" />
               {t.backToApp}
             </Button>

@@ -416,7 +416,7 @@ export function MusicXMLViewerPage() {
       cursor.hide();
     }
     // Navigate to root with state to activate musicxml tab
-    navigate('/', { state: { activeTab: 'musicxml' } });
+    navigate('/app', { state: { activeTab: 'musicxml' } });
   };
 
   // Handle retry

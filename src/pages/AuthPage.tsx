@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
@@ -22,7 +22,16 @@ export default function AuthPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
   const isMiniMode = useMiniMode();
-  const getRedirectPath = () => isMiniMode ? '/mobile/home' : '/';
+  const location = useLocation();
+  const getRedirectPath = () => {
+    // Check for returnTo in sessionStorage or URL params
+    const returnTo = sessionStorage.getItem('returnTo');
+    if (returnTo && returnTo.startsWith('/app')) {
+      sessionStorage.removeItem('returnTo');
+      return returnTo;
+    }
+    return isMiniMode ? '/mobile/home' : '/app';
+  };
   const { toast } = useToast();
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -64,7 +73,7 @@ export default function AuthPage() {
         body: {
           email: email.trim().toLowerCase(),
           locale,
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/app`,
         },
       });
 
@@ -114,7 +123,7 @@ export default function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/app`,
           data: {
             display_name: displayName || email.split('@')[0],
           },
@@ -202,7 +211,7 @@ export default function AuthPage() {
     setIsGoogleLoading(true);
     try {
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/app`,
       });
       if (error) {
         toast({
@@ -227,7 +236,7 @@ export default function AuthPage() {
     setIsAppleLoading(true);
     try {
       const { error } = await lovable.auth.signInWithOAuth("apple", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/app`,
       });
       if (error) {
         toast({
@@ -356,7 +365,7 @@ export default function AuthPage() {
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={location.pathname === '/signup' ? 'signup' : 'login'} className="w-full">
             <TabsList className="grid w-full grid-cols-3 bg-slate-100 p-1 rounded-xl h-12">
               <TabsTrigger 
                 value="magic" 
