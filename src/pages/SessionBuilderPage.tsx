@@ -236,13 +236,13 @@ export default function SessionBuilderPage() {
       if (editId) {
         await updateSession.mutateAsync({ id: editId, ...payload });
         toast({ title: 'Session gespeichert' });
-        if (andStart) navigate(`/practice/sessions/${editId}/play`);
-        else navigate('/practice/sessions');
+        if (andStart) navigate(`/app/practice/sessions/${editId}/play`);
+        else navigate('/app/practice/sessions');
       } else {
         const session = await createSession.mutateAsync(payload);
         toast({ title: 'Session erstellt' });
-        if (andStart) navigate(`/practice/sessions/${session.id}/play`);
-        else navigate('/practice/sessions');
+        if (andStart) navigate(`/app/practice/sessions/${session.id}/play`);
+        else navigate('/app/practice/sessions');
       }
     } catch (e: any) {
       toast({ title: 'Fehler beim Speichern', description: e.message, variant: 'destructive' });
@@ -260,7 +260,7 @@ export default function SessionBuilderPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate('/practice/sessions')}
+          onClick={() => navigate('/app/practice/sessions')}
           className="text-foreground hover:bg-secondary rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />

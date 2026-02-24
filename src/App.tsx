@@ -9,7 +9,9 @@ import { MembershipProvider } from "@/hooks/useMembership";
 
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
+import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
 import { ChatsPage } from "./pages/ChatsPage";
@@ -28,7 +30,9 @@ import TrompeteLernenErwachsenePage from "./pages/TrompeteLernenErwachsenePage";
 import TrompeteLernenKinderPage from "./pages/TrompeteLernenKinderPage";
 import TrompeteAnsatzAtmungPage from "./pages/TrompeteAnsatzAtmungPage";
 import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
+import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
 
 // Mobile Mini-Mode pages
@@ -58,8 +62,13 @@ const App = () => {
                   <BrowserRouter>
                     <MobileRouteGuard>
                       <Routes>
-                        <Route path="/" element={<Index />} />
+                        {/* Public Landing */}
+                        <Route path="/" element={<LandingPage />} />
+                        
+                        {/* Auth Routes */}
                         <Route path="/auth" element={<AuthPage />} />
+                        <Route path="/login" element={<AuthPage />} />
+                        <Route path="/signup" element={<AuthPage />} />
                         
                         {/* Mobile Mini-Mode Routes */}
                         <Route path="/mobile/home" element={<MobileHomePage />} />
@@ -68,17 +77,22 @@ const App = () => {
                         <Route path="/mobile/profile" element={<MobileProfilePage />} />
                         <Route path="/mobile/locked" element={<MobileLockedPage />} />
                         
-                        <Route path="/admin" element={<AdminPage />} />
-                        <Route path="/chats" element={<ChatsPage />} />
-                        <Route path="/classroom" element={<ClassroomPage />} />
+                        {/* Protected App Routes */}
+                        <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                        <Route path="/app/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+                        <Route path="/app/chats" element={<ProtectedRoute><ChatsPage /></ProtectedRoute>} />
+                        <Route path="/app/classroom" element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
+                        <Route path="/app/musicxml" element={<ProtectedRoute><MusicXMLPage /></ProtectedRoute>} />
+                        <Route path="/app/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
+                        <Route path="/app/game/play" element={<ProtectedRoute><GamePlayPage /></ProtectedRoute>} />
+                        <Route path="/app/practice/sessions" element={<ProtectedRoute><SessionListPage /></ProtectedRoute>} />
+                        <Route path="/app/practice/sessions/new" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
+                        <Route path="/app/practice/sessions/:id/edit" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
+                        <Route path="/app/practice/sessions/:id/play" element={<ProtectedRoute><SessionPlayerPage /></ProtectedRoute>} />
+                        <Route path="/app/hilfe" element={<ProtectedRoute><HelpCenterPage /></ProtectedRoute>} />
+                        
+                        {/* Public Routes */}
                         <Route path="/pricing" element={<PricingPage />} />
-                        <Route path="/musicxml" element={<MusicXMLPage />} />
-                        <Route path="/musicxml/:id" element={<MusicXMLViewerPage />} />
-                        <Route path="/game/play" element={<GamePlayPage />} />
-                        <Route path="/practice/sessions" element={<SessionListPage />} />
-                        <Route path="/practice/sessions/new" element={<SessionBuilderPage />} />
-                        <Route path="/practice/sessions/:id/edit" element={<SessionBuilderPage />} />
-                        <Route path="/practice/sessions/:id/play" element={<SessionPlayerPage />} />
                         <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
                         
                         {/* SEO Pillar Pages */}
@@ -88,6 +102,7 @@ const App = () => {
                         <Route path="/trompete-ansatz-atmung" element={<TrompeteAnsatzAtmungPage />} />
                         <Route path="/trompete-erster-ton" element={<TrompeteErsterTonPage />} />
                         <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
+                        <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

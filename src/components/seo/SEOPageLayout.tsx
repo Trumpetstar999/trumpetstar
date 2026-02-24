@@ -25,7 +25,7 @@ export function SEOPageLayout({ children }: SEOPageLayoutProps) {
               <Link to="/pricing">Preise</Link>
             </Button>
             <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-              <Link to="/auth">Anmelden</Link>
+              <Link to="/login">Anmelden</Link>
             </Button>
           </div>
         </div>

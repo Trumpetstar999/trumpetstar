@@ -261,6 +261,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_usage: {
+        Row: {
+          date_key: string
+          games_started: number
+          id: string
+          updated_at: string
+          user_id: string
+          videos_started: number
+        }
+        Insert: {
+          date_key: string
+          games_started?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+          videos_started?: number
+        }
+        Update: {
+          date_key?: string
+          games_started?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+          videos_started?: number
+        }
+        Relationships: []
+      }
       digimember_products: {
         Row: {
           app_plan: string | null
@@ -775,6 +802,51 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_items: {
+        Row: {
+          answer_de: string
+          answer_en: string | null
+          answer_es: string | null
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          question_de: string
+          question_en: string | null
+          question_es: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer_de?: string
+          answer_en?: string | null
+          answer_es?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_de?: string
+          question_en?: string | null
+          question_es?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer_de?: string
+          answer_en?: string | null
+          answer_es?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_de?: string
+          question_en?: string | null
+          question_es?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string
@@ -1023,6 +1095,39 @@ export type Database = {
           type?: string
           updated_at?: string
           visibility?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: []
       }
@@ -2568,6 +2673,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_daily_usage: {
+        Args: { p_date_key: string; p_type: string; p_user_id: string }
+        Returns: number
       }
       is_chat_creator: {
         Args: { _chat_id: string; _user_id: string }

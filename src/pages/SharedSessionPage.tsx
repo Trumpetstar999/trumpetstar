@@ -50,7 +50,7 @@ export default function SharedSessionPage() {
         })),
       });
       toast({ title: t('sharedSession.copySuccess') });
-      navigate('/practice/sessions');
+      navigate('/app/practice/sessions');
     } catch (e: any) {
       toast({ title: t('common.error'), description: e.message, variant: 'destructive' });
     } finally {

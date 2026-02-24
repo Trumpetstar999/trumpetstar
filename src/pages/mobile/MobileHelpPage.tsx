@@ -6,8 +6,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MessageCircle, Loader2 } from 'lucide-react';
+import { Mail, MessageCircle, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const FAQ = {
   de: [
@@ -42,6 +43,7 @@ const TEXTS = {
 
 export default function MobileHelpPage() {
   const { language } = useLanguage();
+  const navigate = useNavigate();
   const [feedback, setFeedback] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -85,6 +87,16 @@ export default function MobileHelpPage() {
             </Accordion>
           </CardContent>
         </Card>
+
+        {/* Link to full Help Center */}
+        <Button
+          variant="outline"
+          className="w-full h-12 border-white/20 text-white bg-white/10 hover:bg-white/20 gap-2"
+          onClick={() => navigate('/app/hilfe')}
+        >
+          <ExternalLink className="w-4 h-4" />
+          {language === 'en' ? 'Full Help Center' : language === 'es' ? 'Centro de Ayuda completo' : 'Vollständiges Hilfe-Center'}
+        </Button>
 
         {/* Contact */}
         <Card className="border-0 shadow-lg">

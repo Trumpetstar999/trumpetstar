@@ -5,14 +5,31 @@ import { Button } from '@/components/ui/button';
 import { GameHighscores } from './GameHighscores';
 import { GameSettingsOverlay } from './GameSettingsOverlay';
 import { useGameSettings } from '@/hooks/useGameSettings';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 
 type View = 'landing' | 'highscores';
 
 export function GameLanding() {
   const [view, setView] = useState<View>('landing');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
   const { settings, updateSettings } = useGameSettings();
+  const { canStartGame, recordGameStart } = useDailyUsage();
   const navigate = useNavigate();
+
+  const handleStartGame = async () => {
+    if (!canStartGame()) {
+      setLimitOpen(true);
+      return;
+    }
+    const allowed = await recordGameStart();
+    if (allowed) {
+      navigate('/app/game/play');
+    } else {
+      setLimitOpen(true);
+    }
+  };
 
   if (view === 'highscores') {
     return (
@@ -47,7 +64,7 @@ export function GameLanding() {
         {/* Main buttons */}
         <div className="w-full max-w-xs space-y-3">
           <Button
-            onClick={() => navigate('/game/play')}
+            onClick={handleStartGame}
             className="w-full h-14 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(var(--reward-gold))]/90 text-[hsl(var(--gold-foreground))] rounded-2xl shadow-lg"
           >
             <Music className="w-5 h-5 mr-2" />
@@ -114,6 +131,12 @@ export function GameLanding() {
         settings={settings}
         onUpdate={updateSettings}
         onClose={() => setSettingsOpen(false)}
+      />
+
+      <DailyLimitOverlay
+        open={limitOpen}
+        type="game"
+        onClose={() => setLimitOpen(false)}
       />
     </div>
   );

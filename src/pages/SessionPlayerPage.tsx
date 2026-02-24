@@ -117,7 +117,7 @@ export default function SessionPlayerPage() {
         <p className="text-muted-foreground">{t('practice.sessions.allItemsDone')}</p>
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => player.restart()}>{t('practice.sessions.again')}</Button>
-          <Button onClick={() => navigate('/practice/sessions')}>{t('common.back')}</Button>
+          <Button onClick={() => navigate('/app/practice/sessions')}>{t('common.back')}</Button>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function SessionPlayerPage() {
     <div className="h-full flex flex-col bg-background">
       {/* Top Bar */}
       <div className="flex items-center gap-3 p-3 border-b border-border/50 bg-card/50">
-        <Button variant="ghost" size="icon" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/practice/sessions'); }}>
+        <Button variant="ghost" size="icon" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/app/practice/sessions'); }}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <h1 className="font-semibold truncate flex-1">{session.name}</h1>
@@ -240,7 +240,7 @@ export default function SessionPlayerPage() {
         <Button variant="outline" size="sm" onClick={() => player.goNext()}>
           {t('common.next')} <SkipForward className="w-4 h-4 ml-1" />
         </Button>
-        <Button variant="destructive" size="sm" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/practice/sessions'); }}>
+        <Button variant="destructive" size="sm" onClick={() => { if (confirm(t('sharedSession.endSession'))) navigate('/app/practice/sessions'); }}>
           <X className="w-4 h-4 mr-1" /> {t('practice.sessions.endSession')}
         </Button>
       </div>
