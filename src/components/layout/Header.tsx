@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { TunerButton } from '@/components/tuner/TunerButton';
+import { DailyPassIndicator } from '@/components/premium/DailyPassIndicator';
 import { supabase } from '@/integrations/supabase/client';
 
 interface HeaderProps {
@@ -89,6 +90,9 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
         
         {/* Right: Actions */}
         <div className="flex items-center gap-3">
+          {/* Daily Pass Indicator for Free users */}
+          <DailyPassIndicator />
+          
           {/* Tuner Button */}
           <TunerButton />
           
