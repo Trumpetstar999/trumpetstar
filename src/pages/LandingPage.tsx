@@ -69,7 +69,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-            Playbacks, Lernvideos und Übe-Tools in einer App – perfekt zu den Trumpetstar-Heften.
+            Schritt für Schritt, total flexibel – mit Mitspielvideos und persönlichem Feedback von ausgebildeten Lehrern.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
