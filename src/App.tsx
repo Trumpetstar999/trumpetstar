@@ -28,6 +28,7 @@ import TrompeteLernenErwachsenePage from "./pages/TrompeteLernenErwachsenePage";
 import TrompeteLernenKinderPage from "./pages/TrompeteLernenKinderPage";
 import TrompeteAnsatzAtmungPage from "./pages/TrompeteAnsatzAtmungPage";
 import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
+import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import NotFound from "./pages/NotFound";
 

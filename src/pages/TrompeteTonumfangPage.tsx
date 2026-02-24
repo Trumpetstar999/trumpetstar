@@ -33,7 +33,7 @@ const howToSteps = [
   {
     position: 5,
     name: "Chromatischer Aufstieg",
-    text: "Spielen Sie chromatisch aufwärts (Halbtonschritte) bis zu Ihrer aktuellen Grenze. Halten Sie den höchsten Ton 3 Sekunden, dann zurück. Jeden Tag eine kleine Steigerung versuchen (nur wenn es locker geht!)."
+    text: "Spielen Sie chromatisch aufwärts (Halbtonschritte) bis zu Ihrer aktuellen Grenze. Halten Sie den höchsten Ton 3 Sekunden, dann zurück. Jeden Tag eine kleine Steigerung versuchen (nur wenn es locker geht!).",
     image: "https://trumpetstar.com/images/chromatic.jpg"
   }
 ];
