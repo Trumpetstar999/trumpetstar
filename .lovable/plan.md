@@ -1,153 +1,127 @@
 
 
-# Fix iPad Pitch Detection with Proven iOS Safari Audio Unlock Sequence
+# Free-Plan Daily Limit System
 
-## Problem
-Pitch detection still fails on iPad (iOS Safari) despite previous fixes. The current implementation does not follow the exact unlock sequence iOS Safari requires.
+## Ubersicht
 
-## Root Causes
-1. AudioContext is created BEFORE playing the silent unlock buffer
-2. `getUserMedia` is called BEFORE the AudioContext is confirmed running
-3. The game button uses only `onClick` (not `touchend`, which iOS prefers)
-4. The desktop fallback path uses `getByteTimeDomainData` (can return silence on iOS)
-5. The mic source is connected through a GainNode, adding unnecessary complexity
-6. No on-screen debug overlay to diagnose issues on iPad
-
-## Changes
-
-### 1. `useGamePitchDetection.tsx` -- Rewrite `startListening` with proven sequence
-
-Replace the entire `startListening` function to follow the exact iOS unlock order:
-
-1. Create AudioContext (with `webkitAudioContext` fallback)
-2. Play a silent buffer to unlock iOS audio (`createBuffer` -> `createBufferSource` -> `start`)
-3. `await audioContext.resume()` if not running
-4. ONLY THEN call `getUserMedia` with minimal constraints
-5. Verify the audio track is `live`
-6. Create `MediaStreamSource` and `AnalyserNode`
-7. Connect source to analyser ONLY (NOT to `destination` on the source path)
-8. For iOS ScriptProcessor path: connect through ScriptProcessor to destination (outputting silence)
-9. Verify data is flowing with a test read
-
-Also:
-- Remove the `getByteTimeDomainData` fallback in `analyzeDesktop` (use Float32Array only)
-- Remove the GainNode from the pipeline (source -> analyser directly on desktop, source -> scriptProcessor on iOS)
-- Add a `startedRef` flag to prevent double initialization
-
-### 2. `usePitchDetection.tsx` (Tuner) -- Same proven sequence
-
-Apply the identical unlock pattern:
-1. Create AudioContext
-2. Play silent buffer
-3. Resume
-4. getUserMedia
-5. Verify track
-6. source -> analyser only (no destination connection)
-
-### 3. `GamePlayPage.tsx` -- Add `touchend` + `click` dual listeners + debug overlay
-
-- Replace `onClick={handleActivateMic}` with a ref-based approach using both `touchend` and `click` event listeners (with `{ once: true }` and a guard flag)
-- Add a toggleable debug overlay (bug icon button) showing:
-  - AudioContext state + sampleRate
-  - Audio track readyState + muted
-  - Raw RMS volume
-  - Detected frequency (Hz)
-  - Frame counter
-
-### 4. `TunerPopup.tsx` -- Add `touchend` support
-
-The "Aktivieren" button already uses `onClick`. Add `onTouchEnd` with a guard flag to ensure it fires on iPad.
+Free-User erhalten taglich 3 Video-Starts und 3 Game-Starts. Nach Erreichen des Limits wird ein freundliches Upgrade-Overlay angezeigt. Pro/Basic-User sind nicht betroffen.
 
 ---
 
-## Technical Details
+## 1. Datenbank
 
-### `useGamePitchDetection.tsx`
-
-**startListening rewrite (lines 243-390):**
+Neue Tabelle `daily_usage` mit atomarem Upsert:
 
 ```text
-// NEW unlock sequence:
-1. const ACtor = window.AudioContext || window.webkitAudioContext
-2. const ctx = new ACtor({ latencyHint: 'playback' })  // iOS only
-3. // Play silent buffer to unlock
-   const silentBuf = ctx.createBuffer(1, 1, ctx.sampleRate)
-   const silentSrc = ctx.createBufferSource()
-   silentSrc.buffer = silentBuf
-   silentSrc.connect(ctx.destination)
-   silentSrc.start(0)
-4. if (ctx.state !== 'running') await ctx.resume()
-5. // NOW getUserMedia
-   stream = await navigator.mediaDevices.getUserMedia({audio:{...}})
-6. // Verify track
-   const track = stream.getAudioTracks()[0]
-   if (!track || track.readyState !== 'live') throw Error(...)
-7. const source = ctx.createMediaStreamSource(stream)
-8. // iOS: source -> scriptProcessor -> destination (silent output)
-   // Desktop: source -> analyser (NO destination)
+daily_usage
++--------------+-------------+---------------------------+
+| user_id      | UUID        | NOT NULL                  |
+| date_key     | TEXT        | NOT NULL (YYYY-MM-DD)     |
+| videos_started| INT        | DEFAULT 0                 |
+| games_started | INT        | DEFAULT 0                 |
+| updated_at   | TIMESTAMPTZ | DEFAULT now()             |
++--------------+-------------+---------------------------+
+UNIQUE (user_id, date_key)
 ```
 
-**Remove byte fallback (lines 220-232):**
-Delete the `getByteTimeDomainData` fallback block in `analyzeDesktop`. Use only `getFloatTimeDomainData`.
+RLS-Policies:
+- SELECT: Nutzer sieht nur eigene Zeilen (`auth.uid() = user_id`)
+- INSERT: Nutzer kann nur eigene Zeilen anlegen
+- UPDATE: Nutzer kann nur eigene Zeilen updaten
+- Admins: ALL
 
-**Remove GainNode (lines 297-304):**
-Connect source directly to analyser/scriptProcessor instead of routing through a GainNode.
+Eine DB-Funktion `increment_daily_usage(p_user_id UUID, p_date_key TEXT, p_type TEXT)` wird erstellt, die atomar per `INSERT ... ON CONFLICT DO UPDATE` den Zahler um 1 erhoht und den neuen Wert zuruckgibt. Das verhindert Race Conditions bei Doppelklicks.
 
-**Export debug data:**
-Add exported refs/state for debug info (rms, frequency, frameCount, audioContext state, track info).
+---
 
-### `usePitchDetection.tsx`
+## 2. Custom Hook: `useDailyUsage`
 
-**startListening rewrite (lines 151-197):**
-Same silent-buffer-first pattern. Remove source -> destination connection. Source connects only to analyser.
+Neuer Hook `src/hooks/useDailyUsage.tsx`:
 
-### `GamePlayPage.tsx`
+- Ermittelt `dateKey` aus Browser-Zeitzone (`Intl.DateTimeFormat`)
+- Ladt aktuellen Stand aus `daily_usage` fur den User + heutiges Datum
+- Stellt bereit:
+  - `videosUsed`, `gamesUsed` (aktuelle Zahler)
+  - `canStartVideo()` / `canStartGame()` -- pruft Plan (FREE?) + Limit
+  - `recordVideoStart()` / `recordGameStart()` -- ruft DB-Funktion auf, gibt `true/false` zuruck
+  - `isLoading`
+- Nutzt `useMembership()` intern: wenn `planKey !== 'FREE'`, immer `true`
+- Debounce: 800ms Sperre nach erfolgreichem Start
 
-**Dual event listeners (around line 119):**
-Replace `onClick={handleActivateMic}` with a `useEffect` + `useRef` approach:
-```text
-const buttonRef = useRef<HTMLButtonElement>(null)
-const handledRef = useRef(false)
+---
 
-useEffect(() => {
-  const btn = buttonRef.current
-  if (!btn || micActivated) return
-  const handler = async (e) => {
-    e.preventDefault()
-    if (handledRef.current) return
-    handledRef.current = true
-    await handleActivateMic()
-  }
-  btn.addEventListener('touchend', handler, { once: true })
-  btn.addEventListener('click', handler, { once: true })
-  return () => {
-    btn.removeEventListener('touchend', handler)
-    btn.removeEventListener('click', handler)
-  }
-}, [micActivated, handleActivateMic])
-```
+## 3. Upgrade-Overlay (Limit erreicht)
 
-**Debug overlay:**
-New component rendered conditionally, toggled by a small bug icon button. Shows AudioContext state, sampleRate, track status, RMS, frequency, and frame count -- pulled from new debug exports on the hook.
+Neue Komponente `src/components/premium/DailyLimitOverlay.tsx`:
 
-### `TunerPopup.tsx`
+- Dialog/Modal mit freundlichem, motivierendem Text
+- Titel: "Fur heute ist dein Free-Kontingent aufgebraucht"
+- Text abhaengig vom Typ (Video/Game)
+- Buttons:
+  - Primary: "Jetzt upgraden" -- navigiert zu `/pricing`
+  - Secondary: "Morgen weitermachen" -- schliesst Dialog
 
-Add `onTouchEnd` to the Aktivieren button with a guard:
-```text
-const handledRef = useRef(false)
-const handleStart = (e) => {
-  e.preventDefault()
-  if (handledRef.current) return
-  handledRef.current = true
-  startListening()
-  setTimeout(() => { handledRef.current = false }, 500)
-}
-// button: onTouchEnd={handleStart} onClick={handleStart}
-```
+---
 
-## Files Modified
-- `src/hooks/useGamePitchDetection.tsx` -- Proven unlock sequence, remove byte fallback, remove GainNode, export debug data
-- `src/hooks/usePitchDetection.tsx` -- Proven unlock sequence, source -> analyser only
-- `src/pages/GamePlayPage.tsx` -- Dual touchend/click, debug overlay
-- `src/components/tuner/TunerPopup.tsx` -- touchend support
+## 4. Daily Pass Indicator
+
+Neue Komponente `src/components/premium/DailyPassIndicator.tsx`:
+
+- Kompaktes UI-Element: "Videos: X/3 | Game: Y/3"
+- Nur fur FREE-User sichtbar
+- Bei 2/3: zeigt Micro-Teaser ("Noch 1 Video frei heute!")
+- Wird im Header (`src/components/layout/Header.tsx`) eingebunden, nur wenn `planKey === 'FREE'`
+
+---
+
+## 5. Integration: Video-Start
+
+In `src/pages/LevelsPage.tsx`:
+
+- Beim Klick auf eine VideoCard (Zeile ~448/500/532 wo `setSelectedVideo` aufgerufen wird):
+  - Vorher `canStartVideo()` prufen
+  - Wenn blockiert: `DailyLimitOverlay` anzeigen statt Video zu offnen
+  - Wenn erlaubt: `recordVideoStart()` aufrufen, dann Video offnen
+
+---
+
+## 6. Integration: Game-Start
+
+In `src/components/game/GameLanding.tsx`:
+
+- Beim Klick auf "Spiel starten" (navigate zu `/game/play`):
+  - `canStartGame()` prufen
+  - Wenn blockiert: `DailyLimitOverlay` anzeigen
+  - Wenn erlaubt: `recordGameStart()`, dann navigieren
+
+In `src/pages/GamePlayPage.tsx`:
+
+- Zusatzliche Absicherung beim `handleActivateMic` (der eigentliche Game-Start):
+  - Falls irgendwie direkt auf `/game/play` navigiert wurde ohne Check
+
+---
+
+## 7. Edge Cases
+
+- **Offline/DB-Fehler**: `canStartVideo()`/`canStartGame()` gibt `false` zuruck bei Fehler, zeigt "Bitte neu laden"
+- **Geraetewechsel**: Serverseitig persistent, Limits gelten uberall
+- **Doppelklick**: 800ms Debounce im Hook + atomare DB-Funktion
+- **Mitternachts-Reset**: Automatisch durch neuen `date_key` am nachsten Tag
+
+---
+
+## Dateien die erstellt/geandert werden
+
+| Aktion | Datei |
+|--------|-------|
+| Migration | `supabase/migrations/..._daily_usage.sql` |
+| Neu | `src/hooks/useDailyUsage.tsx` |
+| Neu | `src/components/premium/DailyLimitOverlay.tsx` |
+| Neu | `src/components/premium/DailyPassIndicator.tsx` |
+| Andern | `src/components/layout/Header.tsx` -- Daily Pass Indicator einbinden |
+| Andern | `src/pages/LevelsPage.tsx` -- Video-Start Gate |
+| Andern | `src/components/game/GameLanding.tsx` -- Game-Start Gate |
+| Andern | `src/pages/GamePlayPage.tsx` -- Fallback Gate |
+| Andern | `src/i18n/locales/de.json`, `en.json`, `es.json` -- Texte |
+| Andern | `src/integrations/supabase/types.ts` -- wird automatisch aktualisiert |
 
