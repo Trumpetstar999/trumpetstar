@@ -802,6 +802,51 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_items: {
+        Row: {
+          answer_de: string
+          answer_en: string | null
+          answer_es: string | null
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          question_de: string
+          question_en: string | null
+          question_es: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer_de?: string
+          answer_en?: string | null
+          answer_es?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_de?: string
+          question_en?: string | null
+          question_es?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer_de?: string
+          answer_en?: string | null
+          answer_es?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          question_de?: string
+          question_en?: string | null
+          question_es?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           created_at: string
