@@ -87,6 +87,7 @@ const App = () => {
                         <Route path="/trompete-lernen-kinder" element={<TrompeteLernenKinderPage />} />
                         <Route path="/trompete-ansatz-atmung" element={<TrompeteAnsatzAtmungPage />} />
                         <Route path="/trompete-erster-ton" element={<TrompeteErsterTonPage />} />
+                        <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
