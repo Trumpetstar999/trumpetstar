@@ -135,14 +135,14 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
               {isAdmin && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                  <DropdownMenuItem onClick={() => navigate('/app/admin')}>
                     <Settings className="w-4 h-4 mr-2" />
                     Admin
                   </DropdownMenuItem>
                 </>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/hilfe')}>
+              <DropdownMenuItem onClick={() => navigate('/app/hilfe')}>
                 <HelpCircle className="w-4 h-4 mr-2" />
                 Hilfe-Center
               </DropdownMenuItem>

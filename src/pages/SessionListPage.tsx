@@ -191,7 +191,7 @@ export default function SessionListPage() {
   });
 
   const handleTabChange = (tab: TabId) => {
-    navigate('/', { state: { activeTab: tab } });
+    navigate('/app', { state: { activeTab: tab } });
   };
 
   return (
@@ -201,7 +201,7 @@ export default function SessionListPage() {
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
           {/* Header */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/', { state: { activeTab: 'practice' } })} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/app', { state: { activeTab: 'practice' } })} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1 min-w-0">
@@ -212,7 +212,7 @@ export default function SessionListPage() {
                 </p>
               )}
             </div>
-            <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
+            <Button onClick={() => navigate('/app/practice/sessions/new')} className="gap-2 rounded-xl">
               <Plus className="w-4 h-4" /> Neue Session
             </Button>
           </div>
@@ -230,7 +230,7 @@ export default function SessionListPage() {
               </div>
               <h3 className="font-semibold text-lg mb-2">Noch keine Sessions</h3>
               <p className="text-muted-foreground mb-6 text-sm">Erstelle deine erste Übesession und starte strukturiert!</p>
-              <Button onClick={() => navigate('/practice/sessions/new')} className="gap-2 rounded-xl">
+              <Button onClick={() => navigate('/app/practice/sessions/new')} className="gap-2 rounded-xl">
                 <Plus className="w-4 h-4" /> Neue Übesession
               </Button>
             </div>
@@ -243,8 +243,8 @@ export default function SessionListPage() {
                 session={session}
                 index={i}
                 thumbnails={thumbnails}
-                onPlay={() => navigate(`/practice/sessions/${session.id}/play`)}
-                onEdit={() => navigate(`/practice/sessions/${session.id}/edit`)}
+                onPlay={() => navigate(`/app/practice/sessions/${session.id}/play`)}
+                onEdit={() => navigate(`/app/practice/sessions/${session.id}/edit`)}
                 onDuplicate={() => duplicateSession.mutate(session.id)}
                 onShare={() => setShareSessionId(session.id)}
                 onDelete={() => { if (confirm('Session löschen?')) deleteSession.mutate(session.id); }}

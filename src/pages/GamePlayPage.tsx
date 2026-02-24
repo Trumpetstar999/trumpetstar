@@ -31,7 +31,7 @@ export default function GamePlayPage() {
 
   // Redirect if not logged in
   useEffect(() => {
-    if (!loading && !user) navigate('/auth');
+    if (!loading && !user) navigate('/login');
   }, [user, loading, navigate]);
 
   // Check hits when pitch data changes
@@ -116,7 +116,7 @@ export default function GamePlayPage() {
   const handleBack = useCallback(() => {
     stopListening();
     stopGame();
-    navigate('/', { state: { activeTab: 'game' } });
+    navigate('/app', { state: { activeTab: 'game' } });
   }, [navigate, stopListening, stopGame]);
 
   const handleTogglePause = useCallback(() => {

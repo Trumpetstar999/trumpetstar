@@ -92,7 +92,7 @@ export default function MobileHelpPage() {
         <Button
           variant="outline"
           className="w-full h-12 border-white/20 text-white bg-white/10 hover:bg-white/20 gap-2"
-          onClick={() => navigate('/hilfe')}
+          onClick={() => navigate('/app/hilfe')}
         >
           <ExternalLink className="w-4 h-4" />
           {language === 'en' ? 'Full Help Center' : language === 'es' ? 'Centro de Ayuda completo' : 'Vollständiges Hilfe-Center'}

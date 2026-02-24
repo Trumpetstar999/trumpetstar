@@ -36,7 +36,7 @@ export default function WordPressCallbackPage() {
       if (success) {
         setStatus('success');
         // Redirect to home after short delay
-        setTimeout(() => navigate('/'), 2000);
+        setTimeout(() => navigate('/app'), 2000);
       } else {
         setStatus('error');
         setError(membershipError || 'OAuth-Authentifizierung fehlgeschlagen');
@@ -69,7 +69,7 @@ export default function WordPressCallbackPage() {
         <CardContent className="flex justify-center">
           {status === 'error' && (
             <div className="space-y-3 w-full">
-              <Button onClick={() => navigate('/auth')} className="w-full">
+              <Button onClick={() => navigate('/login')} className="w-full">
                 Zurück zur Anmeldung
               </Button>
               <Button variant="outline" onClick={() => window.location.reload()} className="w-full">
@@ -78,7 +78,7 @@ export default function WordPressCallbackPage() {
             </div>
           )}
           {status === 'success' && (
-            <Button onClick={() => navigate('/')} className="w-full">
+            <Button onClick={() => navigate('/app')} className="w-full">
               Zur App
             </Button>
           )}

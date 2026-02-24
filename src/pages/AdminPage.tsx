@@ -70,13 +70,13 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth');
+      navigate('/login');
     }
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (!roleLoading && !isAdmin) {
-      navigate('/');
+      navigate('/app');
       toast.error('Zugriff verweigert');
     }
   }, [isAdmin, roleLoading, navigate]);
@@ -186,7 +186,7 @@ export default function AdminPage() {
           <div className="px-8 py-5 flex items-center justify-between">
             <div className="flex items-center gap-5">
               <button 
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/app')}
                 className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
                 title="Zurück zur App"
               >

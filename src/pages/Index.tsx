@@ -52,10 +52,10 @@ const Index = () => {
     }
   }, [location.state]);
 
-  // Redirect to auth if not logged in, or to mobile if mini mode
+  // Redirect to login if not logged in, or to mobile if mini mode
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      navigate('/login');
     } else if (!loading && user && isMiniMode) {
       navigate('/mobile/home', { replace: true });
     }
