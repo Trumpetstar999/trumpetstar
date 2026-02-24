@@ -1,127 +1,167 @@
 
-
-# Free-Plan Daily Limit System
+# Conversion-starke Landingpage + App-Routing Umbau
 
 ## Ubersicht
 
-Free-User erhalten taglich 3 Video-Starts und 3 Game-Starts. Nach Erreichen des Limits wird ein freundliches Upgrade-Overlay angezeigt. Pro/Basic-User sind nicht betroffen.
+Die Root-Route "/" wird von der geschutzten App zu einer oeffentlichen Conversion-Landingpage umgebaut. Eingeloggte Nutzer werden sofort nach "/app" weitergeleitet. Deep-Links werden nach Login korrekt fortgesetzt.
 
 ---
 
-## 1. Datenbank
-
-Neue Tabelle `daily_usage` mit atomarem Upsert:
+## Routing-Architektur (Vorher -> Nachher)
 
 ```text
-daily_usage
-+--------------+-------------+---------------------------+
-| user_id      | UUID        | NOT NULL                  |
-| date_key     | TEXT        | NOT NULL (YYYY-MM-DD)     |
-| videos_started| INT        | DEFAULT 0                 |
-| games_started | INT        | DEFAULT 0                 |
-| updated_at   | TIMESTAMPTZ | DEFAULT now()             |
-+--------------+-------------+---------------------------+
-UNIQUE (user_id, date_key)
+VORHER:
+  /           -> Index.tsx (geschutzt, redirect zu /auth)
+  /auth       -> AuthPage.tsx (Login/Signup)
+
+NACHHER:
+  /           -> LandingPage.tsx (oeffentlich, Auto-Redirect wenn eingeloggt)
+  /login      -> AuthPage.tsx (Magic Link + Passwort, mit returnTo-Support)
+  /signup     -> AuthPage.tsx (Tab "signup" vorausgewaehlt)
+  /app        -> Index.tsx (geschuetzt, die gesamte App)
+  /app/*      -> Deep-Link-faehig (gespeichert in sessionStorage bei Gate)
 ```
 
-RLS-Policies:
-- SELECT: Nutzer sieht nur eigene Zeilen (`auth.uid() = user_id`)
-- INSERT: Nutzer kann nur eigene Zeilen anlegen
-- UPDATE: Nutzer kann nur eigene Zeilen updaten
-- Admins: ALL
+---
 
-Eine DB-Funktion `increment_daily_usage(p_user_id UUID, p_date_key TEXT, p_type TEXT)` wird erstellt, die atomar per `INSERT ... ON CONFLICT DO UPDATE` den Zahler um 1 erhoht und den neuen Wert zuruckgibt. Das verhindert Race Conditions bei Doppelklicks.
+## Schritt-fuer-Schritt Plan
+
+### 1. Neue Landingpage erstellen (`src/pages/LandingPage.tsx`)
+
+- **Sofortige Session-Pruefung**: Beim Laden `supabase.auth.getSession()` pruefen. Wenn Session vorhanden -> `navigate('/app', { replace: true })`. Dabei kurzer Loader (max 300ms), kein Landing-Flash.
+- **Above the fold**:
+  - Headline: "Trompete lernen -- kinderleicht. Auch fur Erwachsene."
+  - Subheadline: "Playbacks, Lernvideos und Ube-Tools in einer App -- perfekt zu den Trumpetstar-Heften."
+  - Primar-CTA: "Kostenlos starten" -> /signup
+  - Sekundar-CTA: "Ich habe schon einen Account" -> /login
+- **Sektionen**:
+  - 3 USPs (Playbacks, Videos, Tools wie Metronom/Stimmgerat/Grifftabelle)
+  - "So funktioniert's" (3 Schritte)
+  - Social Proof ("Von Musikpadagogen entwickelt")
+  - Kurzfassung FAQ (3-4 Fragen)
+  - Footer: Datenschutz, Impressum, Support-Links
+- **Design**: Trumpetstar-Design (blauer Gradient, Glassmorphismus) analog zu bestehenden SEO-Seiten mit `SEOPageLayout`.
+- **UTM-Parameter**: Query-Params werden durchgereicht zu /signup und /login.
+
+### 2. AuthPage erweitern (`src/pages/AuthPage.tsx`)
+
+- **returnTo-Support**: Wenn `?returnTo=...` Query-Param oder `sessionStorage.getItem('returnTo')` vorhanden, nach Login dorthin redirecten statt nach `/app`.
+- **Kontextuelles Gate-Banner**: Wenn `returnTo` vorhanden, oben "Du bist 1 Klick vom Inhalt entfernt" anzeigen.
+- **Tab-Vorauswahl**: Route `/signup` oeffnet AuthPage mit `defaultValue="signup"`, `/login` mit `defaultValue="login"`.
+- **Redirect-Ziel andern**: Standard-Redirect nach Login geht nun zu `/app` statt `/`.
+
+### 3. Index.tsx (App) verschieben auf `/app`
+
+- **Route**: `/app` statt `/`.
+- **Auth-Guard**: Bleibt bestehen. Wenn nicht eingeloggt -> `navigate('/login')` (nicht mehr `/auth`).
+- **Deep-Link-Gate**: Wenn nicht eingeloggt, wird die aktuelle URL in `sessionStorage.setItem('returnTo', location.pathname)` gespeichert, dann Redirect zu `/login`.
+
+### 4. App.tsx Routing aktualisieren
+
+Alle bestehenden geschuetzten Routen bekommen das `/app`-Prefix:
+
+```text
+/app                   -> Index.tsx (Haupt-App)
+/app/admin             -> AdminPage
+/app/chats             -> ChatsPage
+/app/game/play         -> GamePlayPage
+/app/practice/sessions -> SessionListPage
+/app/musicxml/:id      -> MusicXMLViewerPage
+/app/hilfe             -> HelpCenterPage
+...etc
+```
+
+Oeffentliche Routen bleiben unverndert:
+```text
+/                      -> LandingPage (NEU)
+/login                 -> AuthPage
+/signup                -> AuthPage (Tab signup)
+/pricing               -> PricingPage
+/trompete-lernen       -> SEO Pages
+/practice/sessions/share/:slug -> SharedSessionPage
+```
+
+### 5. Protected Route Wrapper (`src/components/auth/ProtectedRoute.tsx`)
+
+Neuer Wrapper der:
+- Auth-Status prueft
+- Bei fehlender Session: URL in `sessionStorage('returnTo')` speichert
+- Redirect zu `/login`
+- Loading-Spinner waehrend Session-Restore zeigt
+
+```tsx
+<Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+```
+
+### 6. MobileRouteGuard anpassen
+
+- Mobile-Routen bleiben auf `/mobile/*`
+- Desktop-Redirect von `/mobile/*` geht nun zu `/app`
+- isMiniMode-Redirect in Index.tsx geht zu `/mobile/home`
+
+### 7. Navigation-Updates (alle Dateien)
+
+Alle internen Navigationen aktualisieren:
+
+| Alt | Neu |
+|-----|-----|
+| `navigate('/')` | `navigate('/app')` |
+| `navigate('/auth')` | `navigate('/login')` |
+| `navigate('/', { state: { activeTab: 'x' } })` | `navigate('/app', { state: { activeTab: 'x' } })` |
+
+Betroffene Dateien:
+- `Header.tsx` (Logo-Click, Hilfe-Center, Sign-Out -> `/`)
+- `MusicXMLViewerPage.tsx`, `GamePlayPage.tsx`, `SessionListPage.tsx`
+- `AdminPage.tsx`, `SharedSessionPage.tsx`, `WordPressCallbackPage.tsx`
+- `MobileRouteGuard.tsx`
+- `HelpCenterPage.tsx`
+- `useAuth.tsx` (signOut -> redirect)
+
+### 8. Analytics-Events tracken
+
+In `logActivity()` (bestehendes System) diese Events tracken:
+- `landing_view` -- LandingPage mount (nur wenn nicht eingeloggt)
+- `cta_start_click` -- "Kostenlos starten" Click
+- `login_view` -- AuthPage mount
+- `signup_start` -- Signup-Tab ausgewaehlt
+- `auth_success` -- Erfolgreicher Login
+- `auto_redirect_to_app` -- Eingeloggter User auf "/" -> "/app"
+- `deep_link_gate_view` -- Login-Gate mit returnTo
+- `deep_link_resume_success` -- Nach Login zurueck zum Deep-Link
+
+Analytics wird ueber `supabase.from('activity_logs').insert()` direkt gemacht (kein Auth-Context noetig fuer public events, Auth-Events nutzen den bestehenden Auth-Provider).
+
+### 9. Session-Persistence (bereits vorhanden)
+
+Das bestehende Setup ist bereits optimal:
+- `localStorage` Persistenz in `client.ts`
+- `autoRefreshToken: true`
+- `persistSession: true`
+- "Angemeldet bleiben" Checkbox in AuthPage
+
+Keine Aenderungen noetig.
 
 ---
 
-## 2. Custom Hook: `useDailyUsage`
+## Technische Details
 
-Neuer Hook `src/hooks/useDailyUsage.tsx`:
+### Neue Dateien
+- `src/pages/LandingPage.tsx` -- Oeffentliche Conversion-Landingpage
+- `src/components/auth/ProtectedRoute.tsx` -- Auth-Guard mit returnTo-Support
 
-- Ermittelt `dateKey` aus Browser-Zeitzone (`Intl.DateTimeFormat`)
-- Ladt aktuellen Stand aus `daily_usage` fur den User + heutiges Datum
-- Stellt bereit:
-  - `videosUsed`, `gamesUsed` (aktuelle Zahler)
-  - `canStartVideo()` / `canStartGame()` -- pruft Plan (FREE?) + Limit
-  - `recordVideoStart()` / `recordGameStart()` -- ruft DB-Funktion auf, gibt `true/false` zuruck
-  - `isLoading`
-- Nutzt `useMembership()` intern: wenn `planKey !== 'FREE'`, immer `true`
-- Debounce: 800ms Sperre nach erfolgreichem Start
+### Wesentlich geaenderte Dateien
+- `src/App.tsx` -- Komplettes Routing-Update
+- `src/pages/AuthPage.tsx` -- returnTo + Tab-Vorauswahl + Gate-Banner
+- `src/pages/Index.tsx` -- Auth-Redirect zu `/login`, Basis-Route `/app`
+- `src/components/layout/Header.tsx` -- Nav-Links aktualisieren
+- `src/components/mobile/MobileRouteGuard.tsx` -- Pfad-Anpassungen
 
----
+### Leicht geaenderte Dateien (nur navigate-Pfade)
+- `MusicXMLViewerPage.tsx`, `GamePlayPage.tsx`, `SessionListPage.tsx`
+- `AdminPage.tsx`, `SharedSessionPage.tsx`, `WordPressCallbackPage.tsx`
+- `HelpCenterPage.tsx`
 
-## 3. Upgrade-Overlay (Limit erreicht)
-
-Neue Komponente `src/components/premium/DailyLimitOverlay.tsx`:
-
-- Dialog/Modal mit freundlichem, motivierendem Text
-- Titel: "Fur heute ist dein Free-Kontingent aufgebraucht"
-- Text abhaengig vom Typ (Video/Game)
-- Buttons:
-  - Primary: "Jetzt upgraden" -- navigiert zu `/pricing`
-  - Secondary: "Morgen weitermachen" -- schliesst Dialog
-
----
-
-## 4. Daily Pass Indicator
-
-Neue Komponente `src/components/premium/DailyPassIndicator.tsx`:
-
-- Kompaktes UI-Element: "Videos: X/3 | Game: Y/3"
-- Nur fur FREE-User sichtbar
-- Bei 2/3: zeigt Micro-Teaser ("Noch 1 Video frei heute!")
-- Wird im Header (`src/components/layout/Header.tsx`) eingebunden, nur wenn `planKey === 'FREE'`
-
----
-
-## 5. Integration: Video-Start
-
-In `src/pages/LevelsPage.tsx`:
-
-- Beim Klick auf eine VideoCard (Zeile ~448/500/532 wo `setSelectedVideo` aufgerufen wird):
-  - Vorher `canStartVideo()` prufen
-  - Wenn blockiert: `DailyLimitOverlay` anzeigen statt Video zu offnen
-  - Wenn erlaubt: `recordVideoStart()` aufrufen, dann Video offnen
-
----
-
-## 6. Integration: Game-Start
-
-In `src/components/game/GameLanding.tsx`:
-
-- Beim Klick auf "Spiel starten" (navigate zu `/game/play`):
-  - `canStartGame()` prufen
-  - Wenn blockiert: `DailyLimitOverlay` anzeigen
-  - Wenn erlaubt: `recordGameStart()`, dann navigieren
-
-In `src/pages/GamePlayPage.tsx`:
-
-- Zusatzliche Absicherung beim `handleActivateMic` (der eigentliche Game-Start):
-  - Falls irgendwie direkt auf `/game/play` navigiert wurde ohne Check
-
----
-
-## 7. Edge Cases
-
-- **Offline/DB-Fehler**: `canStartVideo()`/`canStartGame()` gibt `false` zuruck bei Fehler, zeigt "Bitte neu laden"
-- **Geraetewechsel**: Serverseitig persistent, Limits gelten uberall
-- **Doppelklick**: 800ms Debounce im Hook + atomare DB-Funktion
-- **Mitternachts-Reset**: Automatisch durch neuen `date_key` am nachsten Tag
-
----
-
-## Dateien die erstellt/geandert werden
-
-| Aktion | Datei |
-|--------|-------|
-| Migration | `supabase/migrations/..._daily_usage.sql` |
-| Neu | `src/hooks/useDailyUsage.tsx` |
-| Neu | `src/components/premium/DailyLimitOverlay.tsx` |
-| Neu | `src/components/premium/DailyPassIndicator.tsx` |
-| Andern | `src/components/layout/Header.tsx` -- Daily Pass Indicator einbinden |
-| Andern | `src/pages/LevelsPage.tsx` -- Video-Start Gate |
-| Andern | `src/components/game/GameLanding.tsx` -- Game-Start Gate |
-| Andern | `src/pages/GamePlayPage.tsx` -- Fallback Gate |
-| Andern | `src/i18n/locales/de.json`, `en.json`, `es.json` -- Texte |
-| Andern | `src/integrations/supabase/types.ts` -- wird automatisch aktualisiert |
-
+### Risiken & Mitigations
+- **Bestehende Magic-Link-URLs**: Magic Links redirecten aktuell zu `window.location.origin + '/'`. Da "/" nun die Landingpage ist und eingeloggte User automatisch zu `/app` weitergeleitet werden, funktionieren bestehende Magic Links weiterhin.
+- **SEO-Seiten**: Bleiben unveraendert auf ihren aktuellen Routen.
+- **Bookmarks**: Bestehende Bookmarks auf "/" werden fuer eingeloggte User transparent zu "/app" weitergeleitet.
