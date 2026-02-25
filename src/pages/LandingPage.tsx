@@ -6,6 +6,7 @@ import { Loader2, Play, BookOpen, Music, Headphones, CheckCircle, Star, ArrowRig
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import LeadCaptureForm from '@/components/LeadCaptureForm';
 
 const LANDING_FAQS = [
   { question: 'Ist die App wirklich kostenlos?', answer: 'Ja! Du kannst mit dem kostenlosen Plan starten und hast Zugriff auf die ersten Lektionen und alle Tools. Für den vollen Zugang gibt es Premium-Pläne.' },
@@ -167,16 +168,22 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Final CTA */}
-        <section className="max-w-3xl mx-auto px-5 pb-20 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Bereit loszulegen?</h2>
-          <Button 
-            size="lg"
-            onClick={handleCtaClick}
-            className="h-14 px-8 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-lg shadow-yellow-500/30 gap-2"
-          >
-            Kostenlos starten <ArrowRight className="w-5 h-5" />
-          </Button>
+        {/* Lead Capture Form */}
+        <section className="max-w-md mx-auto px-5 pb-24">
+          <div className="relative bg-white/[0.07] backdrop-blur-xl border border-white/[0.12] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/20">
+            {/* Decorative glow */}
+            <div className="absolute -inset-1 bg-gradient-to-b from-[hsl(var(--reward-gold))]/10 via-transparent to-transparent rounded-3xl blur-xl pointer-events-none" />
+            
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
+                Starte jetzt kostenlos
+              </h2>
+              <p className="text-white/60 text-center text-sm mb-8">
+                Erhalte deine erste Lektion gratis – ohne Kreditkarte.
+              </p>
+              <LeadCaptureForm source="landing_page" />
+            </div>
+          </div>
         </section>
       </div>
     </SEOPageLayout>

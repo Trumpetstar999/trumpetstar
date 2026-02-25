@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { BookOpen, Video, Smartphone, Award, Clock, Users, Baby, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
 
 const faqs = [
   { question: "Ab welchem Alter kann man Trompete lernen?", answer: "Kinder können ab 6-7 Jahren mit dem Kornett (kleinere Version) beginnen, ab 8-9 Jahren mit der normalen Trompete. Erwachsene können jederzeit starten – es ist nie zu spät." },
@@ -36,37 +37,52 @@ export default function TrompeteLernenPage() {
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Trompete lernen: Der komplette Guide für Anfänger (2026)
-          </h1>
-          <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Trompete lernen ist mit der richtigen Methode in 3–6 Monaten möglich – egal ob als Kind, Erwachsener oder Wiedereinsteiger.
-          </p>
+          <AnimatedSection direction="up">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Trompete lernen: Der komplette Guide für Anfänger (2026)
+            </h1>
+            <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
+              Trompete lernen ist mit der richtigen Methode in 3–6 Monaten möglich – egal ob als Kind, Erwachsener oder Wiedereinsteiger.
+            </p>
+          </AnimatedSection>
           
-          <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
-              <p className="text-white">
-                <strong>Kurz gesagt:</strong> Trompete lernen dauert 3–6 Monate für erste Songs. Kinder ab 7 Jahren und Erwachsene können mit der Star-Methode effizient lernen. Täglich 5–15 Minuten sind ausreichend.
-              </p>
+          <AnimatedSection direction="up" delay={150}>
+            <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
+                <p className="text-white">
+                  <strong>Kurz gesagt:</strong> Trompete lernen dauert 3–6 Monate für erste Songs. Kinder ab 7 Jahren und Erwachsene können mit der Star-Methode effizient lernen. Täglich 5–15 Minuten sind ausreichend.
+                </p>
+              </div>
             </div>
-          </div>
+          </AnimatedSection>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kostenlos-starten">Gratis-Lektion testen</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/kurse">Kurs entdecken</Link>
-            </Button>
-          </div>
+          <AnimatedSection direction="up" delay={300}>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+                <Link to="/auth">Kurs entdecken</Link>
+              </Button>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        
+
+        {/* Video */}
+        <AnimatedSection direction="up" className="mb-16">
+          <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
+            <iframe
+              src="https://player.vimeo.com/video/995373130"
+              className="w-full h-full"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </AnimatedSection>
+
         {/* Für wen */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Für wen ist Trompete lernen geeignet?</h2>
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <Card className="hover-lift">
@@ -104,10 +120,10 @@ export default function TrompeteLernenPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Star-Methode */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Die Star-Methode: Modernes Trompete-Lernen</h2>
           <p className="text-lg text-white/70 mb-8">
             Die Star-Methode wurde von <Link to="/ueber-mario" className="text-[hsl(var(--reward-gold))] hover:underline">Mario Schulter</Link> entwickelt und verbindet bewährte Unterrichtsmethoden mit moderner Technologie.
@@ -138,10 +154,10 @@ export default function TrompeteLernenPage() {
               Der Ansatz (auch <em>Embouchure</em>) beschreibt die Lippenstellung am Mundstück. Ein korrekter Ansatz ist die Basis für guten Ton. <strong className="text-white">Zu fest = kein Ton, zu locker = Luft entweicht.</strong> In unserem <Link to="/trompete-ansatz-atmung" className="text-[hsl(var(--reward-gold))] hover:underline">Ansatz-Guide</Link> zeigen wir die optimale Technik.
             </p>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Erste Schritte */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Deine ersten Schritte</h2>
           <div className="space-y-4">
             {ersteSchritte.map((schritt) => (
@@ -172,10 +188,10 @@ export default function TrompeteLernenPage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Praxisbeispiel */}
-        <section className="mb-16">
+        <AnimatedSection direction="left" className="mb-16">
           <Card className="overflow-hidden">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
@@ -190,10 +206,10 @@ export default function TrompeteLernenPage() {
               </div>
             </CardContent>
           </Card>
-        </section>
+        </AnimatedSection>
 
         {/* Zeitplan */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6">Wie lange dauert es wirklich?</h2>
           <div className="space-y-3">
             {[
@@ -211,10 +227,10 @@ export default function TrompeteLernenPage() {
               </div>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* FAQ */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Häufige Fragen</h2>
           <div className="space-y-3">
             {faqs.map((faq, index) => (
@@ -226,10 +242,10 @@ export default function TrompeteLernenPage() {
               </Card>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Zusammenfassung */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass rounded-2xl p-6 border border-[hsl(var(--reward-gold))]/20">
             <h2 className="text-2xl font-bold text-white mb-4">Kurz zusammengefasst</h2>
             <ul className="space-y-2">
@@ -247,31 +263,28 @@ export default function TrompeteLernenPage() {
               ))}
             </ul>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* E-E-A-T */}
-        <section className="mb-16 border-t border-white/10 pt-8">
+        <AnimatedSection direction="fade" className="mb-16 border-t border-white/10 pt-8">
           <div className="text-sm text-white/50 space-y-1">
             <p><strong className="text-white/70">Autor:</strong> Mario Schulter – Professioneller Trompeter, Musikpädagoge</p>
             <p><strong className="text-white/70">Aktualisiert:</strong> 23. Februar 2026</p>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* CTA */}
-        <section className="text-center glass rounded-2xl p-10">
+        <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
           <h2 className="text-3xl font-bold text-white mb-4">Bereit durchzustarten?</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">
             Starte jetzt mit der kostenlosen Star-Lektion – ohne Anmeldung, sofort verfügbar.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kostenlos-starten">🎯 Gratis-Lektion starten</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/kurse">Pro-Kurs entdecken</Link>
+              <Link to="/auth">Kurs entdecken</Link>
             </Button>
           </div>
-        </section>
+        </AnimatedSection>
       </div>
     </SEOPageLayout>
   );

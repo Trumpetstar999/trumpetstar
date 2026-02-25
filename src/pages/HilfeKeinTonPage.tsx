@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { AlertCircle, CheckCircle, Wrench, ArrowRight, Video } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
 
 const faqs = [
   { question: "Warum kommt bei meiner Trompete kein Ton?", answer: "Häufigste Ursachen: 1) Zu festes Drücken, 2) Zu wenig Luftdruck, 3) Lippen nicht geschlossen genug, 4) Falsche Mundstück-Position." },
@@ -29,44 +30,48 @@ export default function HilfeKeinTonPage() {
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[hsl(var(--accent-red))]/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[hsl(var(--accent-red))]/30">
-            <AlertCircle className="h-4 w-4 text-[hsl(var(--accent-red))]" />
-            Problem-Lösung
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Trompete macht keinen Ton?<br />
-            <span className="text-[hsl(var(--accent-red))]">So lösen Sie das Problem</span>
-          </h1>
-          
-          <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Keine Panik! Fast immer liegt es an kleinen, leicht korrigierbaren Fehlern. Diese Checkliste hilft in Minuten.
-          </p>
-
-          <div className="glass rounded-2xl p-6 max-w-2xl mx-auto mb-8 text-left">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
-              <p className="text-white">
-                <strong>Gute Nachrichten:</strong> 95% der "kein Ton"-Probleme liegen am Ansatz – nicht am Instrument. In 10 Minuten können wir das fixen.
-              </p>
+          <AnimatedSection direction="up">
+            <div className="inline-flex items-center gap-2 bg-[hsl(var(--accent-red))]/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[hsl(var(--accent-red))]/30">
+              <AlertCircle className="h-4 w-4 text-[hsl(var(--accent-red))]" />
+              Problem-Lösung
             </div>
-          </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Trompete macht keinen Ton?<br />
+              <span className="text-[hsl(var(--accent-red))]">So lösen Sie das Problem</span>
+            </h1>
+            <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
+              Keine Panik! Fast immer liegt es an kleinen, leicht korrigierbaren Fehlern. Diese Checkliste hilft in Minuten.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection direction="up" delay={150}>
+            <div className="glass rounded-2xl p-6 max-w-2xl mx-auto mb-8 text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
+                <p className="text-white">
+                  <strong>Gute Nachrichten:</strong> 95% der "kein Ton"-Probleme liegen am Ansatz – nicht am Instrument. In 10 Minuten können wir das fixen.
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
           
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-[hsl(var(--accent-red))] hover:bg-[hsl(var(--accent-red))]/90 text-white font-semibold" asChild>
-              <Link to="/support/chat"><Video className="mr-2 h-4 w-4" /> Video-Support starten</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/trompete-erster-ton">Zurück zur Anleitung</Link>
-            </Button>
-          </div>
+          <AnimatedSection direction="up" delay={300}>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button size="lg" className="bg-[hsl(var(--accent-red))] hover:bg-[hsl(var(--accent-red))]/90 text-white font-semibold" asChild>
+                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <Link to="/trompete-erster-ton">Zurück zur Anleitung</Link>
+              </Button>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
 
         {/* Schnell-Checkliste */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6">🔍 Schnell-Checkliste</h2>
           <div className="glass rounded-2xl p-6">
             <p className="text-white/70 mb-4 text-sm">Arbeiten Sie diese Punkte der Reihe nach ab:</p>
@@ -81,10 +86,10 @@ export default function HilfeKeinTonPage() {
               ))}
             </ol>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Top 3 Ursachen */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6">Die 3 häufigsten Ursachen</h2>
           <div className="space-y-4">
             {[
@@ -92,26 +97,28 @@ export default function HilfeKeinTonPage() {
               { num: "2", color: "border-l-[hsl(var(--reward-gold))]", numBg: "bg-[hsl(var(--reward-gold))]/15 text-[hsl(var(--reward-gold))]", title: "Zu wenig Luftdruck", desc: "Vorsichtig pusten funktioniert nicht. Die Trompete braucht einen kräftigen Luftstoß.", fix: "Vorstellen, Sie wollen eine Kerze 1 Meter weit wegpusten – stoßartig!" },
               { num: "3", color: "border-l-primary", numBg: "bg-primary/15 text-primary", title: "Lippen nicht geschlossen genug", desc: "Offene Lippen = Luft entweicht, keine Vibration.", fix: "Machen Sie den 'Mmmh'-Laut. Genau diese Lippenposition brauchen Sie." },
             ].map((item, i) => (
-              <Card key={i} className={`${item.color} border-l-4 hover-lift`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full ${item.numBg} flex items-center justify-center font-bold`}>{item.num}</div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-3">{item.desc}</p>
-                      <div className="bg-primary/5 p-3 rounded-lg">
-                        <p className="text-sm"><strong>Lösung:</strong> {item.fix}</p>
+              <AnimatedSection key={i} direction="left" delay={i * 100}>
+                <Card className={`${item.color} border-l-4 hover-lift`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${item.numBg} flex items-center justify-center font-bold`}>{item.num}</div>
+                      <div>
+                        <h3 className="text-lg font-semibold mb-1">{item.title}</h3>
+                        <p className="text-muted-foreground text-sm mb-3">{item.desc}</p>
+                        <div className="bg-primary/5 p-3 rounded-lg">
+                          <p className="text-sm"><strong>Lösung:</strong> {item.fix}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Diagnose */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6">Selbst-Diagnose: Was hören Sie?</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
@@ -120,18 +127,20 @@ export default function HilfeKeinTonPage() {
               { emoji: "🎺", title: "Ton bricht ab", desc: "→ Zu wenig Luft oder nachlassende Spannung. Lange Töne üben!" },
               { emoji: "🦆", title: "Enten-quacken", desc: "→ Fast ein Ton! Etwas mehr Luft und Spannung – dann wird's!" },
             ].map((item, i) => (
-              <Card key={i} className="hover-lift">
-                <CardContent className="p-5">
-                  <h3 className="font-semibold mb-1 text-sm">{item.emoji} {item.title}</h3>
-                  <p className="text-xs text-muted-foreground">{item.desc}</p>
-                </CardContent>
-              </Card>
+              <AnimatedSection key={i} direction="up" delay={i * 80}>
+                <Card className="hover-lift">
+                  <CardContent className="p-5">
+                    <h3 className="font-semibold mb-1 text-sm">{item.emoji} {item.title}</h3>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Soforthilfe */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass-strong rounded-2xl p-8 text-center border border-[hsl(var(--accent-red))]/20">
             <Wrench className="h-12 w-12 mx-auto mb-4 text-[hsl(var(--accent-red))]" />
             <h2 className="text-2xl font-bold text-white mb-4">Kommen Sie nicht weiter?</h2>
@@ -140,17 +149,14 @@ export default function HilfeKeinTonPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/support/chat">Video-Support buchen</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-                <Link to="/kurse">Pro-Kurs mit Support</Link>
+                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
               </Button>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* FAQ */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Häufige Fragen</h2>
           <div className="space-y-3">
             {faqs.map((faq, index) => (
@@ -162,10 +168,10 @@ export default function HilfeKeinTonPage() {
               </Card>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Verwandte Themen */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6">Das könnte auch helfen</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <Card className="hover-lift">
@@ -183,10 +189,10 @@ export default function HilfeKeinTonPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Zusammenfassung */}
-        <section className="mb-8">
+        <AnimatedSection direction="up" className="mb-8">
           <div className="glass rounded-2xl p-6 border border-[hsl(var(--reward-gold))]/20">
             <h2 className="text-2xl font-bold text-white mb-4">Merken Sie sich</h2>
             <ul className="space-y-2">
@@ -203,7 +209,7 @@ export default function HilfeKeinTonPage() {
               ))}
             </ul>
           </div>
-        </section>
+        </AnimatedSection>
       </div>
     </SEOPageLayout>
   );
