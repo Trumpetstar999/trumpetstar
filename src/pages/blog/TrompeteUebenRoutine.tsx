@@ -12,10 +12,6 @@ const slots = [
 export default function TrompeteUebenRoutine() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEO
-        title="Trompete üben mit Vollzeitjob – TrumpetStar"
-        description="5-Minuten-Methode für Berufstätige. Die beste Übe-Routine wenn du wenig Zeit hast."
-      />
       <div className="bg-white border-b border-gray-200 px-4 py-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-purple-600 font-bold text-xl">🎺 TrumpetStar</Link>

@@ -4,10 +4,6 @@ import { Link } from "react-router-dom";
 export default function TrompeteLernenErwachsene() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEO
-        title="Trompete lernen als Erwachsener – TrumpetStar"
-        description="Warum es nie zu spät ist, Trompete zu lernen. Der ultimative Guide für Erwachsene mit der 5-Minuten-Methode."
-      />
       <div className="bg-white border-b border-gray-200 px-4 py-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-purple-600 font-bold text-xl">🎺 TrumpetStar</Link>
