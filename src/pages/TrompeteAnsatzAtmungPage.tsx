@@ -42,7 +42,7 @@ export default function TrompeteAnsatzAtmungPage() {
           </h1>
           
           <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Der richtige Ansatz (Embouchure) und die korrekte Atmung sind das Fundament für alle Trompeten-Techniken.
+            Der richtige Ansatz (Embouchure) und die korrekte Atmung sind das Fundament für einen schönen Trompetenklang.
           </p>
 
           <div className="glass rounded-2xl p-6 max-w-2xl mx-auto mb-8 text-left">
@@ -69,10 +69,7 @@ export default function TrompeteAnsatzAtmungPage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/videos/ansatz-atmung"><PlayCircle className="mr-2 h-4 w-4" /> Video-Anleitung</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/kurse">Kompletter Technik-Kurs</Link>
+              <Link to="/login"><PlayCircle className="mr-2 h-4 w-4" /> Jetzt anmelden & kostenlos starten</Link>
             </Button>
           </div>
         </div>
@@ -213,7 +210,7 @@ export default function TrompeteAnsatzAtmungPage() {
           <h2 className="text-3xl font-bold text-white mb-4">Mehr Technik-Übungen?</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">Im Pro-Kurs findest du über 50 Technik-Übungen mit Video-Begleitung.</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/kurse">Technik-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/login">Jetzt anmelden & kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </section>
       </div>
