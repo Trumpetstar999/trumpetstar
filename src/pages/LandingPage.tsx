@@ -169,15 +169,20 @@ export default function LandingPage() {
         </section>
 
         {/* Lead Capture Form */}
-        <section className="max-w-xl mx-auto px-5 pb-20">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white text-center mb-2">
-              🎺 Starte jetzt kostenlos!
-            </h2>
-            <p className="text-white/70 text-center text-sm mb-6">
-              Melde dich an und erhalte deine erste Lektion gratis.
-            </p>
-            <LeadCaptureForm source="landing_page" />
+        <section className="max-w-md mx-auto px-5 pb-24">
+          <div className="relative bg-white/[0.07] backdrop-blur-xl border border-white/[0.12] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/20">
+            {/* Decorative glow */}
+            <div className="absolute -inset-1 bg-gradient-to-b from-[hsl(var(--reward-gold))]/10 via-transparent to-transparent rounded-3xl blur-xl pointer-events-none" />
+            
+            <div className="relative">
+              <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
+                Starte jetzt kostenlos
+              </h2>
+              <p className="text-white/60 text-center text-sm mb-8">
+                Erhalte deine erste Lektion gratis – ohne Kreditkarte.
+              </p>
+              <LeadCaptureForm source="landing_page" />
+            </div>
           </div>
         </section>
       </div>
