@@ -4,10 +4,6 @@ import { Link } from "react-router-dom";
 export default function ErsterTonTrompete() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEO
-        title="Der erste Ton auf der Trompete – TrumpetStar"
-        description="Schritt-für-Schritt Anleitung für den ersten Ton auf der Trompete. Von Buzzing bis zum klaren Ton in einer Woche."
-      />
       <div className="bg-white border-b border-gray-200 px-4 py-6">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-purple-600 font-bold text-xl">🎺 TrumpetStar</Link>

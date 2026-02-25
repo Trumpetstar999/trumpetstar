@@ -7,6 +7,7 @@ import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import LeadCaptureForm from '@/components/LeadCaptureForm';
+import appScreenshot from '@/assets/trumpetstar-app-screenshot.png';
 
 const LANDING_FAQS = [
   { question: 'Ist die App wirklich kostenlos?', answer: 'Ja! Du kannst mit dem kostenlosen Plan starten und hast Zugriff auf die ersten Lektionen und alle Tools. Für den vollen Zugang gibt es Premium-Pläne.' },
@@ -89,6 +90,18 @@ export default function LandingPage() {
             >
               Ich habe schon einen Account
             </Button>
+          </div>
+        </section>
+
+        {/* App Screenshot */}
+        <section className="max-w-4xl mx-auto px-5 pb-16">
+          <div className="relative">
+            <div className="absolute inset-0 bg-[hsl(var(--reward-gold))]/10 blur-3xl rounded-full scale-75 pointer-events-none" />
+            <img
+              src={appScreenshot}
+              alt="Trumpetstar App – Levels Übersicht auf dem iPad"
+              className="relative w-full max-w-2xl mx-auto block rounded-2xl shadow-2xl shadow-black/40 border border-white/10"
+            />
           </div>
         </section>
 
