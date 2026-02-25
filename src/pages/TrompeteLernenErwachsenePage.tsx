@@ -2,6 +2,7 @@ import { FAQSchema } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import infografik from "@/assets/trompete-lernen-erwachsene-infografik.png";
 import { Users, Clock, TrendingUp, Award, CheckCircle, ArrowRight, Star, BookOpen } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 
@@ -10,11 +11,11 @@ const faqs = [
   { question: "Lerne ich als Erwachsener schneller als Kinder?", answer: "In den ersten 6 Monaten oft ja! Erwachsene verstehen Anweisungen besser und üben zielgerichteter." },
   { question: "Wie viel Zeit muss ich investieren?", answer: "5-15 Minuten täglich reichen völlig aus. Die Regelmäßigkeit ist wichtiger als die Dauer." },
   { question: "Habe ich überhaupt Talent dafür?", answer: "Talent ist überschätzt. Bei der Trompete geht es um Technik und regelmäßiges Üben." },
-  { question: "Was ist der Unterschied zum Kinder-Kurs?", answer: "Der Erwachsenen-Kurs geht schneller vor, nutzt andere Lernstrategien und behandelt Zeitmanagement." },
+  { question: "Was ist der Unterschied zum Kinder-Kurs?", answer: "Der Erwachsenen-Kurs geht schneller vor, nutzt andere Lernstrategien und behandelt Zeitmanagement. Außerdem bietet der Kurs die Möglichkeit eines persönlichen Feedbacks – schicke uns einfach ein Video und wir helfen dir sofort weiter." },
   { question: "Kann ich auch nach 20 Jahren Pause wieder anfangen?", answer: "Definitiv! Das Muskelgedächtnis ist erstaunlich. Viele Wiedereinsteiger sind nach 2-3 Monaten schnell wieder im Fluss." },
   { question: "Wie lange dauert es bis zum ersten Song?", answer: "Mit konsequentem Üben: Erster Ton in 1-2 Wochen, erste Melodie in 4-6 Wochen, erster Song in 8-12 Wochen." },
   { question: "Muss ich Noten lesen können?", answer: "Nein! Wir beginnen mit auditorischem Lernen. Notenlesen wird Schritt für Schritt eingeführt." },
-  { question: "Was kostet der Einstieg?", answer: "Instrument: 200-400€ (Kauf) oder 25-35€/Monat (Miete). Basic-Kurs kostenlos, Pro-Kurs ab 29€/Monat." },
+  { question: "Was kostet der Einstieg?", answer: "Instrument: 200-400€ (Kauf) oder 25-35€/Monat (Miete). Pro-Kurs ab 59€/Monat – der 1. Monat für nur 1€!" },
   { question: "Was wenn ich aufgeben will?", answer: "Das ist normal! Unsere App erkennt Inaktivität und schickt motivierende Erinnerungen. Unser Support hilft." }
 ];
 
@@ -59,10 +60,10 @@ export default function TrompeteLernenErwachsenePage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kurse/erwachsene">Pro-Kurs für Erwachsene</Link>
+              <Link to="/auth">Pro-Kurs entdecken</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/webinar">Gratis-Webinar ansehen</Link>
+              <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
             </Button>
           </div>
         </div>
@@ -131,6 +132,14 @@ export default function TrompeteLernenErwachsenePage() {
                 <p className="text-sm text-white/60">52 Jahre, Projektmanager, München</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Infografik */}
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">Trompete spielen: Ein Jungbrunnen für Geist & Seele</h2>
+          <div className="rounded-2xl overflow-hidden shadow-2xl">
+            <img src={infografik} alt="Infografik: Vorteile von Trompete spielen für Erwachsene – Fitness für den Geist und Balsam für Körper und Seele" className="w-full h-auto" />
           </div>
         </section>
 
@@ -206,10 +215,10 @@ export default function TrompeteLernenErwachsenePage() {
           <p className="text-white/70 mb-6 max-w-xl mx-auto">Überzeuge dich selbst mit unserem kostenlosen Webinar oder starte direkt durch.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kurse/erwachsene">Pro-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/auth">Pro-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/webinar">Gratis-Webinar ansehen</Link>
+              <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
             </Button>
           </div>
         </section>
