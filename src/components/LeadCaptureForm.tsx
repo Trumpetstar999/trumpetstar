@@ -1,10 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, CheckCircle, Music } from "lucide-react";
+import { Loader2, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LeadCaptureFormProps {
@@ -61,105 +56,118 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
 
   if (status === "success") {
     return (
-      <div className={cn("text-center py-12 px-6", className)}>
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle className="w-8 h-8 text-green-600" />
+      <div className={cn("text-center py-16 px-8", className)}>
+        <div className="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400/40 rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-10 h-10 text-emerald-400" />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Fast geschafft! 🎺</h3>
-        <p className="text-gray-600 mb-4">
-          Check deine E-Mails (auch den Spam-Ordner). Deine erste Lektion wartet schon!
+        <h3 className="text-2xl font-bold text-white mb-3">Fast geschafft! 🎺</h3>
+        <p className="text-white/70 text-base leading-relaxed max-w-sm mx-auto">
+          Check deine E-Mails (auch den Spam-Ordner).<br />
+          Deine erste Lektion wartet schon!
         </p>
         {errorMsg && (
-          <p className="text-amber-600 text-sm">{errorMsg}</p>
+          <p className="text-amber-400 text-sm mt-4">{errorMsg}</p>
         )}
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className={cn("space-y-4", className)}>
-      <div className="space-y-2">
-        <Label htmlFor="first_name" className="text-gray-700">Vorname</Label>
-        <Input
-          id="first_name"
+    <form onSubmit={handleSubmit} className={cn("space-y-5", className)}>
+      {/* Name */}
+      <div className="space-y-1.5">
+        <label htmlFor="lead_first_name" className="block text-sm font-medium text-white/90 pl-1">
+          Vorname
+        </label>
+        <input
+          id="lead_first_name"
           placeholder="Dein Vorname"
           value={formData.first_name}
           onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
           required
-          className="h-12"
+          className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 placeholder:text-slate-400 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-gray-700">E-Mail</Label>
-        <Input
-          id="email"
+      {/* Email */}
+      <div className="space-y-1.5">
+        <label htmlFor="lead_email" className="block text-sm font-medium text-white/90 pl-1">
+          E-Mail
+        </label>
+        <input
+          id="lead_email"
           type="email"
           placeholder="deine@email.com"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
-          className="h-12"
+          className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 placeholder:text-slate-400 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-gray-700">Ich bin...</Label>
-        <Select
+      {/* Segment */}
+      <div className="space-y-1.5">
+        <label htmlFor="lead_segment" className="block text-sm font-medium text-white/90 pl-1">
+          Ich bin...
+        </label>
+        <select
+          id="lead_segment"
           value={formData.segment}
-          onValueChange={(v) => setFormData({ ...formData, segment: v })}
+          onChange={(e) => setFormData({ ...formData, segment: e.target.value })}
+          className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base appearance-none cursor-pointer"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
         >
-          <SelectTrigger className="h-12">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="adult">Erwachsener (25-65)</SelectItem>
-            <SelectItem value="parent">Elternteil (Kind 6-14)</SelectItem>
-            <SelectItem value="teacher">Musiklehrer/Dirigent</SelectItem>
-          </SelectContent>
-        </Select>
+          <option value="adult">Erwachsener Anfänger</option>
+          <option value="parent">Elternteil (Kind 6–14)</option>
+          <option value="teacher">Musiklehrer / Dirigent</option>
+        </select>
       </div>
 
-      <div className="flex items-start space-x-3 py-2">
-        <Checkbox
-          id="privacy"
+      {/* Privacy */}
+      <label className="flex items-start gap-3 pt-1 cursor-pointer group">
+        <input
+          type="checkbox"
           checked={formData.privacy}
-          onCheckedChange={(checked) => 
-            setFormData({ ...formData, privacy: checked as boolean })
-          }
+          onChange={(e) => setFormData({ ...formData, privacy: e.target.checked })}
           required
+          className="mt-1 w-5 h-5 rounded border-2 border-white/30 bg-white/10 checked:bg-[hsl(var(--reward-gold))] checked:border-[hsl(var(--reward-gold))] text-slate-900 focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/40 cursor-pointer transition-colors shrink-0 accent-[hsl(48,100%,50%)]"
         />
-        <Label htmlFor="privacy" className="text-sm text-gray-600 leading-relaxed cursor-pointer">
+        <span className="text-sm text-white/70 leading-relaxed group-hover:text-white/80 transition-colors">
           Ich stimme zu, dass TrumpetStar mich per E-Mail kontaktieren darf. 
-          Abmeldung jederzeit möglich. 
-          <a href="/datenschutz" className="text-purple-600 hover:underline ml-1">Datenschutz</a>
-        </Label>
-      </div>
+          Abmeldung jederzeit möglich.{" "}
+          <a href="/datenschutz" className="text-[hsl(var(--reward-gold))] hover:underline font-medium">
+            Datenschutz
+          </a>
+        </span>
+      </label>
 
       {status === "error" && (
-        <p className="text-red-600 text-sm">{errorMsg}</p>
+        <div className="bg-red-500/15 border border-red-400/30 rounded-xl px-4 py-3">
+          <p className="text-red-300 text-sm">{errorMsg}</p>
+        </div>
       )}
 
-      <Button
+      {/* Submit */}
+      <button
         type="submit"
         disabled={!formData.privacy || status === "loading"}
-        className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-lg"
+        className="w-full h-14 rounded-xl font-bold text-lg transition-all duration-200 flex items-center justify-center gap-2.5 disabled:opacity-40 disabled:cursor-not-allowed bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 shadow-lg shadow-yellow-500/25 hover:shadow-yellow-500/40 hover:scale-[1.01] active:scale-[0.99]"
       >
         {status === "loading" ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
             Wird gesendet...
           </>
         ) : (
           <>
-            <Music className="mr-2 h-5 w-5" />
+            <Sparkles className="w-5 h-5" />
             Jetzt kostenlos starten
           </>
         )}
-      </Button>
+      </button>
 
-      <p className="text-xs text-gray-500 text-center">
-        Keine Spam-Mails. Nur wertvolle Tipps für deinen Trompeten-Erfolg.
+      <p className="text-xs text-white/40 text-center pt-1">
+        Kein Spam. Nur wertvolle Tipps für deinen Trompeten-Erfolg.
       </p>
     </form>
   );
