@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.send-app-link]
 verify_jwt = false
+
+[functions.capture-lead]
+verify_jwt = false
