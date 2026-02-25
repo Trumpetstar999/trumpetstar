@@ -60,10 +60,10 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
         <div className="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400/40 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10 text-emerald-400" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">Fast geschafft! 🎺</h3>
+        <h3 className="text-2xl font-bold text-white mb-3">Willkommen bei TrumpetStar! 🎺</h3>
         <p className="text-white/70 text-base leading-relaxed max-w-sm mx-auto">
-          Check deine E-Mails (auch den Spam-Ordner).<br />
-          Deine erste Lektion wartet schon!
+          Dein Account wurde erstellt!<br />
+          Check deine E-Mails – dein Login-Link ist unterwegs.
         </p>
         {errorMsg && (
           <p className="text-amber-400 text-sm mt-4">{errorMsg}</p>
@@ -117,8 +117,8 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
           className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base appearance-none cursor-pointer"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
         >
-          <option value="adult">Erwachsener Anfänger</option>
-          <option value="parent">Elternteil (Kind 6–14)</option>
+          <option value="adult">Erwachsener</option>
+          <option value="child">Kind / Jugendlicher</option>
           <option value="teacher">Musiklehrer / Dirigent</option>
         </select>
       </div>
