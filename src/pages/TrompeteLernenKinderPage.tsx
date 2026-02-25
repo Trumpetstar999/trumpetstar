@@ -1,4 +1,5 @@
 import { FAQSchema } from "@/components/SEO/FAQSchema";
+import lernweltImg from "@/assets/trumpetstar-lernwelt.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -67,6 +68,17 @@ export default function TrompeteLernenKinderPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
+
+        {/* Lernwelt Bild */}
+        <section className="mb-16">
+          <div className="rounded-2xl overflow-hidden shadow-2xl">
+            <img
+              src={lernweltImg}
+              alt="Deine multimediale Lernwelt für Trompete – Trumpetstar"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </section>
 
         {/* Alters-Übersicht */}
         <section className="mb-16">
