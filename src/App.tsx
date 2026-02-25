@@ -12,6 +12,10 @@ import { LanguageProvider } from "@/hooks/useLanguage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
+import BlogPage from "./pages/BlogPage";
+import TrompeteLernenErwachsene from "./pages/blog/TrompeteLernenErwachsene";
+import ErsterTonTrompete from "./pages/blog/ErsterTonTrompete";
+import TrompeteUebenRoutine from "./pages/blog/TrompeteUebenRoutine";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
 import { ChatsPage } from "./pages/ChatsPage";
@@ -64,6 +68,11 @@ const App = () => {
                       <Routes>
                         {/* Public Landing */}
                         <Route path="/" element={<LandingPage />} />
+                        {/* Blog Routes */}
+                        <Route path="/blog" element={<BlogPage />} />
+                        <Route path="/blog/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsene />} />
+                        <Route path="/blog/erster-ton-trompete" element={<ErsterTonTrompete />} />
+                        <Route path="/blog/trompete-ueben-routine" element={<TrompeteUebenRoutine />} />
                         
                         {/* Auth Routes */}
                         <Route path="/auth" element={<AuthPage />} />
