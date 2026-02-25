@@ -97,11 +97,18 @@ export default function LandingPage() {
         <section className="max-w-4xl mx-auto px-5 pb-16">
           <div className="relative">
             <div className="absolute inset-0 bg-[hsl(var(--reward-gold))]/10 blur-3xl rounded-full scale-75 pointer-events-none" />
-            <img
-              src={appScreenshot}
-              alt="Trumpetstar App – Levels Übersicht auf dem iPad"
-              className="relative w-full max-w-2xl mx-auto block rounded-2xl shadow-2xl shadow-black/40 border border-white/10"
-            />
+            <button onClick={() => navigate('/login')} className="block w-full max-w-2xl mx-auto group cursor-pointer">
+              <img
+                src={appScreenshot}
+                alt="Trumpetstar App – Levels Übersicht auf dem iPad"
+                className="relative w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="bg-[hsl(var(--reward-gold))] text-slate-900 font-bold px-6 py-3 rounded-xl shadow-lg text-lg flex items-center gap-2">
+                  <Play className="w-5 h-5 fill-current" /> Jetzt einloggen
+                </span>
+              </div>
+            </button>
           </div>
         </section>
 
