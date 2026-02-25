@@ -1,20 +1,22 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SEOPageLayoutProps {
   children: ReactNode;
 }
 
 export function SEOPageLayout({ children }: SEOPageLayoutProps) {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen">
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 glass border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={user ? '/app' : '/'} className="flex items-center gap-2">
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
@@ -24,9 +26,15 @@ export function SEOPageLayout({ children }: SEOPageLayoutProps) {
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
               <Link to="/pricing">Preise</Link>
             </Button>
-            <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-              <Link to="/login">Anmelden</Link>
-            </Button>
+            {user ? (
+              <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
+                <Link to="/app">Zur App</Link>
+              </Button>
+            ) : (
+              <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
+                <Link to="/login">Anmelden</Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -59,7 +67,7 @@ export function SEOPageLayout({ children }: SEOPageLayoutProps) {
               <h4 className="text-sm font-semibold text-white mb-3">Hilfe</h4>
               <ul className="space-y-2 text-sm text-white/60">
                 <li><Link to="/trompete-erster-ton" className="hover:text-white transition-colors">Erster Ton</Link></li>
-                <li><Link to="/hilfe-kein-ton" className="hover:text-white transition-colors">Kein Ton? Hilfe!</Link></li>
+                <li><Link to="/hilfe/trompete-kein-ton" className="hover:text-white transition-colors">Kein Ton? Hilfe!</Link></li>
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Preise</Link></li>
               </ul>
             </div>
