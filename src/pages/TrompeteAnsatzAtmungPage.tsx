@@ -11,7 +11,7 @@ const howToSteps = [
   { position: 2, name: "Korrekte Mundstück-Position", text: "Mundstück mittig auf die Lippen. Oberlippe 2/3, Unterlippe 1/3. Ca. 45 Grad nach unten. Nicht zu fest drücken!" },
   { position: 3, name: "Lippenkontrolle (Embouchure)", text: "Lippen leicht nach innen gerollt. Spannung wie bei einem 'Mmmh'-Laut. Gleichmäßiger Druck auf beiden Seiten." },
   { position: 4, name: "Bauchatmung lernen", text: "Hand auf den Bauch. Einatmen: Bauch wölbt sich nach außen. Ausatmen: kontrolliert, gleichmäßig. 4 Sek. ein, 4 Sek. aus." },
-  { position: 5, name: "Atemstoß und Ton", text: "Tief einatmen (Bauch!), Lippen schließen, Luft stoßartig durch die geschlossenen Lippen. Ziel: klarer, stabiler Ton." }
+  { position: 5, name: "Ton", text: "Tief einatmen (Bauch!), Lippen schließen, Luft durch die geschlossenen Lippen. Ziel: klarer, stabiler Ton." }
 ];
 
 const faqs = [
@@ -125,10 +125,6 @@ export default function TrompeteAnsatzAtmungPage() {
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold mb-2">{step.name}</h3>
                       <p className="text-muted-foreground text-sm">{step.text}</p>
-                      <div className="mt-3 flex items-center gap-2 text-sm text-primary">
-                        <PlayCircle className="h-4 w-4" />
-                        <Link to="#" className="hover:underline">Video ansehen</Link>
-                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -143,7 +139,7 @@ export default function TrompeteAnsatzAtmungPage() {
           <div className="glass rounded-2xl p-6">
             <h3 className="font-semibold text-[hsl(var(--reward-gold))] mb-4">Morgen-Routine:</h3>
             <ol className="space-y-3 text-white/80 text-sm">
-              <li><strong className="text-white">1. Buzzing (2 Min):</strong> Ohne Instrument, nur Lippen</li>
+              <li><strong className="text-white">1. Ausatmen (2 Min):</strong> 8 Schläge lang ausatmen</li>
               <li><strong className="text-white">2. Mundstück-Buzzing (1 Min):</strong> Ton halten, lauter/leiser</li>
               <li><strong className="text-white">3. Atemübung (1 Min):</strong> 4 Sekunden ein, 4 aus</li>
               <li><strong className="text-white">4. Lange Töne (1 Min):</strong> Einen Ton so lange wie möglich halten</li>
@@ -168,7 +164,7 @@ export default function TrompeteAnsatzAtmungPage() {
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-semibold text-white mb-1">Brustatmung statt Bauchatmung</h4>
+              <h4 className="font-semibold text-white mb-1">Bauchatmung statt Brustatmung</h4>
                   <p className="text-white/75 text-sm">Die Schultern sollten sich beim Einatmen NICHT heben. Bauch muss sich nach außen wölben.</p>
                 </div>
               </div>
