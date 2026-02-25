@@ -64,7 +64,19 @@ export default function TrompeteLernenPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
-        
+
+        {/* Video */}
+        <section className="mb-16">
+          <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
+            <iframe
+              src="https://player.vimeo.com/video/995373130"
+              className="w-full h-full"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </section>
+
         {/* Für wen */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Für wen ist Trompete lernen geeignet?</h2>
