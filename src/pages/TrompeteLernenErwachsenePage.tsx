@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import infografik from "@/assets/trompete-lernen-erwachsene-infografik.png";
 import { Users, Clock, TrendingUp, Award, CheckCircle, ArrowRight, Star, BookOpen } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
 
 const faqs = [
   { question: "Kann ich mit 40/50/60 noch Trompete lernen?", answer: "Absolut! Unsere erfolgreichsten Wiedereinsteiger sind zwischen 35 und 65 Jahre alt. Erwachsene haben entscheidende Vorteile." },
@@ -34,67 +35,73 @@ export default function TrompeteLernenErwachsenePage() {
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/15">
-            <Users className="h-4 w-4" />
-            Speziell für Erwachsene
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Trompete lernen als Erwachsener:<br />
-            <span className="text-gold-gradient">Nie zu spät für Musik</span>
-          </h1>
-          
-          <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Mit 30, 40, 50 oder 60 – es ist nie zu spät. Unsere Methode ist für Berufstätige mit wenig Zeit optimiert.
-          </p>
+          <AnimatedSection direction="up">
+            <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/15">
+              <Users className="h-4 w-4" />
+              Speziell für Erwachsene
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Trompete lernen als Erwachsener:<br />
+              <span className="text-gold-gradient">Nie zu spät für Musik</span>
+            </h1>
+            <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
+              Mit 30, 40, 50 oder 60 – es ist nie zu spät. Unsere Methode ist für Berufstätige mit wenig Zeit optimiert.
+            </p>
+          </AnimatedSection>
 
-          <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
-              <div>
-                <p className="text-white"><strong>Der Fakt:</strong> Erwachsene lernen in den ersten 6 Monaten oft schneller als Kinder.</p>
-                <p className="text-white/60 text-sm mt-1">Disziplin + Zielorientierung + richtige Methode = Erfolg</p>
+          <AnimatedSection direction="up" delay={150}>
+            <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
+                <div>
+                  <p className="text-white"><strong>Der Fakt:</strong> Erwachsene lernen in den ersten 6 Monaten oft schneller als Kinder.</p>
+                  <p className="text-white/60 text-sm mt-1">Disziplin + Zielorientierung + richtige Methode = Erfolg</p>
+                </div>
               </div>
             </div>
-          </div>
+          </AnimatedSection>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">Pro-Kurs entdecken</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
-            </Button>
-          </div>
+          <AnimatedSection direction="up" delay={300}>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+                <Link to="/auth">Pro-Kurs entdecken</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
+              </Button>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
 
         {/* Vorteile */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">Warum Erwachsene oft besser lernen</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {vorteileErwachsener.map((v, idx) => (
-              <Card key={idx} className="hover-lift">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <v.icon className="h-6 w-6 text-primary" />
+              <AnimatedSection key={idx} direction="up" delay={idx * 100}>
+                <Card className="hover-lift">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <v.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">{v.title}</h3>
+                        <p className="text-muted-foreground text-sm">{v.text}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">{v.title}</h3>
-                      <p className="text-muted-foreground text-sm">{v.text}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Zeitplan */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Dein realistischer Zeitplan</h2>
           <div className="space-y-4">
             {[
@@ -103,21 +110,23 @@ export default function TrompeteLernenErwachsenePage() {
               { color: "border-l-purple-400", label: "Monat 3-6: Song-Repertoire", time: "15 min/Tag", desc: "10-20 Songs, erweiterter Tonumfang, dynamisches Spielen." },
               { color: "border-l-[hsl(var(--reward-gold))]", label: "Jahr 1+: Fortgeschritten", time: "20-30 min/Tag", desc: "Komplexe Stücke, verschiedene Genres, Improvisation." },
             ].map((item, i) => (
-              <Card key={i} className={`${item.color} border-l-4 hover-lift`}>
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold">{item.label}</h3>
-                    <span className="text-xs text-muted-foreground">{item.time}</span>
-                  </div>
-                  <p className="text-muted-foreground text-sm">{item.desc}</p>
-                </CardContent>
-              </Card>
+              <AnimatedSection key={i} direction="left" delay={i * 80}>
+                <Card className={`${item.color} border-l-4 hover-lift`}>
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold">{item.label}</h3>
+                      <span className="text-xs text-muted-foreground">{item.time}</span>
+                    </div>
+                    <p className="text-muted-foreground text-sm">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Testimonial */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass rounded-2xl p-8">
             <div className="flex items-center gap-1 mb-4">
               {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-[hsl(var(--reward-gold))] text-[hsl(var(--reward-gold))]" />)}
@@ -133,10 +142,10 @@ export default function TrompeteLernenErwachsenePage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Video */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Sieh selbst – so funktioniert es</h2>
           <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
             <iframe
@@ -147,18 +156,18 @@ export default function TrompeteLernenErwachsenePage() {
               title="Trompete lernen als Erwachsener"
             />
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Infografik */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Trompete spielen: Ein Jungbrunnen für Geist & Seele</h2>
           <div className="rounded-2xl overflow-hidden shadow-2xl">
             <img src={infografik} alt="Infografik: Vorteile von Trompete spielen für Erwachsene – Fitness für den Geist und Balsam für Körper und Seele" className="w-full h-auto" />
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Methode */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Die Erwachsenen-Methode</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -166,21 +175,23 @@ export default function TrompeteLernenErwachsenePage() {
               { num: "2", title: "Video-Begleitung", desc: "Schau dir Anweisungen so oft an wie nötig." },
               { num: "3", title: "Progress Tracking", desc: "Sieh deine Fortschritte in der App." },
             ].map((item, i) => (
-              <Card key={i} className="text-center hover-lift">
-                <CardContent className="p-6">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-primary">{item.num}</span>
-                  </div>
-                  <h3 className="font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </CardContent>
-              </Card>
+              <AnimatedSection key={i} direction="up" delay={i * 100}>
+                <Card className="text-center hover-lift">
+                  <CardContent className="p-6">
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-primary">{item.num}</span>
+                    </div>
+                    <h3 className="font-semibold mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* FAQ */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Häufige Fragen</h2>
           <div className="space-y-3">
             {faqs.map((faq, index) => (
@@ -192,10 +203,10 @@ export default function TrompeteLernenErwachsenePage() {
               </Card>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Zusammenfassung */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass rounded-2xl p-6 border border-[hsl(var(--reward-gold))]/20">
             <h2 className="text-2xl font-bold text-white mb-4">Das Wichtigste in Kürze</h2>
             <ul className="space-y-2">
@@ -213,18 +224,18 @@ export default function TrompeteLernenErwachsenePage() {
               ))}
             </ul>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* E-E-A-T */}
-        <section className="mb-16 border-t border-white/10 pt-8">
+        <AnimatedSection direction="fade" className="mb-16 border-t border-white/10 pt-8">
           <div className="text-sm text-white/50 space-y-1">
             <p><strong className="text-white/70">Autor:</strong> Mario Schulter – Professioneller Trompeter mit 25+ Jahren Erfahrung</p>
             <p><strong className="text-white/70">Aktualisiert:</strong> 23. Februar 2026</p>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* CTA */}
-        <section className="text-center glass rounded-2xl p-10">
+        <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
           <h2 className="text-3xl font-bold text-white mb-4">Starte dein Trompeten-Abenteuer</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">Überzeuge dich selbst mit unserem kostenlosen Webinar oder starte direkt durch.</p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -235,7 +246,7 @@ export default function TrompeteLernenErwachsenePage() {
               <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
             </Button>
           </div>
-        </section>
+        </AnimatedSection>
       </div>
     </SEOPageLayout>
   );

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Baby, Clock, Heart, Music, HelpCircle, CheckCircle, Star, ArrowRight, AlertTriangle } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
 
 const faqs = [
   { question: "Ab welchem Alter kann mein Kind Trompete lernen?", answer: "Idealerweise ab 7-8 Jahren mit der normalen Trompete. Ab 6 Jahren empfehlen wir das Kornett (kleinere Version)." },
@@ -33,74 +34,76 @@ export default function TrompeteLernenKinderPage() {
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[hsl(var(--reward-gold))]/15 text-[hsl(var(--reward-gold))] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[hsl(var(--reward-gold))]/25">
-            <Baby className="h-4 w-4" />
-            Für Eltern und ihre Musikstars
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Trompete lernen für Kinder:<br />
-            <span className="text-gold-gradient">Der Eltern-Guide</span>
-          </h1>
-          
-          <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Ab welchem Alter? Kornett oder Trompete? Wie motiviere ich mein Kind? Alle Antworten für Eltern.
-          </p>
-
-          <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
-              <p className="text-white">
-                <strong>Die Kurzfassung:</strong> Kinder können ab 6 Jahren mit dem Kornett beginnen, ab 8 Jahren mit der Trompete. Täglich 5-10 Minuten, mit spielerischer Methode und Geduld.
-              </p>
+          <AnimatedSection direction="up">
+            <div className="inline-flex items-center gap-2 bg-[hsl(var(--reward-gold))]/15 text-[hsl(var(--reward-gold))] px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[hsl(var(--reward-gold))]/25">
+              <Baby className="h-4 w-4" />
+              Für Eltern und ihre Musikstars
             </div>
-          </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Trompete lernen für Kinder:<br />
+              <span className="text-gold-gradient">Der Eltern-Guide</span>
+            </h1>
+            <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
+              Ab welchem Alter? Kornett oder Trompete? Wie motiviere ich mein Kind? Alle Antworten für Eltern.
+            </p>
+          </AnimatedSection>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">Kinder-Kurs entdecken</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
-            </Button>
-          </div>
+          <AnimatedSection direction="up" delay={150}>
+            <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
+                <p className="text-white">
+                  <strong>Die Kurzfassung:</strong> Kinder können ab 6 Jahren mit dem Kornett beginnen, ab 8 Jahren mit der Trompete. Täglich 5-10 Minuten, mit spielerischer Methode und Geduld.
+                </p>
+              </div>
+            </div>
+          </AnimatedSection>
+
+          <AnimatedSection direction="up" delay={300}>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+                <Link to="/auth">Kinder-Kurs entdecken</Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
+              </Button>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 pb-16">
 
         {/* Lernwelt Bild */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="rounded-2xl overflow-hidden shadow-2xl">
-            <img
-              src={lernweltImg}
-              alt="Deine multimediale Lernwelt für Trompete – Trumpetstar"
-              className="w-full h-auto object-cover"
-            />
+            <img src={lernweltImg} alt="Deine multimediale Lernwelt für Trompete – Trumpetstar" className="w-full h-auto object-cover" />
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Alters-Übersicht */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8 text-center">Der richtige Einstieg nach Alter</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {altersGruppen.map((gruppe, idx) => (
-              <Card key={idx} className="h-full hover-lift border-t-4 border-t-[hsl(var(--reward-gold))]">
-                <CardContent className="p-6">
-                  <div className="text-3xl font-bold text-primary mb-2">{gruppe.alter}</div>
-                  <div className="space-y-3">
-                    <div><span className="text-xs text-muted-foreground">Instrument:</span><p className="font-medium text-sm">{gruppe.instrument}</p></div>
-                    <div><span className="text-xs text-muted-foreground">Übendauer:</span><p className="font-medium text-sm">{gruppe.dauer}</p></div>
-                    <p className="text-xs text-muted-foreground">{gruppe.merkmale}</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <AnimatedSection key={idx} direction="up" delay={idx * 100}>
+                <Card className="h-full hover-lift border-t-4 border-t-[hsl(var(--reward-gold))]">
+                  <CardContent className="p-6">
+                    <div className="text-3xl font-bold text-primary mb-2">{gruppe.alter}</div>
+                    <div className="space-y-3">
+                      <div><span className="text-xs text-muted-foreground">Instrument:</span><p className="font-medium text-sm">{gruppe.instrument}</p></div>
+                      <div><span className="text-xs text-muted-foreground">Übendauer:</span><p className="font-medium text-sm">{gruppe.dauer}</p></div>
+                      <p className="text-xs text-muted-foreground">{gruppe.merkmale}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Kornett vs Trompete */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Kornett oder Trompete?</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="hover-lift">
@@ -153,10 +156,10 @@ export default function TrompeteLernenKinderPage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Motivation */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Motivation: So bleibt Ihr Kind dran</h2>
           <div className="space-y-4">
             {[
@@ -164,23 +167,25 @@ export default function TrompeteLernenKinderPage() {
               { icon: Star, color: "text-[hsl(var(--reward-gold))]", title: "Gamification & Belohnungen", desc: "Sterne sammeln, Level aufsteigen – unsere App macht Lernen spielerisch." },
               { icon: Heart, color: "text-[hsl(var(--accent-red))]", title: "Gemeinsam musizieren", desc: "Spielen Sie mit Ihrem Kind zusammen – gemeinsame Erlebnisse stärken die Bindung." },
             ].map((item, i) => (
-              <Card key={i} className="hover-lift">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <item.icon className={`h-7 w-7 ${item.color} flex-shrink-0`} />
-                    <div>
-                      <h3 className="font-semibold mb-1">{item.title}</h3>
-                      <p className="text-muted-foreground text-sm">{item.desc}</p>
+              <AnimatedSection key={i} direction="left" delay={i * 100}>
+                <Card className="hover-lift">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <item.icon className={`h-7 w-7 ${item.color} flex-shrink-0`} />
+                      <div>
+                        <h3 className="font-semibold mb-1">{item.title}</h3>
+                        <p className="text-muted-foreground text-sm">{item.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Warnhinweis */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass rounded-xl p-5 border border-[hsl(var(--accent-red))]/30">
             <div className="flex items-start gap-3">
               <AlertTriangle className="h-6 w-6 text-[hsl(var(--accent-red))] flex-shrink-0 mt-0.5" />
@@ -192,10 +197,10 @@ export default function TrompeteLernenKinderPage() {
               </div>
             </div>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Methode */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Die Star-Methode für Kinder</h2>
           <div className="grid md:grid-cols-4 gap-4">
             {[
@@ -204,19 +209,21 @@ export default function TrompeteLernenKinderPage() {
               { emoji: "🎮", title: "3. App", desc: "Spielerische Übungen, Belohnungen" },
               { emoji: "👨‍👩‍👧", title: "4. Eltern", desc: "Begleitung, gemeinsames Musizieren" },
             ].map((item, i) => (
-              <Card key={i} className="text-center hover-lift">
-                <CardContent className="p-6">
-                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center text-2xl">{item.emoji}</div>
-                  <h3 className="font-semibold mb-1 text-sm">{item.title}</h3>
-                  <p className="text-xs text-muted-foreground">{item.desc}</p>
-                </CardContent>
-              </Card>
+              <AnimatedSection key={i} direction="up" delay={i * 80}>
+                <Card className="text-center hover-lift">
+                  <CardContent className="p-6">
+                    <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center text-2xl">{item.emoji}</div>
+                    <h3 className="font-semibold mb-1 text-sm">{item.title}</h3>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* FAQ */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-8">Häufige Fragen von Eltern</h2>
           <div className="space-y-3">
             {faqs.map((faq, index) => (
@@ -228,10 +235,10 @@ export default function TrompeteLernenKinderPage() {
               </Card>
             ))}
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* Zusammenfassung */}
-        <section className="mb-16">
+        <AnimatedSection direction="up" className="mb-16">
           <div className="glass rounded-2xl p-6 border border-[hsl(var(--reward-gold))]/20">
             <h2 className="text-2xl font-bold text-white mb-4">Kurz zusammengefasst</h2>
             <ul className="space-y-2">
@@ -249,10 +256,10 @@ export default function TrompeteLernenKinderPage() {
               ))}
             </ul>
           </div>
-        </section>
+        </AnimatedSection>
 
         {/* CTA */}
-        <section className="text-center glass rounded-2xl p-10">
+        <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
           <h2 className="text-3xl font-bold text-white mb-4">Bereit für den Musikstart Ihres Kindes?</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">Starten Sie direkt mit unserem Kinder-Kurs oder lassen Sie sich beraten.</p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -263,7 +270,7 @@ export default function TrompeteLernenKinderPage() {
               <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
             </Button>
           </div>
-        </section>
+        </AnimatedSection>
       </div>
     </SEOPageLayout>
   );
