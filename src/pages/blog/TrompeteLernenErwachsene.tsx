@@ -1,92 +1,130 @@
 import { Link } from "react-router-dom";
-
+import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, CheckCircle, Users } from "lucide-react";
 
 export default function TrompeteLernenErwachsene() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <Link to="/" className="text-purple-600 font-bold text-xl">🎺 TrumpetStar</Link>
-          <Link to="/blog" className="text-sm text-gray-500 hover:text-gray-700">← Blog</Link>
+    <SEOPageLayout>
+      {/* Hero */}
+      <section className="py-20 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <AnimatedSection direction="up">
+            <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/15">
+              <Users className="h-4 w-4" /> Anfänger-Guide
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+              Trompete lernen als Erwachsener: Der ultimative Guide
+            </h1>
+            <p className="text-white/70 text-lg mb-3">
+              Warum es nie zu spät ist — und wie du mit nur 5 Minuten am Tag echte Fortschritte machst.
+            </p>
+            <p className="text-white/50 text-sm">25. Februar 2026 · 8 Min Lesezeit · Von Valentin | TrumpetStar</p>
+          </AnimatedSection>
         </div>
-      </div>
+      </section>
 
-      <article className="max-w-2xl mx-auto px-4 py-10">
-        <div className="mb-8">
-          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Anfänger-Guide</span>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-3 leading-tight">
-            Trompete lernen als Erwachsener: Der ultimative Guide für Einsteiger
-          </h1>
-          <p className="text-gray-500 text-sm">25. Februar 2026 · 8 Min Lesezeit · Von Valentin | TrumpetStar</p>
-        </div>
+      <div className="max-w-2xl mx-auto px-4 pb-20 space-y-8">
 
-        <div className="prose prose-gray max-w-none space-y-6 text-gray-700 leading-relaxed">
-          <h2 className="text-xl font-bold text-gray-900">Warum es nie zu spät ist, Trompete zu lernen</h2>
-          <p>„Ich bin doch schon 40..." — Diesen Satz höre ich fast täglich. Und meine Antwort ist immer dieselbe: <strong>Das ist nonsense.</strong></p>
-          <p>Als Erwachsener hast du entscheidende Vorteile gegenüber Kindern:</p>
-          <ul className="list-disc pl-6 space-y-1">
-            <li><strong>Disziplin:</strong> Du weißt, dass Erfolg Übung erfordert</li>
-            <li><strong>Zeitmanagement:</strong> Du kannst feste Übezeiten einplanen</li>
-            <li><strong>Motivation:</strong> Du lernst aus eigenem Antrieb</li>
-            <li><strong>Musikalisches Verständnis:</strong> Du hast Jahrzehnte Musik hören hinter dir</li>
-          </ul>
-          <p>Unser ältester aktiver Schüler ist 67. Er spielt jetzt seit 2 Jahren und hat gerade sein erstes Weihnachtskonzert gemeistert.</p>
-
-          <h2 className="text-xl font-bold text-gray-900">Die 5 größten Mythen über Trompete lernen</h2>
-          <div className="bg-gray-50 rounded-xl p-5 space-y-4">
+        <AnimatedSection direction="up">
+          <h2 className="text-2xl font-bold text-white mb-4">Warum es nie zu spät ist</h2>
+          <p className="text-white/70 mb-4">„Ich bin doch schon 40..." — Diesen Satz höre ich fast täglich. Und meine Antwort ist immer dieselbe: <strong className="text-white">Das ist Unsinn.</strong></p>
+          <p className="text-white/70 mb-4">Als Erwachsener hast du entscheidende Vorteile gegenüber Kindern:</p>
+          <div className="grid sm:grid-cols-2 gap-3">
             {[
-              ["Mythos 1: Deine Lungen sind nicht gut genug", "Die Trompete braucht kein extremes Lungenvolumen — sie braucht Luftkontrolle. Und die trainierst du."],
-              ["Mythos 2: Deine Lippen werden zu schnell müde", "Normal! Mundmuskulatur muss sich aufbauen wie jeder andere Muskel. Unsere 5-Minuten-Methode ist genau dafür gemacht."],
-              ["Mythos 3: Du hast kein musikalisches Talent", "Talent ist überbewertet. Systematik schlägt Talent."],
-              ["Mythos 4: Du hast keine Zeit", "5 Minuten am Tag reichen für echte Fortschritte."],
-              ["Mythos 5: Es dauert Jahre bis du was spielst", "Nach 30 Tagen kannst du 3–4 einfache Melodien spielen."],
-            ].map(([m, f]) => (
-              <div key={m}>
-                <p className="font-semibold text-gray-900">❌ {m}</p>
-                <p className="text-sm text-gray-600 mt-1">✅ {f}</p>
-              </div>
+              ["Disziplin", "Du weißt, dass Erfolg Übung erfordert"],
+              ["Zeitmanagement", "Du kannst feste Übezeiten einplanen"],
+              ["Motivation", "Du lernst aus eigenem Antrieb"],
+              ["Musikalisches Verständnis", "Du hast Jahrzehnte Musik hören hinter dir"],
+            ].map(([t, d], i) => (
+              <AnimatedSection key={t} direction="up" delay={i * 80}>
+                <Card className="hover-lift">
+                  <CardContent className="p-4 flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-[hsl(var(--reward-gold))] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-sm">{t}</p>
+                      <p className="text-xs text-muted-foreground">{d}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
             ))}
           </div>
+          <p className="text-white/60 text-sm mt-4 italic">Unser ältester aktiver Schüler ist 67. Er spielt jetzt seit 2 Jahren und hat gerade sein erstes Weihnachtskonzert gemeistert.</p>
+        </AnimatedSection>
 
-          <h2 className="text-xl font-bold text-gray-900">Die TrumpetStar-Methode: 5-Minuten-Prinzip</h2>
-          <p>Die meisten Erwachsenen scheitern nicht am Können, sondern am Übermut. Sie üben eine Stunde am ersten Tag, haben Muskelkater in den Lippen und hören auf.</p>
-          <p>Unsere Lösung: <strong>Mikro-Übungen</strong></p>
-          <ul className="list-disc pl-6 space-y-1">
-            <li>Tag 1–7: 2–5 Minuten täglich</li>
-            <li>Woche 2–4: 5–10 Minuten täglich</li>
-            <li>Ab Monat 2: 15–20 Minuten täglich</li>
-          </ul>
-
-          <h2 className="text-xl font-bold text-gray-900">Deine erste Woche: Der Plan</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead><tr className="bg-purple-50"><th className="text-left p-3 font-semibold">Tag</th><th className="text-left p-3 font-semibold">Übung</th><th className="text-left p-3 font-semibold">Dauer</th></tr></thead>
-              <tbody>
-                {[["1","Buzzing (nur Lippen)","2 Min"],["2–3","Mundstück-Training","3 Min"],["4–7","Erste Töne am Instrument","5 Min"]].map(([d,u,z]) => (
-                  <tr key={d} className="border-t border-gray-100"><td className="p-3 font-medium">Tag {d}</td><td className="p-3">{u}</td><td className="p-3 text-gray-500">{z}</td></tr>
-                ))}
-              </tbody>
-            </table>
+        <AnimatedSection direction="up">
+          <h2 className="text-2xl font-bold text-white mb-4">Die 5 größten Mythen</h2>
+          <div className="space-y-3">
+            {[
+              ["Deine Lungen sind nicht gut genug", "Die Trompete braucht kein extremes Lungenvolumen — sie braucht Luftkontrolle. Und die trainierst du."],
+              ["Deine Lippen werden zu schnell müde", "Normal! Mundmuskulatur muss sich aufbauen wie jeder andere Muskel. Unsere 5-Minuten-Methode ist genau dafür gemacht."],
+              ["Du hast kein musikalisches Talent", "Talent ist überbewertet. Systematik schlägt Talent."],
+              ["Du hast keine Zeit", "5 Minuten am Tag reichen für echte Fortschritte."],
+              ["Es dauert Jahre bis du was spielst", "Nach 30 Tagen kannst du 3–4 einfache Melodien spielen."],
+            ].map(([m, f]) => (
+              <Card key={m}>
+                <CardContent className="p-4">
+                  <p className="font-semibold text-sm text-destructive">❌ Mythos: {m}</p>
+                  <p className="text-sm text-muted-foreground mt-1">✅ {f}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </div>
+        </AnimatedSection>
 
-        {/* CTA */}
-        <div className="mt-12 bg-purple-600 rounded-2xl p-8 text-center text-white">
-          <h3 className="text-xl font-bold mb-2">Starte jetzt deine 7-Tage-Challenge 🎺</h3>
-          <p className="text-purple-200 mb-6 text-sm">Kostenlos · 5 Min/Tag · Erster Ton in Woche 1</p>
-          <Link to="/" className="bg-white text-purple-600 font-bold px-6 py-3 rounded-xl inline-block">
-            Jetzt kostenlos anmelden
-          </Link>
-        </div>
+        <AnimatedSection direction="up">
+          <h2 className="text-2xl font-bold text-white mb-4">Die TrumpetStar-Methode: 5-Minuten-Prinzip</h2>
+          <p className="text-white/70 mb-4">Die meisten Erwachsenen scheitern nicht am Können, sondern am Übermut. Sie üben eine Stunde am ersten Tag, haben Muskelkater in den Lippen und hören auf.</p>
+          <p className="text-white/70 mb-4">Unsere Lösung: <strong className="text-white">Mikro-Übungen</strong></p>
+          <div className="grid grid-cols-3 gap-3">
+            {[["Tag 1–7","2–5 Min täglich"],["Woche 2–4","5–10 Min täglich"],["Ab Monat 2","15–20 Min täglich"]].map(([z,d]) => (
+              <Card key={z} className="text-center">
+                <CardContent className="p-4">
+                  <p className="text-xs text-muted-foreground mb-1">{z}</p>
+                  <p className="font-bold text-sm">{d}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </AnimatedSection>
 
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-sm text-gray-500 mb-4">Weitere Artikel:</p>
+        <AnimatedSection direction="up">
+          <h2 className="text-2xl font-bold text-white mb-4">Deine erste Woche: Der Plan</h2>
           <div className="space-y-2">
-            <Link to="/blog/erster-ton-trompete" className="block text-purple-600 hover:underline text-sm">→ Der erste Ton: Schritt-für-Schritt-Anleitung</Link>
-            <Link to="/blog/trompete-ueben-routine" className="block text-purple-600 hover:underline text-sm">→ Die optimale Übe-Routine für Berufstätige</Link>
+            {[["1","Buzzing (nur Lippen)","2 Min"],["2–3","Mundstück-Training","3 Min"],["4–7","Erste Töne am Instrument","5 Min"]].map(([d, u, z], i) => (
+              <AnimatedSection key={d} direction="left" delay={i * 80}>
+                <Card className={`border-l-4 ${i === 0 ? 'border-l-green-400' : i === 1 ? 'border-l-primary' : 'border-l-[hsl(var(--reward-gold))]'}`}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-sm">Tag {d}: {u}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{z}</span>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
+            ))}
           </div>
-        </div>
-      </article>
-    </div>
+        </AnimatedSection>
+
+        <AnimatedSection direction="up" className="glass rounded-2xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-white mb-2">Starte jetzt deine 7-Tage-Challenge 🎺</h3>
+          <p className="text-white/60 mb-6 text-sm">Kostenlos · 5 Min/Tag · Erster Ton in Woche 1</p>
+          <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+            <Link to="/auth">Jetzt kostenlos anmelden <ArrowRight className="ml-2 w-4 h-4" /></Link>
+          </Button>
+        </AnimatedSection>
+
+        <AnimatedSection direction="fade" className="border-t border-white/10 pt-6">
+          <p className="text-sm text-white/40 mb-3">Weitere Artikel:</p>
+          <div className="space-y-2">
+            <Link to="/blog/erster-ton-trompete" className="flex items-center gap-1 text-primary hover:underline text-sm"><CheckCircle className="w-3 h-3" /> Der erste Ton: Schritt-für-Schritt-Anleitung</Link>
+            <Link to="/blog/trompete-ueben-routine" className="flex items-center gap-1 text-primary hover:underline text-sm"><CheckCircle className="w-3 h-3" /> Die optimale Übe-Routine für Berufstätige</Link>
+          </div>
+        </AnimatedSection>
+      </div>
+    </SEOPageLayout>
   );
 }
