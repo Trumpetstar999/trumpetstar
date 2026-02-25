@@ -208,7 +208,7 @@ export default function TrompeteAnsatzAtmungPage() {
         {/* CTA */}
         <section className="text-center glass rounded-2xl p-10">
           <h2 className="text-3xl font-bold text-white mb-4">Mehr Technik-Übungen?</h2>
-          <p className="text-white/70 mb-6 max-w-xl mx-auto">Im Pro-Kurs findest du über 50 Technik-Übungen mit Video-Begleitung.</p>
+          <p className="text-white/70 mb-6 max-w-xl mx-auto">Im Kurs findest du noch mehr Tipps und Tricks für einen stabilen Ansatz.</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
             <Link to="/login">Jetzt anmelden & kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
