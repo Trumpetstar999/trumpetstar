@@ -54,10 +54,7 @@ export default function TrompeteLernenPage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kostenlos-starten">Gratis-Lektion testen</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/kurse">Kurs entdecken</Link>
+              <Link to="/auth">Kurs entdecken</Link>
             </Button>
           </div>
         </div>
@@ -277,10 +274,7 @@ export default function TrompeteLernenPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kostenlos-starten">🎯 Gratis-Lektion starten</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/kurse">Pro-Kurs entdecken</Link>
+              <Link to="/auth">Kurs entdecken</Link>
             </Button>
           </div>
         </section>
