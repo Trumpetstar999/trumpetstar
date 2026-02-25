@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
-
+import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Clock } from "lucide-react";
 
 const posts = [
   {
@@ -33,58 +37,63 @@ const posts = [
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      
-
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <Link to="/" className="text-purple-600 font-bold text-xl">🎺 TrumpetStar</Link>
-          <Link to="/auth" className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium">App starten</Link>
-        </div>
-      </div>
-
+    <SEOPageLayout>
       {/* Hero */}
-      <div className="bg-white border-b border-gray-100 px-4 py-12">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Blog</h1>
-          <p className="text-gray-600">Trompete lernen leicht gemacht — Tipps, Guides und Anleitungen</p>
-        </div>
-      </div>
+      <section className="py-16 px-4 text-center">
+        <AnimatedSection direction="up">
+          <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/15">
+            🎺 Trumpetstar Blog
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Tipps, Guides & Anleitungen
+          </h1>
+          <p className="text-white/70 text-lg max-w-xl mx-auto">
+            Alles rund ums Trompete lernen — für Anfänger, Berufstätige und Wiedereinsteiger.
+          </p>
+        </AnimatedSection>
+      </section>
 
       {/* Posts */}
-      <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
-        {posts.map((post) => (
-          <Link key={post.slug} to={`/blog/${post.slug}`}
-            className="block bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl shrink-0">
-                {post.emoji}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">{post.tag}</span>
-                  <span className="text-xs text-gray-400">{post.readTime} Lesezeit</span>
-                </div>
-                <h2 className="text-lg font-bold text-gray-900 mb-1 leading-tight">{post.title}</h2>
-                <p className="text-gray-600 text-sm leading-relaxed">{post.excerpt}</p>
-                <p className="text-xs text-gray-400 mt-3">{post.date}</p>
-              </div>
-            </div>
-          </Link>
+      <div className="max-w-3xl mx-auto px-4 pb-20 space-y-6">
+        {posts.map((post, i) => (
+          <AnimatedSection key={post.slug} direction="up" delay={i * 100}>
+            <Link to={`/blog/${post.slug}`}>
+              <Card className="hover-lift cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-2xl shrink-0">
+                      {post.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{post.tag}</span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
+                      </div>
+                      <h2 className="text-lg font-bold mb-1 leading-tight">{post.title}</h2>
+                      <p className="text-muted-foreground text-sm leading-relaxed">{post.excerpt}</p>
+                      <div className="flex items-center justify-between mt-3">
+                        <span className="text-xs text-muted-foreground">{post.date}</span>
+                        <span className="text-primary text-sm font-medium flex items-center gap-1">Lesen <ArrowRight className="w-3 h-3" /></span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </AnimatedSection>
         ))}
       </div>
 
       {/* CTA */}
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        <div className="bg-purple-600 rounded-2xl p-8 text-center text-white">
-          <h3 className="text-xl font-bold mb-2">Bereit für deinen ersten Ton? 🎺</h3>
-          <p className="text-purple-200 mb-6 text-sm">7-Tage kostenlose Challenge · 5 Minuten am Tag · Kein Vorwissen nötig</p>
-          <Link to="/" className="bg-white text-purple-600 font-bold px-6 py-3 rounded-xl inline-block hover:bg-purple-50">
-            Jetzt kostenlos starten
-          </Link>
+      <AnimatedSection direction="up" className="max-w-3xl mx-auto px-4 pb-20">
+        <div className="glass rounded-2xl p-8 text-center">
+          <h3 className="text-2xl font-bold text-white mb-2">Bereit für deinen ersten Ton? 🎺</h3>
+          <p className="text-white/60 mb-6 text-sm">7-Tage kostenlose Challenge · 5 Minuten am Tag · Kein Vorwissen nötig</p>
+          <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+            <Link to="/auth">Jetzt kostenlos starten <ArrowRight className="ml-2 w-4 h-4" /></Link>
+          </Button>
         </div>
-      </div>
-    </div>
+      </AnimatedSection>
+    </SEOPageLayout>
   );
 }
