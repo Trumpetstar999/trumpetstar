@@ -29,8 +29,9 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
     setStatus("loading");
     
     try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const response = await fetch(
-        "https://bfxwbiazhgtkjfdnkbwn.supabase.co/functions/v1/capture-lead",
+        `${supabaseUrl}/functions/v1/capture-lead`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
