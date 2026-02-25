@@ -54,7 +54,7 @@ export default function HilfeKeinTonPage() {
           
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-[hsl(var(--accent-red))] hover:bg-[hsl(var(--accent-red))]/90 text-white font-semibold" asChild>
-              <Link to="/support/chat"><Video className="mr-2 h-4 w-4" /> Video-Support starten</Link>
+              <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <Link to="/trompete-erster-ton">Zurück zur Anleitung</Link>
@@ -140,10 +140,7 @@ export default function HilfeKeinTonPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/support/chat">Video-Support buchen</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-                <Link to="/kurse">Pro-Kurs mit Support</Link>
+                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
               </Button>
             </div>
           </div>
