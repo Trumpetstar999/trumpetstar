@@ -123,7 +123,7 @@ export default function TrompeteLernenErwachsenePage() {
               {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-[hsl(var(--reward-gold))] text-[hsl(var(--reward-gold))]" />)}
             </div>
             <blockquote className="text-xl italic text-white mb-4">
-              „Mit 52 Jahren dachte ich, das ist unmöglich. Jetzt, 8 Monate später, spiele ich bei unserem Firmen-Event vor Kollegen."
+              „Mit 52 Jahren dachte ich, das ist unmöglich. Jetzt, 8 Monate später, spiele ich schon richtig schöne Melodien und habe eine riesen Freude dabei."
             </blockquote>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center text-white font-bold">MK</div>
