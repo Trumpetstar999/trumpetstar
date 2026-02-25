@@ -61,7 +61,7 @@ export default function TrompeteLernenKinderPage() {
               <Link to="/auth">Kinder-Kurs entdecken</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/instrumenten-beratung">Kostenlose Beratung</Link>
+              <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
             </Button>
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function TrompeteLernenKinderPage() {
               <Link to="/auth">Kinder-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-              <Link to="/instrumenten-beratung">Kostenlose Beratung</Link>
+              <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
             </Button>
           </div>
         </section>
