@@ -16,7 +16,7 @@ const faqs = [
   { question: "Soll mein Kind in eine Bläserklasse?", answer: "Bläserklassen sind ideal ab dem 2. Jahr, wenn Grundlagen sitzen. Vorbereitung mit unserer Methode ist empfohlen." },
   { question: "Mein Kind will aufhören – was tun?", answer: "Das ist normal! Fragen Sie nach dem Warum. Oft ist es Frustration. Pausen sind okay." },
   { question: "Kann ich selbst Trompete spielen lernen, um mein Kind zu begleiten?", answer: "Absolut! Viele Eltern starten parallel. Wir haben spezielle Eltern-Kind-Module im Pro-Kurs." },
-  { question: "Ist Trompete lernen schwierig für Kinder?", answer: "Der erste Ton ist die größte Hürde (1-3 Wochen). Danach wird es kontinuierlich einfacher." }
+  { question: "Ist Trompete lernen schwierig für Kinder?", answer: "Der erste Ton ist die größte Hürde. Danach wird es kontinuierlich einfacher." }
 ];
 
 const altersGruppen = [
