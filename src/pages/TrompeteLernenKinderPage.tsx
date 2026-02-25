@@ -58,7 +58,7 @@ export default function TrompeteLernenKinderPage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kurse/kinder">Kinder-Kurs entdecken</Link>
+              <Link to="/auth">Kinder-Kurs entdecken</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <Link to="/instrumenten-beratung">Kostenlose Beratung</Link>
@@ -257,7 +257,7 @@ export default function TrompeteLernenKinderPage() {
           <p className="text-white/70 mb-6 max-w-xl mx-auto">Starten Sie direkt mit unserem Kinder-Kurs oder lassen Sie sich beraten.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/kurse/kinder">Kinder-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/auth">Kinder-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <Link to="/instrumenten-beratung">Kostenlose Beratung</Link>
