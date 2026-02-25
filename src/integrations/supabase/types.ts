@@ -1100,9 +1100,13 @@ export type Database = {
       }
       leads: {
         Row: {
+          auth_user_id: string | null
           created_at: string
           email: string
+          first_name: string | null
           id: string
+          language: string | null
+          segment: string | null
           source: string | null
           utm_campaign: string | null
           utm_content: string | null
@@ -1110,9 +1114,13 @@ export type Database = {
           utm_source: string | null
         }
         Insert: {
+          auth_user_id?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           id?: string
+          language?: string | null
+          segment?: string | null
           source?: string | null
           utm_campaign?: string | null
           utm_content?: string | null
@@ -1120,9 +1128,13 @@ export type Database = {
           utm_source?: string | null
         }
         Update: {
+          auth_user_id?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           id?: string
+          language?: string | null
+          segment?: string | null
           source?: string | null
           utm_campaign?: string | null
           utm_content?: string | null
