@@ -54,6 +54,19 @@ export default function TrompeteAnsatzAtmungPage() {
             </div>
           </div>
           
+          <div className="max-w-3xl mx-auto mb-10">
+            <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
+              <iframe
+                src="https://player.vimeo.com/video/1025864403?h=6b28cdec78&title=0&byline=0&portrait=0&dnt=1"
+                className="absolute inset-0 w-full h-full"
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                allowFullScreen
+                title="Trompete Ansatz und Atmung"
+              />
+            </div>
+          </div>
+
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
               <Link to="/videos/ansatz-atmung"><PlayCircle className="mr-2 h-4 w-4" /> Video-Anleitung</Link>
