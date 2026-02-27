@@ -393,6 +393,11 @@ serve(async (req) => {
       ? `\n\nRELEVANTE WISSENSBASIS-INHALTE:\n${contextChunks.join("\n\n---\n\n")}\n\n`
       : "\n\n(Keine relevanten Inhalte in der Wissensbasis gefunden.)\n\n";
 
+    // Add fingering link hint if fingering/note query detected
+    const fingeringLinkHint = (isFingeringQuery || isNoteQuery)
+      ? `\n\nFINGERING_LINK_HINT: Bei dieser Frage zu Griffen oder Noten, füge am Ende deiner Antwort folgenden Satz hinzu (exakt so, mit dem Markdown-Link): "📖 Die vollständige Grifftabelle findest du hier: [Grifftabelle öffnen](/app/levels?highlight=grifftabelle)"\n\n`
+      : "";
+
     // Save unanswered question if no knowledge base match was found
     if (noContextFound && lastUserMessage.trim().length > 0) {
       try {
@@ -447,7 +452,7 @@ Basierend auf diesen Metadaten, gib:
     // Build system prompt with language-specific content
     const modePrompt = MODE_PROMPTS[mode]?.[language] || MODE_PROMPTS.mixed[language] || MODE_PROMPTS.mixed.de;
     const baseInstr = BASE_INSTRUCTIONS[language] || BASE_INSTRUCTIONS.de;
-    const systemPrompt = `${modePrompt}${baseInstr}${userContext}${contextString}${recordingInfo}`;
+    const systemPrompt = `${modePrompt}${baseInstr}${userContext}${contextString}${fingeringLinkHint}${recordingInfo}`;
 
     // Prepare messages for API
     const apiMessages: Message[] = [
