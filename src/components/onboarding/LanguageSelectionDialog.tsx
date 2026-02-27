@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
-import { Music, Sparkles, ArrowRight, User, Globe, Target } from 'lucide-react';
+import { Music, Sparkles, ArrowRight, User, Globe, Target, Users, GraduationCap } from 'lucide-react';
 
 interface LanguageOption {
   code: Language;
@@ -23,6 +23,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 type SkillLevel = 'beginner' | 'intermediate';
+type Segment = 'adult_beginner' | 'parent_child' | 'teacher';
 
 interface LanguageSelectionDialogProps {
   open: boolean;
@@ -35,10 +36,11 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
   const [name, setName] = useState('');
   const [selectedLang, setSelectedLang] = useState<Language>(language);
   const [skillLevel, setSkillLevel] = useState<SkillLevel>('beginner');
+  const [segment, setSegment] = useState<Segment>('adult_beginner');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < 4) {
       setStep(step + 1);
     }
   };
@@ -54,7 +56,6 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
     setIsSubmitting(true);
 
     try {
-      // Save display name to profiles
       if (name.trim()) {
         await supabase
           .from('profiles')
@@ -62,7 +63,15 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
           .eq('id', user.id);
       }
 
-      // Save language and skill level
+      // Save segment to leads table (upsert by user email)
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser?.email) {
+        await supabase.from('leads').upsert(
+          { email: authUser.email, segment, auth_user_id: user.id },
+          { onConflict: 'email' }
+        );
+      }
+
       await completeOnboarding(selectedLang, skillLevel);
     } catch (error) {
       console.error('[Onboarding] Error completing setup:', error);
@@ -78,7 +87,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
 
   const renderStepIndicator = () => (
     <div className="flex justify-center gap-2 mb-6">
-      {[1, 2, 3].map((s) => (
+      {[1, 2, 3, 4].map((s) => (
         <div
           key={s}
           className={cn(
@@ -99,9 +108,18 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
       1: <User className="w-5 h-5" />,
       2: <Globe className="w-5 h-5" />,
       3: <Target className="w-5 h-5" />,
+      4: <Users className="w-5 h-5" />,
     };
     return icons[stepNum as keyof typeof icons];
   };
+
+  const checkmark = (
+    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+  );
 
   const renderStep1 = () => (
     <div className="space-y-6">
@@ -109,14 +127,9 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-4">
           {renderStepIcon(1)}
         </div>
-        <h2 className="text-2xl font-bold text-white">
-          {t('onboarding.step1Title')}
-        </h2>
-        <p className="text-white/60 mt-2">
-          {t('onboarding.step1Subtitle')}
-        </p>
+        <h2 className="text-2xl font-bold text-white">{t('onboarding.step1Title')}</h2>
+        <p className="text-white/60 mt-2">{t('onboarding.step1Subtitle')}</p>
       </div>
-      
       <Input
         type="text"
         placeholder={t('onboarding.namePlaceholder')}
@@ -134,14 +147,9 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-4">
           {renderStepIcon(2)}
         </div>
-        <h2 className="text-2xl font-bold text-white">
-          {t('onboarding.step2Title')}
-        </h2>
-        <p className="text-white/60 mt-2">
-          {t('onboarding.step2Subtitle')}
-        </p>
+        <h2 className="text-2xl font-bold text-white">{t('onboarding.step2Title')}</h2>
+        <p className="text-white/60 mt-2">{t('onboarding.step2Subtitle')}</p>
       </div>
-
       <div className="space-y-3">
         {LANGUAGE_OPTIONS.map((option) => (
           <button
@@ -156,20 +164,10 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
           >
             <span className="text-3xl">{option.flag}</span>
             <div className="text-left flex-1">
-              <p className="font-semibold text-white">
-                {option.nativeName}
-              </p>
-              <p className="text-sm text-white/50">
-                {option.name}
-              </p>
+              <p className="font-semibold text-white">{option.nativeName}</p>
+              <p className="text-sm text-white/50">{option.name}</p>
             </div>
-            {selectedLang === option.code && (
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            )}
+            {selectedLang === option.code && checkmark}
           </button>
         ))}
       </div>
@@ -182,127 +180,93 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-4">
           {renderStepIcon(3)}
         </div>
-        <h2 className="text-2xl font-bold text-white">
-          {t('onboarding.step3Title')}
-        </h2>
-        <p className="text-white/60 mt-2">
-          {t('onboarding.step3Subtitle')}
-        </p>
+        <h2 className="text-2xl font-bold text-white">{t('onboarding.step3Title')}</h2>
+        <p className="text-white/60 mt-2">{t('onboarding.step3Subtitle')}</p>
       </div>
-
       <div className="space-y-3">
-        <button
-          onClick={() => setSkillLevel('beginner')}
-          className={cn(
-            "w-full flex items-center gap-4 p-5 rounded-xl transition-all duration-200",
-            skillLevel === 'beginner'
-              ? "bg-primary/20 border-2 border-primary ring-2 ring-primary/30"
-              : "bg-white/5 border-2 border-transparent hover:bg-white/10 hover:border-white/20"
-          )}
-        >
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div className="text-left flex-1">
-            <p className="font-semibold text-white text-lg">
-              {t('onboarding.skillBeginner')}
-            </p>
-            <p className="text-sm text-white/50">
-              {t('onboarding.skillBeginnerDesc')}
-            </p>
-          </div>
-          {skillLevel === 'beginner' && (
-            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
+        {[
+          { value: 'beginner' as SkillLevel, label: t('onboarding.skillBeginner'), desc: t('onboarding.skillBeginnerDesc'), icon: <Sparkles className="w-6 h-6 text-white" />, gradient: 'from-green-400 to-emerald-600' },
+          { value: 'intermediate' as SkillLevel, label: t('onboarding.skillIntermediate'), desc: t('onboarding.skillIntermediateDesc'), icon: <Music className="w-6 h-6 text-white" />, gradient: 'from-amber-400 to-orange-600' },
+        ].map((opt) => (
+          <button key={opt.value} onClick={() => setSkillLevel(opt.value)}
+            className={cn("w-full flex items-center gap-4 p-5 rounded-xl transition-all duration-200",
+              skillLevel === opt.value ? "bg-primary/20 border-2 border-primary ring-2 ring-primary/30" : "bg-white/5 border-2 border-transparent hover:bg-white/10 hover:border-white/20"
+            )}>
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0`}>{opt.icon}</div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-white text-lg">{opt.label}</p>
+              <p className="text-sm text-white/50">{opt.desc}</p>
             </div>
-          )}
-        </button>
+            {skillLevel === opt.value && checkmark}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
-        <button
-          onClick={() => setSkillLevel('intermediate')}
-          className={cn(
-            "w-full flex items-center gap-4 p-5 rounded-xl transition-all duration-200",
-            skillLevel === 'intermediate'
-              ? "bg-primary/20 border-2 border-primary ring-2 ring-primary/30"
-              : "bg-white/5 border-2 border-transparent hover:bg-white/10 hover:border-white/20"
-          )}
-        >
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
-            <Music className="w-6 h-6 text-white" />
-          </div>
-          <div className="text-left flex-1">
-            <p className="font-semibold text-white text-lg">
-              {t('onboarding.skillIntermediate')}
-            </p>
-            <p className="text-sm text-white/50">
-              {t('onboarding.skillIntermediateDesc')}
-            </p>
-          </div>
-          {skillLevel === 'intermediate' && (
-            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
+  const renderStep4 = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/20 mb-4">
+          {renderStepIcon(4)}
+        </div>
+        <h2 className="text-2xl font-bold text-white">Wer bist du?</h2>
+        <p className="text-white/60 mt-2">Damit wir dir die besten Tipps senden können.</p>
+      </div>
+      <div className="space-y-3">
+        {[
+          { value: 'adult_beginner' as Segment, label: 'Erwachsener Anfänger / Wiedereinsteiger', desc: 'Du lernst Trompete zum ersten Mal oder nach einer Pause.', icon: <User className="w-6 h-6 text-white" />, gradient: 'from-blue-400 to-blue-600' },
+          { value: 'parent_child' as Segment, label: 'Elternteil – Kind (6–14 Jahre)', desc: 'Dein Kind möchte Trompete lernen.', icon: <Users className="w-6 h-6 text-white" />, gradient: 'from-purple-400 to-purple-600' },
+          { value: 'teacher' as Segment, label: 'Musiklehrer', desc: 'Du unterrichtest oder leitest eine Gruppe.', icon: <GraduationCap className="w-6 h-6 text-white" />, gradient: 'from-rose-400 to-rose-600' },
+        ].map((opt) => (
+          <button key={opt.value} onClick={() => setSegment(opt.value)}
+            className={cn("w-full flex items-center gap-4 p-4 rounded-xl transition-all duration-200",
+              segment === opt.value ? "bg-primary/20 border-2 border-primary ring-2 ring-primary/30" : "bg-white/5 border-2 border-transparent hover:bg-white/10 hover:border-white/20"
+            )}>
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0`}>{opt.icon}</div>
+            <div className="text-left flex-1">
+              <p className="font-semibold text-white">{opt.label}</p>
+              <p className="text-sm text-white/50">{opt.desc}</p>
             </div>
-          )}
-        </button>
+            {segment === opt.value && checkmark}
+          </button>
+        ))}
       </div>
     </div>
   );
 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent 
+      <DialogContent
         className="sm:max-w-md border-0 bg-gradient-to-b from-slate-900 to-slate-800"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        {/* Logo */}
         <div className="flex justify-center mb-2">
-          <img 
-            src={trumpetstarLogo} 
-            alt="TrumpetStar" 
-            className="h-12 w-auto"
-          />
+          <img src={trumpetstarLogo} alt="TrumpetStar" className="h-12 w-auto" />
         </div>
 
         {renderStepIndicator()}
 
-        {/* Step Content */}
-        <div className="min-h-[280px]">
+        <div className="min-h-[320px]">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-3 mt-4">
           {step > 1 && (
-            <Button
-              variant="outline"
-              onClick={handleBack}
-              className="flex-1 h-12 border-white/20 text-white hover:bg-white/10"
-            >
+            <Button variant="outline" onClick={handleBack} className="flex-1 h-12 border-white/20 text-white hover:bg-white/10">
               {t('common.back')}
             </Button>
           )}
-          
-          {step < 3 ? (
-            <Button 
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="flex-1 h-12 text-lg font-semibold"
-            >
+          {step < 4 ? (
+            <Button onClick={handleNext} disabled={!canProceed()} className="flex-1 h-12 text-lg font-semibold">
               {t('common.next')}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           ) : (
-            <Button 
-              onClick={handleComplete}
-              disabled={isSubmitting}
-              className="flex-1 h-12 text-lg font-semibold"
-            >
+            <Button onClick={handleComplete} disabled={isSubmitting} className="flex-1 h-12 text-lg font-semibold">
               {isSubmitting ? t('common.loading') : t('onboarding.letsStart')}
               {!isSubmitting && <Sparkles className="w-5 h-5 ml-2" />}
             </Button>
