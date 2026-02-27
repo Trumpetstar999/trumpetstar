@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { PremiumLockOverlay } from '@/components/premium/PremiumLockOverlay';
+
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
@@ -527,37 +527,21 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               )}
             </div>
           ) : currentLevel && (
-            <>
-              {/* Check if level is locked */}
-              {currentLevel.requiredPlanKey && currentLevel.requiredPlanKey !== 'FREE' && !canAccessLevel(currentLevel.requiredPlanKey) ? (
-                /* Show ONLY the lock overlay - don't render sections at all */
-                <div className="h-full flex items-center justify-center p-6"
-                     style={{ 
-                       background: 'linear-gradient(180deg, rgba(30, 134, 255, 0.95) 0%, rgba(15, 94, 219, 0.95) 40%, rgba(11, 46, 138, 0.95) 100%)'
-                     }}>
-                  <PremiumLockOverlay 
-                    requiredPlanKey={currentLevel.requiredPlanKey} 
-                    title={currentLevel.title} 
-                  />
-                </div>
-              ) : (
-                /* Sections - only rendered when level is unlocked */
-                <div className="p-6">
-                  {currentLevel.sections.map((section, sectionIndex) => (
-                    <SectionRow
-                      key={section.id}
-                      section={section}
-                      onVideoClick={(video) => handleVideoClick({ 
-                        video, 
-                        levelId: currentLevel.id, 
-                        levelTitle: currentLevel.title 
-                      })}
-                      sectionIndex={sectionIndex}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
+            /* Sections - all levels accessible; daily limit enforced on video click */
+            <div className="p-6">
+              {currentLevel.sections.map((section, sectionIndex) => (
+                <SectionRow
+                  key={section.id}
+                  section={section}
+                  onVideoClick={(video) => handleVideoClick({ 
+                    video, 
+                    levelId: currentLevel.id, 
+                    levelTitle: currentLevel.title 
+                  })}
+                  sectionIndex={sectionIndex}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
