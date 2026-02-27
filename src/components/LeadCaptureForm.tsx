@@ -11,7 +11,7 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
   const [formData, setFormData] = useState({
     first_name: "",
     email: "",
-    segment: "adult",
+    segment: "adult_beginner",
     privacy: false,
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -117,9 +117,9 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
           className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base appearance-none cursor-pointer"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
         >
-          <option value="adult">Erwachsener</option>
-          <option value="child">Kind / Jugendlicher</option>
-          <option value="teacher">Musiklehrer / Dirigent</option>
+          <option value="adult_beginner">Erwachsener Anfänger / Wiedereinsteiger</option>
+          <option value="parent_child">Elternteil – Kind (6–14 Jahre)</option>
+          <option value="teacher">Musiklehrer</option>
         </select>
       </div>
 
