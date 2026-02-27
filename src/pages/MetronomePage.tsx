@@ -45,7 +45,7 @@ const defaultSettings: SavedSettings = {
   accentBeat1: true,
   subdivision: 'off',
   lastBeatId: null,
-  mode: 'metronome',
+  mode: 'drummachine',
 };
 
 function loadSettings(): SavedSettings {
