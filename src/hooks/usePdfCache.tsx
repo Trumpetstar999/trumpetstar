@@ -3,7 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 const DB_NAME = 'trumpetstar-pdf-cache';
 const STORE_NAME = 'pdfs';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
+const CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 interface CachedPdf {
   id: string;
@@ -51,19 +52,26 @@ function openDatabase(): Promise<IDBDatabase> {
 async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
   try {
     const db = await openDatabase();
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const transaction = db.transaction(STORE_NAME, 'readonly');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.get(pdfId);
-      
+
       request.onerror = () => {
         console.error('IndexedDB get error:', request.error);
-        reject(request.error);
+        resolve(null);
       };
       request.onsuccess = () => {
         const result = request.result as CachedPdf | undefined;
         if (result && result.blob && result.blob.size > 0) {
-          console.log('Cache entry found for PDF:', pdfId, 'blob size:', result.blob.size);
+          // Check if cache entry is still valid (within 30 days)
+          const age = Date.now() - (result.cachedAt || 0);
+          if (age > CACHE_MAX_AGE_MS) {
+            console.log('Cache entry expired for PDF:', pdfId);
+            resolve(null);
+            return;
+          }
+          console.log('Cache hit for PDF:', pdfId, 'blob size:', result.blob.size, 'age:', Math.round(age / 86400000) + 'd');
           resolve(result);
         } else {
           console.log('Cache miss for PDF:', pdfId);
@@ -121,24 +129,30 @@ async function clearCacheEntry(pdfId: string): Promise<void> {
   }
 }
 
-// Validate that a blob is a valid PDF by reading its header bytes
+// Validate that a blob is a valid PDF by checking size and magic bytes
 async function isValidPdfBlob(blob: Blob): Promise<boolean> {
-  if (!blob || blob.size < 1000) {
+  if (!blob || blob.size < 100) {
     console.log('Blob too small to be valid PDF:', blob?.size);
     return false;
   }
-  
+
   try {
-    // Read first 5 bytes to check PDF magic number
-    const headerSlice = blob.slice(0, 5);
+    // Check PDF magic bytes: %PDF- = 0x25 0x50 0x44 0x46 0x2D
+    const headerSlice = blob.slice(0, 8);
     const arrayBuffer = await headerSlice.arrayBuffer();
-    const header = new TextDecoder().decode(arrayBuffer);
-    const isValid = header.startsWith('%PDF-');
-    console.log('PDF validation result:', isValid, 'header:', header);
+    const bytes = new Uint8Array(arrayBuffer);
+
+    // Allow for optional BOM before %PDF-
+    const startsAtZero = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+    const startsAtThree = bytes[3] === 0x25 && bytes[4] === 0x50 && bytes[5] === 0x44 && bytes[6] === 0x46; // after BOM
+
+    const isValid = startsAtZero || startsAtThree;
+    console.log('PDF validation result:', isValid, 'size:', blob.size, 'bytes:', Array.from(bytes.slice(0, 5)));
     return isValid;
   } catch (e) {
     console.error('Error validating PDF blob:', e);
-    return false;
+    // If validation itself fails, trust the blob if it's large enough
+    return blob.size > 10000;
   }
 }
 
