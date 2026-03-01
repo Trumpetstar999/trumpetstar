@@ -64,6 +64,7 @@ interface AudioTrack {
 interface PdfViewerProps {
   pdf: PdfDocument;
   pdfBlobUrl: string;
+  pdfBlob?: Blob | null;
   currentPage: number;
   onPageChange: (page: number) => void;
   audioTracks: AudioTrack[];
@@ -93,7 +94,7 @@ const HIGHLIGHTER_COLORS = [
 const BRUSH_SIZES = [2, 4, 6, 8, 12];
 const HIGHLIGHTER_SIZES = [12, 20, 28, 36];
 
-export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
+export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
   const [searchParams] = useSearchParams();
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
@@ -202,33 +203,40 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     onClose();
   }, [pdf.id, onClose]);
 
-  // Load PDF document from blob URL
+  // Load PDF document from blob URL or blob
   useEffect(() => {
-    console.log('PdfViewer: pdfBlobUrl changed:', pdfBlobUrl ? 'exists' : 'null');
+    const hasSource = pdfBlob || pdfBlobUrl;
+    console.log('PdfViewer: source changed:', pdfBlob ? 'blob' : pdfBlobUrl ? 'blobUrl' : 'null');
     
-    if (!pdfBlobUrl) {
-      console.log('PdfViewer: No blob URL provided');
+    if (!hasSource) {
+      console.log('PdfViewer: No PDF source provided');
       return;
     }
 
-    // Reset state when URL changes
+    // Reset state when source changes
     setPdfDoc(null);
     setIsLoading(true);
     setLoadError(null);
 
     const loadPdf = async () => {
-      console.log('PdfViewer: Starting PDF load from blob URL:', pdfBlobUrl);
+      console.log('PdfViewer: Starting PDF load...');
       
       try {
-        // First, fetch the blob to verify it's valid and get ArrayBuffer
-        console.log('PdfViewer: Fetching blob...');
-        const response = await fetch(pdfBlobUrl);
+        let arrayBuffer: ArrayBuffer;
         
-        if (!response.ok) {
-          throw new Error(`Failed to fetch blob: HTTP ${response.status}`);
+        if (pdfBlob) {
+          // Use blob directly - no fetch needed (Safari-safe)
+          console.log('PdfViewer: Using blob directly, size:', pdfBlob.size);
+          arrayBuffer = await pdfBlob.arrayBuffer();
+        } else {
+          // Fallback: fetch from blob URL
+          console.log('PdfViewer: Fetching from blob URL:', pdfBlobUrl);
+          const response = await fetch(pdfBlobUrl);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch blob: HTTP ${response.status}`);
+          }
+          arrayBuffer = await response.arrayBuffer();
         }
-        
-        const arrayBuffer = await response.arrayBuffer();
         console.log('PdfViewer: Got ArrayBuffer, size:', arrayBuffer.byteLength);
         
         if (arrayBuffer.byteLength < 1000) {
@@ -280,7 +288,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
     };
 
     loadPdf();
-  }, [pdfBlobUrl]);
+  }, [pdfBlobUrl, pdfBlob]);
 
   // Render current page
   useEffect(() => {

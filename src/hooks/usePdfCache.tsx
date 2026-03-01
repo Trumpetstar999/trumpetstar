@@ -144,7 +144,7 @@ async function isValidPdfBlob(blob: Blob): Promise<boolean> {
 
     // Allow for optional BOM before %PDF-
     const startsAtZero = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
-    const startsAtThree = bytes[3] === 0x25 && bytes[4] === 0x50 && bytes[5] === 0x44 && bytes[6] === 0x46; // after BOM
+    const startsAtThree = bytes[3] === 0x25 && bytes[4] === 0x50 && bytes[5] === 0x44 && bytes[6] === 0x46;
 
     const isValid = startsAtZero || startsAtThree;
     console.log('PDF validation result:', isValid, 'size:', blob.size, 'bytes:', Array.from(bytes.slice(0, 5)));
@@ -159,10 +159,7 @@ async function isValidPdfBlob(blob: Blob): Promise<boolean> {
 // Check if PDF.js worker is reachable
 async function checkWorkerReachable(): Promise<boolean> {
   try {
-    // Check local worker file
-    const response = await fetch('/pdf.worker.min.mjs', {
-      method: 'HEAD',
-    });
+    const response = await fetch('/pdf.worker.min.mjs', { method: 'HEAD' });
     return response.ok;
   } catch {
     return false;
@@ -193,10 +190,8 @@ export function usePdfCache() {
     };
 
     try {
-      // Check worker
       diag.workerReachable = await checkWorkerReachable();
 
-      // Test proxy endpoint with debug mode
       const debugResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}&debug=1`, {
         headers: {
           'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
@@ -224,21 +219,22 @@ export function usePdfCache() {
     return diag;
   }, []);
 
-  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<string | null> => {
-    console.log('getPdfUrl called for:', pdfId, 'useProxy:', useProxy);
+  /**
+   * Returns the PDF as a Blob (from cache or freshly downloaded).
+   * Using Blob directly avoids Safari's issues with fetching blob: URLs.
+   */
+  const getPdfBlob = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<Blob | null> => {
+    console.log('getPdfBlob called for:', pdfId, 'useProxy:', useProxy);
     
     // Check cache first
     const cached = await getCachedPdf(pdfId);
     
     if (cached) {
-      // Validate the cached blob is a real PDF
       const isValid = await isValidPdfBlob(cached.blob);
       
       if (isValid) {
         console.log('Valid PDF found in cache:', pdfId);
-        const blobUrl = URL.createObjectURL(cached.blob);
-        console.log('Created blob URL from cache:', blobUrl);
-        return blobUrl;
+        return cached.blob;
       } else {
         console.log('Cached blob is invalid, clearing cache for:', pdfId);
         await clearCacheEntry(pdfId);
@@ -253,28 +249,22 @@ export function usePdfCache() {
       let downloadUrl: string;
       
       if (useProxy) {
-        // Use the proxy endpoint to get a signed URL
         const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
         console.log('Getting signed URL from proxy:', proxyUrl);
         
-        // Get auth token for proxy requests
         const session = await supabase.auth.getSession();
         const authToken = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         
         const proxyResponse = await fetch(proxyUrl, {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-          },
+          headers: { 'Authorization': `Bearer ${authToken}` },
         });
         
         if (!proxyResponse.ok) {
           const errorData = await proxyResponse.json().catch(() => ({}));
           console.error('Proxy request failed:', proxyResponse.status, errorData);
-          
-          // Fallback to direct URL approach
           console.log('Proxy failed, trying direct URL fallback...');
           setDownloadProgress(null);
-          return getPdfUrl(pdfId, pdfFileUrl, false);
+          return getPdfBlob(pdfId, pdfFileUrl, false);
         }
         
         const proxyData = await proxyResponse.json();
@@ -282,7 +272,7 @@ export function usePdfCache() {
         if (!proxyData.signedUrl) {
           console.error('Proxy did not return signed URL:', proxyData);
           setDownloadProgress(null);
-          return getPdfUrl(pdfId, pdfFileUrl, false);
+          return getPdfBlob(pdfId, pdfFileUrl, false);
         }
         
         downloadUrl = proxyData.signedUrl;
@@ -321,7 +311,6 @@ export function usePdfCache() {
 
       console.log('Starting download from signed URL...');
 
-      // Download the PDF directly from the signed URL (no auth needed)
       const response = await fetch(downloadUrl);
       
       if (!response.ok) {
@@ -343,9 +332,7 @@ export function usePdfCache() {
 
       while (true) {
         const { done, value } = await reader.read();
-        
         if (done) break;
-        
         chunks.push(value);
         received += value.length;
         
@@ -353,59 +340,50 @@ export function usePdfCache() {
           const progress = Math.round((received / total) * 100);
           setDownloadProgress({ pdfId, progress, isDownloading: true });
         } else {
-          // If no content-length, show indeterminate progress
           setDownloadProgress({ pdfId, progress: Math.min(received / 1000000 * 100, 95), isDownloading: true });
         }
       }
 
-      // Combine chunks into blob
       const blob = new Blob(chunks as BlobPart[], { type: 'application/pdf' });
-      
       console.log('Download complete, blob size:', blob.size);
       
-      // Validate downloaded blob
       const isValid = await isValidPdfBlob(blob);
       if (!isValid) {
         console.error('Downloaded blob is not a valid PDF');
-        
-        // If proxy failed validation, try direct URL
         if (useProxy) {
           console.log('Proxy returned invalid PDF, trying direct URL fallback...');
           setDownloadProgress(null);
-          return getPdfUrl(pdfId, pdfFileUrl, false);
+          return getPdfBlob(pdfId, pdfFileUrl, false);
         }
-        
         setDownloadProgress(null);
         return null;
       }
       
-      // Cache the PDF
       await savePdfToCache(pdfId, blob);
       
       setDownloadProgress({ pdfId, progress: 100, isDownloading: false });
-      
-      // Small delay to show 100%
       await new Promise(resolve => setTimeout(resolve, 300));
       setDownloadProgress(null);
       
-      const blobUrl = URL.createObjectURL(blob);
-      console.log('Created blob URL from download:', blobUrl);
-      
-      return blobUrl;
+      return blob;
     } catch (error) {
       console.error('Failed to download PDF:', error);
-      
-      // If proxy failed, try direct URL as fallback
       if (useProxy) {
         console.log('Proxy error, trying direct URL fallback...');
         setDownloadProgress(null);
-        return getPdfUrl(pdfId, pdfFileUrl, false);
+        return getPdfBlob(pdfId, pdfFileUrl, false);
       }
-      
       setDownloadProgress(null);
       return null;
     }
   }, []);
+
+  // Legacy: returns a blob URL (for backward compat if needed)
+  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<string | null> => {
+    const blob = await getPdfBlob(pdfId, pdfFileUrl, useProxy);
+    if (!blob) return null;
+    return URL.createObjectURL(blob);
+  }, [getPdfBlob]);
 
   const clearCache = useCallback(async (pdfId?: string) => {
     try {
@@ -432,6 +410,7 @@ export function usePdfCache() {
   }, []);
 
   return {
+    getPdfBlob,
     getPdfUrl,
     downloadProgress,
     clearCache,

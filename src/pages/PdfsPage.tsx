@@ -47,12 +47,13 @@ export function PdfsPage() {
   const { user } = useAuth();
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
   const { setIsPdfViewerOpen } = usePdfViewer();
-  const { getPdfUrl, downloadProgress, isCached } = usePdfCache();
+  const { getPdfBlob, downloadProgress, isCached } = usePdfCache();
   const { t } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
   
   const [selectedPdfId, setSelectedPdfId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [cachedStatus, setCachedStatus] = useState<Map<string, boolean>>(new Map());
   const [searchQuery, setSearchQuery] = useState('');
@@ -116,10 +117,10 @@ export function PdfsPage() {
 
   // Update global state when PDF viewer opens/closes
   useEffect(() => {
-    const isOpen = !!pdfBlobUrl && canAccessSelectedPdf;
+    const isOpen = !!pdfBlob && canAccessSelectedPdf;
     setIsPdfViewerOpen(isOpen);
     return () => setIsPdfViewerOpen(false);
-  }, [pdfBlobUrl, canAccessSelectedPdf, setIsPdfViewerOpen]);
+  }, [pdfBlob, canAccessSelectedPdf, setIsPdfViewerOpen]);
 
   const isLoading = pdfsLoading || membershipLoading;
 
@@ -135,22 +136,25 @@ export function PdfsPage() {
 
     setSelectedPdfId(id);
     
-    // Get PDF URL (from cache or download)
-    const url = await getPdfUrl(id, pdf.pdf_file_url);
+    // Get PDF Blob directly (from cache or download) - avoids Safari blob URL fetch issue
+    const blob = await getPdfBlob(id, pdf.pdf_file_url);
     
-    if (url) {
+    if (blob) {
+      setPdfBlob(blob);
+      // Also create a blob URL for the viewer component
+      const url = URL.createObjectURL(blob);
       setPdfBlobUrl(url);
       setCurrentPage(1);
-      // Update cached status
       setCachedStatus(prev => new Map(prev).set(id, true));
     } else {
       toast.error('PDF konnte nicht geladen werden');
       setSelectedPdfId(null);
     }
-  }, [pdfs, canAccessLevel, getPdfUrl]);
+  }, [pdfs, canAccessLevel, getPdfBlob]);
 
   const handleClosePdf = useCallback(() => {
     setSelectedPdfId(null);
+    setPdfBlob(null);
     if (pdfBlobUrl) {
       URL.revokeObjectURL(pdfBlobUrl);
       setPdfBlobUrl(null);
@@ -277,10 +281,11 @@ export function PdfsPage() {
       </div>
 
       {/* Fullscreen PDF Viewer */}
-      {selectedPdf && pdfBlobUrl && canAccessSelectedPdf && (
+      {selectedPdf && pdfBlob && canAccessSelectedPdf && (
         <PdfViewer
           pdf={selectedPdf}
-          pdfBlobUrl={pdfBlobUrl}
+          pdfBlobUrl={pdfBlobUrl || ''}
+          pdfBlob={pdfBlob}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           audioTracks={audioTracks}
