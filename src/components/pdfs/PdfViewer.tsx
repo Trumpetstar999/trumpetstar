@@ -473,125 +473,79 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
   const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
   const handleResetZoom = () => setZoom(1);
 
-  // Print current page only
+  // Print current page only – uses a hidden iframe so the dialog opens directly
   const handlePrintCurrentPage = useCallback(() => {
     const pdfCanvas = canvasRef.current;
     const drawingCanvas = drawingCanvasRef.current;
-    
+
     if (!pdfCanvas) {
       toast.error('Seite konnte nicht gedruckt werden');
       return;
     }
 
-    // Create a temporary canvas to merge PDF and drawings
+    // Merge PDF canvas + annotation canvas
     const printCanvas = document.createElement('canvas');
     printCanvas.width = pdfCanvas.width;
     printCanvas.height = pdfCanvas.height;
     const ctx = printCanvas.getContext('2d');
-    
+
     if (!ctx) {
       toast.error('Druckfehler');
       return;
     }
 
-    // Draw PDF page
     ctx.drawImage(pdfCanvas, 0, 0);
-    
-    // Draw annotations on top if they exist
     if (drawingCanvas) {
       ctx.drawImage(drawingCanvas, 0, 0);
     }
 
-    // Convert to image data URL
     const imageData = printCanvas.toDataURL('image/png', 1.0);
 
-    // Open print window with single page
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast.error('Popup wurde blockiert. Bitte erlauben Sie Popups für diese Seite.');
+    // Build HTML for the iframe
+    const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      @page { size: A4 portrait; margin: 0; }
+      html, body { width: 210mm; height: 297mm; background: white; }
+      img { width: 210mm; height: 297mm; object-fit: contain; display: block; }
+    </style>
+  </head>
+  <body>
+    <img src="${imageData}" alt="Seite ${currentPage}" />
+  </body>
+</html>`;
+
+    // Remove any existing print iframe
+    const existing = document.getElementById('pdf-print-frame');
+    if (existing) existing.remove();
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'pdf-print-frame';
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow?.document;
+    if (!iframeDoc) {
+      toast.error('Druckfehler');
       return;
     }
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${pdf.title} - Seite ${currentPage}</title>
-          <style>
-            * {
-              box-sizing: border-box;
-              margin: 0;
-              padding: 0;
-            }
-            @page {
-              size: A4 portrait;
-              margin: 0;
-            }
-            html, body {
-              width: 210mm;
-              height: 297mm;
-              background: white;
-            }
-            .page-wrapper {
-              width: 210mm;
-              height: 297mm;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-            }
-            img {
-              width: 210mm;
-              height: 297mm;
-              object-fit: contain;
-              display: block;
-            }
-            .no-print {
-              position: fixed;
-              top: 10px;
-              right: 10px;
-              padding: 8px 16px;
-              background: #2563eb;
-              color: white;
-              border: none;
-              border-radius: 6px;
-              cursor: pointer;
-              font-family: system-ui, sans-serif;
-              font-size: 14px;
-              z-index: 9999;
-            }
-            .no-print:hover {
-              background: #1d4ed8;
-            }
-            @media print {
-              .no-print {
-                display: none !important;
-              }
-              html, body {
-                width: 210mm;
-                height: 297mm;
-              }
-              .page-wrapper {
-                width: 210mm;
-                height: 297mm;
-              }
-              img {
-                width: 210mm;
-                height: 297mm;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <button class="no-print" onclick="window.print()">Drucken</button>
-          <div class="page-wrapper">
-            <img src="${imageData}" alt="Seite ${currentPage}" />
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  }, [pdf.title, currentPage]);
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+
+    // Wait for image to load, then print
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        // Clean up after print dialog closes
+        setTimeout(() => iframe.remove(), 2000);
+      }, 200);
+    };
+  }, [currentPage]);
 
   // Drawing functions
   const getCanvasCoordinates = useCallback((e: React.TouchEvent | React.MouseEvent) => {
