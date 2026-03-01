@@ -247,8 +247,8 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         // Load PDF.js with explicit worker configuration
         const pdfjsLib = await import('pdfjs-dist');
         
-        // Set worker source matching installed pdfjs-dist version
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+        // Use local worker file for iOS/Safari compatibility (no external CDN)
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
