@@ -518,29 +518,33 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
         <head>
           <title>${pdf.title} - Seite ${currentPage}</title>
           <style>
-            @media print {
-              @page {
-                margin: 10mm;
-                size: auto;
-              }
-              body {
-                margin: 0;
-                padding: 0;
-              }
-            }
-            body {
+            * {
+              box-sizing: border-box;
               margin: 0;
-              padding: 20px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
+              padding: 0;
+            }
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+            html, body {
+              width: 210mm;
+              height: 297mm;
               background: white;
             }
+            .page-wrapper {
+              width: 210mm;
+              height: 297mm;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+            }
             img {
-              max-width: 100%;
-              max-height: 100vh;
+              width: 210mm;
+              height: 297mm;
               object-fit: contain;
+              display: block;
             }
             .no-print {
               position: fixed;
@@ -554,20 +558,35 @@ export function PdfViewer({ pdf, pdfBlobUrl, currentPage, onPageChange, audioTra
               cursor: pointer;
               font-family: system-ui, sans-serif;
               font-size: 14px;
+              z-index: 9999;
             }
             .no-print:hover {
               background: #1d4ed8;
             }
             @media print {
               .no-print {
-                display: none;
+                display: none !important;
+              }
+              html, body {
+                width: 210mm;
+                height: 297mm;
+              }
+              .page-wrapper {
+                width: 210mm;
+                height: 297mm;
+              }
+              img {
+                width: 210mm;
+                height: 297mm;
               }
             }
           </style>
         </head>
         <body>
           <button class="no-print" onclick="window.print()">Drucken</button>
-          <img src="${imageData}" alt="Seite ${currentPage}" />
+          <div class="page-wrapper">
+            <img src="${imageData}" alt="Seite ${currentPage}" />
+          </div>
         </body>
       </html>
     `);
