@@ -223,8 +223,8 @@ export function usePdfCache() {
    * Returns the PDF as a Blob (from cache or freshly downloaded).
    * Using Blob directly avoids Safari's issues with fetching blob: URLs.
    */
-  const getPdfBlob = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<Blob | null> => {
-    console.log('getPdfBlob called for:', pdfId, 'useProxy:', useProxy);
+  const getPdfBlob = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<Blob | null> => {
+    console.log('getPdfBlob called for:', pdfId);
     
     // Check cache first
     const cached = await getCachedPdf(pdfId);
@@ -246,67 +246,39 @@ export function usePdfCache() {
     setDownloadProgress({ pdfId, progress: 0, isDownloading: true });
 
     try {
-      let downloadUrl: string;
+      // Extract file path from the storage URL
+      let filePath = '';
+      const decodedUrl = decodeURIComponent(pdfFileUrl);
       
-      if (useProxy) {
-        const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pdf-proxy?docId=${pdfId}`;
-        console.log('Getting signed URL from proxy:', proxyUrl);
-        
-        const session = await supabase.auth.getSession();
-        const authToken = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        
-        const proxyResponse = await fetch(proxyUrl, {
-          headers: { 'Authorization': `Bearer ${authToken}` },
-        });
-        
-        if (!proxyResponse.ok) {
-          const errorData = await proxyResponse.json().catch(() => ({}));
-          console.error('Proxy request failed:', proxyResponse.status, errorData);
-          console.log('Proxy failed, trying direct URL fallback...');
-          setDownloadProgress(null);
-          return getPdfBlob(pdfId, pdfFileUrl, false);
+      if (decodedUrl.includes('/pdf-documents/')) {
+        const urlParts = decodedUrl.split('/pdf-documents/');
+        filePath = urlParts[urlParts.length - 1];
+        if (filePath.includes('?')) {
+          filePath = filePath.split('?')[0];
         }
-        
-        const proxyData = await proxyResponse.json();
-        
-        if (!proxyData.signedUrl) {
-          console.error('Proxy did not return signed URL:', proxyData);
-          setDownloadProgress(null);
-          return getPdfBlob(pdfId, pdfFileUrl, false);
-        }
-        
-        downloadUrl = proxyData.signedUrl;
-        console.log('Got signed URL from proxy');
-      } else {
-        // Fallback to direct signed URL approach
-        let filePath = '';
-        const decodedUrl = decodeURIComponent(pdfFileUrl);
-        
-        if (decodedUrl.includes('/pdf-documents/')) {
-          const urlParts = decodedUrl.split('/pdf-documents/');
-          filePath = urlParts[urlParts.length - 1];
-          if (filePath.includes('?')) {
-            filePath = filePath.split('?')[0];
-          }
-        }
+      }
 
-        if (!filePath) {
-          console.error('Could not extract file path from URL:', pdfFileUrl);
-          setDownloadProgress(null);
-          return null;
-        }
+      let downloadUrl: string;
 
+      if (filePath) {
+        // Use Supabase client to create a signed URL — most reliable, works on iOS/Safari
+        console.log('Creating signed URL for file path:', filePath);
         const { data: signedData, error: signError } = await supabase.storage
           .from('pdf-documents')
           .createSignedUrl(filePath, 3600);
 
         if (signError || !signedData?.signedUrl) {
-          console.error('Failed to get signed URL:', signError);
-          setDownloadProgress(null);
-          return null;
+          console.error('Failed to create signed URL:', signError);
+          // Fall back to direct public URL
+          downloadUrl = pdfFileUrl;
+        } else {
+          downloadUrl = signedData.signedUrl;
+          console.log('Using signed URL for download');
         }
-
-        downloadUrl = signedData.signedUrl;
+      } else {
+        // Fallback: use the URL directly
+        downloadUrl = pdfFileUrl;
+        console.log('Using direct URL for download:', downloadUrl.substring(0, 80));
       }
 
       console.log('Starting download from signed URL...');
@@ -349,12 +321,7 @@ export function usePdfCache() {
       
       const isValid = await isValidPdfBlob(blob);
       if (!isValid) {
-        console.error('Downloaded blob is not a valid PDF');
-        if (useProxy) {
-          console.log('Proxy returned invalid PDF, trying direct URL fallback...');
-          setDownloadProgress(null);
-          return getPdfBlob(pdfId, pdfFileUrl, false);
-        }
+        console.error('Downloaded blob is not a valid PDF, size:', blob.size);
         setDownloadProgress(null);
         return null;
       }
@@ -368,19 +335,14 @@ export function usePdfCache() {
       return blob;
     } catch (error) {
       console.error('Failed to download PDF:', error);
-      if (useProxy) {
-        console.log('Proxy error, trying direct URL fallback...');
-        setDownloadProgress(null);
-        return getPdfBlob(pdfId, pdfFileUrl, false);
-      }
       setDownloadProgress(null);
       return null;
     }
   }, []);
 
   // Legacy: returns a blob URL (for backward compat if needed)
-  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string, useProxy = true): Promise<string | null> => {
-    const blob = await getPdfBlob(pdfId, pdfFileUrl, useProxy);
+  const getPdfUrl = useCallback(async (pdfId: string, pdfFileUrl: string): Promise<string | null> => {
+    const blob = await getPdfBlob(pdfId, pdfFileUrl);
     if (!blob) return null;
     return URL.createObjectURL(blob);
   }, [getPdfBlob]);
