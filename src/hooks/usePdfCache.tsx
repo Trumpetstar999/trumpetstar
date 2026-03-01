@@ -247,16 +247,28 @@ export function usePdfCache() {
 
     try {
       // Extract file path from the storage URL
+      // Handles both /object/public/pdf-documents/ and /object/sign/pdf-documents/ patterns
       let filePath = '';
       const decodedUrl = decodeURIComponent(pdfFileUrl);
       
-      if (decodedUrl.includes('/pdf-documents/')) {
-        const urlParts = decodedUrl.split('/pdf-documents/');
-        filePath = urlParts[urlParts.length - 1];
-        if (filePath.includes('?')) {
-          filePath = filePath.split('?')[0];
+      const bucketMarkers = [
+        '/object/public/pdf-documents/',
+        '/object/sign/pdf-documents/',
+        '/pdf-documents/',
+      ];
+      
+      for (const marker of bucketMarkers) {
+        if (decodedUrl.includes(marker)) {
+          const urlParts = decodedUrl.split(marker);
+          filePath = urlParts[urlParts.length - 1];
+          if (filePath.includes('?')) {
+            filePath = filePath.split('?')[0];
+          }
+          break;
         }
       }
+      
+      console.log('Extracted file path:', filePath, 'from URL:', decodedUrl.substring(0, 100));
 
       let downloadUrl: string;
 
