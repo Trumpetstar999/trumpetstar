@@ -8,7 +8,7 @@ const CACHE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 interface CachedPdf {
   id: string;
-  blob: Blob;
+  bytes: Uint8Array;
   cachedAt: number;
 }
 
@@ -63,7 +63,7 @@ async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
       };
       request.onsuccess = () => {
         const result = request.result as CachedPdf | undefined;
-        if (result && result.blob && result.blob.size > 0) {
+        if (result && result.bytes && result.bytes.byteLength > 0) {
           // Check if cache entry is still valid (within 30 days)
           const age = Date.now() - (result.cachedAt || 0);
           if (age > CACHE_MAX_AGE_MS) {
@@ -71,7 +71,7 @@ async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
             resolve(null);
             return;
           }
-          console.log('Cache hit for PDF:', pdfId, 'blob size:', result.blob.size, 'age:', Math.round(age / 86400000) + 'd');
+          console.log('Cache hit for PDF:', pdfId, 'bytes size:', result.bytes.byteLength, 'age:', Math.round(age / 86400000) + 'd');
           resolve(result);
         } else {
           console.log('Cache miss for PDF:', pdfId);
@@ -87,13 +87,16 @@ async function getCachedPdf(pdfId: string): Promise<CachedPdf | null> {
 
 async function savePdfToCache(pdfId: string, blob: Blob): Promise<void> {
   try {
+    // Store as Uint8Array bytes to avoid Safari blob invalidation issues
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
     const db = await openDatabase();
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(STORE_NAME, 'readwrite');
       const store = transaction.objectStore(STORE_NAME);
       const request = store.put({
         id: pdfId,
-        blob,
+        bytes,
         cachedAt: Date.now(),
       });
       
@@ -230,13 +233,15 @@ export function usePdfCache() {
     const cached = await getCachedPdf(pdfId);
     
     if (cached) {
-      const isValid = await isValidPdfBlob(cached.blob);
+      // Reconstruct Blob from stored bytes (avoids Safari blob invalidation)
+      const cachedBlob = new Blob([cached.bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+      const isValid = await isValidPdfBlob(cachedBlob);
       
       if (isValid) {
         console.log('Valid PDF found in cache:', pdfId);
-        return cached.blob;
+        return cachedBlob;
       } else {
-        console.log('Cached blob is invalid, clearing cache for:', pdfId);
+        console.log('Cached bytes are invalid, clearing cache for:', pdfId);
         await clearCacheEntry(pdfId);
       }
     }
@@ -380,7 +385,8 @@ export function usePdfCache() {
   const isCached = useCallback(async (pdfId: string): Promise<boolean> => {
     const cached = await getCachedPdf(pdfId);
     if (!cached) return false;
-    return await isValidPdfBlob(cached.blob);
+    const blob = new Blob([cached.bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+    return await isValidPdfBlob(blob);
   }, []);
 
   return {
