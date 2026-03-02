@@ -255,8 +255,9 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
         // Load PDF.js with explicit worker configuration
         const pdfjsLib = await import('pdfjs-dist');
         
-        // Use local worker file for iOS/Safari compatibility (no external CDN)
+        // Use local worker file - Vite plugin ensures version matches pdfjs-dist
         pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        console.log('PdfViewer: using pdfjs-dist version', pdfjsLib.version);
 
         console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
         
