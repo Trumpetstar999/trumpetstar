@@ -2,7 +2,10 @@
 // VALENTIN - MARKETING AUTOMATION ENGINE
 // =====================================================
 
-import { supabase } from '@/lib/supabase';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const supabase = supabaseClient as any;
 
 // Konstanten
 const SCORE_THRESHOLDS = {

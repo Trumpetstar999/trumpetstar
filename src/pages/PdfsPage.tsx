@@ -212,7 +212,7 @@ export function PdfsPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">{t('pdfs.title')}</h1>
-                <p className="text-sm text-muted-foreground">{t('pdfs.available', { count: pdfs.length })}</p>
+                <p className="text-sm text-white/70">{t('pdfs.available', { count: pdfs.length })}</p>
               </div>
             </div>
             
