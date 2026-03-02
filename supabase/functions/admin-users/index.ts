@@ -466,21 +466,44 @@ Deno.serve(async (req) => {
 
       if (!emailSent) {
         console.error('Resend error for invitation:', resendData);
+        // Return the actual Resend error so the admin can see it
+        return new Response(JSON.stringify({
+          success: true,
+          emailSent: false,
+          userId,
+          message: `Nutzer erstellt, aber E-Mail konnte nicht gesendet werden: ${resendData?.message || JSON.stringify(resendData)}`,
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       return new Response(JSON.stringify({
         success: true,
-        emailSent,
-        message: emailSent
-          ? 'Einladung erfolgreich versendet'
-          : 'Nutzer erstellt, aber E-Mail konnte nicht gesendet werden.',
+        emailSent: true,
+        userId,
+        message: 'Einladung erfolgreich versendet',
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
+    // Action: List users with emails (profiles don't have email)
+    if (action === 'list-users') {
+      const { data: { users: authUsers }, error: listError } = await supabaseClient.auth.admin.listUsers({ perPage: 1000 });
+      if (listError) {
+        return new Response(JSON.stringify({ error: listError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const userEmails = (authUsers || []).map(u => ({ id: u.id, email: u.email || null, last_sign_in_at: u.last_sign_in_at || null }));
+      return new Response(JSON.stringify({ success: true, users: userEmails }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     return new Response(JSON.stringify({ 
-      error: 'Invalid action. Use: create-user, delete-user, reset-password, invite-user' 
+      error: 'Invalid action. Use: create-user, delete-user, reset-password, invite-user, list-users' 
     }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

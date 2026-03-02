@@ -77,6 +77,11 @@ export function InviteFriendDialog({ open, onOpenChange }: InviteFriendDialogPro
 
       if (!response.ok || result.error) {
         toast.error(result.error || 'Fehler beim Senden der Einladung');
+      } else if (!result.emailSent) {
+        // User created but email failed - show the real reason
+        toast.warning(result.message || 'Nutzer erstellt, aber E-Mail konnte nicht gesendet werden.');
+        setEmail('');
+        onOpenChange(false);
       } else {
         toast.success(result.message || 'Einladung gesendet! ⭐');
         setEmail('');
