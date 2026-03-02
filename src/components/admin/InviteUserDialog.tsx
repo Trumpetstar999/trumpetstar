@@ -69,7 +69,8 @@ export function InviteUserDialog({ open, onOpenChange, onUserInvited }: InviteUs
         title: result.emailSent ? 'Einladung versendet' : 'Nutzer erstellt',
         description: result.emailSent
           ? `Eine Einladungs-E-Mail wurde an ${email.trim()} gesendet.`
-          : result.message,
+          : result.message || 'Nutzer erstellt, aber E-Mail konnte nicht gesendet werden.',
+        variant: result.emailSent ? 'default' : 'destructive',
       });
 
       await onUserInvited();

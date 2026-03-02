@@ -117,40 +117,38 @@ export function UserList() {
     console.log('fetchUsers called - loading users from database');
     setIsLoading(true);
     try {
-      // Fetch profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: { session } } = await supabase.auth.getSession();
 
-      if (profilesError) throw profilesError;
-      
-      console.log('Fetched profiles:', profiles?.length);
+      // Fetch profiles, roles, memberships, and auth emails in parallel
+      const [profilesRes, rolesRes, membershipsRes, emailsRes] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('user_roles').select('user_id, role'),
+        supabase.from('user_memberships').select('user_id, plan_key'),
+        session?.access_token
+          ? fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list-users`, {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            }).then(r => r.ok ? r.json() : { users: [] }).catch(() => ({ users: [] }))
+          : Promise.resolve({ users: [] }),
+      ]);
 
-      // Fetch roles for all users
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
+      if (profilesRes.error) throw profilesRes.error;
 
-      if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
+      const profiles = profilesRes.data || [];
+      const roles = rolesRes.data || [];
+      const memberships = membershipsRes.data || [];
+      const emailMap: Record<string, { email: string | null; last_sign_in_at: string | null }> = {};
+      for (const u of (emailsRes.users || [])) {
+        emailMap[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at };
       }
 
-      // Fetch memberships for all users
-      const { data: memberships, error: membershipsError } = await supabase
-        .from('user_memberships')
-        .select('user_id, plan_key');
+      console.log('Fetched profiles:', profiles.length, '| emails:', Object.keys(emailMap).length);
 
-      if (membershipsError) {
-        console.error('Error fetching memberships:', membershipsError);
-      }
-
-      // Merge profiles with roles and plans
-      const usersWithData = (profiles || []).map(profile => {
-        const userRole = roles?.find(r => r.user_id === profile.id);
-        const userMembership = memberships?.find(m => m.user_id === profile.id);
+      const usersWithData = profiles.map(profile => {
+        const userRole = roles.find(r => r.user_id === profile.id);
+        const userMembership = memberships.find(m => m.user_id === profile.id);
         return {
           ...profile,
+          email: emailMap[profile.id]?.email || null,
           role: userRole?.role || null,
           plan_key: userMembership?.plan_key || 'FREE',
         };
@@ -220,9 +218,14 @@ export function UserList() {
     }
   }
 
-  const filteredUsers = users.filter((user) =>
-    user.display_name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = users.filter((user) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      user.display_name?.toLowerCase().includes(q) ||
+      user.email?.toLowerCase().includes(q) ||
+      !q
+    );
+  });
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '-';
