@@ -125,7 +125,13 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
   // Upload file with progress tracking using XMLHttpRequest
   const uploadFileWithProgress = useCallback(async (file: File): Promise<{ url: string; pageCount: number; fileName: string }> => {
     return new Promise(async (resolve, reject) => {
-      const fileName = `${Date.now()}-${file.name}`;
+      // Sanitize filename: replace umlauts and special characters
+      const sanitized = file.name
+        .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue')
+        .replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue')
+        .replace(/ß/g, 'ss')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
+      const fileName = `${Date.now()}-${sanitized}`;
       
       setUploadState({ progress: 0, status: 'uploading', message: 'Upload wird gestartet...' });
 
