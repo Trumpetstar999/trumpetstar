@@ -16,12 +16,14 @@ const LANGUAGE_FLAGS: Record<Language, string> = {
   de: '🇩🇪',
   en: '🇬🇧',
   es: '🇪🇸',
+  sl: '🇸🇮',
 };
 
 const LANGUAGE_LABELS: Record<Language, string> = {
   de: 'Deutsch',
   en: 'English',
   es: 'Español',
+  sl: 'Slovenščina',
 };
 
 export function LanguageTabs({ 
