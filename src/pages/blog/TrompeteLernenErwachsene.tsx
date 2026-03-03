@@ -4,8 +4,10 @@ import { AnimatedSection } from "@/components/seo/AnimatedSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, CheckCircle, Users } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function TrompeteLernenErwachsene() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       {/* Hero */}
@@ -16,12 +18,15 @@ export default function TrompeteLernenErwachsene() {
               <Users className="h-4 w-4" /> Anfänger-Guide
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Trompete lernen als Erwachsener: Der ultimative Guide
+              {t('seo_erwachsene.hero.title')}
             </h1>
             <p className="text-white/70 text-lg mb-3">
-              Warum es nie zu spät ist — und wie du mit nur 5 Minuten am Tag echte Fortschritte machst.
+              {t('seo_erwachsene.hero.subtitle')}
             </p>
             <p className="text-white/50 text-sm">25. Februar 2026 · 8 Min Lesezeit · Von Valentin | TrumpetStar</p>
+            {language !== 'de' && (
+              <p className="text-white/40 text-xs italic mt-3">{t('common.articleInGerman')}</p>
+            )}
           </AnimatedSection>
         </div>
       </section>
@@ -110,10 +115,10 @@ export default function TrompeteLernenErwachsene() {
         </AnimatedSection>
 
         <AnimatedSection direction="up" className="glass rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-2">Starte jetzt deine 7-Tage-Challenge 🎺</h3>
-          <p className="text-white/60 mb-6 text-sm">Kostenlos · 5 Min/Tag · Erster Ton in Woche 1</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{t('landing.capture.title')} 🎺</h3>
+          <p className="text-white/60 mb-6 text-sm">{t('landing.capture.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Jetzt kostenlos anmelden <ArrowRight className="ml-2 w-4 h-4" /></Link>
+            <Link to="/auth">{t('landing.hero.ctaStart')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
           </Button>
         </AnimatedSection>
 

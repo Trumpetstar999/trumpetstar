@@ -2,23 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Loader2, Play, BookOpen, Music, Headphones, CheckCircle, Star, ArrowRight } from 'lucide-react';
+import { Loader2, Play, Music, Headphones, CheckCircle, Star, ArrowRight } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import LeadCaptureForm from '@/components/LeadCaptureForm';
 import appScreenshot from '@/assets/trumpetstar-app-screenshot.png';
-
-const LANDING_FAQS = [
-  { question: 'Ist die App wirklich kostenlos?', answer: 'Ja! Du kannst mit dem kostenlosen Plan starten und hast Zugriff auf die ersten Lektionen und alle Tools. Für den vollen Zugang gibt es Premium-Pläne.' },
-  { question: 'Brauche ich die Trumpetstar-Hefte?', answer: 'Die App ist perfekt auf die Trumpetstar-Hefte abgestimmt, funktioniert aber auch eigenständig mit den enthaltenen Video-Lektionen und Tools.' },
-  { question: 'Für welches Alter ist die App geeignet?', answer: 'Für alle! Kinder ab 6 Jahren lernen spielerisch, Erwachsene profitieren von strukturierten Lektionen und professionellen Tools.' },
-  { question: 'Kann ich die App auf dem iPad nutzen?', answer: 'Ja, die App läuft auf allen Geräten mit einem modernen Browser – Smartphone, Tablet und Desktop.' },
-];
+import { useLanguage } from '@/hooks/useLanguage';
+import type { Language } from '@/hooks/useLanguage';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
+  const { t, language, setLanguage } = useLanguage();
 
   // Check session and redirect if logged in
   useEffect(() => {
@@ -33,8 +29,6 @@ export default function LandingPage() {
         navigate('/app', { replace: true });
       } else {
         setChecking(false);
-        // Track landing view (anonymous)
-        // No user_id available for anonymous tracking
       }
     });
   }, [navigate]);
@@ -48,47 +42,84 @@ export default function LandingPage() {
   }
 
   const handleCtaClick = () => {
-    // Pass UTM params
     const params = new URLSearchParams(window.location.search);
     const utmString = params.toString();
     navigate(`/signup${utmString ? `?${utmString}` : ''}`);
   };
 
+  const landingFaqs = [
+    { question: t('landing.faq.q1'), answer: t('landing.faq.a1') },
+    { question: t('landing.faq.q2'), answer: t('landing.faq.a2') },
+    { question: t('landing.faq.q3'), answer: t('landing.faq.a3') },
+    { question: t('landing.faq.q4'), answer: t('landing.faq.a4') },
+  ];
+
+  const uspItems = [
+    { icon: Play, title: t('landing.usps.video.title'), desc: t('landing.usps.video.desc') },
+    { icon: Headphones, title: t('landing.usps.audio.title'), desc: t('landing.usps.audio.desc') },
+    { icon: Music, title: t('landing.usps.tools.title'), desc: t('landing.usps.tools.desc') },
+  ];
+
+  const howItWorksSteps = [
+    { step: '1', title: t('landing.howItWorks.step1.title'), desc: t('landing.howItWorks.step1.desc') },
+    { step: '2', title: t('landing.howItWorks.step2.title'), desc: t('landing.howItWorks.step2.desc') },
+    { step: '3', title: t('landing.howItWorks.step3.title'), desc: t('landing.howItWorks.step3.desc') },
+  ];
+
   return (
-    <SEOPageLayout>
-      <FAQSchema faqs={LANDING_FAQS} />
+    <SEOPageLayout
+      title={t('landing.seo.title')}
+      description={t('landing.seo.description')}
+    >
+      <FAQSchema faqs={landingFaqs} />
 
       <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)]">
         {/* Hero Section */}
-        <section className="max-w-5xl mx-auto px-5 pt-16 pb-20 text-center">
+        <section className="relative max-w-5xl mx-auto px-5 pt-16 pb-20 text-center">
+          {/* Language Switcher */}
+          <div className="absolute top-4 right-4 z-10">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Language)}
+              className="bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1.5 text-sm cursor-pointer backdrop-blur-sm hover:bg-white/20 transition-colors"
+            >
+              <option value="de">🇩🇪 DE</option>
+              <option value="en">🇬🇧 EN</option>
+              <option value="es">🇪🇸 ES</option>
+              <option value="sl">🇸🇮 SL</option>
+            </select>
+          </div>
+
           <div className="flex justify-center mb-8">
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-20 w-auto drop-shadow-lg" />
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-            Trompete lernen –<br />kinderleicht.{' '}
-            <span className="text-[hsl(var(--reward-gold))]">Auch für Erwachsene.</span>
+            {t('landing.hero.title').split('\n').map((line, i, arr) => (
+              i < arr.length - 1 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>
+            ))}{' '}
+            <span className="text-[hsl(var(--reward-gold))]">{t('landing.hero.titleHighlight')}</span>
           </h1>
-          
+
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-            Schritt für Schritt, total flexibel – mit Mitspielvideos und persönlichem Feedback von ausgebildeten Lehrern.
+            {t('landing.hero.subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
+            <Button
               size="lg"
               onClick={handleCtaClick}
               className="h-14 px-8 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-lg shadow-yellow-500/30 gap-2"
             >
-              Kostenlos starten <ArrowRight className="w-5 h-5" />
+              {t('landing.hero.ctaStart')} <ArrowRight className="w-5 h-5" />
             </Button>
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="lg"
               onClick={() => navigate('/login')}
               className="h-14 px-8 text-lg text-white/90 hover:text-white hover:bg-white/10 rounded-xl"
             >
-              Ich habe schon einen Account
+              {t('landing.hero.ctaLogin')}
             </Button>
           </div>
         </section>
@@ -100,12 +131,12 @@ export default function LandingPage() {
             <button onClick={() => navigate('/login')} className="block w-full max-w-2xl mx-auto group cursor-pointer">
               <img
                 src={appScreenshot}
-                alt="Trumpetstar App – Levels Übersicht auf dem iPad"
+                alt={t('landing.hero.imageAlt')}
                 className="relative w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
               />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <span className="bg-[hsl(var(--reward-gold))] text-slate-900 font-bold px-6 py-3 rounded-xl shadow-lg text-lg flex items-center gap-2">
-                  <Play className="w-5 h-5 fill-current" /> Jetzt einloggen
+                  <Play className="w-5 h-5 fill-current" /> {t('landing.hero.imageHover')}
                 </span>
               </div>
             </button>
@@ -115,11 +146,7 @@ export default function LandingPage() {
         {/* USPs */}
         <section className="max-w-5xl mx-auto px-5 pb-20">
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: Play, title: 'Video-Lektionen', desc: 'Strukturierte Kurse vom Anfänger bis zum Fortgeschrittenen – Schritt für Schritt erklärt.' },
-              { icon: Headphones, title: 'Playbacks & Audio', desc: 'Übe mit professionellen Begleit-Tracks in verschiedenen Tempi zu deinen Noten.' },
-              { icon: Music, title: 'Übe-Tools', desc: 'Metronom, Stimmgerät, Grifftabelle und Noten-Viewer – alles in einer App.' },
-            ].map(({ icon: Icon, title, desc }) => (
+            {uspItems.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center">
                 <div className="w-14 h-14 rounded-xl bg-white/15 flex items-center justify-center mx-auto mb-4">
                   <Icon className="w-7 h-7 text-[hsl(var(--reward-gold))]" />
@@ -133,13 +160,9 @@ export default function LandingPage() {
 
         {/* How it works */}
         <section className="max-w-4xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">So funktioniert's</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">{t('landing.howItWorks.title')}</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: '1', title: 'Kostenlos registrieren', desc: 'Erstelle in Sekunden ein Konto – ganz ohne Kreditkarte.' },
-              { step: '2', title: 'Lektionen starten', desc: 'Wähle dein Level und lerne mit Videos, Noten und Playbacks.' },
-              { step: '3', title: 'Fortschritt verfolgen', desc: 'Sammle Sterne, nutze die Übe-Tools und werde besser – Tag für Tag.' },
-            ].map(({ step, title, desc }) => (
+            {howItWorksSteps.map(({ step, title, desc }) => (
               <div key={step} className="text-center">
                 <div className="w-12 h-12 rounded-full bg-[hsl(var(--reward-gold))] text-slate-900 font-bold text-xl flex items-center justify-center mx-auto mb-4">
                   {step}
@@ -160,21 +183,21 @@ export default function LandingPage() {
               ))}
             </div>
             <p className="text-white/90 text-lg italic mb-4">
-              „Von Musikpädagogen entwickelt – für alle, die Trompete lernen wollen."
+              „{t('landing.socialProof.quote')}"
             </p>
             <div className="flex flex-wrap gap-4 justify-center text-sm text-white/60">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> Strukturierte Lernpfade</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> Für Kinder & Erwachsene</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> Perfekt zu den Heften</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> {t('landing.socialProof.badge1')}</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> {t('landing.socialProof.badge2')}</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-emerald-400" /> {t('landing.socialProof.badge3')}</span>
             </div>
           </div>
         </section>
 
         {/* FAQ */}
         <section className="max-w-3xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-8">Häufige Fragen</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-8">{t('landing.faq.title')}</h2>
           <div className="space-y-4">
-            {LANDING_FAQS.map(({ question, answer }) => (
+            {landingFaqs.map(({ question, answer }) => (
               <details key={question} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl overflow-hidden group">
                 <summary className="cursor-pointer px-6 py-4 text-white font-semibold flex items-center justify-between">
                   {question}
@@ -193,13 +216,13 @@ export default function LandingPage() {
           <div className="relative bg-white/[0.07] backdrop-blur-xl border border-white/[0.12] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/20">
             {/* Decorative glow */}
             <div className="absolute -inset-1 bg-gradient-to-b from-[hsl(var(--reward-gold))]/10 via-transparent to-transparent rounded-3xl blur-xl pointer-events-none" />
-            
+
             <div className="relative">
               <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
-                Starte jetzt kostenlos
+                {t('landing.capture.title')}
               </h2>
               <p className="text-white/60 text-center text-sm mb-8">
-                Erhalte deine erste Lektion gratis – ohne Kreditkarte.
+                {t('landing.capture.subtitle')}
               </p>
               <LeadCaptureForm source="landing_page" />
             </div>

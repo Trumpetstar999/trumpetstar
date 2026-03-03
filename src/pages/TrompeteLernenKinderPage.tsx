@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Baby, Clock, Heart, Music, HelpCircle, CheckCircle, Star, ArrowRight, AlertTriangle } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const faqs = [
   { question: "Ab welchem Alter kann mein Kind Trompete lernen?", answer: "Idealerweise ab 7-8 Jahren mit der normalen Trompete. Ab 6 Jahren empfehlen wir das Kornett (kleinere Version)." },
@@ -27,6 +28,7 @@ const altersGruppen = [
 ];
 
 export default function TrompeteLernenKinderPage() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <FAQSchema faqs={faqs} />
@@ -40,13 +42,18 @@ export default function TrompeteLernenKinderPage() {
               Für Eltern und ihre Musikstars
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trompete lernen für Kinder:<br />
-              <span className="text-gold-gradient">Der Eltern-Guide</span>
+              {t('seo_kinder.hero.title')}
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              Ab welchem Alter? Kornett oder Trompete? Wie motiviere ich mein Kind? Alle Antworten für Eltern.
+              {t('seo_kinder.hero.subtitle')}
             </p>
           </AnimatedSection>
+
+          {language !== 'de' && (
+            <AnimatedSection direction="up" delay={50}>
+              <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+            </AnimatedSection>
+          )}
 
           <AnimatedSection direction="up" delay={150}>
             <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
@@ -62,7 +69,7 @@ export default function TrompeteLernenKinderPage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">Kinder-Kurs entdecken</Link>
+                <Link to="/auth">{t('seo_kinder.hero.cta')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
                 <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
@@ -260,11 +267,11 @@ export default function TrompeteLernenKinderPage() {
 
         {/* CTA */}
         <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
-          <h2 className="text-3xl font-bold text-white mb-4">Bereit für den Musikstart Ihres Kindes?</h2>
-          <p className="text-white/70 mb-6 max-w-xl mx-auto">Starten Sie direkt mit unserem Kinder-Kurs oder lassen Sie sich beraten.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{t('seo_kinder.cta.title')}</h2>
+          <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_kinder.cta.subtitle')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">Kinder-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/auth">{t('seo_kinder.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>

@@ -4,8 +4,10 @@ import { AnimatedSection } from "@/components/seo/AnimatedSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, CheckCircle, Music } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function ErsterTonTrompete() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       {/* Hero */}
@@ -16,12 +18,15 @@ export default function ErsterTonTrompete() {
               <Music className="h-4 w-4" /> Tutorial
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Der erste Ton auf der Trompete
+              {t('seo_ersterTon.hero.title')}
             </h1>
             <p className="text-white/70 text-lg mb-3">
-              Schritt-für-Schritt-Anleitung — Von Buzzing bis zum klaren Ton in einer Woche
+              {t('seo_ersterTon.hero.subtitle')}
             </p>
             <p className="text-white/50 text-sm">25. Februar 2026 · 6 Min Lesezeit · Von Valentin | TrumpetStar</p>
+            {language !== 'de' && (
+              <p className="text-white/40 text-xs italic mt-3">{t('common.articleInGerman')}</p>
+            )}
           </AnimatedSection>
         </div>
       </section>
@@ -120,10 +125,10 @@ export default function ErsterTonTrompete() {
         </AnimatedSection>
 
         <AnimatedSection direction="up" className="glass rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-2">Du schaffst das! 🎺</h3>
-          <p className="text-white/60 mb-6 text-sm">Starte die 7-Tage-Challenge mit Video-Tutorials für jeden Schritt</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{t('landing.capture.title')} 🎺</h3>
+          <p className="text-white/60 mb-6 text-sm">{t('landing.capture.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Kostenlos starten <ArrowRight className="ml-2 w-4 h-4" /></Link>
+            <Link to="/auth">{t('landing.hero.ctaStart')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
           </Button>
         </AnimatedSection>
 

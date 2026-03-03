@@ -10,6 +10,7 @@ import { MembershipProvider } from "@/hooks/useMembership";
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { LanguageDetector } from "@/components/LanguageDetector";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import BlogPage from "./pages/BlogPage";
@@ -64,6 +65,7 @@ const App = () => {
                   <Toaster />
                   <Sonner />
                   <BrowserRouter>
+                    <LanguageDetector />
                     <MobileRouteGuard>
                       <Routes>
                         {/* Public Landing */}

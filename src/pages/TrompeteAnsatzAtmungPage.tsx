@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Wind, Activity, AlertCircle, CheckCircle, PlayCircle, ArrowRight } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const howToSteps = [
   { position: 1, name: "Lippenschwingungen (Buzzing) üben", text: "Ohne Instrument: Lippen leicht geschlossen, Luft durchblasen, bis ein brummendes Vibrieren entsteht. 2-3 Minuten täglich." },
@@ -24,6 +25,7 @@ const faqs = [
 ];
 
 export default function TrompeteAnsatzAtmungPage() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <HowToSchema name="Trompete: Korrekter Ansatz und Atmung" description="Lerne den richtigen Trompeten-Ansatz und die Bauchatmung Schritt für Schritt" steps={howToSteps} totalTime="P1W" />
@@ -38,13 +40,17 @@ export default function TrompeteAnsatzAtmungPage() {
               Technik-Guide für Anfänger
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trompete Ansatz & Atmung:<br />
-              <span className="text-gold-gradient">Die Grundlagen für guten Ton</span>
+              {t('seo_ansatzAtmung.hero.title')}
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              Der richtige Ansatz (Embouchure) und die korrekte Atmung sind das Fundament für einen schönen Trompetenklang.
+              {t('seo_ansatzAtmung.hero.subtitle')}
             </p>
           </AnimatedSection>
+          {language !== 'de' && (
+            <AnimatedSection direction="up" delay={50}>
+              <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+            </AnimatedSection>
+          )}
 
           <AnimatedSection direction="up" delay={150}>
             <div className="glass rounded-2xl p-6 max-w-2xl mx-auto mb-8 text-left">
@@ -224,10 +230,10 @@ export default function TrompeteAnsatzAtmungPage() {
 
         {/* CTA */}
         <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
-          <h2 className="text-3xl font-bold text-white mb-4">Mehr Technik-Übungen?</h2>
-          <p className="text-white/70 mb-6 max-w-xl mx-auto">Im Kurs findest du noch mehr Tipps und Tricks für einen stabilen Ansatz.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{t('seo_ansatzAtmung.cta.title')}</h2>
+          <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_ansatzAtmung.cta.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/login">Jetzt anmelden & kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/login">{t('seo_ansatzAtmung.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </AnimatedSection>
       </div>

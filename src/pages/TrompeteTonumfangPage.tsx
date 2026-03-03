@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ArrowUp, AlertTriangle, CheckCircle, Activity, PlayCircle, ArrowRight } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const howToSteps = [
   { position: 1, name: "Grundlage: Feste Töne stabilisieren", text: "Bevor Sie höher spielen können, müssen die mittleren Töne (c'-g') absolut stabil sitzen. Üben Sie lange Töne: 10 Sekunden halten, gleichmäßig, klar, ohne Zittern. Erst dann weiter nach oben.", image: "https://trumpetstar.com/images/stable-tones.jpg" },
@@ -30,6 +31,7 @@ const uebungsplan = [
 ];
 
 export default function TrompeteTonumfangPage() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <HowToSchema
@@ -49,13 +51,15 @@ export default function TrompeteTonumfangPage() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Trompete Tonumfang erhöhen:<br />
-            <span className="text-gold-gradient">Range-Training ohne Druck</span>
+            {t('seo_tonumfang.hero.title')}
           </h1>
 
           <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-            Höhere Töne spielen – aber gesund und ohne zu pressen. Mit dieser Schritt-für-Schritt-Methode erweitern Sie Ihren Tonumfang nachhaltig.
+            {t('seo_tonumfang.hero.subtitle')}
           </p>
+          {language !== 'de' && (
+            <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+          )}
 
           <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
             <div className="flex items-start gap-3">

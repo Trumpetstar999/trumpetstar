@@ -1,15 +1,67 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
+import type { Language } from '@/hooks/useLanguage';
 
 interface SEOPageLayoutProps {
   children: ReactNode;
+  title?: string;
+  description?: string;
 }
 
-export function SEOPageLayout({ children }: SEOPageLayoutProps) {
+// hreflang URLs for all supported languages (single-domain setup)
+const BASE_URL = 'https://www.trumpetstar.app';
+const HREFLANG_LANGS: { lang: string; href: string }[] = [
+  { lang: 'de', href: BASE_URL + '/' },
+  { lang: 'en', href: BASE_URL + '/' },
+  { lang: 'es', href: BASE_URL + '/' },
+  { lang: 'sl', href: BASE_URL + '/' },
+  { lang: 'x-default', href: BASE_URL + '/' },
+];
+
+export function SEOPageLayout({ children, title, description }: SEOPageLayoutProps) {
   const { user } = useAuth();
+  const { language, setLanguage } = useLanguage();
+
+  // Inject hreflang + update document title/meta description
+  useEffect(() => {
+    // Remove existing hreflang tags added by us
+    document.querySelectorAll('link[data-hreflang="trumpetstar"]').forEach(el => el.remove());
+
+    // Add new hreflang tags
+    HREFLANG_LANGS.forEach(({ lang, href }) => {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.setAttribute('hreflang', lang);
+      link.href = href;
+      link.setAttribute('data-hreflang', 'trumpetstar');
+      document.head.appendChild(link);
+    });
+
+    // Update document title
+    if (title) {
+      document.title = title;
+    }
+
+    // Update meta description
+    if (description) {
+      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = description;
+    }
+
+    return () => {
+      // Cleanup on unmount
+      document.querySelectorAll('link[data-hreflang="trumpetstar"]').forEach(el => el.remove());
+    };
+  }, [title, description]);
 
   return (
     <div className="min-h-screen">
@@ -26,6 +78,18 @@ export function SEOPageLayout({ children }: SEOPageLayoutProps) {
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
               <Link to="/pricing">Preise</Link>
             </Button>
+            {/* Language Switcher */}
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Language)}
+              className="bg-white/10 border border-white/20 text-white rounded-lg px-2 py-1 text-xs cursor-pointer backdrop-blur-sm hover:bg-white/20 transition-colors"
+              title="Select language"
+            >
+              <option value="de">🇩🇪 DE</option>
+              <option value="en">🇬🇧 EN</option>
+              <option value="es">🇪🇸 ES</option>
+              <option value="sl">🇸🇮 SL</option>
+            </select>
             {user ? (
               <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
                 <Link to="/app">Zur App</Link>

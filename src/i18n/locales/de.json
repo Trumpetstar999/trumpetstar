@@ -40,6 +40,7 @@
   },
   "common": {
     "loading": "Laden...",
+    "articleInGerman": "Der vollständige Artikel ist auf Deutsch verfügbar — englische Version folgt bald.",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",
@@ -257,12 +258,14 @@
   "languages": {
     "de": "Deutsch",
     "en": "English",
-    "es": "Español"
+    "es": "Español",
+    "sl": "Slovenščina"
   },
   "languageTabs": {
     "german": "Deutsch",
     "english": "English",
-    "spanish": "Español"
+    "spanish": "Español",
+    "slovenian": "Slovenščina"
   },
   "onboarding": {
     "welcome": "Willkommen!",
@@ -381,5 +384,138 @@
     "optout": "Nicht mehr anzeigen",
     "showQR": "QR-Code anzeigen",
     "hideQR": "QR-Code ausblenden"
+  },
+  "landing": {
+    "hero": {
+      "title": "Trompete lernen –\nkinderleicht.",
+      "titleHighlight": "Auch für Erwachsene.",
+      "subtitle": "Schritt für Schritt, total flexibel – mit Mitspielvideos und persönlichem Feedback von ausgebildeten Lehrern.",
+      "ctaStart": "Kostenlos starten",
+      "ctaLogin": "Ich habe schon einen Account",
+      "imageAlt": "Trumpetstar App – Levels Übersicht auf dem iPad",
+      "imageHover": "Jetzt einloggen"
+    },
+    "usps": {
+      "video": {
+        "title": "Video-Lektionen",
+        "desc": "Strukturierte Kurse vom Anfänger bis zum Fortgeschrittenen – Schritt für Schritt erklärt."
+      },
+      "audio": {
+        "title": "Playbacks & Audio",
+        "desc": "Übe mit professionellen Begleit-Tracks in verschiedenen Tempi zu deinen Noten."
+      },
+      "tools": {
+        "title": "Übe-Tools",
+        "desc": "Metronom, Stimmgerät, Grifftabelle und Noten-Viewer – alles in einer App."
+      }
+    },
+    "howItWorks": {
+      "title": "So funktioniert's",
+      "step1": {
+        "title": "Kostenlos registrieren",
+        "desc": "Erstelle in Sekunden ein Konto – ganz ohne Kreditkarte."
+      },
+      "step2": {
+        "title": "Lektionen starten",
+        "desc": "Wähle dein Level und lerne mit Videos, Noten und Playbacks."
+      },
+      "step3": {
+        "title": "Fortschritt verfolgen",
+        "desc": "Sammle Sterne, nutze die Übe-Tools und werde besser – Tag für Tag."
+      }
+    },
+    "socialProof": {
+      "quote": "Von Musikpädagogen entwickelt – für alle, die Trompete lernen wollen.",
+      "badge1": "Strukturierte Lernpfade",
+      "badge2": "Für Kinder & Erwachsene",
+      "badge3": "Perfekt zu den Heften"
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "q1": "Ist die App wirklich kostenlos?",
+      "a1": "Ja! Du kannst mit dem kostenlosen Plan starten und hast Zugriff auf die ersten Lektionen und alle Tools. Für den vollen Zugang gibt es Premium-Pläne.",
+      "q2": "Brauche ich die Trumpetstar-Hefte?",
+      "a2": "Die App ist perfekt auf die Trumpetstar-Hefte abgestimmt, funktioniert aber auch eigenständig mit den enthaltenen Video-Lektionen und Tools.",
+      "q3": "Für welches Alter ist die App geeignet?",
+      "a3": "Für alle! Kinder ab 6 Jahren lernen spielerisch, Erwachsene profitieren von strukturierten Lektionen und professionellen Tools.",
+      "q4": "Kann ich die App auf dem iPad nutzen?",
+      "a4": "Ja, die App läuft auf allen Geräten mit einem modernen Browser – Smartphone, Tablet und Desktop."
+    },
+    "capture": {
+      "title": "Starte jetzt kostenlos",
+      "subtitle": "Erhalte deine erste Lektion gratis – ohne Kreditkarte."
+    },
+    "seo": {
+      "title": "Trompete lernen – TrumpetStar App",
+      "description": "Trompete lernen für Kinder & Erwachsene. Strukturierte Video-Lektionen, Playbacks und Übe-Tools. Kostenlos starten!"
+    }
+  },
+  "seo_trompeteLernen": {
+    "hero": {
+      "title": "Trompete lernen: Der komplette Guide für Anfänger",
+      "subtitle": "Mit der richtigen Methode in 3–6 Monaten möglich – egal ob als Kind, Erwachsener oder Wiedereinsteiger.",
+      "cta": "Kurs entdecken"
+    },
+    "cta": {
+      "title": "Bereit durchzustarten?",
+      "subtitle": "Starte jetzt mit der kostenlosen Star-Lektion – ohne Anmeldung, sofort verfügbar.",
+      "button": "Kurs entdecken"
+    }
+  },
+  "seo_ansatzAtmung": {
+    "hero": {
+      "title": "Trompete: Korrekter Ansatz und Atmung",
+      "subtitle": "Lerne den richtigen Trompeten-Ansatz und die Bauchatmung Schritt für Schritt.",
+      "cta": "Jetzt üben"
+    },
+    "cta": {
+      "title": "Verbessere deine Technik",
+      "subtitle": "Starte mit der kostenlosen Lektion und lerne den richtigen Ansatz.",
+      "button": "Kostenlos starten"
+    }
+  },
+  "seo_erwachsene": {
+    "hero": {
+      "title": "Trompete lernen als Erwachsener",
+      "subtitle": "Nie zu spät – mit nur 5 Minuten täglich echte Fortschritte machen.",
+      "cta": "Jetzt starten"
+    },
+    "cta": {
+      "title": "Starte deine Reise",
+      "subtitle": "Kostenlos starten – dein Fortschritt bleibt erhalten.",
+      "button": "Kostenlos starten"
+    }
+  },
+  "seo_kinder": {
+    "hero": {
+      "title": "Trompete für Kinder",
+      "subtitle": "Strukturiertes Lernen für Kinder ab 6 Jahren – spielerisch und mit Freude.",
+      "cta": "Kurs entdecken"
+    },
+    "cta": {
+      "title": "Gemeinsam starten",
+      "subtitle": "Registriere dein Kind kostenlos und startet gemeinsam.",
+      "button": "Kostenlos starten"
+    }
+  },
+  "seo_ersterTon": {
+    "hero": {
+      "title": "Erster Ton auf der Trompete",
+      "subtitle": "So gelingt dir der erste Ton – einfach, entspannt und mit Spaß.",
+      "cta": "Jetzt starten"
+    }
+  },
+  "seo_tonumfang": {
+    "hero": {
+      "title": "Tonumfang auf der Trompete erweitern",
+      "subtitle": "Professionelle Tipps und Übungen für realistischen Fortschritt.",
+      "cta": "Jetzt üben"
+    }
+  },
+  "seo_blog": {
+    "hero": {
+      "title": "Blog & Trompeten-Tipps",
+      "subtitle": "Tipps, Guides und Tutorials für Trompetenlernende."
+    }
   }
 }

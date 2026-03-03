@@ -40,6 +40,7 @@
   },
   "common": {
     "loading": "Cargando...",
+    "articleInGerman": "Artículo completo disponible en alemán — versión en español próximamente.",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
@@ -257,12 +258,14 @@
   "languages": {
     "de": "Deutsch",
     "en": "English",
-    "es": "Español"
+    "es": "Español",
+    "sl": "Slovenščina"
   },
   "languageTabs": {
     "german": "Deutsch",
     "english": "English",
-    "spanish": "Español"
+    "spanish": "Español",
+    "slovenian": "Slovenščina"
   },
   "onboarding": {
     "welcome": "¡Bienvenido!",
@@ -381,5 +384,138 @@
     "optout": "No mostrar más",
     "showQR": "Mostrar código QR",
     "hideQR": "Ocultar código QR"
+  },
+  "landing": {
+    "hero": {
+      "title": "Aprende trompeta –\nfácil como nunca.",
+      "titleHighlight": "También para adultos.",
+      "subtitle": "Paso a paso, totalmente flexible – con videos de acompañamiento y retroalimentación personal de profesores cualificados.",
+      "ctaStart": "Empezar gratis",
+      "ctaLogin": "Ya tengo una cuenta",
+      "imageAlt": "App Trumpetstar – Vista general de niveles en el iPad",
+      "imageHover": "Iniciar sesión ahora"
+    },
+    "usps": {
+      "video": {
+        "title": "Lecciones en Video",
+        "desc": "Cursos estructurados desde principiante hasta avanzado – explicados paso a paso."
+      },
+      "audio": {
+        "title": "Acompañamientos y Audio",
+        "desc": "Practica con pistas de acompañamiento profesionales a diferentes tempos junto a tus partituras."
+      },
+      "tools": {
+        "title": "Herramientas de Práctica",
+        "desc": "Metrónomo, afinador, tabla de digitación y visor de partituras – todo en una app."
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "step1": {
+        "title": "Regístrate gratis",
+        "desc": "Crea una cuenta en segundos – sin tarjeta de crédito."
+      },
+      "step2": {
+        "title": "Inicia las lecciones",
+        "desc": "Elige tu nivel y aprende con videos, partituras y acompañamientos."
+      },
+      "step3": {
+        "title": "Sigue tu progreso",
+        "desc": "Colecciona estrellas, usa las herramientas de práctica y mejora – día a día."
+      }
+    },
+    "socialProof": {
+      "quote": "Desarrollado por pedagogos musicales – para todos los que quieren aprender trompeta.",
+      "badge1": "Rutas de aprendizaje estructuradas",
+      "badge2": "Para niños y adultos",
+      "badge3": "Perfecto con los libros"
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "q1": "¿La app es realmente gratuita?",
+      "a1": "¡Sí! Puedes empezar con el plan gratuito y acceder a las primeras lecciones y todas las herramientas. Hay planes Premium para acceso completo.",
+      "q2": "¿Necesito los libros Trumpetstar?",
+      "a2": "La app está perfectamente alineada con los libros Trumpetstar, pero también funciona de forma independiente con las video lecciones y herramientas incluidas.",
+      "q3": "¿Para qué edad es adecuada la app?",
+      "a3": "¡Para todos! Los niños desde 6 años aprenden de forma lúdica, los adultos se benefician de lecciones estructuradas y herramientas profesionales.",
+      "q4": "¿Puedo usar la app en un iPad?",
+      "a4": "Sí, la app funciona en todos los dispositivos con un navegador moderno – smartphone, tableta y escritorio."
+    },
+    "capture": {
+      "title": "Empieza ahora gratis",
+      "subtitle": "Obtén tu primera lección gratis – sin tarjeta de crédito."
+    },
+    "seo": {
+      "title": "Aprende Trompeta – App TrumpetStar",
+      "description": "Aprende trompeta para niños y adultos. Lecciones en video estructuradas, acompañamientos y herramientas de práctica. ¡Empieza gratis!"
+    }
+  },
+  "seo_trompeteLernen": {
+    "hero": {
+      "title": "Aprender Trompeta: La Guía Completa para Principiantes",
+      "subtitle": "Con el método correcto es posible en 3–6 meses – ya sea como niño, adulto o quien retoma el instrumento.",
+      "cta": "Descubrir el curso"
+    },
+    "cta": {
+      "title": "¿Listo para empezar?",
+      "subtitle": "Comienza ahora con la lección Star gratuita – sin registro, disponible de inmediato.",
+      "button": "Descubrir el curso"
+    }
+  },
+  "seo_ansatzAtmung": {
+    "hero": {
+      "title": "Trompeta: Embocadura y Respiración Correctas",
+      "subtitle": "Aprende la embocadura correcta y la respiración abdominal paso a paso.",
+      "cta": "Empezar a practicar"
+    },
+    "cta": {
+      "title": "Mejora tu técnica",
+      "subtitle": "Comienza con la lección gratuita y aprende la embocadura correcta.",
+      "button": "Empezar gratis"
+    }
+  },
+  "seo_erwachsene": {
+    "hero": {
+      "title": "Aprender Trompeta como Adulto",
+      "subtitle": "Nunca es demasiado tarde – y con solo 5 minutos al día lograrás un progreso real.",
+      "cta": "Empezar ahora"
+    },
+    "cta": {
+      "title": "Comienza tu camino",
+      "subtitle": "Empieza gratis – tu progreso se guarda.",
+      "button": "Empezar gratis"
+    }
+  },
+  "seo_kinder": {
+    "hero": {
+      "title": "Trompeta para Niños",
+      "subtitle": "Aprendizaje estructurado para niños desde 6 años – de forma lúdica y con alegría.",
+      "cta": "Descubrir el curso"
+    },
+    "cta": {
+      "title": "Empezar juntos",
+      "subtitle": "Registra a tu hijo gratuitamente y empezad juntos.",
+      "button": "Empezar gratis"
+    }
+  },
+  "seo_ersterTon": {
+    "hero": {
+      "title": "Tu Primera Nota en Trompeta",
+      "subtitle": "Así consigues tu primera nota – fácil, relajado y divertido.",
+      "cta": "Empezar ahora"
+    }
+  },
+  "seo_tonumfang": {
+    "hero": {
+      "title": "Ampliar el Registro de la Trompeta",
+      "subtitle": "Consejos profesionales y ejercicios para un progreso realista.",
+      "cta": "Empezar a practicar"
+    }
+  },
+  "seo_blog": {
+    "hero": {
+      "title": "Blog y Consejos de Trompeta",
+      "subtitle": "Consejos, guías y tutoriales para quienes aprenden trompeta."
+    }
   }
 }

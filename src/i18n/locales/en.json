@@ -40,6 +40,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "articleInGerman": "Full article available in German — English version coming soon.",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -257,12 +258,14 @@
   "languages": {
     "de": "Deutsch",
     "en": "English",
-    "es": "Español"
+    "es": "Español",
+    "sl": "Slovenščina"
   },
   "languageTabs": {
     "german": "Deutsch",
     "english": "English",
-    "spanish": "Español"
+    "spanish": "Español",
+    "slovenian": "Slovenščina"
   },
   "onboarding": {
     "welcome": "Welcome!",
@@ -381,5 +384,138 @@
     "optout": "Don't show again",
     "showQR": "Show QR code",
     "hideQR": "Hide QR code"
+  },
+  "landing": {
+    "hero": {
+      "title": "Learn trumpet –\neasier than you think.",
+      "titleHighlight": "For adults too.",
+      "subtitle": "Step by step, totally flexible – with play-along videos and personal feedback from qualified teachers.",
+      "ctaStart": "Start for free",
+      "ctaLogin": "I already have an account",
+      "imageAlt": "Trumpetstar App – Levels overview on iPad",
+      "imageHover": "Log in now"
+    },
+    "usps": {
+      "video": {
+        "title": "Video Lessons",
+        "desc": "Structured courses from beginner to advanced – explained step by step."
+      },
+      "audio": {
+        "title": "Playbacks & Audio",
+        "desc": "Practice with professional backing tracks at different tempos alongside your sheet music."
+      },
+      "tools": {
+        "title": "Practice Tools",
+        "desc": "Metronome, tuner, fingering chart and sheet music viewer – all in one app."
+      }
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Register for free",
+        "desc": "Create an account in seconds – no credit card required."
+      },
+      "step2": {
+        "title": "Start lessons",
+        "desc": "Choose your level and learn with videos, sheet music and playbacks."
+      },
+      "step3": {
+        "title": "Track your progress",
+        "desc": "Collect stars, use the practice tools and improve – day by day."
+      }
+    },
+    "socialProof": {
+      "quote": "Developed by music educators – for everyone who wants to learn trumpet.",
+      "badge1": "Structured learning paths",
+      "badge2": "For children & adults",
+      "badge3": "Perfect with the books"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Is the app really free?",
+      "a1": "Yes! You can start with the free plan and access the first lessons and all tools. Premium plans are available for full access.",
+      "q2": "Do I need the Trumpetstar books?",
+      "a2": "The app is perfectly aligned with the Trumpetstar books, but also works independently with the included video lessons and tools.",
+      "q3": "What age is the app suitable for?",
+      "a3": "For everyone! Children from age 6 learn playfully, adults benefit from structured lessons and professional tools.",
+      "q4": "Can I use the app on an iPad?",
+      "a4": "Yes, the app runs on all devices with a modern browser – smartphone, tablet and desktop."
+    },
+    "capture": {
+      "title": "Start now for free",
+      "subtitle": "Get your first lesson for free – no credit card needed."
+    },
+    "seo": {
+      "title": "Learn Trumpet – TrumpetStar App",
+      "description": "Learn trumpet for kids & adults. Structured video lessons, playbacks and practice tools. Start for free!"
+    }
+  },
+  "seo_trompeteLernen": {
+    "hero": {
+      "title": "Learn Trumpet: The Complete Beginner's Guide",
+      "subtitle": "With the right method, it's possible in 3–6 months – whether as a child, adult or returning player.",
+      "cta": "Discover the course"
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "subtitle": "Start now with the free Star lesson – no sign-up required, available immediately.",
+      "button": "Discover the course"
+    }
+  },
+  "seo_ansatzAtmung": {
+    "hero": {
+      "title": "Trumpet: Correct Embouchure and Breathing",
+      "subtitle": "Learn the correct trumpet embouchure and abdominal breathing step by step.",
+      "cta": "Start practicing"
+    },
+    "cta": {
+      "title": "Improve your technique",
+      "subtitle": "Start with the free lesson and learn the correct embouchure.",
+      "button": "Start for free"
+    }
+  },
+  "seo_erwachsene": {
+    "hero": {
+      "title": "Learning Trumpet as an Adult",
+      "subtitle": "It's never too late – and with just 5 minutes a day you'll make real progress.",
+      "cta": "Start now"
+    },
+    "cta": {
+      "title": "Start your journey",
+      "subtitle": "Start for free – your progress is saved.",
+      "button": "Start for free"
+    }
+  },
+  "seo_kinder": {
+    "hero": {
+      "title": "Trumpet for Children",
+      "subtitle": "Structured learning for children from age 6 – playfully and with joy.",
+      "cta": "Discover the course"
+    },
+    "cta": {
+      "title": "Start together",
+      "subtitle": "Register your child for free and start together.",
+      "button": "Start for free"
+    }
+  },
+  "seo_ersterTon": {
+    "hero": {
+      "title": "Your First Note on Trumpet",
+      "subtitle": "Here's how to get your first note – easy, relaxed and fun.",
+      "cta": "Start now"
+    }
+  },
+  "seo_tonumfang": {
+    "hero": {
+      "title": "Expanding Your Trumpet Range",
+      "subtitle": "Professional tips and exercises for realistic progress.",
+      "cta": "Start practicing"
+    }
+  },
+  "seo_blog": {
+    "hero": {
+      "title": "Blog & Trumpet Tips",
+      "subtitle": "Tips, guides and tutorials for trumpet learners."
+    }
   }
 }

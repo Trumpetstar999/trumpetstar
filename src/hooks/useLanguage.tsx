@@ -11,16 +11,17 @@ export type { Language, SkillLevel } from '@/contexts/LanguageContext';
 import de from '@/i18n/locales/de.json';
 import en from '@/i18n/locales/en.json';
 import es from '@/i18n/locales/es.json';
+import sl from '@/i18n/locales/sl.json';
 
 type TranslationValue = string | { [key: string]: TranslationValue };
 type Translations = { [key: string]: TranslationValue };
 
-const translations: Record<Language, Translations> = { de, en, es };
+const translations: Record<Language, Translations> = { de, en, es, sl };
 
 // Detect browser language
 function detectBrowserLanguage(): Language {
   const browserLang = navigator.language.split('-')[0].toLowerCase();
-  if (browserLang === 'de' || browserLang === 'en' || browserLang === 'es') {
+  if (browserLang === 'de' || browserLang === 'en' || browserLang === 'es' || browserLang === 'sl') {
     return browserLang as Language;
   }
   return 'de'; // Default to German
@@ -47,7 +48,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     // Check localStorage first for immediate UI
     const stored = localStorage.getItem('trumpetstar_language') as Language;
-    if (stored && ['de', 'en', 'es'].includes(stored)) {
+    if (stored && ['de', 'en', 'es', 'sl'].includes(stored)) {
       return stored;
     }
     // Fall back to browser detection
@@ -73,7 +74,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (data?.language && ['de', 'en', 'es'].includes(data.language)) {
+        if (data?.language && ['de', 'en', 'es', 'sl'].includes(data.language)) {
           // User has a saved language preference - they've completed setup
           setLanguageState(data.language as Language);
           localStorage.setItem('trumpetstar_language', data.language);

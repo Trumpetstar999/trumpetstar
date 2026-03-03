@@ -1,0 +1,521 @@
+{
+  "welcome": {
+    "next": "Naprej",
+    "skip": "Preskoči",
+    "start": "Gremo!",
+    "slides": {
+      "welcome": {
+        "title": "Dobrodošli v TrumpetStar!",
+        "description": "Vaša osebna platforma za učenje trobente. Oglejte si kratek pregled vseh funkcij."
+      },
+      "levels": {
+        "title": "Video lekcije",
+        "description": "Strukturirani tečaji od začetnika do naprednega. Učite se v svojem tempu s profesionalnimi video vadnicami."
+      },
+      "pdfs": {
+        "title": "Note in PDF-ji",
+        "description": "Dostop do obsežne zbirke not, vadbenikov in učnih gradiv za igranje."
+      },
+      "musicxml": {
+        "title": "Interaktivne partiture",
+        "description": "Predvajajte partiture interaktivno, spremenite tempo in vadite težke odlomke z osredotočenostjo."
+      },
+      "practice": {
+        "title": "Dnevnik vadbe",
+        "description": "Dokumentirajte napredek, postavljajte cilje in sledite svojim vadbenim sejam."
+      },
+      "recordings": {
+        "title": "Posnetki",
+        "description": "Posnemite sebe, poslušajte svojo igro in sledite razvoju skozi čas."
+      },
+      "chats": {
+        "title": "Povratne informacije učitelja",
+        "description": "Delite posnetke z učiteljem in prejemajte osebne video komentarje."
+      },
+      "classroom": {
+        "title": "Živa učilnica",
+        "description": "Pridružite se živim sejam ali ustvarite lastne virtualne vadne sobe."
+      }
+    }
+  },
+  "common": {
+    "loading": "Nalaganje...",
+    "save": "Shrani",
+    "cancel": "Prekliči",
+    "delete": "Izbriši",
+    "edit": "Uredi",
+    "close": "Zapri",
+    "search": "Iskanje",
+    "filter": "Filter",
+    "all": "Vse",
+    "back": "Nazaj",
+    "next": "Naprej",
+    "yes": "Da",
+    "no": "Ne",
+    "confirm": "Potrdi",
+    "error": "Napaka",
+    "success": "Uspešno",
+    "noResults": "Ni rezultatov",
+    "resultsCount": "{{count}} rezultat",
+    "resultsCount_other": "{{count}} rezultati",
+    "articleInGerman": "Celoten članek je na voljo v nemščini — slovenska različica kmalu."
+  },
+  "auth": {
+    "login": "Prijava",
+    "logout": "Odjava",
+    "register": "Registracija",
+    "email": "E-pošta",
+    "password": "Geslo",
+    "forgotPassword": "Pozabljeno geslo?",
+    "signedOutSuccess": "Uspešno ste se odjavili"
+  },
+  "navigation": {
+    "levels": "Lekcije",
+    "pdfs": "Note",
+    "musicxml": "MusicXML",
+    "practice": "Vadba",
+    "recordings": "Posnetki",
+    "chats": "Pogovori",
+    "classroom": "Učilnica",
+    "profile": "Profil",
+    "game": "Igra",
+    "metronome": "Metronom"
+  },
+  "levels": {
+    "title": "Lekcije",
+    "searchPlaceholder": "Iskanje videov...",
+    "recentlyWatched": "Nedavno ogledano",
+    "recentlyWatchedDesc": "Vaši nedavno ogledani videi",
+    "noRecentVideos": "Še ni ogledanih videov",
+    "startLearning": "Izberite lekcijo in začnite z učenjem",
+    "firstLevel": "Pojdi na prvo lekcijo",
+    "noLevels": "Lekcije niso na voljo.",
+    "importShowcases": "Najprej uvozite showcase vsebine v administracijskem področju.",
+    "noVideosFound": "Ni najdenih videov",
+    "tryDifferentSearch": "Poskusite z drugim iskalnim izrazom",
+    "resetSearch": "Ponastavi iskanje",
+    "allLevels": "Vse lekcije",
+    "difficulty": {
+      "all": "Vse ravni",
+      "basics": "Osnove",
+      "beginner": "Začetnik",
+      "easy": "Enostavno",
+      "medium": "Srednje",
+      "advanced": "Napredno"
+    }
+  },
+  "pdfs": {
+    "title": "Notni zvezki",
+    "available": "{{count}} zvezkov na voljo",
+    "searchPlaceholder": "Iskanje...",
+    "noPdfs": "Ni PDF-jev na voljo",
+    "noPdfsDesc": "Še ni bilo naloženih notnih zvezkov.",
+    "upgradeRequired": "Potrebna nadgradnja na {{plan}}",
+    "noPdfsFound": "Ni najdenih not"
+  },
+  "musicxml": {
+    "title": "MusicXML partiture",
+    "available": "{{count}} skladb na voljo",
+    "searchPlaceholder": "Iskanje...",
+    "allLevels": "Vse ravni",
+    "allCategories": "Vse kategorije",
+    "noDocuments": "MusicXML partiture niso na voljo",
+    "noDocumentsDesc": "Še ni bilo naloženih partitur.",
+    "noDocumentsFound": "Ni najdenih partitur"
+  },
+  "player": {
+    "play": "Predvajaj",
+    "pause": "Pavza",
+    "stop": "Ustavi",
+    "tempo": "Tempo",
+    "speed": "Hitrost",
+    "volume": "Glasnost",
+    "fullscreen": "Celozaslonski način",
+    "exitFullscreen": "Izhod iz celozaslonskega načina",
+    "selectTrack": "Izberi posnetek",
+    "export": "Izvozi",
+    "markings": "Oznake",
+    "concertPitch": "Koncertni ton",
+    "transposed": "Transponirano"
+  },
+  "recordings": {
+    "title": "Posnetki",
+    "myRecordings": "Moji posnetki",
+    "noRecordings": "Še ni posnetkov",
+    "noRecordingsDesc": "Začnite snemati v video predvajalniku"
+  },
+  "practice": {
+    "title": "Vadba",
+    "journal": "Dnevnik vadbe",
+    "todos": "Naloge",
+    "startPractice": "Začni vadbo",
+    "lastActivity": "Zadnja aktivnost",
+    "minutes": "Minute",
+    "mood": "Razpoloženje",
+    "notes": "Opombe",
+    "tags": "Oznake",
+    "sessions": {
+      "title": "Začni vadbenico",
+      "subtitle": "Sestavite svojo vadbeno listo",
+      "mySessions": "Moje vadbenice",
+      "newSession": "Nova vadbenica",
+      "noSessions": "Še ni vadbenice",
+      "noSessionsDesc": "Ustvarite svojo prvo vadbenico!",
+      "sessionName": "Ime vadbenice",
+      "save": "Shrani",
+      "saveAndStart": "Shrani in začni",
+      "autoPause": "Samodejna pavza",
+      "sections": "Razdelki",
+      "newSection": "Nov razdelek",
+      "addPause": "Dodaj pavzo",
+      "library": "Knjižnica",
+      "searchPlaceholder": "Iskanje videa ali PDF-ja…",
+      "untilEnd": "do konca",
+      "items": "Elementi",
+      "estimatedDuration": "Ocenjen čas",
+      "lastUsed": "Zadnja uporaba",
+      "start": "Začni",
+      "duplicate": "Podvoji",
+      "share": "Deli",
+      "shareLink": "Ustvari povezavo za deljenje",
+      "shareLinkDesc": "Prejemniki si lahko ogledajo vadbenico in ustvarijo lastno kopijo.",
+      "linkCopied": "Povezava kopirana!",
+      "copySession": "Ustvari kopijo",
+      "sessionFinished": "Vadbenica zaključena!",
+      "allItemsDone": "Zaključili ste vse elemente.",
+      "again": "Znova",
+      "overview": "Pregled",
+      "skipPause": "Preskoči",
+      "replay": "Ponovi",
+      "endSession": "Konec",
+      "restUp": "Počijte se…",
+      "startTimer": "Zaženi časovnik",
+      "pauseTimer": "Pavza",
+      "resetTimer": "Ponastavi"
+    }
+  },
+  "chats": {
+    "title": "Pogovori",
+    "newChat": "Nov pogovor",
+    "noChats": "Ni pogovorov",
+    "typeMessage": "Vnesite sporočilo..."
+  },
+  "profile": {
+    "title": "Profil",
+    "dashboard": "Nadzorna plošča",
+    "personalOverview": "Vaš osebni pregled",
+    "editProfile": "Uredi profil",
+    "changePassword": "Spremeni geslo",
+    "settings": "Nastavitve",
+    "language": "Jezik",
+    "selectLanguage": "Izberi jezik",
+    "arrangeWidgets": "Razporedi",
+    "done": "Končano",
+    "reset": "Ponastavi",
+    "dragHint": "Pridržite in povlecite ploščico, da spremenite vrstni red",
+    "premiumHint": "Kadarkoli se lahko preklopite na Premium – vaš napredek se ohrani."
+  },
+  "widgets": {
+    "profile": "Profil",
+    "starsProgress": "Zvezde in napredek",
+    "calendar": "Tedenski pregled",
+    "recordings": "Moji posnetki",
+    "notesTodo": "Opombe in naloge",
+    "feedbackChat": "Povratne informacije in pogovor",
+    "classroom": "Učilnica",
+    "statistics": "Statistika",
+    "gameHighscore": "Rekord igre",
+    "recentVideos": "Nedavno predvajano",
+    "weeklyGoals": "Tedenski cilji",
+    "practiceSessions": "Vadbenice"
+  },
+  "game": {
+    "noHighscoresYet": "Še ni rekordov",
+    "playToScore": "Igrajte NoteRunner za prvi rezultat!",
+    "bestScore": "Najboljši rezultat",
+    "bestStreak": "Najboljša serija",
+    "accuracy": "Natančnost",
+    "level": "Raven"
+  },
+  "assistant": {
+    "name": "Toni vaš trobilni trener",
+    "online": "na spletu",
+    "typing": "piše...",
+    "greeting": "Zdravo, jaz sem Toni!",
+    "greetingDesc": "Vprašajte me o tehniki trobente, nasvetih za vadbo, repertoarju ali platformi.",
+    "inputPlaceholder": "Vnesite sporočilo...",
+    "recording": "Snemanje... Tapnite znova za ustavitev",
+    "readingAloud": "Glasno branje...",
+    "wasHelpful": "Je bilo to koristno?",
+    "modes": {
+      "platform": "📱 Platforma",
+      "technique": "🎺 Nasveti",
+      "mental": "🧠 Mentalno",
+      "repertoire": "🎵 Repertoar",
+      "mixed": "✨ Vse"
+    }
+  },
+  "languages": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "sl": "Slovenščina"
+  },
+  "languageTabs": {
+    "german": "Deutsch",
+    "english": "English",
+    "spanish": "Español",
+    "slovenian": "Slovenščina"
+  },
+  "onboarding": {
+    "welcome": "Dobrodošli!",
+    "selectLanguage": "Izberite jezik",
+    "continue": "Naprej",
+    "letsStart": "Gremo!",
+    "step1Title": "Kako vam je ime?",
+    "step1Subtitle": "Vnesite svoje ime",
+    "namePlaceholder": "Vaše ime",
+    "step2Title": "Vaš jezik",
+    "step2Subtitle": "Izberite željeni jezik",
+    "step3Title": "Vaša raven",
+    "step3Subtitle": "Kje ste trenutno?",
+    "skillBeginner": "Začetnik",
+    "skillBeginnerDesc": "Šele začenjam",
+    "skillIntermediate": "Že igram",
+    "skillIntermediateDesc": "Imam nekaj izkušenj"
+  },
+  "sessionCard": {
+    "start": "Začni",
+    "copy": "Kopiraj",
+    "copied": "Kopirano",
+    "copySuccess": "Vadbenica kopirana na vaš seznam!",
+    "copyError": "Kopiranje ni uspelo",
+    "notFound": "Vadbenica ni najdena"
+  },
+  "sessionChat": {
+    "title": "Ustvari vadbenico",
+    "namePlaceholder": "Ime vadbenice...",
+    "selected": "Izbrano",
+    "searchVideos": "Iskanje videov...",
+    "noVideosFound": "Ni najdenih videov",
+    "sendButton": "Pošlji vadbenico ({{count}} videov)"
+  },
+  "classroom": {
+    "createRoom": "Ustvari novo sobo",
+    "createRoomDesc": "Ustvarite video vadbenico za do 6 udeležencev.",
+    "roomName": "Ime sobe (neobvezno)",
+    "roomNamePlaceholder": "Moja vadbenica",
+    "visibility": "Vidnost",
+    "inviteOnly": "Samo po povabilu",
+    "inviteOnlyDesc": "Pridružijo se lahko samo povabljeni uporabniki",
+    "friends": "Prijatelji",
+    "friendsDesc": "Vsi vaši prijatelji se lahko pridružijo",
+    "withLink": "S povezavo",
+    "withLinkDesc": "Kdorkoli s povezavo se lahko pridruži",
+    "enableRecording": "Omogoči snemanje",
+    "autoRecord": "Seja bo samodejno posneta",
+    "startRoom": "Začni sobo"
+  },
+  "recording": {
+    "recordVideo": "Posnemite video",
+    "recordVideoDesc": "Posnemite svojo igro in jo shranite v knjižnico.",
+    "cameraError": "Dostop do kamere zavrnjen. Dovolite dostop v brskalniku.",
+    "noVideoSupport": "Vaš brskalnik ne podpira snemanja videa.",
+    "startError": "Napaka pri zagonu snemanja.",
+    "retry": "Poskusi znova",
+    "titleOptional": "Naslov (neobvezno)",
+    "defaultTitle": "Posnetek z dne {{date}}",
+    "startRecording": "Začni snemanje",
+    "stopRecording": "Ustavi snemanje",
+    "reRecord": "Posnemite znova"
+  },
+  "feedbackWidget": {
+    "title": "Povratne informacije in pogovor",
+    "premiumRequired": "Osebne povratne informacije so del Pro paketa",
+    "unlockPro": "Odkleni Pro",
+    "new": "novo",
+    "videoMessage": "Video sporočilo",
+    "textMessage": "Besedilno sporočilo",
+    "unreadMessages": "{{count}} neprebrano sporočilo",
+    "unreadMessages_other": "{{count}} neprebrana sporočila",
+    "allRead": "Vse prebrano",
+    "noChats": "Še ni pogovorov",
+    "startChat": "Začnite pogovor o svojih posnetkih",
+    "viewMessages": "Poglej sporočila",
+    "openChat": "Odpri pogovor"
+  },
+  "notesWidget": {
+    "notes": "Opombe",
+    "todo": "Naloge",
+    "noNotes": "Še ni opomb",
+    "allDone": "Vse opravljeno! 🎉",
+    "due": "Rok: {{date}}",
+    "newNote": "Nova opomba"
+  },
+  "editProfile": {
+    "title": "Uredi profil",
+    "description": "Prilagodite profil in naložite profilno sliko.",
+    "uploading": "Nalaganje...",
+    "changePhoto": "Spremeni fotografijo",
+    "imageOnly": "Izberite sliko",
+    "maxSize": "Slika mora biti 5 MB ali manj",
+    "uploadSuccess": "Slika naložena!",
+    "uploadError": "Napaka pri nalaganju",
+    "displayName": "Prikazno ime",
+    "namePlaceholder": "Vaše ime",
+    "saveSuccess": "Profil shranjen!",
+    "saveError": "Napaka pri shranjevanju",
+    "saving": "Shranjevanje..."
+  },
+  "sharedSession": {
+    "notFound": "Vadbenica ni najdena ali ni javna.",
+    "loginRequired": "Prijavite se, da kopirate vadbenico",
+    "createCopy": "Ustvari kopijo",
+    "copySuccess": "Vadbenica kopirana!",
+    "endSession": "Zaključiti vadbenico?"
+  },
+  "review": {
+    "title": "Ocenite Trumpetstar",
+    "description": "Če vam Trumpetstar pomaga, bi bili veseli kratke in iskrene ocene.",
+    "ctaButton": "Ocenite na Googlu",
+    "promptTitle": "Ocenite Trumpetstar",
+    "promptDescription": "Vaše mnenje pomaga drugim odkriti Trumpetstar.",
+    "later": "Pozneje",
+    "optout": "Ne prikazuj več",
+    "showQR": "Prikaži QR kodo",
+    "hideQR": "Skrij QR kodo"
+  },
+  "landing": {
+    "hero": {
+      "title": "Naučite se trobente –\npreprosto kot ena, dva, tri.",
+      "titleHighlight": "Tudi za odrasle.",
+      "subtitle": "Korak za korakom, popolnoma fleksibilno – z videolekcijami in osebnimi povratnimi informacijami usposobljenih učiteljev.",
+      "ctaStart": "Začni brezplačno",
+      "ctaLogin": "Že imam račun",
+      "imageAlt": "Trumpetstar aplikacija – pregled lekcij na iPadu",
+      "imageHover": "Prijavi se zdaj"
+    },
+    "usps": {
+      "video": {
+        "title": "Video lekcije",
+        "desc": "Strukturirani tečaji od začetnika do naprednega – razloženi korak za korakom."
+      },
+      "audio": {
+        "title": "Spremljevalni posnetki",
+        "desc": "Vadite s profesionalnimi spremljevalnimi posnetki v različnih tempih k vašim notam."
+      },
+      "tools": {
+        "title": "Vadna orodja",
+        "desc": "Metronom, uglasitvenica, tabela prstnih položajev in pregledovalnik not – vse v eni aplikaciji."
+      }
+    },
+    "howItWorks": {
+      "title": "Kako deluje",
+      "step1": {
+        "title": "Registracija brezplačno",
+        "desc": "Ustvarite račun v nekaj sekundah – brez kreditne kartice."
+      },
+      "step2": {
+        "title": "Začnite z lekcijami",
+        "desc": "Izberite svojo raven in se učite z videi, notami in spremljevalnimi posnetki."
+      },
+      "step3": {
+        "title": "Sledite napredku",
+        "desc": "Zbirajte zvezde, uporabljajte vadna orodja in se izboljšujte – dan za dnem."
+      }
+    },
+    "socialProof": {
+      "quote": "Razvito s strani glasbenih pedagogov – za vse, ki se želijo naučiti trobente.",
+      "badge1": "Strukturirane učne poti",
+      "badge2": "Za otroke in odrasle",
+      "badge3": "Popolno k zvezkom"
+    },
+    "faq": {
+      "title": "Pogosta vprašanja",
+      "q1": "Je aplikacija res brezplačna?",
+      "a1": "Da! Začnete lahko z brezplačnim načrtom in dostopate do prvih lekcij in vseh orodij. Za poln dostop so na voljo Premium načrti.",
+      "q2": "Ali potrebujem Trumpetstar zvezke?",
+      "a2": "Aplikacija je popolno usklajena s Trumpetstar zvezki, deluje pa tudi samostojno z vključenimi video lekcijami in orodji.",
+      "q3": "Za katero starost je aplikacija primerna?",
+      "a3": "Za vse! Otroci od 6. leta se učijo skozi igro, odrasli pa imajo korist od strukturiranih lekcij in profesionalnih orodij.",
+      "q4": "Ali lahko aplikacijo uporabljam na iPadu?",
+      "a4": "Da, aplikacija deluje na vseh napravah z modernim brskalnikom – pametnem telefonu, tablici in namiznem računalniku."
+    },
+    "capture": {
+      "title": "Začnite zdaj brezplačno",
+      "subtitle": "Prejmite svojo prvo lekcijo brezplačno – brez kreditne kartice."
+    },
+    "seo": {
+      "title": "Naučite se trobente – aplikacija TrumpetStar",
+      "description": "Naučite se trobente za otroke in odrasle. Strukturirane video lekcije, spremljevalni posnetki in vadna orodja. Začnite brezplačno!"
+    }
+  },
+  "seo_trompeteLernen": {
+    "hero": {
+      "title": "Naučite se trobente: Popoln vodič za začetnike",
+      "subtitle": "Z pravo metodo se je mogoče naučiti trobente v 3–6 mesecih – ne glede na starost.",
+      "cta": "Odkrij tečaj"
+    },
+    "cta": {
+      "title": "Pripravljeni začeti?",
+      "subtitle": "Začnite zdaj z brezplačno Star lekcijo – brez registracije, takoj na voljo.",
+      "button": "Odkrij tečaj"
+    }
+  },
+  "seo_ansatzAtmung": {
+    "hero": {
+      "title": "Trobenta: Pravilen nastavek in dihanje",
+      "subtitle": "Naučite se pravilnega nastavka in trebušnega dihanja korak za korakom.",
+      "cta": "Začni vaditi"
+    },
+    "cta": {
+      "title": "Izboljšajte svojo tehniko",
+      "subtitle": "Začnite z brezplačno lekcijo in se naučite pravilnega nastavka.",
+      "button": "Začni brezplačno"
+    }
+  },
+  "seo_erwachsene": {
+    "hero": {
+      "title": "Učenje trobente kot odrasli",
+      "subtitle": "Nikoli ni prepozno – in z le 5 minutami na dan dosežete resnični napredek.",
+      "cta": "Začni zdaj"
+    },
+    "cta": {
+      "title": "Začnite svojo pot",
+      "subtitle": "Začnite brezplačno – vaš napredek se ohrani.",
+      "button": "Začni brezplačno"
+    }
+  },
+  "seo_kinder": {
+    "hero": {
+      "title": "Trobenta za otroke",
+      "subtitle": "Strukturirano učenje za otroke od 6. leta naprej – skozi igro in z veseljem.",
+      "cta": "Odkrij tečaj"
+    },
+    "cta": {
+      "title": "Začnite skupaj",
+      "subtitle": "Brezplačno registrirajte otroka in začnite skupaj.",
+      "button": "Začni brezplačno"
+    }
+  },
+  "seo_ersterTon": {
+    "hero": {
+      "title": "Prvi ton na trobenti",
+      "subtitle": "Tako vam uspe – enostavno, sproščeno in z veseljem.",
+      "cta": "Začni zdaj"
+    }
+  },
+  "seo_tonumfang": {
+    "hero": {
+      "title": "Razširite obseg tonov na trobenti",
+      "subtitle": "Strokovni nasveti in vaje za realen napredek.",
+      "cta": "Začni vaditi"
+    }
+  },
+  "seo_blog": {
+    "hero": {
+      "title": "Blog in nasveti za trobento",
+      "subtitle": "Nasveti, vodniki in vadnice za vadboteže."
+    }
+  }
+}

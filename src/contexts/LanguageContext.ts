@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export type Language = 'de' | 'en' | 'es';
+export type Language = 'de' | 'en' | 'es' | 'sl';
 export type SkillLevel = 'beginner' | 'intermediate';
 
 export interface LanguageContextType {

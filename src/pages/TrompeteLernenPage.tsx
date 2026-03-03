@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, Video, Smartphone, Award, Clock, Users, Baby, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const faqs = [
   { question: "Ab welchem Alter kann man Trompete lernen?", answer: "Kinder können ab 6-7 Jahren mit dem Kornett (kleinere Version) beginnen, ab 8-9 Jahren mit der normalen Trompete. Erwachsene können jederzeit starten – es ist nie zu spät." },
@@ -29,6 +30,7 @@ const ersteSchritte = [
 ];
 
 export default function TrompeteLernenPage() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <FAQSchema faqs={faqs} />
@@ -39,13 +41,19 @@ export default function TrompeteLernenPage() {
         <div className="max-w-4xl mx-auto text-center">
           <AnimatedSection direction="up">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trompete lernen: Der komplette Guide für Anfänger (2026)
+              {t('seo_trompeteLernen.hero.title')}
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              Trompete lernen ist mit der richtigen Methode in 3–6 Monaten möglich – egal ob als Kind, Erwachsener oder Wiedereinsteiger.
+              {t('seo_trompeteLernen.hero.subtitle')}
             </p>
           </AnimatedSection>
-          
+
+          {language !== 'de' && (
+            <AnimatedSection direction="up" delay={50}>
+              <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+            </AnimatedSection>
+          )}
+
           <AnimatedSection direction="up" delay={150}>
             <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
               <div className="flex items-start gap-3">
@@ -60,7 +68,7 @@ export default function TrompeteLernenPage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">Kurs entdecken</Link>
+                <Link to="/auth">{t('seo_trompeteLernen.hero.cta')}</Link>
               </Button>
             </div>
           </AnimatedSection>
@@ -275,13 +283,13 @@ export default function TrompeteLernenPage() {
 
         {/* CTA */}
         <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
-          <h2 className="text-3xl font-bold text-white mb-4">Bereit durchzustarten?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">{t('seo_trompeteLernen.cta.title')}</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">
-            Starte jetzt mit der kostenlosen Star-Lektion – ohne Anmeldung, sofort verfügbar.
+            {t('seo_trompeteLernen.cta.subtitle')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">Kurs entdecken</Link>
+              <Link to="/auth">{t('seo_trompeteLernen.cta.button')}</Link>
             </Button>
           </div>
         </AnimatedSection>

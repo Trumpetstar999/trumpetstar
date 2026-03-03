@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import { Music, CheckCircle, ArrowRight } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const TrompeteErsterTonPage = () => {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <title>Erster Ton auf der Trompete – So gelingt er | Trumpetstar</title>
@@ -19,12 +21,17 @@ const TrompeteErsterTonPage = () => {
               Dein erster Ton
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Erster Ton auf der Trompete
+              {t('seo_ersterTon.hero.title')}
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              So gelingt dir der erste Ton – einfach, entspannt und mit Spaß.
+              {t('seo_ersterTon.hero.subtitle')}
             </p>
           </AnimatedSection>
+          {language !== 'de' && (
+            <AnimatedSection direction="up" delay={50}>
+              <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+            </AnimatedSection>
+          )}
 
           <AnimatedSection direction="up" delay={150}>
             <div className="max-w-3xl mx-auto mb-10">
@@ -76,10 +83,10 @@ const TrompeteErsterTonPage = () => {
       {/* CTA */}
       <section className="py-16 px-4">
         <AnimatedSection direction="up" className="max-w-2xl mx-auto text-center glass rounded-2xl p-10">
-          <h2 className="text-2xl font-bold text-white mb-4">Bereit für deinen ersten Ton?</h2>
-          <p className="text-white/70 mb-6">Starte jetzt kostenlos und lerne Schritt für Schritt mit Video-Begleitung.</p>
+          <h2 className="text-2xl font-bold text-white mb-4">{t('landing.capture.title')}</h2>
+          <p className="text-white/70 mb-6">{t('landing.capture.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/signup">Kostenlos starten <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/signup">{t('seo_ersterTon.hero.cta')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </AnimatedSection>
       </section>

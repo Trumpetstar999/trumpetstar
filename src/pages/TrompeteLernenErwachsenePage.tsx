@@ -6,6 +6,7 @@ import infografik from "@/assets/trompete-lernen-erwachsene-infografik.png";
 import { Users, Clock, TrendingUp, Award, CheckCircle, ArrowRight, Star, BookOpen } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const faqs = [
   { question: "Kann ich mit 40/50/60 noch Trompete lernen?", answer: "Absolut! Unsere erfolgreichsten Wiedereinsteiger sind zwischen 35 und 65 Jahre alt. Erwachsene haben entscheidende Vorteile." },
@@ -28,6 +29,7 @@ const vorteileErwachsener = [
 ];
 
 export default function TrompeteLernenErwachsenePage() {
+  const { t, language } = useLanguage();
   return (
     <SEOPageLayout>
       <FAQSchema faqs={faqs} />
@@ -41,13 +43,18 @@ export default function TrompeteLernenErwachsenePage() {
               Speziell für Erwachsene
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trompete lernen als Erwachsener:<br />
-              <span className="text-gold-gradient">Nie zu spät für Musik</span>
+              {t('seo_erwachsene.hero.title')}
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              Mit 30, 40, 50 oder 60 – es ist nie zu spät. Unsere Methode ist für Berufstätige mit wenig Zeit optimiert.
+              {t('seo_erwachsene.hero.subtitle')}
             </p>
           </AnimatedSection>
+
+          {language !== 'de' && (
+            <AnimatedSection direction="up" delay={50}>
+              <p className="text-white/40 text-xs italic mb-4">{t('common.articleInGerman')}</p>
+            </AnimatedSection>
+          )}
 
           <AnimatedSection direction="up" delay={150}>
             <div className="glass rounded-2xl p-6 mb-8 max-w-2xl mx-auto text-left">
@@ -64,7 +71,7 @@ export default function TrompeteLernenErwachsenePage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">Pro-Kurs entdecken</Link>
+                <Link to="/auth">{t('seo_erwachsene.hero.cta')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
                 <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
@@ -236,11 +243,11 @@ export default function TrompeteLernenErwachsenePage() {
 
         {/* CTA */}
         <AnimatedSection direction="up" className="text-center glass rounded-2xl p-10">
-          <h2 className="text-3xl font-bold text-white mb-4">Starte dein Trompeten-Abenteuer</h2>
-          <p className="text-white/70 mb-6 max-w-xl mx-auto">Überzeuge dich selbst mit unserem kostenlosen Webinar oder starte direkt durch.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{t('seo_erwachsene.cta.title')}</h2>
+          <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_erwachsene.cta.subtitle')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">Pro-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/auth">{t('seo_erwachsene.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>

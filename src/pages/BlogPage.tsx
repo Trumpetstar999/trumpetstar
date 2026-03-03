@@ -4,6 +4,7 @@ import { AnimatedSection } from "@/components/seo/AnimatedSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Clock } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const posts = [
   {
@@ -36,6 +37,7 @@ const posts = [
 ];
 
 export default function BlogPage() {
+  const { t } = useLanguage();
   return (
     <SEOPageLayout>
       {/* Hero */}
@@ -45,10 +47,10 @@ export default function BlogPage() {
             🎺 Trumpetstar Blog
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Tipps, Guides & Anleitungen
+            {t('seo_blog.hero.title')}
           </h1>
           <p className="text-white/70 text-lg max-w-xl mx-auto">
-            Alles rund ums Trompete lernen — für Anfänger, Berufstätige und Wiedereinsteiger.
+            {t('seo_blog.hero.subtitle')}
           </p>
         </AnimatedSection>
       </section>
@@ -87,10 +89,10 @@ export default function BlogPage() {
       {/* CTA */}
       <AnimatedSection direction="up" className="max-w-3xl mx-auto px-4 pb-20">
         <div className="glass rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-2">Bereit für deinen ersten Ton? 🎺</h3>
-          <p className="text-white/60 mb-6 text-sm">7-Tage kostenlose Challenge · 5 Minuten am Tag · Kein Vorwissen nötig</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{t('landing.capture.title')} 🎺</h3>
+          <p className="text-white/60 mb-6 text-sm">{t('landing.capture.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Jetzt kostenlos starten <ArrowRight className="ml-2 w-4 h-4" /></Link>
+            <Link to="/auth">{t('landing.hero.ctaStart')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
           </Button>
         </div>
       </AnimatedSection>
