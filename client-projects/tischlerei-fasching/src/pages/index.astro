@@ -8,9 +8,8 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
   <!-- ===== NAVIGATION ===== -->
   <nav class="site-nav" aria-label="Hauptnavigation">
     <div class="nav-inner">
-      <a href="#" class="nav-brand" aria-label="Tischlerei Fasching OG – Startseite">
-        {site.name}
-        <span>{site.tagline}</span>
+      <a href="#" class="nav-logo-link" aria-label="Tischlerei Fasching OG – Startseite">
+        <img src="/images/logo.jpg" alt="Tischlerei Fasching OG" class="nav-logo" width="130" height="52" />
       </a>
       <ul class="nav-links" role="list">
         <li><a href="#leistungen">Leistungen</a></li>
@@ -113,7 +112,7 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
           <div class="about-text-col">
             <h2 id="about-title">{about.headline}</h2>
             <p class="about-text">{about.text}</p>
-            <span class="about-accent">Georg & Jochen Fasching</span>
+            <span class="about-names">Georg & Jochen Fasching</span>
           </div>
           <div class="about-highlights-col">
             <ul class="highlights-list" role="list">
@@ -339,6 +338,7 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <div class="footer-inner">
+      <img src="/images/logo.jpg" alt="Tischlerei Fasching OG" class="footer-logo" width="90" height="36" />
       <span class="footer-copyright">{footer.copyright}</span>
       <ul class="footer-links" role="list">
         {footer.links.map(link => (

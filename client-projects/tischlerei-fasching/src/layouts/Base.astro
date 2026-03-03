@@ -31,7 +31,7 @@ const schemaOrgJson = JSON.stringify({
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#5C3D2E" />
+  <meta name="theme-color" content="#E8611A" />
 
   <title>{metaTitle}</title>
   <meta name="description" content={metaDesc} />
@@ -58,16 +58,9 @@ const schemaOrgJson = JSON.stringify({
   <!-- Critical CSS inline for above-the-fold -->
   <style>
     /* Critical: nav + hero skeleton to prevent FOUC */
-    .site-nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1rem 0;
-    }
-    .hero {
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      background: linear-gradient(135deg, #5C3D2E 0%, #8B6347 50%, #C8A96E 100%);
-    }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0.75rem 0; }
+    .hero { min-height: 100svh; display: flex; align-items: center; background: #2C2C2C; }
   </style>
 </head>
 <body>
