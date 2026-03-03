@@ -1,0 +1,88 @@
+{
+  "version": "1.0",
+  "updatedAt": "2026-03-03",
+  "orchestrator": "Valentin (OpenClaw)",
+  "subagent": "Seppl-Checker",
+
+  "environment": "prod",
+  "appUrl": "https://www.trumpetstar.app",
+  "apiUrl": "https://osgrjouxwpnokfvzztji.supabase.co",
+
+  "repo": {
+    "name": "Trumpetstar999/trumpetstar",
+    "local": "/root/.openclaw/workspace/trumpetstar",
+    "access": "write"
+  },
+
+  "testAccounts": {
+    "_note": "ASSUMPTION — Mario muss echte Test-Account-Daten eintragen",
+    "student": {
+      "email": "FILL_IN_student@test.trumpetstar.app",
+      "password": "FILL_IN"
+    },
+    "teacher": {
+      "email": "FILL_IN_teacher@test.trumpetstar.app",
+      "password": "FILL_IN"
+    },
+    "admin": {
+      "email": "schulterm@me.com",
+      "password": "FILL_IN"
+    }
+  },
+
+  "devStackHints": {
+    "frontend": "React/TypeScript + Vite + Lovable",
+    "backend": "Supabase (Auth + RLS + Edge Functions)",
+    "payments": "Digistore24 (webhook-based)",
+    "emailAutomation": "World4You SMTP via Edge Function send-email",
+    "i18n": "Custom useLanguage hook, 4 locales: de/en/es/sl"
+  },
+
+  "issueTracker": "github",
+  "reportSink": "/root/.openclaw/workspace/qa_reports",
+  "releaseGateSink": "/root/.openclaw/workspace/release_gates",
+
+  "weeklySchedule": {
+    "day": "Monday",
+    "time": "06:00",
+    "timezone": "Europe/Vienna",
+    "cronExpr": "0 5 * * 1"
+  },
+
+  "escalationRules": {
+    "immediateTelegramAlert": ["Critical", "P0"],
+    "alertRecipient": "Mario (Telegram 7262426343)",
+    "topics": ["auth_broken", "payments_broken", "security_leak", "data_loss"]
+  },
+
+  "knownOpenIssues": [
+    {
+      "id": "TS-QA-PDF-001",
+      "title": "PDF double-fetch on blob URL in usePdfCache",
+      "severity": "High",
+      "priority": "P1",
+      "status": "open"
+    },
+    {
+      "id": "TS-QA-PDF-002",
+      "title": "handleRetry calls onClose() instead of reloading PDF",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open"
+    },
+    {
+      "id": "TS-QA-PDF-003",
+      "title": "isCached stale closure in PdfsPage useEffect",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open"
+    },
+    {
+      "id": "TS-QA-DB-001",
+      "title": "agent_log anon INSERT blocked by missing RLS policy",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open"
+    }
+  ]
+}
