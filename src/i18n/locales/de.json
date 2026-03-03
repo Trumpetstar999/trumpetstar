@@ -70,6 +70,25 @@
     "footerLinkPricing": "Preise",
     "footerCopyright": "Alle Rechte vorbehalten."
   },
+  "lead": {
+    "firstName": "Vorname",
+    "firstNamePlaceholder": "Dein Vorname",
+    "email": "E-Mail",
+    "emailPlaceholder": "deine@email.com",
+    "iAm": "Ich bin...",
+    "segmentAdult": "Erwachsener Anfänger / Wiedereinsteiger",
+    "segmentParent": "Elternteil – Kind (6–14 Jahre)",
+    "segmentTeacher": "Musiklehrer",
+    "privacyText": "Ich stimme zu, dass TrumpetStar mich per E-Mail kontaktieren darf. Abmeldung jederzeit möglich.",
+    "privacyLink": "Datenschutz",
+    "submit": "Jetzt kostenlos starten",
+    "sending": "Wird gesendet...",
+    "noSpam": "Kein Spam. Nur wertvolle Tipps für deinen Trompeten-Erfolg.",
+    "successTitle": "Willkommen bei TrumpetStar! 🎺",
+    "successDesc": "Dein Account wurde erstellt! Check deine E-Mails – dein Login-Link ist unterwegs.",
+    "alreadyRegistered": "Du bist bereits registriert!",
+    "errorGeneric": "Etwas ist schiefgegangen. Bitte versuche es später nochmal."
+  },
   "welcome": {
     "next": "Weiter",
     "skip": "Überspringen",
