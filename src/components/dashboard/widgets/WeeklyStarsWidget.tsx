@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { de, en, es, sl } from 'date-fns/locale';
+import { de, enUS, es, sl } from 'date-fns/locale';
+import type { Locale } from 'date-fns';
 
 interface DayStars {
   date: Date;
@@ -21,7 +22,7 @@ export function WeeklyStarsWidget() {
   const [loading, setLoading] = useState(true);
   const [animationPhase, setAnimationPhase] = useState(0);
 
-  const localeMap: Record<string, Locale> = { de, en, es, sl };
+  const localeMap: Record<string, Locale> = { de, en: enUS, es, sl };
   const dateLocale = localeMap[language] ?? de;
 
   useEffect(() => {
