@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Loader2, CheckCircle, ArrowRight, Sparkles } from "lucide-react";
+import { Loader2, CheckCircle, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface LeadCaptureFormProps {
   className?: string;
@@ -8,6 +9,7 @@ interface LeadCaptureFormProps {
 }
 
 export default function LeadCaptureForm({ className, source = "website_form" }: LeadCaptureFormProps) {
+  const { t, language } = useLanguage();
   const [formData, setFormData] = useState({
     first_name: "",
     email: "",
@@ -33,7 +35,7 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
           body: JSON.stringify({
             ...formData,
             source,
-            language: "de",
+            language,
           }),
         }
       );
@@ -43,14 +45,14 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
       if (data.success) {
         setStatus("success");
         if (data.duplicate) {
-          setErrorMsg("Du bist bereits registriert!");
+          setErrorMsg(t('lead.alreadyRegistered'));
         }
       } else {
         throw new Error(data.error || "Unknown error");
       }
     } catch (err) {
       setStatus("error");
-      setErrorMsg("Etwas ist schiefgegangen. Bitte versuche es später nochmal.");
+      setErrorMsg(t('lead.errorGeneric'));
     }
   };
 
@@ -60,10 +62,9 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
         <div className="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400/40 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10 text-emerald-400" />
         </div>
-        <h3 className="text-2xl font-bold text-white mb-3">Willkommen bei TrumpetStar! 🎺</h3>
+        <h3 className="text-2xl font-bold text-white mb-3">{t('lead.successTitle')}</h3>
         <p className="text-white/70 text-base leading-relaxed max-w-sm mx-auto">
-          Dein Account wurde erstellt!<br />
-          Check deine E-Mails – dein Login-Link ist unterwegs.
+          {t('lead.successDesc')}
         </p>
         {errorMsg && (
           <p className="text-amber-400 text-sm mt-4">{errorMsg}</p>
@@ -77,11 +78,11 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
       {/* Name */}
       <div className="space-y-1.5">
         <label htmlFor="lead_first_name" className="block text-sm font-medium text-white/90 pl-1">
-          Vorname
+          {t('lead.firstName')}
         </label>
         <input
           id="lead_first_name"
-          placeholder="Dein Vorname"
+          placeholder={t('lead.firstNamePlaceholder')}
           value={formData.first_name}
           onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
           required
@@ -92,12 +93,12 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
       {/* Email */}
       <div className="space-y-1.5">
         <label htmlFor="lead_email" className="block text-sm font-medium text-white/90 pl-1">
-          E-Mail
+          {t('lead.email')}
         </label>
         <input
           id="lead_email"
           type="email"
-          placeholder="deine@email.com"
+          placeholder={t('lead.emailPlaceholder')}
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           required
@@ -108,7 +109,7 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
       {/* Segment */}
       <div className="space-y-1.5">
         <label htmlFor="lead_segment" className="block text-sm font-medium text-white/90 pl-1">
-          Ich bin...
+          {t('lead.iAm')}
         </label>
         <select
           id="lead_segment"
@@ -117,9 +118,9 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
           className="w-full h-12 px-4 rounded-xl bg-white/95 text-slate-900 border-0 outline-none focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/60 transition-shadow text-base appearance-none cursor-pointer"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
         >
-          <option value="adult_beginner">Erwachsener Anfänger / Wiedereinsteiger</option>
-          <option value="parent_child">Elternteil – Kind (6–14 Jahre)</option>
-          <option value="teacher">Musiklehrer</option>
+          <option value="adult_beginner">{t('lead.segmentAdult')}</option>
+          <option value="parent_child">{t('lead.segmentParent')}</option>
+          <option value="teacher">{t('lead.segmentTeacher')}</option>
         </select>
       </div>
 
@@ -133,10 +134,9 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
           className="mt-1 w-5 h-5 rounded border-2 border-white/30 bg-white/10 checked:bg-[hsl(var(--reward-gold))] checked:border-[hsl(var(--reward-gold))] text-slate-900 focus:ring-2 focus:ring-[hsl(var(--reward-gold))]/40 cursor-pointer transition-colors shrink-0 accent-[hsl(48,100%,50%)]"
         />
         <span className="text-sm text-white/70 leading-relaxed group-hover:text-white/80 transition-colors">
-          Ich stimme zu, dass TrumpetStar mich per E-Mail kontaktieren darf. 
-          Abmeldung jederzeit möglich.{" "}
+          {t('lead.privacyText')}{" "}
           <a href="/datenschutz" className="text-[hsl(var(--reward-gold))] hover:underline font-medium">
-            Datenschutz
+            {t('lead.privacyLink')}
           </a>
         </span>
       </label>
@@ -156,19 +156,20 @@ export default function LeadCaptureForm({ className, source = "website_form" }: 
         {status === "loading" ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            Wird gesendet...
+            {t('lead.sending')}
           </>
         ) : (
           <>
             <Sparkles className="w-5 h-5" />
-            Jetzt kostenlos starten
+            {t('lead.submit')}
           </>
         )}
       </button>
 
       <p className="text-xs text-white/40 text-center pt-1">
-        Kein Spam. Nur wertvolle Tipps für deinen Trompeten-Erfolg.
+        {t('lead.noSpam')}
       </p>
     </form>
   );
 }
+

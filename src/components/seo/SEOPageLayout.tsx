@@ -74,10 +74,10 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
           </Link>
           <div className="flex items-center gap-3">
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
-              <Link to="/trompete-lernen">{t('layout.nav.learn')}</Link>
+              <Link to="/trompete-lernen">{t('auth.navLearn')}</Link>
             </Button>
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
-              <Link to="/pricing">{t('layout.nav.pricing')}</Link>
+              <Link to="/pricing">{t('auth.navPricing')}</Link>
             </Button>
             {/* Language Switcher */}
             <select
@@ -93,11 +93,11 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
             </select>
             {user ? (
               <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-                <Link to="/app">{t('layout.nav.toApp')}</Link>
+                <Link to="/app">{t('auth.toApp')}</Link>
               </Button>
             ) : (
               <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-                <Link to="/login">{t('layout.nav.login')}</Link>
+                <Link to="/login">{t('auth.login')}</Link>
               </Button>
             )}
           </div>
@@ -116,29 +116,29 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
             <div>
               <img src={trumpetstarLogo} alt="Trumpetstar" className="h-6 w-auto mb-3" />
               <p className="text-sm text-white/60">
-                {t('layout.footer.tagline')}
+                {t('auth.footerTagline')}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white mb-3">{t('layout.footer.learnSection')}</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">{t('auth.footerLearnTitle')}</h4>
               <ul className="space-y-2 text-sm text-white/60">
-                <li><Link to="/trompete-lernen" className="hover:text-white transition-colors">{t('layout.footer.links.learn')}</Link></li>
-                <li><Link to="/trompete-lernen-kinder" className="hover:text-white transition-colors">{t('layout.footer.links.kids')}</Link></li>
-                <li><Link to="/trompete-lernen-erwachsene" className="hover:text-white transition-colors">{t('layout.footer.links.adults')}</Link></li>
-                <li><Link to="/trompete-ansatz-atmung" className="hover:text-white transition-colors">{t('layout.footer.links.technique')}</Link></li>
+                <li><Link to="/trompete-lernen" className="hover:text-white transition-colors">{t('auth.footerLinkLearn')}</Link></li>
+                <li><Link to="/trompete-lernen-kinder" className="hover:text-white transition-colors">{t('auth.footerLinkKids')}</Link></li>
+                <li><Link to="/trompete-lernen-erwachsene" className="hover:text-white transition-colors">{t('auth.footerLinkAdults')}</Link></li>
+                <li><Link to="/trompete-ansatz-atmung" className="hover:text-white transition-colors">{t('auth.footerLinkEmbouchure')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white mb-3">{t('layout.footer.helpSection')}</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">{t('auth.footerHelpTitle')}</h4>
               <ul className="space-y-2 text-sm text-white/60">
-                <li><Link to="/trompete-erster-ton" className="hover:text-white transition-colors">{t('layout.footer.links.firstNote')}</Link></li>
-                <li><Link to="/hilfe/trompete-kein-ton" className="hover:text-white transition-colors">{t('layout.footer.links.noSound')}</Link></li>
-                <li><Link to="/pricing" className="hover:text-white transition-colors">{t('layout.footer.links.pricing')}</Link></li>
+                <li><Link to="/trompete-erster-ton" className="hover:text-white transition-colors">{t('auth.footerLinkFirstNote')}</Link></li>
+                <li><Link to="/hilfe/trompete-kein-ton" className="hover:text-white transition-colors">{t('auth.footerLinkNoSound')}</Link></li>
+                <li><Link to="/pricing" className="hover:text-white transition-colors">{t('auth.footerLinkPricing')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-white/10 pt-6 text-center text-xs text-white/40">
-            © {new Date().getFullYear()} Trumpetstar. {t('layout.footer.copyright')}
+            © {new Date().getFullYear()} Trumpetstar. {t('auth.footerCopyright')}
           </div>
         </div>
       </footer>

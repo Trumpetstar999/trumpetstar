@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMiniMode } from '@/hooks/useMiniMode';
+import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const isMiniMode = useMiniMode();
   const location = useLocation();
+  const { t } = useLanguage();
   const getRedirectPath = () => {
     // Check for returnTo in sessionStorage or URL params
     const returnTo = sessionStorage.getItem('returnTo');
@@ -58,11 +60,7 @@ export default function AuthPage() {
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      toast({
-        title: 'E-Mail erforderlich',
-        description: 'Bitte gib deine E-Mail-Adresse ein.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.emailRequired'), description: t('auth.emailRequiredDesc'), variant: 'destructive' });
       return;
     }
 
@@ -85,14 +83,14 @@ export default function AuthPage() {
 
       setMagicLinkSent(true);
       toast({
-        title: 'Magic Link gesendet!',
-        description: 'Überprüfe deine E-Mails und klicke auf den Link zum Einloggen.',
+        title: t('auth.magicLinkSentToast'),
+        description: t('auth.magicLinkSentToastDesc'),
       });
     } catch (error) {
       console.error('Magic link error:', error);
       toast({
-        title: 'Fehler',
-        description: error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten.',
+        title: t('auth.error'),
+        description: error instanceof Error ? error.message : t('auth.unknownError'),
         variant: 'destructive',
       });
     } finally {
@@ -103,23 +101,13 @@ export default function AuthPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({
-        title: 'Fehlende Angaben',
-        description: 'Bitte gib E-Mail und Passwort ein.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.missingFields'), description: t('auth.missingFieldsDesc'), variant: 'destructive' });
       return;
     }
-
     if (password.length < 6) {
-      toast({
-        title: 'Passwort zu kurz',
-        description: 'Das Passwort muss mindestens 6 Zeichen lang sein.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.passwordTooShort'), description: t('auth.passwordTooShortDesc'), variant: 'destructive' });
       return;
     }
-
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signUp({
@@ -127,36 +115,22 @@ export default function AuthPage() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/app`,
-          data: {
-            display_name: displayName || email.split('@')[0],
-          },
+          data: { display_name: displayName || email.split('@')[0] },
         },
       });
-
       if (error) {
         if (error.message.includes('already registered')) {
-          toast({
-            title: 'E-Mail bereits registriert',
-            description: 'Diese E-Mail-Adresse ist bereits registriert. Bitte logge dich ein.',
-            variant: 'destructive',
-          });
+          toast({ title: t('auth.emailAlreadyRegistered'), description: t('auth.emailAlreadyRegisteredDesc'), variant: 'destructive' });
         } else {
           throw error;
         }
       } else {
-        toast({
-          title: 'Registrierung erfolgreich!',
-          description: 'Du bist jetzt eingeloggt.',
-        });
+        toast({ title: t('auth.signupSuccess'), description: t('auth.signupSuccessDesc') });
         navigate(getRedirectPath());
       }
     } catch (error) {
       console.error('Signup error:', error);
-      toast({
-        title: 'Registrierung fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.signupFailed'), description: error instanceof Error ? error.message : t('auth.unknownError'), variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -165,45 +139,25 @@ export default function AuthPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      toast({
-        title: 'Fehlende Angaben',
-        description: 'Bitte gib E-Mail und Passwort ein.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.missingFields'), description: t('auth.missingFieldsDesc'), variant: 'destructive' });
       return;
     }
-
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          toast({
-            title: 'Ungültige Anmeldedaten',
-            description: 'E-Mail oder Passwort ist falsch.',
-            variant: 'destructive',
-          });
+          toast({ title: t('auth.invalidCredentials'), description: t('auth.invalidCredentialsDesc'), variant: 'destructive' });
         } else {
           throw error;
         }
       } else {
-        toast({
-          title: 'Willkommen zurück!',
-          description: 'Du bist jetzt eingeloggt.',
-        });
+        toast({ title: t('auth.welcomeBack'), description: t('auth.nowLoggedIn') });
         navigate(getRedirectPath());
       }
     } catch (error) {
       console.error('Signin error:', error);
-      toast({
-        title: 'Anmeldung fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten.',
-        variant: 'destructive',
-      });
+      toast({ title: t('auth.loginFailed'), description: error instanceof Error ? error.message : t('auth.unknownError'), variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -218,16 +172,16 @@ export default function AuthPage() {
       });
       if (error) {
         toast({
-          title: 'Google Login fehlgeschlagen',
-          description: error.message || 'Ein Fehler ist aufgetreten.',
+        title: t('auth.googleLoginFailed'),
+          description: error.message || t('auth.unknownError'),
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Google sign-in error:', error);
       toast({
-        title: 'Google Login fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten.',
+        title: t('auth.googleLoginFailed'),
+        description: error instanceof Error ? error.message : t('auth.unknownError'),
         variant: 'destructive',
       });
     } finally {
@@ -243,16 +197,16 @@ export default function AuthPage() {
       });
       if (error) {
         toast({
-          title: 'Apple Login fehlgeschlagen',
-          description: error.message || 'Ein Fehler ist aufgetreten.',
+        title: t('auth.appleLoginFailed'),
+          description: error.message || t('auth.unknownError'),
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Apple sign-in error:', error);
       toast({
-        title: 'Apple Login fehlgeschlagen',
-        description: error instanceof Error ? error.message : 'Ein Fehler ist aufgetreten.',
+        title: t('auth.appleLoginFailed'),
+        description: error instanceof Error ? error.message : t('auth.unknownError'),
         variant: 'destructive',
       });
     } finally {
@@ -279,12 +233,10 @@ export default function AuthPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-slate-900 mb-3">
-            {t('auth.emailSent')}
+            {t('auth.magicLinkSentTitle')}
           </h1>
           <p className="text-slate-600 mb-6">
-            {t('auth.magicLinkSentDesc').replace('{email}', '')}
-            <strong className="text-slate-900">{email}</strong>
-            {'.'}
+            {t('auth.magicLinkSentDesc', { email })}
           </p>
           
           <Button
@@ -292,7 +244,7 @@ export default function AuthPage() {
             className="w-full h-12 text-base border-slate-300 text-slate-700 hover:bg-slate-100"
             onClick={() => setMagicLinkSent(false)}
           >
-            {t('auth.backToSignIn')}
+            {t('auth.backToLogin')}
           </Button>
         </div>
       </div>
@@ -326,10 +278,10 @@ export default function AuthPage() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-            {t('auth.welcomeTitle')}
+            {t('auth.welcome')}
           </h1>
           <p className="text-white/80 text-lg">
-            {t('auth.welcomeSubtitle')}
+            {t('auth.tagline')}
           </p>
         </div>
 
@@ -378,7 +330,7 @@ export default function AuthPage() {
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-slate-400 font-medium">{t('auth.or')}</span>
+              <span className="bg-white px-4 text-slate-400 font-medium">{t('auth.orDivider')}</span>
             </div>
           </div>
 
@@ -410,7 +362,7 @@ export default function AuthPage() {
               <form onSubmit={handleMagicLink} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="magic-email" className="text-slate-700 font-medium">
-                    {t('auth.emailAddress')}
+                    {t('auth.emailLabel')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -450,7 +402,7 @@ export default function AuthPage() {
                   )}
                 </Button>
                 <p className="text-sm text-slate-500 text-center">
-                  {t('auth.magicLinkInfo')}
+                  {t('auth.magicLinkHint')}
                 </p>
               </form>
             </TabsContent>
@@ -460,7 +412,7 @@ export default function AuthPage() {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="text-slate-700 font-medium">
-                    {t('auth.emailAddress')}
+                    {t('auth.emailLabel')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -477,14 +429,14 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password" className="text-slate-700 font-medium">
-                    {t('auth.password')}
+                    {t('auth.passwordLabel')}
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="login-password"
                       type="password"
-                      placeholder="••••••••"
+                      placeholder={t('auth.passwordPlaceholder')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -524,7 +476,7 @@ export default function AuthPage() {
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name" className="text-slate-700 font-medium">
-                    {t('auth.displayName')} <span className="text-slate-400 font-normal">({t('auth.displayNameOptional')})</span>
+                    {t('auth.displayNameLabel')} <span className="text-slate-400 font-normal">{t('auth.displayNameOptional')}</span>
                   </Label>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -541,7 +493,7 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="text-slate-700 font-medium">
-                    {t('auth.emailAddress')}
+                    {t('auth.emailLabel')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -558,14 +510,14 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="text-slate-700 font-medium">
-                    {t('auth.password')}
+                    {t('auth.passwordLabel')}
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder={t('auth.passwordMin')}
+                      placeholder={t('auth.passwordMinLength')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -581,7 +533,7 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      {t('auth.creatingAccount')}
+                      {t('auth.registering')}
                     </>
                   ) : (
                     t('auth.createAccount')
@@ -594,7 +546,7 @@ export default function AuthPage() {
 
         {/* Footer */}
         <p className="text-center text-white/60 text-sm mt-6">
-          {t('auth.termsNotice')}
+          {t('auth.footer')}
         </p>
       </div>
     </div>
