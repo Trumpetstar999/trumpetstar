@@ -47,7 +47,14 @@
     "magicLinkSentToast": "Čarobna povezava poslana!",
     "magicLinkSentToastDesc": "Preverite e-pošto in kliknite na povezavo za prijavo.",
     "error": "Napaka",
-    "unknownError": "Prišlo je do napake."
+    "unknownError": "Prišlo je do napake.",
+    "login": "Prijava",
+    "logout": "Odjava",
+    "register": "Registracija",
+    "email": "E-pošta",
+    "password": "Geslo",
+    "forgotPassword": "Pozabljeno geslo?",
+    "signedOutSuccess": "Uspešno ste se odjavili"
   },
   "welcome": {
     "next": "Naprej",
@@ -109,15 +116,6 @@
     "resultsCount": "{{count}} rezultat",
     "resultsCount_other": "{{count}} rezultati",
     "articleInGerman": "Celoten članek je na voljo v nemščini — slovenska različica kmalu."
-  },
-  "auth": {
-    "login": "Prijava",
-    "logout": "Odjava",
-    "register": "Registracija",
-    "email": "E-pošta",
-    "password": "Geslo",
-    "forgotPassword": "Pozabljeno geslo?",
-    "signedOutSuccess": "Uspešno ste se odjavili"
   },
   "navigation": {
     "levels": "Lekcije",

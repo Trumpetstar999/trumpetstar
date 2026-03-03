@@ -47,7 +47,14 @@
     "magicLinkSentToast": "Magic Link gesendet!",
     "magicLinkSentToastDesc": "Überprüfe deine E-Mails und klicke auf den Link zum Einloggen.",
     "error": "Fehler",
-    "unknownError": "Ein Fehler ist aufgetreten."
+    "unknownError": "Ein Fehler ist aufgetreten.",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "forgotPassword": "Passwort vergessen?",
+    "signedOutSuccess": "Erfolgreich abgemeldet"
   },
   "welcome": {
     "next": "Weiter",
@@ -109,15 +116,6 @@
     "noResults": "Keine Ergebnisse gefunden",
     "resultsCount": "{{count}} Ergebnis",
     "resultsCount_other": "{{count}} Ergebnisse"
-  },
-  "auth": {
-    "login": "Anmelden",
-    "logout": "Abmelden",
-    "register": "Registrieren",
-    "email": "E-Mail",
-    "password": "Passwort",
-    "forgotPassword": "Passwort vergessen?",
-    "signedOutSuccess": "Erfolgreich abgemeldet"
   },
   "navigation": {
     "levels": "Levels",
