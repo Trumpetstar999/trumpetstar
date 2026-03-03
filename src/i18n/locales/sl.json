@@ -70,6 +70,25 @@
     "footerLinkPricing": "Cene",
     "footerCopyright": "Vse pravice pridržane."
   },
+  "lead": {
+    "firstName": "Ime",
+    "firstNamePlaceholder": "Tvoje ime",
+    "email": "E-pošta",
+    "emailPlaceholder": "tvoj@email.com",
+    "iAm": "Sem...",
+    "segmentAdult": "Odrasli začetnik / ponovni učenec",
+    "segmentParent": "Starš – otrok (6–14 let)",
+    "segmentTeacher": "Učitelj glasbe",
+    "privacyText": "Strinjam se, da me TrumpetStar kontaktira po e-pošti. Odjava kadar koli možna.",
+    "privacyLink": "Zasebnost",
+    "submit": "Začni brezplačno zdaj",
+    "sending": "Pošiljanje...",
+    "noSpam": "Brez neželene pošte. Samo koristni nasveti za tvojo pot s trobento.",
+    "successTitle": "Dobrodošel v TrumpetStar! 🎺",
+    "successDesc": "Tvoj račun je bil ustvarjen! Preveri e-pošto – tvoja povezava za prijavo je na poti.",
+    "alreadyRegistered": "Že si registriran!",
+    "errorGeneric": "Nekaj je šlo narobe. Prosim, poskusi znova pozneje."
+  },
   "welcome": {
     "next": "Naprej",
     "skip": "Preskoči",

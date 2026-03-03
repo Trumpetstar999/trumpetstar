@@ -70,6 +70,25 @@
     "footerLinkPricing": "Pricing",
     "footerCopyright": "All rights reserved."
   },
+  "lead": {
+    "firstName": "First name",
+    "firstNamePlaceholder": "Your first name",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "iAm": "I am...",
+    "segmentAdult": "Adult beginner / returning player",
+    "segmentParent": "Parent – child (6–14 years)",
+    "segmentTeacher": "Music teacher",
+    "privacyText": "I agree that TrumpetStar may contact me by email. Unsubscribe anytime.",
+    "privacyLink": "Privacy policy",
+    "submit": "Start for free now",
+    "sending": "Sending...",
+    "noSpam": "No spam. Only valuable tips for your trumpet journey.",
+    "successTitle": "Welcome to TrumpetStar! 🎺",
+    "successDesc": "Your account has been created! Check your emails – your login link is on its way.",
+    "alreadyRegistered": "You are already registered!",
+    "errorGeneric": "Something went wrong. Please try again later."
+  },
   "welcome": {
     "next": "Next",
     "skip": "Skip",
