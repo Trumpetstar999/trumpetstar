@@ -9,12 +9,11 @@ import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import LeadCaptureForm from '@/components/LeadCaptureForm';
 import appScreenshot from '@/assets/trumpetstar-app-screenshot.png';
 import { useLanguage } from '@/hooks/useLanguage';
-import type { Language } from '@/hooks/useLanguage';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
 
   // Check session and redirect if logged in
   useEffect(() => {
@@ -76,19 +75,6 @@ export default function LandingPage() {
       <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)]">
         {/* Hero Section */}
         <section className="relative max-w-5xl mx-auto px-5 pt-16 pb-20 text-center">
-          {/* Language Switcher */}
-          <div className="absolute top-4 right-4 z-10">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value as Language)}
-              className="bg-white/10 border border-white/20 text-white rounded-lg px-3 py-1.5 text-sm cursor-pointer backdrop-blur-sm hover:bg-white/20 transition-colors"
-            >
-              <option value="de">🇩🇪 DE</option>
-              <option value="en">🇬🇧 EN</option>
-              <option value="es">🇪🇸 ES</option>
-              <option value="sl">🇸🇮 SL</option>
-            </select>
-          </div>
 
           <div className="flex justify-center mb-8">
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-20 w-auto drop-shadow-lg" />
