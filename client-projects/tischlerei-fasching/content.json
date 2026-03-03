@@ -22,9 +22,9 @@
       "secondary": { "text": "03325/8228", "href": "tel:+433325822800" }
     },
     "slides": [
-      { "src": "/images/hero-1.jpg", "alt": "Maßgefertigte Holzmöbel aus der Tischlerei Fasching" },
-      { "src": "/images/hero-2.jpg", "alt": "Moderne Küche nach Maß – Tischlerei Fasching" },
-      { "src": "/images/hero-3.jpg", "alt": "Einbauschrank in Wohnzimmer – Maßanfertigung" }
+      { "src": "/images/hero-1.jpg", "alt": "Tischlerei Fasching OG auf der Fachmesse – Einblick in unsere Arbeit" },
+      { "src": "/images/hero-2.jpg", "alt": "Tischlerei Fasching – Präsentation auf Fachmesse" },
+      { "src": "/images/hero-3.jpg", "alt": "Tischlerei Fasching – Handwerkliche Qualität aus Mogersdorf" }
     ]
   },
   "leistungen": {
@@ -56,12 +56,12 @@
   "gallery": {
     "headline": "Einblicke in unsere Arbeit",
     "images": [
-      { "src": "/images/gallery-1.svg", "alt": "Maßküche in Holz und Weiß", "caption": "Küche nach Maß" },
-      { "src": "/images/gallery-2.svg", "alt": "Einbauschrank im Schlafzimmer", "caption": "Einbauschrank" },
-      { "src": "/images/gallery-3.svg", "alt": "Massivholz Sideboard", "caption": "Sideboard Massivholz" },
-      { "src": "/images/gallery-4.svg", "alt": "Badezimmermöbel Holz", "caption": "Badmöbel" },
-      { "src": "/images/gallery-5.svg", "alt": "Bücherregal nach Maß", "caption": "Bücherregal" },
-      { "src": "/images/gallery-6.svg", "alt": "Kinderzimmer Einbauschrank", "caption": "Kinderzimmer" }
+      { "src": "/images/gallery-1.jpg", "alt": "Maßgefertigter Wohnraum – Tischlerei Fasching OG", "caption": "Wohnraum nach Maß" },
+      { "src": "/images/gallery-2.jpg", "alt": "Badmöbel maßgefertigt – Tischlerei Fasching", "caption": "Badezimmermöbel" },
+      { "src": "/images/gallery-3.jpg", "alt": "Maßmöbel aus heimischem Holz", "caption": "Maßarbeit" },
+      { "src": "/images/gallery-4.jpg", "alt": "Hochwertiges Möbelstück – Tischlerei Fasching", "caption": "Qualitätshandwerk" },
+      { "src": "/images/gallery-5.jpg", "alt": "Einbaumöbel maßgefertigt", "caption": "Einbau nach Maß" },
+      { "src": "/images/gallery-6.jpg", "alt": "Individuelle Tischlerarbeit Fasching OG", "caption": "Individuelle Fertigung" }
     ]
   },
   "faq": {
