@@ -1,0 +1,111 @@
+{
+  "site": {
+    "name": "Tischlerei Fasching OG",
+    "tagline": "Maßarbeit mit Herz. Seit 2010.",
+    "description": "Tischlerei Fasching OG – Maßgefertigte Möbel, Küchen und Innenausbau in Mogersdorf. Familiengeführt, regional, höchste Qualität.",
+    "url": "https://www.wohnen-fasching.com",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "Tischlerei Fasching OG | Maßmöbel & Innenausbau – Mogersdorf",
+    "description": "Familiengeführte Tischlerei in Mogersdorf. Maßgefertigte Möbel, Küchen, Einbauschränke & Raumausbau. ☎ 03325/8228",
+    "ogImage": "/images/og-image.jpg",
+    "canonical": "https://www.wohnen-fasching.com"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Maßarbeit,\ndie bleibt.",
+    "subheadline": "Wir fertigen Möbel, Küchen und Einbauten nach Ihrem Wunsch – handwerklich präzise, persönlich begleitet.",
+    "cta": {
+      "primary": { "text": "Jetzt Termin anfragen", "href": "#kontakt" },
+      "secondary": { "text": "03325/8228", "href": "tel:+433325822800" }
+    },
+    "slides": [
+      { "src": "/images/hero-1.jpg", "alt": "Maßgefertigte Holzmöbel aus der Tischlerei Fasching" },
+      { "src": "/images/hero-2.jpg", "alt": "Moderne Küche nach Maß – Tischlerei Fasching" },
+      { "src": "/images/hero-3.jpg", "alt": "Einbauschrank in Wohnzimmer – Maßanfertigung" }
+    ]
+  },
+  "leistungen": {
+    "headline": "Unsere Leistungen",
+    "subheadline": "Vom Entwurf bis zur Montage – alles aus einer Hand.",
+    "items": [
+      { "icon": "🪵", "title": "Maßmöbel", "text": "Schränke, Sideboards, Regale – nach Ihren Maßen und Vorstellungen gefertigt." },
+      { "icon": "🍳", "title": "Küchen", "text": "Planung und Fertigung Ihrer Traumküche – funktional, individuell, langlebig." },
+      { "icon": "🛁", "title": "Badmöbel", "text": "Maßgefertigte Möbel fürs Bad – wasserfest, schön, praktisch." },
+      { "icon": "🏠", "title": "Innenausbau", "text": "Wand- und Deckenverkleidungen, Böden, Türen – kompetenter Raumausbau." },
+      { "icon": "🔨", "title": "Reparaturen", "text": "Alte Möbel reparieren, restaurieren oder auffrischen – wir geben Holz ein zweites Leben." },
+      { "icon": "📐", "title": "Planung & Beratung", "text": "Persönliches Erstgespräch, 3D-Planung auf Wunsch, transparente Angebote." }
+    ]
+  },
+  "about": {
+    "headline": "Familienbetrieb mit Leidenschaft",
+    "text": "Seit 2010 steht Tischlerei Fasching OG für handwerkliche Präzision und persönlichen Service. Georg und Jochen Fasching führen den Betrieb mit dem Anspruch, dass jedes Stück ein Unikat ist – gefertigt in Mogersdorf, für Menschen in der Region.",
+    "highlights": ["Familiengeführt seit 2010", "Regional verwurzelt", "Persönliche Beratung", "Höchste Materialqualität"]
+  },
+  "testimonials": {
+    "headline": "Was unsere Kunden sagen",
+    "_note": "PLATZHALTER – durch echte Bewertungen ersetzen",
+    "items": [
+      { "name": "Familie Horvath, Jennersdorf", "text": "Die Einbauküche ist perfekt geworden. Präzise Arbeit, freundliche Beratung und pünktliche Lieferung – wir sind begeistert!" },
+      { "name": "M. Wagner, Güssing", "text": "Unser Kleiderschrank passt millimetergenau. Man merkt, dass hier echte Handwerker am Werk sind." },
+      { "name": "Fam. Schneider, Fehring", "text": "Sehr professionelle Abwicklung von der Planung bis zur Montage. Können wir nur weiterempfehlen!" }
+    ]
+  },
+  "gallery": {
+    "headline": "Einblicke in unsere Arbeit",
+    "images": [
+      { "src": "/images/gallery-1.svg", "alt": "Maßküche in Holz und Weiß", "caption": "Küche nach Maß" },
+      { "src": "/images/gallery-2.svg", "alt": "Einbauschrank im Schlafzimmer", "caption": "Einbauschrank" },
+      { "src": "/images/gallery-3.svg", "alt": "Massivholz Sideboard", "caption": "Sideboard Massivholz" },
+      { "src": "/images/gallery-4.svg", "alt": "Badezimmermöbel Holz", "caption": "Badmöbel" },
+      { "src": "/images/gallery-5.svg", "alt": "Bücherregal nach Maß", "caption": "Bücherregal" },
+      { "src": "/images/gallery-6.svg", "alt": "Kinderzimmer Einbauschrank", "caption": "Kinderzimmer" }
+    ]
+  },
+  "faq": {
+    "headline": "Häufig gestellte Fragen",
+    "items": [
+      { "q": "Wie lange dauert die Lieferung?", "a": "Je nach Umfang des Projekts beträgt die Fertigungszeit typischerweise 6–12 Wochen nach Auftragserteilung. Wir informieren Sie von Anfang an über realistische Zeitpläne." },
+      { "q": "In welcher Region sind Sie tätig?", "a": "Wir sind im südlichen Burgenland und der angrenzenden Steiermark tätig – von Güssing bis Fürstenfeld und Bad Radkersburg." },
+      { "q": "Was kostet eine Maßküche?", "a": "Die Kosten hängen stark von Größe, Materialien und Ausstattung ab. Gerne erstellen wir Ihnen ein individuelles Angebot nach einem kostenlosen Erstgespräch." },
+      { "q": "Welche Materialien verwenden Sie?", "a": "Wir arbeiten mit hochwertigen Massivhölzern, Furnierhölzern sowie modernen Lackoberflächen und Beschlägen führender Hersteller." },
+      { "q": "Kann ich meinen Wunsch auch digital planen lassen?", "a": "Ja – auf Wunsch erstellen wir 3D-Visualisierungen Ihrer Möbel, damit Sie sich das Ergebnis vorab genau vorstellen können." }
+    ]
+  },
+  "contact": {
+    "headline": "Kontakt aufnehmen",
+    "subheadline": "Kein Projekt ist zu groß oder zu klein. Wir freuen uns auf Ihre Anfrage.",
+    "phone": "03325/8228",
+    "email": "office@wohnen-fasching.com",
+    "address": "Mogersdorf 205, 8382 Mogersdorf",
+    "formPlaceholder": {
+      "name": "Ihr Name",
+      "email": "Ihre E-Mail",
+      "message": "Beschreiben Sie kurz Ihr Projekt...",
+      "submit": "Anfrage senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Tischlerei Fasching OG",
+    "links": [
+      { "text": "Impressum", "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ]
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "Tischlerei Fasching OG",
+      "Mogersdorf 205, 8382 Mogersdorf",
+      "Tel: 03325/8228",
+      "E-Mail: office@wohnen-fasching.com",
+      "Firmenbuch: FN 343558 h",
+      "UID: ATU65609433",
+      "Gesellschafter: Georg Fasching, Jochen Fasching",
+      "Behörde: Bezirkshauptmannschaft Jennersdorf",
+      "Berufsrecht: Gewerbeordnung (GewO) – www.ris.bka.gv.at"
+    ]
+  }
+}

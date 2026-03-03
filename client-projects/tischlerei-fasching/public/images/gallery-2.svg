@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#B8956A" opacity="0.25"/>
+  <rect x="0" y="0" width="800" height="600" fill="#FAF7F2"/>
+  <rect width="800" height="600" fill="#B8956A" opacity="0.18"/>
+  <rect x="150" y="120" width="500" height="360" rx="8" fill="#B8956A" opacity="0.2"/>
+  <rect x="180" y="150" width="440" height="300" rx="4" fill="#B8956A" opacity="0.15"/>
+  <text x="400" y="290" text-anchor="middle" fill="#5C3D2E" font-size="22" font-family="Georgia,serif" font-weight="bold">Einbauschrank</text>
+  <text x="400" y="330" text-anchor="middle" fill="#8B6347" font-size="15" font-family="sans-serif">Foto folgt</text>
+  <text x="400" y="365" text-anchor="middle" fill="#C8A96E" font-size="13" font-family="sans-serif">Tischlerei Fasching OG</text>
+</svg>
