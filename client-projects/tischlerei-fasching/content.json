@@ -24,19 +24,21 @@
     "slides": [
       { "src": "/images/hero-1.jpg", "alt": "Tischlerei Fasching OG auf der Fachmesse – Einblick in unsere Arbeit" },
       { "src": "/images/hero-2.jpg", "alt": "Tischlerei Fasching – Präsentation auf Fachmesse" },
-      { "src": "/images/hero-3.jpg", "alt": "Tischlerei Fasching – Handwerkliche Qualität aus Mogersdorf" }
+      { "src": "/images/hero-3.jpg", "alt": "Tischlerei Fasching – Handwerkliche Qualität aus Mogersdorf" },
+      { "src": "/images/hero-4.jpg", "alt": "Tischlerei Fasching – Innenausbau und Möbelplanung" },
+      { "src": "/images/hero-5.jpg", "alt": "Tischlerei Fasching – Maßarbeit für Wohnraum und Halle" }
     ]
   },
   "leistungen": {
     "headline": "Unsere Leistungen",
     "subheadline": "Vom Entwurf bis zur Montage – alles aus einer Hand.",
     "items": [
-      { "icon": "🪵", "title": "Maßmöbel", "text": "Schränke, Sideboards, Regale – nach Ihren Maßen und Vorstellungen gefertigt." },
-      { "icon": "🍳", "title": "Küchen", "text": "Planung und Fertigung Ihrer Traumküche – funktional, individuell, langlebig." },
-      { "icon": "🛁", "title": "Badmöbel", "text": "Maßgefertigte Möbel fürs Bad – wasserfest, schön, praktisch." },
-      { "icon": "🏠", "title": "Innenausbau", "text": "Wand- und Deckenverkleidungen, Böden, Türen – kompetenter Raumausbau." },
-      { "icon": "🔨", "title": "Reparaturen", "text": "Alte Möbel reparieren, restaurieren oder auffrischen – wir geben Holz ein zweites Leben." },
-      { "icon": "📐", "title": "Planung & Beratung", "text": "Persönliches Erstgespräch, 3D-Planung auf Wunsch, transparente Angebote." }
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Maßmöbel", "text": "Schränke, Sideboards, Regale – nach Ihren Maßen und Vorstellungen gefertigt." },
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Küchen", "text": "Planung und Fertigung Ihrer Traumküche – funktional, individuell, langlebig." },
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Badmöbel", "text": "Maßgefertigte Möbel fürs Bad – wasserfest, schön, praktisch." },
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Innenausbau", "text": "Wand- und Deckenverkleidungen, Böden, Türen – kompetenter Raumausbau." },
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Reparaturen", "text": "Alte Möbel reparieren, restaurieren oder auffrischen – wir geben Holz ein zweites Leben." },
+      { "image": "/images/leistung-innenausbau.jpg", "title": "Planung & Beratung", "text": "Persönliches Erstgespräch, 3D-Planung auf Wunsch, transparente Angebote." }
     ]
   },
   "about": {
@@ -80,6 +82,11 @@
     "phone": "03325/8228",
     "email": "office@wohnen-fasching.com",
     "address": "Mogersdorf 205, 8382 Mogersdorf",
+    "hours": [
+      { "label": "Mo – Fr", "time": "07:00 – 12:00" },
+      { "label": "Mo – Fr", "time": "12:40 – 17:00" },
+      { "label": "Sa", "time": "Geschlossen" }
+    ],
     "formPlaceholder": {
       "name": "Ihr Name",
       "email": "Ihre E-Mail",
@@ -92,6 +99,9 @@
     "links": [
       { "text": "Impressum", "href": "#impressum" },
       { "text": "Datenschutz", "href": "#datenschutz" }
+    ],
+    "social": [
+      { "name": "Facebook", "href": "https://www.facebook.com/georg.fasching.397", "icon": "facebook" }
     ]
   },
   "impressum": {

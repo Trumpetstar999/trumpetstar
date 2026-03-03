@@ -160,11 +160,14 @@ h1, h2, h3, h4 {
 }
 .nav-logo {
   height: 48px; width: auto;
-  filter: brightness(0) invert(1);
+  filter: brightness(1.15) contrast(1.05);
+  background: rgba(255,255,255,0.08);
+  padding: 4px 8px;
+  border-radius: 2px;
   transition: filter 0.2s, transform 0.2s;
 }
 .nav-logo-link:hover .nav-logo { transform: scale(1.03); }
-.site-nav.scrolled .nav-logo { filter: brightness(0) invert(1); }
+.site-nav.scrolled .nav-logo { filter: brightness(1.15) contrast(1.05); }
 
 .nav-links {
   display: flex; gap: 2.25rem; list-style: none; align-items: center;
@@ -351,6 +354,7 @@ h1, h2, h3, h4 {
   border-left: 4px solid transparent;
   transition: border-color 0.2s, transform 0.22s, box-shadow 0.22s, background 0.2s;
   position: relative;
+  overflow: hidden;
 }
 .leistung-card::before {
   content: '';
@@ -368,11 +372,20 @@ h1, h2, h3, h4 {
   font-size: 2rem; margin-bottom: 1.25rem;
   display: block; line-height: 1;
 }
+.leistung-img {
+  display: block;
+  height: 200px;
+  object-fit: cover;
+  margin: -2.25rem -2rem 1.5rem -2rem;
+  width: calc(100% + 4rem);
+}
+.leistung-text h3,
 .leistung-card h3 {
   font-size: 1.1rem; margin-bottom: 0.6rem;
   color: var(--charcoal); font-weight: 800;
   letter-spacing: -0.01em;
 }
+.leistung-text p,
 .leistung-card p {
   color: var(--text-light); font-size: 0.925rem; line-height: 1.7;
 }
@@ -681,6 +694,7 @@ details.faq-item summary:hover {
   color: var(--charcoal); font-size: 1rem;
   text-decoration: none; font-weight: 700;
 }
+.contact-info-content span { display: block; }
 .contact-info-content a:hover { color: var(--orange); }
 
 /* Contact Form — white card, sharp orange top accent */
@@ -778,11 +792,16 @@ footer.site-footer {
 }
 
 .footer-logo {
-  height: 34px; width: auto;
-  filter: brightness(0) invert(0.4);
+  height: 40px; width: auto;
+  filter: brightness(0) invert(0.65);
   transition: filter 0.2s;
+  opacity: 0.7;
 }
-.footer-logo:hover { filter: brightness(0) invert(0.6); }
+.footer-logo:hover { filter: brightness(0) invert(0.85); opacity: 1; }
+
+.footer-social { display: flex; gap: 1rem; align-items: center; }
+.footer-social a { color: rgba(255,255,255,0.4); transition: color 0.2s; text-decoration: none; }
+.footer-social a:hover { color: #1877F2; }
 
 .footer-copyright { font-size: 0.82rem; letter-spacing: 0.04em; }
 
