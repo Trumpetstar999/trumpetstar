@@ -54,7 +54,21 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
-    "signedOutSuccess": "Sesión cerrada correctamente"
+    "signedOutSuccess": "Sesión cerrada correctamente",
+    "toApp": "Ir a la App",
+    "navLearn": "Aprender",
+    "navPricing": "Precios",
+    "footerTagline": "Aprende trompeta con el Método Star – libro, videos y app para todas las edades.",
+    "footerLearnTitle": "Aprender",
+    "footerHelpTitle": "Ayuda",
+    "footerLinkLearn": "Aprender trompeta",
+    "footerLinkKids": "Para niños",
+    "footerLinkAdults": "Para adultos",
+    "footerLinkEmbouchure": "Embocadura & Respiración",
+    "footerLinkFirstNote": "Primera nota",
+    "footerLinkNoSound": "¿Sin sonido? ¡Ayuda!",
+    "footerLinkPricing": "Precios",
+    "footerCopyright": "Todos los derechos reservados."
   },
   "welcome": {
     "next": "Siguiente",

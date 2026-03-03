@@ -54,7 +54,21 @@
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot password?",
-    "signedOutSuccess": "Signed out successfully"
+    "signedOutSuccess": "Signed out successfully",
+    "toApp": "Go to App",
+    "navLearn": "Learn",
+    "navPricing": "Pricing",
+    "footerTagline": "Learn trumpet with the Star Method – book, videos and app for all ages.",
+    "footerLearnTitle": "Learn",
+    "footerHelpTitle": "Help",
+    "footerLinkLearn": "Learn Trumpet",
+    "footerLinkKids": "For Kids",
+    "footerLinkAdults": "For Adults",
+    "footerLinkEmbouchure": "Embouchure & Breathing",
+    "footerLinkFirstNote": "First Note",
+    "footerLinkNoSound": "No Sound? Help!",
+    "footerLinkPricing": "Pricing",
+    "footerCopyright": "All rights reserved."
   },
   "welcome": {
     "next": "Next",
