@@ -54,7 +54,21 @@
     "email": "E-pošta",
     "password": "Geslo",
     "forgotPassword": "Pozabljeno geslo?",
-    "signedOutSuccess": "Uspešno ste se odjavili"
+    "signedOutSuccess": "Uspešno ste se odjavili",
+    "toApp": "Na aplikacijo",
+    "navLearn": "Učenje",
+    "navPricing": "Cene",
+    "footerTagline": "Učite se trobente z metodo Star – knjiga, videi in aplikacija za vse starosti.",
+    "footerLearnTitle": "Učenje",
+    "footerHelpTitle": "Pomoč",
+    "footerLinkLearn": "Učiti se trobente",
+    "footerLinkKids": "Za otroke",
+    "footerLinkAdults": "Za odrasle",
+    "footerLinkEmbouchure": "Embušura & Dihanje",
+    "footerLinkFirstNote": "Prva nota",
+    "footerLinkNoSound": "Brez tona? Pomoč!",
+    "footerLinkPricing": "Cene",
+    "footerCopyright": "Vse pravice pridržane."
   },
   "welcome": {
     "next": "Naprej",

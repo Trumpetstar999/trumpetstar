@@ -54,7 +54,21 @@
     "email": "E-Mail",
     "password": "Passwort",
     "forgotPassword": "Passwort vergessen?",
-    "signedOutSuccess": "Erfolgreich abgemeldet"
+    "signedOutSuccess": "Erfolgreich abgemeldet",
+    "toApp": "Zur App",
+    "navLearn": "Lernen",
+    "navPricing": "Preise",
+    "footerTagline": "Trompete lernen mit der Star-Methode – Buch, Videos und App für alle Altersgruppen.",
+    "footerLearnTitle": "Lernen",
+    "footerHelpTitle": "Hilfe",
+    "footerLinkLearn": "Trompete lernen",
+    "footerLinkKids": "Für Kinder",
+    "footerLinkAdults": "Für Erwachsene",
+    "footerLinkEmbouchure": "Ansatz & Atmung",
+    "footerLinkFirstNote": "Erster Ton",
+    "footerLinkNoSound": "Kein Ton? Hilfe!",
+    "footerLinkPricing": "Preise",
+    "footerCopyright": "Alle Rechte vorbehalten."
   },
   "welcome": {
     "next": "Weiter",
