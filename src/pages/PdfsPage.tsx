@@ -47,7 +47,7 @@ export function PdfsPage() {
   const { user } = useAuth();
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
   const { setIsPdfViewerOpen } = usePdfViewer();
-  const { getPdfBlob, downloadProgress, isCached } = usePdfCache();
+  const { getPdfBlob, downloadProgress, isCached, clearCache } = usePdfCache();
   const { t } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
   
@@ -160,6 +160,37 @@ export function PdfsPage() {
       setPdfBlobUrl(null);
     }
   }, [pdfBlobUrl]);
+
+  // Retry: clear cached entry for selected PDF and re-download it
+  const handleRetryPdf = useCallback(async () => {
+    if (!selectedPdfId) return;
+    const pdf = pdfs.find(p => p.id === selectedPdfId);
+    if (!pdf) return;
+
+    // Revoke old blob URL first
+    if (pdfBlobUrl) {
+      URL.revokeObjectURL(pdfBlobUrl);
+      setPdfBlobUrl(null);
+    }
+    setPdfBlob(null);
+
+    // Clear the stale cache entry so download is forced
+    await clearCache(selectedPdfId);
+    setCachedStatus(prev => new Map(prev).set(selectedPdfId, false));
+
+    // Re-download and show the viewer again
+    const blob = await getPdfBlob(selectedPdfId, pdf.pdf_file_url);
+    if (blob) {
+      setPdfBlob(blob);
+      const url = URL.createObjectURL(blob);
+      setPdfBlobUrl(url);
+      setCurrentPage(1);
+      setCachedStatus(prev => new Map(prev).set(selectedPdfId, true));
+    } else {
+      toast.error('PDF konnte nicht neu geladen werden');
+      setSelectedPdfId(null);
+    }
+  }, [selectedPdfId, pdfs, pdfBlobUrl, clearCache, getPdfBlob]);
 
   // Filter PDFs by search and content language
   const filteredPdfs = pdfs.filter(pdf => {
@@ -290,6 +321,7 @@ export function PdfsPage() {
           onPageChange={setCurrentPage}
           audioTracks={audioTracks}
           onClose={handleClosePdf}
+          onRetry={handleRetryPdf}
         />
       )}
 

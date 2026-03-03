@@ -69,6 +69,7 @@ interface PdfViewerProps {
   onPageChange: (page: number) => void;
   audioTracks: AudioTrack[];
   onClose: () => void;
+  onRetry?: () => void;
 }
 
 // Brush colors
@@ -94,7 +95,7 @@ const HIGHLIGHTER_COLORS = [
 const BRUSH_SIZES = [2, 4, 6, 8, 12];
 const HIGHLIGHTER_SIZES = [12, 20, 28, 36];
 
-export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange, audioTracks, onClose }: PdfViewerProps) {
+export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange, audioTracks, onClose, onRetry }: PdfViewerProps) {
   const [searchParams] = useSearchParams();
   const { isAdmin } = useUserRole();
   const { user } = useAuth();
@@ -192,16 +193,18 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
     }
   }, [pdf.id, pdf.pdf_file_url, runDiagnostics]);
 
-  // Handle retry
+  // Handle retry: if parent provides onRetry (clears cache + re-downloads),
+  // use that. Otherwise fall back to closing so the user can manually reopen.
   const handleRetry = useCallback(() => {
     setLoadError(null);
     setIsLoading(true);
     setPdfDoc(null);
-    // Trigger reload by resetting
-    const reloadEvent = new CustomEvent('pdf-reload', { detail: pdf.id });
-    window.dispatchEvent(reloadEvent);
-    onClose();
-  }, [pdf.id, onClose]);
+    if (onRetry) {
+      onRetry();
+    } else {
+      onClose();
+    }
+  }, [onRetry, onClose]);
 
   // Load PDF document from blob URL or blob
   useEffect(() => {
