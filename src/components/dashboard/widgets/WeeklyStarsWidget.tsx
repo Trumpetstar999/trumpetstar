@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Star, TrendingUp, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { de } from 'date-fns/locale';
+import { de, en, es, sl } from 'date-fns/locale';
 
 interface DayStars {
   date: Date;
@@ -14,10 +15,14 @@ interface DayStars {
 
 export function WeeklyStarsWidget() {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const [weekData, setWeekData] = useState<DayStars[]>([]);
   const [totalWeekStars, setTotalWeekStars] = useState(0);
   const [loading, setLoading] = useState(true);
   const [animationPhase, setAnimationPhase] = useState(0);
+
+  const localeMap: Record<string, Locale> = { de, en, es, sl };
+  const dateLocale = localeMap[language] ?? de;
 
   useEffect(() => {
     if (!user) {
@@ -35,7 +40,7 @@ export function WeeklyStarsWidget() {
           const date = subDays(today, i);
           days.push({
             date,
-            dayLabel: format(date, 'EEE', { locale: de }),
+            dayLabel: format(date, 'EEE', { locale: dateLocale }),
             stars: 0,
             isToday: i === 0,
           });
@@ -96,7 +101,7 @@ export function WeeklyStarsWidget() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-white/60" />
-          <span className="text-sm text-white/60">Diese Woche</span>
+          <span className="text-sm text-white/60">{t('widgets.thisWeek')}</span>
         </div>
         <div className="flex items-center gap-2">
           <Star className="w-5 h-5 text-reward-gold fill-reward-gold" />
@@ -176,19 +181,19 @@ export function WeeklyStarsWidget() {
       {/* Encouragement message */}
       {totalWeekStars === 0 && (
         <p className="text-center text-white/50 text-sm py-2">
-          Schau Videos um Sterne zu sammeln! ⭐
+          {t('widgets.watchVideosForStars')}
         </p>
       )}
       
       {totalWeekStars > 0 && totalWeekStars < 7 && (
         <p className="text-center text-white/60 text-sm">
-          Weiter so! 🎯
+          {t('widgets.keepGoing')}
         </p>
       )}
       
       {totalWeekStars >= 7 && (
         <p className="text-center text-reward-gold text-sm font-medium">
-          Fantastische Woche! 🏆
+          {t('widgets.fantasticWeek')}
         </p>
       )}
     </div>

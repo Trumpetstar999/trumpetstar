@@ -36,6 +36,7 @@ import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 function WidgetContent({ id }: { id: WidgetId }) {
+  const { t } = useLanguage();
   switch (id) {
     case 'profile':
       return <ProfileWidget />;
@@ -60,7 +61,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
     case 'review':
       return <ReviewCard />;
     default:
-      return <div className="text-white/50 text-center py-8">Widget kommt bald...</div>;
+      return <div className="text-white/50 text-center py-8">{t('widgets.comingSoon')}</div>;
   }
 }
 
@@ -92,7 +93,7 @@ export function ProfilePage() {
 
   const getUpgradeButtonText = () => {
     if (planKey === 'PRO') return null;
-    if (planKey === 'BASIC') return 'Pro freischalten';
+    if (planKey === 'BASIC') return t('widgets.unlockPro');
     return 'Pricing';
   };
 
@@ -190,12 +191,12 @@ export function ProfilePage() {
           <DialogTrigger asChild>
             <Button variant="ghost" size="sm" className="text-white/30 hover:text-white/60 text-xs gap-1.5">
               <Scale className="w-3 h-3" />
-              Impressum
+              {t('profile.impressumTitle')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh]">
             <DialogHeader>
-              <DialogTitle>Impressum</DialogTitle>
+              <DialogTitle>{t('profile.impressumTitle')}</DialogTitle>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh] pr-4">
               <div className="space-y-4 text-sm text-muted-foreground">

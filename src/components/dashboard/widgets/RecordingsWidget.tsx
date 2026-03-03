@@ -1,5 +1,6 @@
 import { useRecordings } from '@/hooks/useRecordings';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Video, Plus, Eye, Play } from 'lucide-react';
 import { useRef, useEffect } from 'react';
@@ -7,6 +8,7 @@ import { useRef, useEffect } from 'react';
 export function RecordingsWidget() {
   const { recordings, loading } = useRecordings();
   const { navigateToTab } = useTabNavigation();
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const latestRecording = recordings[0];
@@ -57,7 +59,7 @@ export function RecordingsWidget() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Video className="w-5 h-5 text-blue-400" />
-          <h3 className="text-white font-semibold">Meine Aufnahmen</h3>
+          <h3 className="text-white font-semibold">{t('widgets.recordings')}</h3>
         </div>
         <span className="text-white/70 text-sm">{recordingsCount} Videos</span>
       </div>
@@ -100,7 +102,7 @@ export function RecordingsWidget() {
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/10 flex items-center justify-center">
             <Video className="w-6 h-6 text-white/50" />
           </div>
-          <p className="text-white/70 text-sm">Noch keine Aufnahmen</p>
+          <p className="text-white/70 text-sm">{t('widgets.noRecordings')}</p>
         </div>
       )}
 

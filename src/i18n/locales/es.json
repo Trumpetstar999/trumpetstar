@@ -294,7 +294,11 @@
     "done": "Listo",
     "reset": "Restablecer",
     "dragHint": "Mantén presionado y arrastra una tarjeta para cambiar el orden",
-    "premiumHint": "Puedes cambiar a Premium en cualquier momento – tu progreso se guarda."
+    "premiumHint": "Puedes cambiar a Premium en cualquier momento – tu progreso se guarda.",
+    "impressumTitle": "Aviso Legal",
+    "disputeResolution": "Resolución de disputas en línea",
+    "liabilityNote": "Aviso de responsabilidad",
+    "copyright": "Derechos de autor"
   },
   "widgets": {
     "profile": "Perfil",
@@ -308,7 +312,26 @@
     "gameHighscore": "Puntuación del Juego",
     "recentVideos": "Reproducido Recientemente",
     "weeklyGoals": "Objetivos Semanales",
-    "practiceSessions": "Sesiones de Práctica"
+    "practiceSessions": "Sesiones de Práctica",
+    "thisWeek": "Esta semana",
+    "daysStreak": "Racha de días",
+    "minutesToday": "Minutos hoy",
+    "totalPlaytime": "Tiempo total",
+    "videosWatched": "Videos vistos",
+    "activeDays": "Días activos",
+    "watchVideosForStars": "¡Mira videos para coleccionar estrellas! ⭐",
+    "keepGoing": "¡Sigue así! 🎯",
+    "fantasticWeek": "¡Semana fantástica! 🏆",
+    "classroomProOnly": "Las clases en vivo son parte de Pro",
+    "unlockPro": "Desbloquear Pro",
+    "nowAvailable": "Disponible ahora",
+    "startLiveSession": "Iniciar una sesión en vivo",
+    "nextAppointment": "Próxima cita",
+    "nonePlanned": "Ninguno planificado",
+    "join": "Unirse",
+    "noPracticeSessions": "Aún no hay sesiones de práctica",
+    "noRecordings": "Aún no hay grabaciones",
+    "comingSoon": "Widget próximamente..."
   },
   "game": {
     "noHighscoresYet": "Sin puntuaciones aún",

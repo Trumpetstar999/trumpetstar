@@ -1,10 +1,12 @@
 import { usePracticeSessions } from '@/hooks/usePracticeSessions';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Music, Play, Plus, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function PracticeSessionsWidget() {
   const { sessions, isLoading } = usePracticeSessions();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const formatDuration = (seconds: number) => {
@@ -19,7 +21,7 @@ export function PracticeSessionsWidget() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Music className="w-5 h-5 text-purple-400" />
-          <h3 className="text-white font-semibold">Meine Übesessions</h3>
+          <h3 className="text-white font-semibold">{t('widgets.practiceSessions')}</h3>
         </div>
         <span className="text-white/70 text-sm">{sessions.length} Sessions</span>
       </div>
@@ -57,7 +59,7 @@ export function PracticeSessionsWidget() {
           <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/10 flex items-center justify-center">
             <Music className="w-6 h-6 text-white/50" />
           </div>
-          <p className="text-white/70 text-sm">Noch keine Übesessions</p>
+          <p className="text-white/70 text-sm">{t('widgets.noPracticeSessions')}</p>
         </div>
       )}
 

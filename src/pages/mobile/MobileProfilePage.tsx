@@ -64,7 +64,7 @@ const LANG_OPTIONS: { code: Language; flag: string; label: string }[] = [
 export default function MobileProfilePage() {
   const { user, signOut } = useAuth();
   const { planKey } = useMembership();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -194,12 +194,12 @@ export default function MobileProfilePage() {
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="text-white/30 hover:text-white/60 text-xs gap-1.5">
                 <Scale className="w-3 h-3" />
-                Impressum
+                {t('profile.impressumTitle')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[80vh]">
               <DialogHeader>
-                <DialogTitle>Impressum</DialogTitle>
+                <DialogTitle>{t('profile.impressumTitle')}</DialogTitle>
               </DialogHeader>
               <ScrollArea className="max-h-[60vh] pr-4">
                 <div className="space-y-4 text-sm text-muted-foreground">
@@ -220,7 +220,7 @@ export default function MobileProfilePage() {
                     <p>Web: www.trumpetstar.com</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Online-Streitbeilegung</p>
+                    <p className="font-semibold text-foreground">{t('profile.disputeResolution')}</p>
                     <p>
                       Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
                       <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
@@ -229,7 +229,7 @@ export default function MobileProfilePage() {
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Haftungshinweis</p>
+                    <p className="font-semibold text-foreground">{t('profile.liabilityNote')}</p>
                     <p>Trotz sorgfältiger Prüfung übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte.</p>
                   </div>
                   <p className="text-xs text-muted-foreground/60 pt-2">Angaben gemäß §5 ECG, §14 UGB, §63 GewO, §25 MedienG</p>

@@ -294,7 +294,11 @@
     "done": "Končano",
     "reset": "Ponastavi",
     "dragHint": "Pridržite in povlecite ploščico, da spremenite vrstni red",
-    "premiumHint": "Kadarkoli se lahko preklopite na Premium – vaš napredek se ohrani."
+    "premiumHint": "Kadarkoli se lahko preklopite na Premium – vaš napredek se ohrani.",
+    "impressumTitle": "Pravne informacije",
+    "disputeResolution": "Spletno reševanje sporov",
+    "liabilityNote": "Omejitev odgovornosti",
+    "copyright": "Avtorske pravice"
   },
   "widgets": {
     "profile": "Profil",
@@ -308,7 +312,26 @@
     "gameHighscore": "Rekord igre",
     "recentVideos": "Nedavno predvajano",
     "weeklyGoals": "Tedenski cilji",
-    "practiceSessions": "Vadbenice"
+    "practiceSessions": "Vadbenice",
+    "thisWeek": "Ta teden",
+    "daysStreak": "Dnevi zapored",
+    "minutesToday": "Minut danes",
+    "totalPlaytime": "Skupni čas igranja",
+    "videosWatched": "Ogledanih videov",
+    "activeDays": "Aktivni dnevi",
+    "watchVideosForStars": "Oglej si videoposnetke za zbiranje zvezdic! ⭐",
+    "keepGoing": "Nadaljuj tako! 🎯",
+    "fantasticWeek": "Fantastičen teden! 🏆",
+    "classroomProOnly": "Živi pouk je del plana Pro",
+    "unlockPro": "Odkleni Pro",
+    "nowAvailable": "Na voljo zdaj",
+    "startLiveSession": "Začni živo sejo",
+    "nextAppointment": "Naslednji termin",
+    "nonePlanned": "Ni načrtovan",
+    "join": "Pridruži se",
+    "noPracticeSessions": "Še ni vadbenih sej",
+    "noRecordings": "Še ni posnetkov",
+    "comingSoon": "Widget kmalu..."
   },
   "game": {
     "noHighscoresYet": "Še ni rekordov",

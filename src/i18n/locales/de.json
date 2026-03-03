@@ -294,7 +294,11 @@
     "done": "Fertig",
     "reset": "Zurücksetzen",
     "dragHint": "Halte eine Kachel gedrückt und ziehe sie, um die Reihenfolge zu ändern",
-    "premiumHint": "Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten."
+    "premiumHint": "Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten.",
+    "impressumTitle": "Impressum",
+    "disputeResolution": "Online-Streitbeilegung",
+    "liabilityNote": "Haftungshinweis",
+    "copyright": "Urheberrecht"
   },
   "widgets": {
     "profile": "Profil",
@@ -308,7 +312,26 @@
     "gameHighscore": "Game Highscore",
     "recentVideos": "Zuletzt gespielt",
     "weeklyGoals": "Wochenziele",
-    "practiceSessions": "Übesessions"
+    "practiceSessions": "Übesessions",
+    "thisWeek": "Diese Woche",
+    "daysStreak": "Tage Streak",
+    "minutesToday": "Minuten heute",
+    "totalPlaytime": "Spielzeit gesamt",
+    "videosWatched": "Videos angeschaut",
+    "activeDays": "Aktive Tage",
+    "watchVideosForStars": "Schau Videos um Sterne zu sammeln! ⭐",
+    "keepGoing": "Weiter so! 🎯",
+    "fantasticWeek": "Fantastische Woche! 🏆",
+    "classroomProOnly": "Live-Unterricht ist Teil von Pro",
+    "unlockPro": "Pro freischalten",
+    "nowAvailable": "Jetzt verfügbar",
+    "startLiveSession": "Starte eine Live-Session",
+    "nextAppointment": "Nächster Termin",
+    "nonePlanned": "Keiner geplant",
+    "join": "Beitreten",
+    "noPracticeSessions": "Noch keine Übesessions",
+    "noRecordings": "Noch keine Aufnahmen",
+    "comingSoon": "Widget kommt bald..."
   },
   "game": {
     "noHighscoresYet": "Noch keine Highscores",

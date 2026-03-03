@@ -1,7 +1,9 @@
 import { Star, Flame, Clock } from 'lucide-react';
 import { mockStats } from '@/data/mockData';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function StarsProgressWidget() {
+  const { t } = useLanguage();
   const stats = mockStats;
 
   return (
@@ -13,7 +15,7 @@ export function StarsProgressWidget() {
             <Star className="w-5 h-5 text-reward-gold fill-reward-gold" />
           </div>
           <p className="text-2xl font-bold text-white">{stats.weekStars}</p>
-          <p className="text-xs text-white/70">Diese Woche</p>
+          <p className="text-xs text-white/70">{t('widgets.thisWeek')}</p>
         </div>
         
         <div className="text-center p-4 bg-white/10 rounded-xl">
@@ -21,7 +23,7 @@ export function StarsProgressWidget() {
             <Flame className="w-5 h-5 text-accent-red" />
           </div>
           <p className="text-2xl font-bold text-white">{stats.streak}</p>
-          <p className="text-xs text-white/70">Tage Streak</p>
+          <p className="text-xs text-white/70">{t('widgets.daysStreak')}</p>
         </div>
         
         <div className="text-center p-4 bg-white/10 rounded-xl">
@@ -29,7 +31,7 @@ export function StarsProgressWidget() {
             <Clock className="w-5 h-5 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-white">{stats.todayMinutes}</p>
-          <p className="text-xs text-white/70">Minuten heute</p>
+          <p className="text-xs text-white/70">{t('widgets.minutesToday')}</p>
         </div>
       </div>
     </div>

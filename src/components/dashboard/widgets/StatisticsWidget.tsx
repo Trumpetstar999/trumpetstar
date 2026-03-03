@@ -1,7 +1,9 @@
 import { BarChart3, Clock, Video, Calendar } from 'lucide-react';
 import { mockStats, mockActivities } from '@/data/mockData';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function StatisticsWidget() {
+  const { t } = useLanguage();
   const stats = mockStats;
   
   // Calculate active days this month
@@ -17,21 +19,21 @@ export function StatisticsWidget() {
   const statItems = [
     {
       icon: Clock,
-      label: 'Spielzeit gesamt',
+      label: t('widgets.totalPlaytime'),
       value: `${Math.floor(stats.weekMinutes * 4)} Min`,
       color: 'text-blue-400',
       bgColor: 'bg-blue-500/20',
     },
     {
       icon: Video,
-      label: 'Videos angeschaut',
+      label: t('widgets.videosWatched'),
       value: totalVideosWatched.toString(),
       color: 'text-yellow-400',
       bgColor: 'bg-yellow-500/20',
     },
     {
       icon: Calendar,
-      label: 'Aktive Tage',
+      label: t('widgets.activeDays'),
       value: activeDaysThisMonth.toString(),
       color: 'text-green-400',
       bgColor: 'bg-green-500/20',
@@ -42,7 +44,7 @@ export function StatisticsWidget() {
     <div>
       <div className="flex items-center gap-2 mb-4">
         <BarChart3 className="w-5 h-5 text-blue-400" />
-        <h3 className="text-white font-semibold">Statistik</h3>
+        <h3 className="text-white font-semibold">{t('widgets.statistics')}</h3>
       </div>
 
       <div className="space-y-3">
