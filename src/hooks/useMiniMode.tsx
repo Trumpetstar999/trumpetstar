@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const MINI_MODE_BREAKPOINT = 900;
+const MINI_MODE_BREAKPOINT = 768;
 
 export function useMiniMode() {
   const [isMiniMode, setIsMiniMode] = useState<boolean>(() => {
