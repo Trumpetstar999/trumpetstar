@@ -64,13 +64,12 @@ const LANG_OPTIONS: { code: Language; flag: string; label: string }[] = [
 export default function MobileProfilePage() {
   const { user, signOut } = useAuth();
   const { planKey } = useMembership();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t: tGlobal } = useLanguage();
+  const texts = TEXTS[language as keyof typeof TEXTS] || TEXTS.de;
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-
-  const t = TEXTS[language] || TEXTS.de;
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -87,13 +86,13 @@ export default function MobileProfilePage() {
 
   const handleSignOut = async () => {
     await signOut();
-    toast.success(t.loggedOut);
+    toast.success(texts.loggedOut);
   };
 
   return (
     <MobileLayout>
       <div className="px-5 py-6 space-y-6">
-        <h1 className="text-2xl font-bold text-white">{t.title}</h1>
+        <h1 className="text-2xl font-bold text-white">{texts.title}</h1>
 
         {/* Profile Card */}
         <Card className="border-0 shadow-lg">
@@ -106,32 +105,32 @@ export default function MobileProfilePage() {
             </Avatar>
 
             <div>
-              <h2 className="text-lg font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-foreground">
                 {profile?.display_name || user?.email?.split('@')[0]}
               </h2>
-              <p className="text-slate-500 text-sm">{user?.email}</p>
+              <p className="text-muted-foreground text-sm">{user?.email}</p>
             </div>
 
             <Badge className="bg-primary/10 text-primary border-primary/20 font-semibold">
-              {t.plan}: {PLAN_DISPLAY_NAMES[planKey]}
+              {texts.plan}: {PLAN_DISPLAY_NAMES[planKey]}
             </Badge>
 
             <Button
               variant="outline"
-              className="w-full h-11 border-slate-200 text-slate-700 gap-2"
+              className="w-full h-11 gap-2"
               onClick={() => setEditDialogOpen(true)}
             >
               <Edit2 className="w-4 h-4" />
-              {t.editProfile}
+              {texts.editProfile}
             </Button>
 
             <Button
               variant="outline"
-              className="w-full h-11 border-slate-200 text-slate-700 gap-2"
+              className="w-full h-11 gap-2"
               onClick={() => setPasswordDialogOpen(true)}
             >
               <Lock className="w-4 h-4" />
-              {t.changePassword}
+              {texts.changePassword}
             </Button>
           </CardContent>
         </Card>
@@ -157,7 +156,7 @@ export default function MobileProfilePage() {
         {/* Language Selector */}
         <Card className="border-0 shadow-lg">
           <CardContent className="p-5 space-y-3">
-            <h3 className="font-bold text-slate-900 text-sm">{t.language}</h3>
+            <h3 className="font-bold text-foreground text-sm">{texts.language}</h3>
             <div className="flex gap-2">
               {LANG_OPTIONS.map((opt) => (
                 <button
@@ -167,7 +166,7 @@ export default function MobileProfilePage() {
                     'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all min-h-[44px]',
                     language === opt.code
                       ? 'bg-primary/10 border-2 border-primary text-primary'
-                      : 'bg-slate-50 border-2 border-transparent text-slate-600 hover:bg-slate-100'
+                      : 'bg-muted border-2 border-transparent text-muted-foreground hover:bg-muted/80'
                   )}
                 >
                   <span>{opt.flag}</span>
@@ -181,11 +180,11 @@ export default function MobileProfilePage() {
         {/* Logout */}
         <Button
           variant="outline"
-          className="w-full h-12 border-red-200 text-red-600 hover:bg-red-50 gap-2"
+          className="w-full h-12 border-destructive/30 text-destructive hover:bg-destructive/10 gap-2"
           onClick={handleSignOut}
         >
           <LogOut className="w-4 h-4" />
-          {t.logout}
+          {texts.logout}
         </Button>
 
         {/* Impressum */}
@@ -194,12 +193,12 @@ export default function MobileProfilePage() {
             <DialogTrigger asChild>
               <Button variant="ghost" size="sm" className="text-white/30 hover:text-white/60 text-xs gap-1.5">
                 <Scale className="w-3 h-3" />
-                {t('profile.impressumTitle')}
+                {tGlobal('profile.impressumTitle')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[80vh]">
               <DialogHeader>
-                <DialogTitle>{t('profile.impressumTitle')}</DialogTitle>
+                <DialogTitle>{tGlobal('profile.impressumTitle')}</DialogTitle>
               </DialogHeader>
               <ScrollArea className="max-h-[60vh] pr-4">
                 <div className="space-y-4 text-sm text-muted-foreground">
@@ -220,7 +219,7 @@ export default function MobileProfilePage() {
                     <p>Web: www.trumpetstar.com</p>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">{t('profile.disputeResolution')}</p>
+                    <p className="font-semibold text-foreground">{tGlobal('profile.disputeResolution')}</p>
                     <p>
                       Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
                       <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
@@ -229,7 +228,7 @@ export default function MobileProfilePage() {
                     </p>
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">{t('profile.liabilityNote')}</p>
+                    <p className="font-semibold text-foreground">{tGlobal('profile.liabilityNote')}</p>
                     <p>Trotz sorgfältiger Prüfung übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte.</p>
                   </div>
                   <p className="text-xs text-muted-foreground/60 pt-2">Angaben gemäß §5 ECG, §14 UGB, §63 GewO, §25 MedienG</p>
