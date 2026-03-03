@@ -73,7 +73,17 @@ Autonomer Bau von Onepager-Websites:
 
 ## Aufruf durch Valentin
 ```bash
+# Standard Claude Code:
 ANTHROPIC_KEY=$(python3 -c "import json; d=json.load(open('/root/.openclaw/agents/main/agent/auth-profiles.json')); print(d['profiles']['anthropic:default']['key'])")
 cd /root/.openclaw/workspace/{PROJECT_NAME}
 ANTHROPIC_API_KEY=$ANTHROPIC_KEY claude -p "{task}" 2>&1
+
+# Mit Frontend-Design Plugin (für UI/UX Aufgaben):
+claude-design -p "{task}" 2>&1
+# Wrapper: /usr/local/bin/claude-design (auto-loads frontend-design skill)
 ```
+
+## Installiertes Plugin
+- **frontend-design** v1.0.0 — `~/.claude/plugins/frontend-design/`
+- Skill: Distinctive, production-grade UI — Bold aesthetics, kein generisches AI-Look
+- Laden: `--plugin-dir ~/.claude/plugins/frontend-design` oder Wrapper `claude-design`
