@@ -67,7 +67,31 @@
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot password?",
-    "signedOutSuccess": "Signed out successfully"
+    "signedOutSuccess": "Signed out successfully",
+    "welcomeTitle": "Welcome",
+    "welcomeSubtitle": "Learn trumpet? Easier than you think – even for adults.",
+    "or": "or",
+    "tabMagicLink": "Magic Link",
+    "tabLogin": "Login",
+    "tabRegister": "Register",
+    "emailAddress": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "displayName": "Display name",
+    "displayNameOptional": "optional",
+    "displayNamePlaceholder": "Your name",
+    "passwordMin": "At least 6 characters",
+    "rememberMe": "Stay signed in",
+    "sendMagicLink": "Send Magic Link",
+    "sendingLink": "Sending link...",
+    "magicLinkInfo": "You will receive a link via email to sign in without a password.",
+    "signingIn": "Signing in...",
+    "signIn": "Sign in",
+    "creatingAccount": "Creating account...",
+    "createAccount": "Create account",
+    "termsNotice": "By signing in, you agree to our terms of service",
+    "emailSent": "Email sent!",
+    "magicLinkSentDesc": "We sent a Magic Link to {email}. Click the link in the email to sign in.",
+    "backToSignIn": "Back to sign in"
   },
   "navigation": {
     "levels": "Levels",
@@ -516,6 +540,72 @@
     "hero": {
       "title": "Blog & Trumpet Tips",
       "subtitle": "Tips, guides and tutorials for trumpet learners."
+    }
+  },
+  "layout": {
+    "nav": {
+      "learn": "Learn",
+      "pricing": "Pricing",
+      "toApp": "Go to App",
+      "login": "Sign In"
+    },
+    "footer": {
+      "tagline": "Learn trumpet with the Star Method – book, videos and app for all ages.",
+      "learnSection": "Learn",
+      "helpSection": "Help",
+      "links": {
+        "learn": "Learn Trumpet",
+        "kids": "For Children",
+        "adults": "For Adults",
+        "technique": "Embouchure & Breathing",
+        "firstNote": "First Note",
+        "noSound": "No Sound? Help!",
+        "pricing": "Pricing"
+      },
+      "copyright": "All rights reserved."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Choose Your Learning Path",
+      "subtitle": "Whether you're a beginner or an ambitious musician – find the plan that fits your goals."
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "Can I cancel at any time?",
+      "a1": "Yes, you can cancel your subscription at any time. For annual plans, your access continues until the end of the paid period.",
+      "q2": "Can I switch between plans?",
+      "a2": "Absolutely! You can upgrade at any time. When switching to a higher plan, the remaining period is prorated.",
+      "q3": "Is there a money-back guarantee?",
+      "a3": "Yes, within the first 14 days you can cancel your subscription without giving a reason and receive a full refund."
+    }
+  },
+  "seo_hilfeKeinTon": {
+    "hero": {
+      "badge": "Troubleshooting",
+      "title": "No Sound from Your Trumpet?\nHere's How to Fix It",
+      "subtitle": "Don't panic! It's almost always small, easily correctable mistakes. This checklist helps in minutes.",
+      "goodNews": "95% of \"no sound\" problems are embouchure-related – not the instrument. We can fix this in 10 minutes.",
+      "ctaVideo": "Start & Book Video Support",
+      "ctaBack": "Back to the guide"
+    },
+    "cta": {
+      "title": "Stuck and can't move forward?",
+      "desc": "Via video call we can correct your embouchure directly – often in just a few minutes.",
+      "button": "Start & Book Video Support"
+    }
+  },
+  "seo_uebenRoutine": {
+    "hero": {
+      "badge": "Practice Tips",
+      "title": "Practicing Trumpet with a Full-Time Job",
+      "subtitle": "The ultimate routine for working professionals — 5 minutes a day is all you need.",
+      "date": "February 25, 2026 · 7 min read · By Valentin | TrumpetStar"
+    },
+    "cta": {
+      "title": "Your 5 Minutes Start Now 🎺",
+      "subtitle": "Personal practice plan · Daily reminders · Progress tracking",
+      "button": "Sign up for free"
     }
   }
 }

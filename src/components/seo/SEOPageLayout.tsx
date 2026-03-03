@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import type { Language } from '@/hooks/useLanguage';
 
+
 interface SEOPageLayoutProps {
   children: ReactNode;
   title?: string;
@@ -24,7 +25,7 @@ const HREFLANG_LANGS: { lang: string; href: string }[] = [
 
 export function SEOPageLayout({ children, title, description }: SEOPageLayoutProps) {
   const { user } = useAuth();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   // Inject hreflang + update document title/meta description
   useEffect(() => {
@@ -73,10 +74,10 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
           </Link>
           <div className="flex items-center gap-3">
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
-              <Link to="/trompete-lernen">Lernen</Link>
+              <Link to="/trompete-lernen">{t('layout.nav.learn')}</Link>
             </Button>
             <Button size="sm" variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" asChild>
-              <Link to="/pricing">Preise</Link>
+              <Link to="/pricing">{t('layout.nav.pricing')}</Link>
             </Button>
             {/* Language Switcher */}
             <select
@@ -92,11 +93,11 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
             </select>
             {user ? (
               <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-                <Link to="/app">Zur App</Link>
+                <Link to="/app">{t('layout.nav.toApp')}</Link>
               </Button>
             ) : (
               <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
-                <Link to="/login">Anmelden</Link>
+                <Link to="/login">{t('layout.nav.login')}</Link>
               </Button>
             )}
           </div>
@@ -115,29 +116,29 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
             <div>
               <img src={trumpetstarLogo} alt="Trumpetstar" className="h-6 w-auto mb-3" />
               <p className="text-sm text-white/60">
-                Trompete lernen mit der Star-Methode – Buch, Videos und App für alle Altersgruppen.
+                {t('layout.footer.tagline')}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white mb-3">Lernen</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">{t('layout.footer.learnSection')}</h4>
               <ul className="space-y-2 text-sm text-white/60">
-                <li><Link to="/trompete-lernen" className="hover:text-white transition-colors">Trompete lernen</Link></li>
-                <li><Link to="/trompete-lernen-kinder" className="hover:text-white transition-colors">Für Kinder</Link></li>
-                <li><Link to="/trompete-lernen-erwachsene" className="hover:text-white transition-colors">Für Erwachsene</Link></li>
-                <li><Link to="/trompete-ansatz-atmung" className="hover:text-white transition-colors">Ansatz & Atmung</Link></li>
+                <li><Link to="/trompete-lernen" className="hover:text-white transition-colors">{t('layout.footer.links.learn')}</Link></li>
+                <li><Link to="/trompete-lernen-kinder" className="hover:text-white transition-colors">{t('layout.footer.links.kids')}</Link></li>
+                <li><Link to="/trompete-lernen-erwachsene" className="hover:text-white transition-colors">{t('layout.footer.links.adults')}</Link></li>
+                <li><Link to="/trompete-ansatz-atmung" className="hover:text-white transition-colors">{t('layout.footer.links.technique')}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-white mb-3">Hilfe</h4>
+              <h4 className="text-sm font-semibold text-white mb-3">{t('layout.footer.helpSection')}</h4>
               <ul className="space-y-2 text-sm text-white/60">
-                <li><Link to="/trompete-erster-ton" className="hover:text-white transition-colors">Erster Ton</Link></li>
-                <li><Link to="/hilfe/trompete-kein-ton" className="hover:text-white transition-colors">Kein Ton? Hilfe!</Link></li>
-                <li><Link to="/pricing" className="hover:text-white transition-colors">Preise</Link></li>
+                <li><Link to="/trompete-erster-ton" className="hover:text-white transition-colors">{t('layout.footer.links.firstNote')}</Link></li>
+                <li><Link to="/hilfe/trompete-kein-ton" className="hover:text-white transition-colors">{t('layout.footer.links.noSound')}</Link></li>
+                <li><Link to="/pricing" className="hover:text-white transition-colors">{t('layout.footer.links.pricing')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-white/10 pt-6 text-center text-xs text-white/40">
-            © {new Date().getFullYear()} Trumpetstar. Alle Rechte vorbehalten.
+            © {new Date().getFullYear()} Trumpetstar. {t('layout.footer.copyright')}
           </div>
         </div>
       </footer>

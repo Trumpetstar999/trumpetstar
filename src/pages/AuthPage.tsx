@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import { useLanguage } from '@/hooks/useLanguage';
+import type { Language } from '@/hooks/useLanguage';
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +35,7 @@ export default function AuthPage() {
     return isMiniMode ? '/mobile/home' : '/app';
   };
   const { toast } = useToast();
+  const { t, language, setLanguage } = useLanguage();
   const [rememberMe, setRememberMe] = useState(true);
 
   // Check if already logged in
@@ -276,11 +279,12 @@ export default function AuthPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-slate-900 mb-3">
-            E-Mail gesendet!
+            {t('auth.emailSent')}
           </h1>
           <p className="text-slate-600 mb-6">
-            Wir haben dir einen Magic Link an <strong className="text-slate-900">{email}</strong> gesendet.
-            Klicke auf den Link in der E-Mail, um dich einzuloggen.
+            {t('auth.magicLinkSentDesc').replace('{email}', '')}
+            <strong className="text-slate-900">{email}</strong>
+            {'.'}
           </p>
           
           <Button
@@ -288,7 +292,7 @@ export default function AuthPage() {
             className="w-full h-12 text-base border-slate-300 text-slate-700 hover:bg-slate-100"
             onClick={() => setMagicLinkSent(false)}
           >
-            Zurück zur Anmeldung
+            {t('auth.backToSignIn')}
           </Button>
         </div>
       </div>
@@ -298,6 +302,20 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md">
+        {/* Language Switcher */}
+        <div className="flex justify-end mb-4">
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as Language)}
+            className="bg-white/10 border border-white/20 text-white rounded-lg px-2 py-1 text-xs cursor-pointer backdrop-blur-sm hover:bg-white/20 transition-colors"
+            title="Select language"
+          >
+            <option value="de">🇩🇪 DE</option>
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="sl">🇸🇮 SL</option>
+          </select>
+        </div>
         {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -308,10 +326,10 @@ export default function AuthPage() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-            Willkommen
+            {t('auth.welcomeTitle')}
           </h1>
           <p className="text-white/80 text-lg">
-            Trompete lernen? Kinderleicht – auch für Erwachsene.
+            {t('auth.welcomeSubtitle')}
           </p>
         </div>
 
@@ -360,7 +378,7 @@ export default function AuthPage() {
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-4 text-slate-400 font-medium">oder</span>
+              <span className="bg-white px-4 text-slate-400 font-medium">{t('auth.or')}</span>
             </div>
           </div>
 
@@ -371,19 +389,19 @@ export default function AuthPage() {
                 value="magic" 
                 className="rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm text-slate-600"
               >
-                Magic Link
+                {t('auth.tabMagicLink')}
               </TabsTrigger>
               <TabsTrigger 
                 value="login"
                 className="rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm text-slate-600"
               >
-                Login
+                {t('auth.tabLogin')}
               </TabsTrigger>
               <TabsTrigger 
                 value="signup"
                 className="rounded-lg text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm text-slate-600"
               >
-                Registrieren
+                {t('auth.tabRegister')}
               </TabsTrigger>
             </TabsList>
 
@@ -392,14 +410,14 @@ export default function AuthPage() {
               <form onSubmit={handleMagicLink} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="magic-email" className="text-slate-700 font-medium">
-                    E-Mail-Adresse
+                    {t('auth.emailAddress')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="magic-email"
                       type="email"
-                      placeholder="deine@email.de"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -414,7 +432,7 @@ export default function AuthPage() {
                     onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
                   />
                   <Label htmlFor="rememberMe-magic" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
-                    Angemeldet bleiben
+                    {t('auth.rememberMe')}
                   </Label>
                 </div>
                 <Button 
@@ -425,14 +443,14 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Sende Link...
+                      {t('auth.sendingLink')}
                     </>
                   ) : (
-                    'Magic Link senden'
+                    t('auth.sendMagicLink')
                   )}
                 </Button>
                 <p className="text-sm text-slate-500 text-center">
-                  Du erhältst einen Link per E-Mail, mit dem du dich ohne Passwort einloggen kannst.
+                  {t('auth.magicLinkInfo')}
                 </p>
               </form>
             </TabsContent>
@@ -442,14 +460,14 @@ export default function AuthPage() {
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="text-slate-700 font-medium">
-                    E-Mail-Adresse
+                    {t('auth.emailAddress')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="login-email"
                       type="email"
-                      placeholder="deine@email.de"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -459,7 +477,7 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password" className="text-slate-700 font-medium">
-                    Passwort
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -481,7 +499,7 @@ export default function AuthPage() {
                     onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
                   />
                   <Label htmlFor="rememberMe-login" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
-                    Angemeldet bleiben
+                    {t('auth.rememberMe')}
                   </Label>
                 </div>
                 <Button 
@@ -492,10 +510,10 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Anmelden...
+                      {t('auth.signingIn')}
                     </>
                   ) : (
-                    'Anmelden'
+                    t('auth.signIn')
                   )}
                 </Button>
               </form>
@@ -506,14 +524,14 @@ export default function AuthPage() {
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name" className="text-slate-700 font-medium">
-                    Anzeigename <span className="text-slate-400 font-normal">(optional)</span>
+                    {t('auth.displayName')} <span className="text-slate-400 font-normal">({t('auth.displayNameOptional')})</span>
                   </Label>
                   <div className="relative">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="signup-name"
                       type="text"
-                      placeholder="Dein Name"
+                      placeholder={t('auth.displayNamePlaceholder')}
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -523,14 +541,14 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="text-slate-700 font-medium">
-                    E-Mail-Adresse
+                    {t('auth.emailAddress')}
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="deine@email.de"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -540,14 +558,14 @@ export default function AuthPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="text-slate-700 font-medium">
-                    Passwort
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Mindestens 6 Zeichen"
+                      placeholder={t('auth.passwordMin')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
@@ -563,10 +581,10 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Registrieren...
+                      {t('auth.creatingAccount')}
                     </>
                   ) : (
-                    'Konto erstellen'
+                    t('auth.createAccount')
                   )}
                 </Button>
               </form>
@@ -576,7 +594,7 @@ export default function AuthPage() {
 
         {/* Footer */}
         <p className="text-center text-white/60 text-sm mt-6">
-          Mit der Anmeldung akzeptierst du unsere Nutzungsbedingungen
+          {t('auth.termsNotice')}
         </p>
       </div>
     </div>

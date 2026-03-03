@@ -67,7 +67,31 @@
     "email": "E-pošta",
     "password": "Geslo",
     "forgotPassword": "Pozabljeno geslo?",
-    "signedOutSuccess": "Uspešno ste se odjavili"
+    "signedOutSuccess": "Uspešno ste se odjavili",
+    "welcomeTitle": "Dobrodošli",
+    "welcomeSubtitle": "Naučiti se trobente? Lažje, kot si misliš – tudi za odrasle.",
+    "or": "ali",
+    "tabMagicLink": "Čarobna povezava",
+    "tabLogin": "Prijava",
+    "tabRegister": "Registracija",
+    "emailAddress": "E-poštni naslov",
+    "emailPlaceholder": "tvoj@email.si",
+    "displayName": "Prikazno ime",
+    "displayNameOptional": "neobvezno",
+    "displayNamePlaceholder": "Tvoje ime",
+    "passwordMin": "Vsaj 6 znakov",
+    "rememberMe": "Ostani prijavljen",
+    "sendMagicLink": "Pošlji čarobno povezavo",
+    "sendingLink": "Pošiljanje povezave...",
+    "magicLinkInfo": "Prejeli boste e-poštno sporočilo s povezavo za prijavo brez gesla.",
+    "signingIn": "Prijavljanje...",
+    "signIn": "Prijava",
+    "creatingAccount": "Ustvarjanje računa...",
+    "createAccount": "Ustvari račun",
+    "termsNotice": "Z registracijo sprejemate naše pogoje storitve",
+    "emailSent": "E-pošta poslana!",
+    "magicLinkSentDesc": "Poslali smo vam čarobno povezavo na {email}. Kliknite na povezavo v e-pošti, da se prijavite.",
+    "backToSignIn": "Nazaj na prijavo"
   },
   "navigation": {
     "levels": "Lekcije",
@@ -516,6 +540,72 @@
     "hero": {
       "title": "Blog in nasveti za trobento",
       "subtitle": "Nasveti, vodniki in vadnice za vadboteže."
+    }
+  },
+  "layout": {
+    "nav": {
+      "learn": "Učenje",
+      "pricing": "Cenik",
+      "toApp": "Na aplikacijo",
+      "login": "Prijava"
+    },
+    "footer": {
+      "tagline": "Naučite se trobente z metodo Star – knjiga, videi in aplikacija za vse starosti.",
+      "learnSection": "Učenje",
+      "helpSection": "Pomoč",
+      "links": {
+        "learn": "Naučite se trobente",
+        "kids": "Za otroke",
+        "adults": "Za odrasle",
+        "technique": "Ustnik in dihanje",
+        "firstNote": "Prva nota",
+        "noSound": "Brez zvoka? Pomoč!",
+        "pricing": "Cenik"
+      },
+      "copyright": "Vse pravice pridržane."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Izberite svojo pot učenja",
+      "subtitle": "Ne glede na to, ali ste začetnik ali ambiciozni glasbenik – poiščite načrt, ki ustreza vašim ciljem."
+    },
+    "faq": {
+      "title": "Pogosta vprašanja",
+      "q1": "Ali lahko kadar koli odpovem naročnino?",
+      "a1": "Da, naročnino lahko odpovete kadar koli. Pri letnih naročninah vaš dostop velja do konca plačanega obdobja.",
+      "q2": "Ali lahko zamenjam načrt?",
+      "a2": "Seveda! Nadgradnjo lahko opravite kadar koli. Pri prehodu na višji načrt se preostalo obdobje sorazmerno obračuna.",
+      "q3": "Ali obstaja garancija vračila denarja?",
+      "a3": "Da, v prvih 14 dneh lahko odpovete naročnino brez navedbe razloga in prejmete celotno povračilo."
+    }
+  },
+  "seo_hilfeKeinTon": {
+    "hero": {
+      "badge": "Reševanje težav",
+      "title": "Trobenta ne oddaja zvoka?\nTako rešite težavo",
+      "subtitle": "Ne panicirajte! Skoraj vedno gre za majhne, enostavno popravljive napake. Ta kontrolni seznam pomaga v minutah.",
+      "goodNews": "95 % težav z \"brez zvoka\" je povezanih z ustničenjem – ne z instrumentom. To lahko odpravimo v 10 minutah.",
+      "ctaVideo": "Začnite in rezervirajte video podporo",
+      "ctaBack": "Nazaj na navodila"
+    },
+    "cta": {
+      "title": "Se niste znašli in ne morete naprej?",
+      "desc": "Prek video klica lahko neposredno popravimo vaše ustničenje – pogosto v samo nekaj minutah.",
+      "button": "Začnite in rezervirajte video podporo"
+    }
+  },
+  "seo_uebenRoutine": {
+    "hero": {
+      "badge": "Nasveti za vadbo",
+      "title": "Vadba trobente s polnim delovnim časom",
+      "subtitle": "Popolna rutina za zaposlene — 5 minut na dan je vse, kar potrebujete.",
+      "date": "25. februar 2026 · 7 min branja · Avtor: Valentin | TrumpetStar"
+    },
+    "cta": {
+      "title": "Vaših 5 minut se začne zdaj 🎺",
+      "subtitle": "Osebni načrt vadbe · Dnevni opomniki · Sledenje napredku",
+      "button": "Registrirajte se brezplačno"
     }
   }
 }

@@ -67,7 +67,31 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
-    "signedOutSuccess": "Sesión cerrada correctamente"
+    "signedOutSuccess": "Sesión cerrada correctamente",
+    "welcomeTitle": "Bienvenido",
+    "welcomeSubtitle": "¿Aprender trompeta? Más fácil de lo que crees – incluso para adultos.",
+    "or": "o",
+    "tabMagicLink": "Magic Link",
+    "tabLogin": "Iniciar sesión",
+    "tabRegister": "Registrarse",
+    "emailAddress": "Correo electrónico",
+    "emailPlaceholder": "tu@correo.com",
+    "displayName": "Nombre visible",
+    "displayNameOptional": "opcional",
+    "displayNamePlaceholder": "Tu nombre",
+    "passwordMin": "Mínimo 6 caracteres",
+    "rememberMe": "Permanecer conectado",
+    "sendMagicLink": "Enviar Magic Link",
+    "sendingLink": "Enviando enlace...",
+    "magicLinkInfo": "Recibirás un enlace por correo electrónico para iniciar sesión sin contraseña.",
+    "signingIn": "Iniciando sesión...",
+    "signIn": "Iniciar sesión",
+    "creatingAccount": "Creando cuenta...",
+    "createAccount": "Crear cuenta",
+    "termsNotice": "Al registrarte, aceptas nuestros términos de servicio",
+    "emailSent": "¡Correo enviado!",
+    "magicLinkSentDesc": "Te hemos enviado un Magic Link a {email}. Haz clic en el enlace del correo electrónico para iniciar sesión.",
+    "backToSignIn": "Volver al inicio de sesión"
   },
   "navigation": {
     "levels": "Niveles",
@@ -516,6 +540,72 @@
     "hero": {
       "title": "Blog y Consejos de Trompeta",
       "subtitle": "Consejos, guías y tutoriales para quienes aprenden trompeta."
+    }
+  },
+  "layout": {
+    "nav": {
+      "learn": "Aprender",
+      "pricing": "Precios",
+      "toApp": "Ir a la App",
+      "login": "Iniciar sesión"
+    },
+    "footer": {
+      "tagline": "Aprende trompeta con el Método Star – libro, videos y app para todas las edades.",
+      "learnSection": "Aprender",
+      "helpSection": "Ayuda",
+      "links": {
+        "learn": "Aprender Trompeta",
+        "kids": "Para Niños",
+        "adults": "Para Adultos",
+        "technique": "Embocadura y Respiración",
+        "firstNote": "Primera Nota",
+        "noSound": "¿Sin Sonido? ¡Ayuda!",
+        "pricing": "Precios"
+      },
+      "copyright": "Todos los derechos reservados."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Elige Tu Camino de Aprendizaje",
+      "subtitle": "Ya seas principiante o músico ambicioso – encuentra el plan que se adapte a tus objetivos."
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "q1": "¿Puedo cancelar en cualquier momento?",
+      "a1": "Sí, puedes cancelar tu suscripción en cualquier momento. Para planes anuales, tu acceso continúa hasta el final del período pagado.",
+      "q2": "¿Puedo cambiar de plan?",
+      "a2": "¡Por supuesto! Puedes actualizar en cualquier momento. Al cambiar a un plan superior, el período restante se prorratea.",
+      "q3": "¿Hay garantía de devolución de dinero?",
+      "a3": "Sí, dentro de los primeros 14 días puedes cancelar tu suscripción sin dar razones y recibirás un reembolso completo."
+    }
+  },
+  "seo_hilfeKeinTon": {
+    "hero": {
+      "badge": "Solución de Problemas",
+      "title": "¿Tu Trompeta No Suena?\nAsí Se Resuelve el Problema",
+      "subtitle": "¡No te asustes! Casi siempre se trata de pequeños errores fácilmente corregibles. Esta lista de verificación ayuda en minutos.",
+      "goodNews": "El 95% de los problemas de \"sin sonido\" son de embocadura – no del instrumento. Podemos solucionarlo en 10 minutos.",
+      "ctaVideo": "Iniciar y reservar soporte por video",
+      "ctaBack": "Volver a la guía"
+    },
+    "cta": {
+      "title": "¿Atascado y no puedes avanzar?",
+      "desc": "Por videollamada podemos corregir tu embocadura directamente – a menudo en solo unos minutos.",
+      "button": "Iniciar y reservar soporte por video"
+    }
+  },
+  "seo_uebenRoutine": {
+    "hero": {
+      "badge": "Consejos de Práctica",
+      "title": "Practicar Trompeta con Trabajo a Tiempo Completo",
+      "subtitle": "La rutina definitiva para profesionales — 5 minutos al día es todo lo que necesitas.",
+      "date": "25 de febrero de 2026 · 7 min de lectura · Por Valentin | TrumpetStar"
+    },
+    "cta": {
+      "title": "Tus 5 Minutos Comienzan Ahora 🎺",
+      "subtitle": "Plan de práctica personal · Recordatorios diarios · Seguimiento del progreso",
+      "button": "Registrarse gratis"
     }
   }
 }

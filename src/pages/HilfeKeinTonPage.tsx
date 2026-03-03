@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { AlertCircle, CheckCircle, Wrench, ArrowRight, Video } from "lucide-react";
 import { SEOPageLayout } from "@/components/seo/SEOPageLayout";
 import { AnimatedSection } from "@/components/seo/AnimatedSection";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const faqs = [
   { question: "Warum kommt bei meiner Trompete kein Ton?", answer: "Häufigste Ursachen: 1) Zu festes Drücken, 2) Zu wenig Luftdruck, 3) Lippen nicht geschlossen genug, 4) Falsche Mundstück-Position." },
@@ -23,6 +24,7 @@ const checkliste = [
 ];
 
 export default function HilfeKeinTonPage() {
+  const { t } = useLanguage();
   return (
     <SEOPageLayout>
       <FAQSchema faqs={faqs} />
@@ -33,14 +35,14 @@ export default function HilfeKeinTonPage() {
           <AnimatedSection direction="up">
             <div className="inline-flex items-center gap-2 bg-[hsl(var(--accent-red))]/15 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-[hsl(var(--accent-red))]/30">
               <AlertCircle className="h-4 w-4 text-[hsl(var(--accent-red))]" />
-              Problem-Lösung
+              {t('seo_hilfeKeinTon.hero.badge')}
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Trompete macht keinen Ton?<br />
-              <span className="text-[hsl(var(--accent-red))]">So lösen Sie das Problem</span>
+              {t('seo_hilfeKeinTon.hero.title').split('\n')[0]}<br />
+              <span className="text-[hsl(var(--accent-red))]">{t('seo_hilfeKeinTon.hero.title').split('\n')[1]}</span>
             </h1>
             <p className="text-xl text-white/75 mb-8 max-w-2xl mx-auto">
-              Keine Panik! Fast immer liegt es an kleinen, leicht korrigierbaren Fehlern. Diese Checkliste hilft in Minuten.
+              {t('seo_hilfeKeinTon.hero.subtitle')}
             </p>
           </AnimatedSection>
 
@@ -49,7 +51,7 @@ export default function HilfeKeinTonPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle className="h-6 w-6 text-[hsl(var(--reward-gold))] flex-shrink-0 mt-1" />
                 <p className="text-white">
-                  <strong>Gute Nachrichten:</strong> 95% der "kein Ton"-Probleme liegen am Ansatz – nicht am Instrument. In 10 Minuten können wir das fixen.
+                  {t('seo_hilfeKeinTon.hero.goodNews')}
                 </p>
               </div>
             </div>
@@ -58,10 +60,10 @@ export default function HilfeKeinTonPage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-[hsl(var(--accent-red))] hover:bg-[hsl(var(--accent-red))]/90 text-white font-semibold" asChild>
-                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
+                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> {t('seo_hilfeKeinTon.hero.ctaVideo')}</a>
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
-                <Link to="/trompete-erster-ton">Zurück zur Anleitung</Link>
+                <Link to="/trompete-erster-ton">{t('seo_hilfeKeinTon.hero.ctaBack')}</Link>
               </Button>
             </div>
           </AnimatedSection>
@@ -143,13 +145,13 @@ export default function HilfeKeinTonPage() {
         <AnimatedSection direction="up" className="mb-16">
           <div className="glass-strong rounded-2xl p-8 text-center border border-[hsl(var(--accent-red))]/20">
             <Wrench className="h-12 w-12 mx-auto mb-4 text-[hsl(var(--accent-red))]" />
-            <h2 className="text-2xl font-bold text-white mb-4">Kommen Sie nicht weiter?</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{t('seo_hilfeKeinTon.cta.title')}</h2>
             <p className="mb-6 text-white/70">
-              Per Video-Call können wir Ihren Ansatz direkt korrigieren – oft in wenigen Minuten.
+              {t('seo_hilfeKeinTon.cta.desc')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> Video-Support starten & buchen</a>
+                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> {t('seo_hilfeKeinTon.cta.button')}</a>
               </Button>
             </div>
           </div>

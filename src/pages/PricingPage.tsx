@@ -4,12 +4,15 @@ import { PricingTable } from '@/components/pricing/PricingTable';
 import { FAQSchema } from '@/components/SEO';
 import { Card, CardContent } from '@/components/ui/card';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function PricingPage() {
+  const { t } = useLanguage();
+
   const pricingFaqs = [
-    { question: 'Kann ich jederzeit kündigen?', answer: 'Ja, du kannst dein Abo jederzeit kündigen. Bei Jahresabos läuft dein Zugang bis zum Ende der bezahlten Periode weiter.' },
-    { question: 'Kann ich zwischen Plänen wechseln?', answer: 'Klar! Du kannst jederzeit upgraden. Beim Wechsel zu einem höheren Plan wird der restliche Zeitraum anteilig verrechnet.' },
-    { question: 'Gibt es eine Geld-zurück-Garantie?', answer: 'Ja, innerhalb der ersten 14 Tage kannst du dein Abo ohne Angabe von Gründen kündigen und erhältst dein Geld zurück.' },
+    { question: t('pricing.faq.q1'), answer: t('pricing.faq.a1') },
+    { question: t('pricing.faq.q2'), answer: t('pricing.faq.a2') },
+    { question: t('pricing.faq.q3'), answer: t('pricing.faq.a3') },
   ];
 
   return (
@@ -18,9 +21,9 @@ export function PricingPage() {
 
       {/* Hero */}
       <section className="py-16 px-4 text-center">
-        <h1 className="text-4xl font-bold text-white mb-4">Wähle deinen Lernweg</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">{t('pricing.hero.title')}</h1>
         <p className="text-xl text-white/70 max-w-2xl mx-auto">
-          Ob Einsteiger oder ambitionierter Musiker – finde den Plan, der zu deinen Zielen passt.
+          {t('pricing.hero.subtitle')}
         </p>
       </section>
 
@@ -32,7 +35,7 @@ export function PricingPage() {
       {/* FAQ */}
       <section className="py-12 px-4">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Häufige Fragen</h2>
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">{t('pricing.faq.title')}</h2>
           <div className="space-y-3">
             {pricingFaqs.map((faq, i) => (
               <Card key={i}>

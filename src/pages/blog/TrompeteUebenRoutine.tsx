@@ -4,6 +4,7 @@ import { AnimatedSection } from "@/components/seo/AnimatedSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, CheckCircle, Clock } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const slots = [
   { time: "☀️ Morgens", ideal: "Frühaufsteher", desc: "Frischer Kopf, keine Ablenkung" },
@@ -14,6 +15,7 @@ const slots = [
 ];
 
 export default function TrompeteUebenRoutine() {
+  const { t } = useLanguage();
   return (
     <SEOPageLayout>
       {/* Hero */}
@@ -21,15 +23,15 @@ export default function TrompeteUebenRoutine() {
         <div className="max-w-3xl mx-auto text-center">
           <AnimatedSection direction="up">
             <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/15">
-              <Clock className="h-4 w-4" /> Übe-Tipps
+              <Clock className="h-4 w-4" /> {t('seo_uebenRoutine.hero.badge')}
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Trompete üben mit Vollzeitjob
+              {t('seo_uebenRoutine.hero.title')}
             </h1>
             <p className="text-white/70 text-lg mb-3">
-              Die ultimative Routine für Berufstätige — 5 Minuten am Tag reichen aus.
+              {t('seo_uebenRoutine.hero.subtitle')}
             </p>
-            <p className="text-white/50 text-sm">25. Februar 2026 · 7 Min Lesezeit · Von Valentin | TrumpetStar</p>
+            <p className="text-white/50 text-sm">{t('seo_uebenRoutine.hero.date')}</p>
           </AnimatedSection>
         </div>
       </section>
@@ -137,10 +139,10 @@ export default function TrompeteUebenRoutine() {
         </AnimatedSection>
 
         <AnimatedSection direction="up" className="glass rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-2">Deine 5 Minuten starten jetzt 🎺</h3>
-          <p className="text-white/60 mb-6 text-sm">Persönlicher Übeplan · Tägliche Erinnerungen · Fortschritts-Tracking</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{t('seo_uebenRoutine.cta.title')}</h3>
+          <p className="text-white/60 mb-6 text-sm">{t('seo_uebenRoutine.cta.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">Kostenlos anmelden <ArrowRight className="ml-2 w-4 h-4" /></Link>
+            <Link to="/auth">{t('seo_uebenRoutine.cta.button')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
           </Button>
         </AnimatedSection>
 

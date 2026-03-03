@@ -67,7 +67,31 @@
     "email": "E-Mail",
     "password": "Passwort",
     "forgotPassword": "Passwort vergessen?",
-    "signedOutSuccess": "Erfolgreich abgemeldet"
+    "signedOutSuccess": "Erfolgreich abgemeldet",
+    "welcomeTitle": "Willkommen",
+    "welcomeSubtitle": "Trompete lernen? Kinderleicht – auch für Erwachsene.",
+    "or": "oder",
+    "tabMagicLink": "Magic Link",
+    "tabLogin": "Login",
+    "tabRegister": "Registrieren",
+    "emailAddress": "E-Mail-Adresse",
+    "emailPlaceholder": "deine@email.de",
+    "displayName": "Anzeigename",
+    "displayNameOptional": "optional",
+    "displayNamePlaceholder": "Dein Name",
+    "passwordMin": "Mindestens 6 Zeichen",
+    "rememberMe": "Angemeldet bleiben",
+    "sendMagicLink": "Magic Link senden",
+    "sendingLink": "Sende Link...",
+    "magicLinkInfo": "Du erhältst einen Link per E-Mail, mit dem du dich ohne Passwort einloggen kannst.",
+    "signingIn": "Anmelden...",
+    "signIn": "Anmelden",
+    "creatingAccount": "Registrieren...",
+    "createAccount": "Konto erstellen",
+    "termsNotice": "Mit der Anmeldung akzeptierst du unsere Nutzungsbedingungen",
+    "emailSent": "E-Mail gesendet!",
+    "magicLinkSentDesc": "Wir haben dir einen Magic Link an {email} gesendet. Klicke auf den Link in der E-Mail, um dich einzuloggen.",
+    "backToSignIn": "Zurück zur Anmeldung"
   },
   "navigation": {
     "levels": "Levels",
@@ -516,6 +540,72 @@
     "hero": {
       "title": "Blog & Trompeten-Tipps",
       "subtitle": "Tipps, Guides und Tutorials für Trompetenlernende."
+    }
+  },
+  "layout": {
+    "nav": {
+      "learn": "Lernen",
+      "pricing": "Preise",
+      "toApp": "Zur App",
+      "login": "Anmelden"
+    },
+    "footer": {
+      "tagline": "Trompete lernen mit der Star-Methode – Buch, Videos und App für alle Altersgruppen.",
+      "learnSection": "Lernen",
+      "helpSection": "Hilfe",
+      "links": {
+        "learn": "Trompete lernen",
+        "kids": "Für Kinder",
+        "adults": "Für Erwachsene",
+        "technique": "Ansatz & Atmung",
+        "firstNote": "Erster Ton",
+        "noSound": "Kein Ton? Hilfe!",
+        "pricing": "Preise"
+      },
+      "copyright": "Alle Rechte vorbehalten."
+    }
+  },
+  "pricing": {
+    "hero": {
+      "title": "Wähle deinen Lernweg",
+      "subtitle": "Ob Einsteiger oder ambitionierter Musiker – finde den Plan, der zu deinen Zielen passt."
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "q1": "Kann ich jederzeit kündigen?",
+      "a1": "Ja, du kannst dein Abo jederzeit kündigen. Bei Jahresabos läuft dein Zugang bis zum Ende der bezahlten Periode weiter.",
+      "q2": "Kann ich zwischen Plänen wechseln?",
+      "a2": "Klar! Du kannst jederzeit upgraden. Beim Wechsel zu einem höheren Plan wird der restliche Zeitraum anteilig verrechnet.",
+      "q3": "Gibt es eine Geld-zurück-Garantie?",
+      "a3": "Ja, innerhalb der ersten 14 Tage kannst du dein Abo ohne Angabe von Gründen kündigen und erhältst dein Geld zurück."
+    }
+  },
+  "seo_hilfeKeinTon": {
+    "hero": {
+      "badge": "Problem-Lösung",
+      "title": "Trompete macht keinen Ton?\nSo lösen Sie das Problem",
+      "subtitle": "Keine Panik! Fast immer liegt es an kleinen, leicht korrigierbaren Fehlern. Diese Checkliste hilft in Minuten.",
+      "goodNews": "95% der \"kein Ton\"-Probleme liegen am Ansatz – nicht am Instrument. In 10 Minuten können wir das fixen.",
+      "ctaVideo": "Video-Support starten & buchen",
+      "ctaBack": "Zurück zur Anleitung"
+    },
+    "cta": {
+      "title": "Kommen Sie nicht weiter?",
+      "desc": "Per Video-Call können wir Ihren Ansatz direkt korrigieren – oft in wenigen Minuten.",
+      "button": "Video-Support starten & buchen"
+    }
+  },
+  "seo_uebenRoutine": {
+    "hero": {
+      "badge": "Übe-Tipps",
+      "title": "Trompete üben mit Vollzeitjob",
+      "subtitle": "Die ultimative Routine für Berufstätige — 5 Minuten am Tag reichen aus.",
+      "date": "25. Februar 2026 · 7 Min Lesezeit · Von Valentin | TrumpetStar"
+    },
+    "cta": {
+      "title": "Deine 5 Minuten starten jetzt 🎺",
+      "subtitle": "Persönlicher Übeplan · Tägliche Erinnerungen · Fortschritts-Tracking",
+      "button": "Kostenlos anmelden"
     }
   }
 }
