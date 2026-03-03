@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "updatedAt": "2026-03-03",
   "orchestrator": "Valentin (OpenClaw)",
   "subagent": "Seppl-Checker",
@@ -46,13 +46,71 @@
     "day": "Monday",
     "time": "06:00",
     "timezone": "Europe/Vienna",
-    "cronExpr": "0 5 * * 1"
+    "cronExpr": "0 5 * * 1",
+    "cronJobId": "edf02ab3-46fb-4868-a710-6efa1c292a3b"
+  },
+
+  "emergencyRules": {
+    "triggers": [
+      "Critical Security Finding",
+      "RLS/Permissions Leak",
+      "Payments broken",
+      "Datenverlust / Progress gelöscht"
+    ],
+    "actions": [
+      "1) Sofort NO-GO setzen",
+      "2) Sofortiger Telegram-Alert an Mario (kurz: Exploit + Impact)",
+      "3) Hotfix-Plan erstellen (1–5 Schritte)",
+      "4) Retest direkt nach Hotfix (Smoke + Security Verification)"
+    ],
+    "alertRecipient": "Mario Schulter",
+    "alertChannel": "telegram",
+    "alertTargetId": "7262426343"
   },
 
   "escalationRules": {
     "immediateTelegramAlert": ["Critical", "P0"],
     "alertRecipient": "Mario (Telegram 7262426343)",
     "topics": ["auth_broken", "payments_broken", "security_leak", "data_loss"]
+  },
+
+  "outputFormats": {
+    "telegramKurzbericht": {
+      "fields": ["go_no_go", "top_issues", "next_steps"],
+      "maxLength": 500,
+      "format": "markdown"
+    },
+    "markdownFullReport": {
+      "sections": [
+        "Datum / Environment / Build-Version",
+        "Executive Summary",
+        "Bugliste P0→P3",
+        "Security Findings",
+        "Fix Plan",
+        "Retest Plan",
+        "Appendix: Logs/Links"
+      ]
+    },
+    "jsonSummary": {
+      "schema": {
+        "date": "ISO-8601",
+        "env": "staging|prod",
+        "go_no_go": "GO|NO-GO",
+        "p0_count": "number",
+        "p1_count": "number",
+        "p2_count": "number",
+        "p3_count": "number",
+        "top_risks": "string[]",
+        "next_steps": "string[]",
+        "commit": "string",
+        "fixesApplied": "string[]"
+      }
+    }
+  },
+
+  "standardPrompts": {
+    "weekly": "Seppl-Checker: Weekly Full-Check\nContext: ENVIRONMENT={env} APP_URL={appUrl} Devices=iPhone,iPad,Desktop Roles=Student,Teacher,Admin Focus={optional_focus}",
+    "release": "Seppl-Checker: Run Release Check\nContext: ENVIRONMENT=staging APP_URL={appUrl} Build={version_or_commit} Devices=iPhone,iPad,Desktop"
   },
 
   "knownOpenIssues": [
