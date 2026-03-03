@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { useLanguage } from '@/hooks/useLanguage';
+import type { Language } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
@@ -12,8 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
-import { useLanguage } from '@/hooks/useLanguage';
-import type { Language } from '@/hooks/useLanguage';
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,9 +25,11 @@ export default function AuthPage() {
   const navigate = useNavigate();
   const isMiniMode = useMiniMode();
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
+  const { toast } = useToast();
+  const [rememberMe, setRememberMe] = useState(true);
+
   const getRedirectPath = () => {
-    // Check for returnTo in sessionStorage or URL params
     const returnTo = sessionStorage.getItem('returnTo');
     if (returnTo && returnTo.startsWith('/app')) {
       sessionStorage.removeItem('returnTo');
@@ -36,9 +37,6 @@ export default function AuthPage() {
     }
     return isMiniMode ? '/mobile/home' : '/app';
   };
-  const { toast } = useToast();
-  const { t, language, setLanguage } = useLanguage();
-  const [rememberMe, setRememberMe] = useState(true);
 
   // Check if already logged in
   useEffect(() => {
