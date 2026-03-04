@@ -2,27 +2,58 @@
 import Base from '../layouts/Base.astro';
 import content from '../../content.json';
 
-const { site, hero, leistungen, about, testimonials, gallery, faq, contact, footer, impressum } = content;
+const { site, hero, leistungen, about, testimonials, faq, contact, impressum } = content;
 
-// Icons für Leistungen
-const leistungIcons = ['🔥', '🚿', '🔧', '🛠️', '⚡', '💡'];
-
-// Icons für Warum-Wir
-const whyIcons = ['👨‍🔧', '⏰', '🏆', '🌿'];
-
-// Icons für Prozess
-const processIcons = ['📞', '📋', '🔨', '✅'];
+// Echte Leistungen mit Bildern aus der Website
+const services = [
+  {
+    icon: '🔥',
+    title: 'Heizungsbau & Modernisierung',
+    text: 'Von der Planung bis zur Inbetriebnahme – wir installieren und modernisieren Heizsysteme aller Art. Effizient, umweltfreundlich und auf Ihre Bedürfnisse zugeschnitten.',
+    image: '/images/slider_2.jpg'
+  },
+  {
+    icon: '🛢️',
+    title: 'Gas-, Öl- & Pelletsheizungen',
+    text: 'Fachgerechte Installation und Wartung von Gas-, Öl- und Pelletsheizungen. Wir beraten Sie zur optimalen Lösung für Ihre Immobilie und Ihr Budget.',
+    image: '/images/slider_4.jpg'
+  },
+  {
+    icon: '🌿',
+    title: 'Wärmepumpen & erneuerbare Energien',
+    text: 'Zukunftssichere Heiztechnik: Wärmepumpen, Solarthermie und Hybridlösungen für maximale Energieeffizienz und staatliche Förderungen.',
+    image: '/images/slider_8.jpg'
+  },
+  {
+    icon: '🚿',
+    title: 'Sanitärinstallationen',
+    text: 'Komplette Rohrleitungsarbeiten, Wasserinstallationen und Montage hochwertiger Sanitärprodukte – sauber ausgeführt und auf Wunsch schlüsselfertig.',
+    image: '/images/slider_3.jpg'
+  },
+  {
+    icon: '🛁',
+    title: 'Badsanierung',
+    text: 'Ihr Traumbad in neuer Pracht: Wir planen und realisieren Ihre Badsanierung komplett – von der Fliese bis zur Armatur, alles aus einer Hand.',
+    image: '/images/slider_3a.jpg'
+  },
+  {
+    icon: '⚡',
+    title: 'Wartung & Notdienst',
+    text: 'Regelmäßige Wartung verlängert die Lebensdauer Ihrer Anlagen. Bei Notfällen (Rohrbruch, Heizungsausfall) reagieren wir schnell und zuverlässig.',
+    image: '/images/slider_5a.jpg'
+  }
+];
 ---
 
 <Base title={`${site.name} | Heizung & Sanitär – Jennersdorf`}>
-  
+
   <!-- ===== STICKY HEADER ===== -->
   <header class="site-header" id="header">
     <div class="header-inner">
-      <a href="#" class="nav-logo-link" aria-label="${site.name} – Startseite">
-        <img src="/images/logo.png" alt="${site.name}" class="nav-logo" />
+      <a href="#" class="nav-logo-link" aria-label="Taucher Installationen – Startseite">
+        <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="nav-logo" />
       </a>
-      
+
       <nav class="nav-desktop" aria-label="Hauptnavigation">
         <ul class="nav-links" role="list">
           <li><a href="#leistungen">Leistungen</a></li>
@@ -31,71 +62,60 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
           <li><a href="#bewertungen">Bewertungen</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
-        
-        <div class="header-cta">
-          <a href={`tel:${contact.phone.replace(/\s/g, '')}`} class="header-phone">{contact.phone}</a>
-          <a href="#kontakt" class="nav-cta-btn">Jetzt anfragen</a>
-        </div>
       </nav>
-      
-      <button class="mobile-menu-toggle" aria-label="Menü öffnen">
-        <span></span>
-        <span></span>
-        <span></span>
+
+      <div class="header-cta">
+        <a href="#kontakt" class="nav-cta-btn">Jetzt anfragen</a>
+        <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="notruf-btn">🔴 Notruf: {contact.mobile}</a>
+      </div>
+
+      <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
       </button>
+    </div>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobile-nav" hidden>
+      <ul class="mobile-nav-links" role="list">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#warum-wir">Über uns</a></li>
+        <li><a href="#ablauf">Ablauf</a></li>
+        <li><a href="#bewertungen">Bewertungen</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="#kontakt" class="mobile-nav-cta">Jetzt anfragen</a>
+      <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="mobile-nav-phone">{contact.phone}</a>
     </div>
   </header>
 
   <main id="main-content">
 
-    <!-- ===== HERO SECTION (Split Layout) ===== -->
+    <!-- ===== HERO SLIDESHOW ===== -->
     <section class="hero" aria-label="Willkommen bei Taucher Installationen">
-      <div class="container hero-grid">
-        <!-- Links: 60% Text -->
-        <div class="hero-content">
-          <span class="hero-badge">Kompetent seit 1995</span>
-          <h1>Heizung & Sanitär <em>mit System</em></h1>
-          <p class="hero-subtitle">Ihr Partner für moderne Heiztechnik, Sanitärinstallationen und Energieeffizienz im Südburgenland. Familiengeführt, zuverlässig, professionell.</p>
-          
-          <div class="hero-ctas">
-            <a href="#kontakt" class="btn btn-primary btn-large">Jetzt anfragen</a>
-            <a href={`tel:${contact.phone.replace(/\s/g, '')}`} class="btn btn-secondary btn-large">{contact.phone}</a>
-          </div>
-          
-          <div class="hero-stats">
-            <div class="hero-stat">
-              <span class="hero-stat-number">30+</span>
-              <span class="hero-stat-label">Jahre Erfahrung</span>
-            </div>
-            <div class="hero-stat">
-              <span class="hero-stat-number">2.500+</span>
-              <span class="hero-stat-label">Zufriedene Kunden</span>
-            </div>
-            <div class="hero-stat">
-              <span class="hero-stat-number">24/7</span>
-              <span class="hero-stat-label">Notdienst</span>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Rechts: 40% Bild -->
-        <div class="hero-visual">
-          <div class="hero-image-wrapper">
-            <img src="/images/slider_home.jpg" alt="Professionelle Heizungsinstallation" class="hero-image" />
-            <div class="hero-image-badge">
-              <div class="hero-image-badge-icon">🏆</div>
-              <div class="hero-image-badge-text">
-                <strong>TOP-Bewertung</strong>
-                4.9/5 Kundenzufriedenheit
-              </div>
-            </div>
-          </div>
+      <div class="hero-slides">
+        <div class="hero-slide active" style="background-image: url('/images/slider_home.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_2.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_3.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_7.jpg')"></div>
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <span class="hero-badge">Kompetent seit 1995 · Jennersdorf</span>
+        <h1>Heizung &amp; Sanitär<br><em>mit System.</em></h1>
+        <p class="hero-sub">Ihr verlässlicher Partner im Südburgenland — von der Planung bis zur Wartung.</p>
+        <div class="hero-ctas">
+          <a href="#kontakt" class="btn btn-primary">Jetzt anfragen</a>
+          <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="btn btn-outline">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            {contact.mobile}
+          </a>
         </div>
       </div>
+      <div class="hero-dots" id="hero-dots"></div>
     </section>
 
     <!-- ===== TRUST BAR ===== -->
-    <section class="trust-bar">
+    <section class="trust-bar" id="trust">
       <div class="container trust-bar-content">
         <div class="trust-item">
           <div class="trust-item-icon">✓</div>
@@ -103,7 +123,7 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
         </div>
         <div class="trust-item">
           <div class="trust-item-icon">✓</div>
-          <span>Faire Preise</span>
+          <span>Faire, transparente Preise</span>
         </div>
         <div class="trust-item">
           <div class="trust-item-icon">✓</div>
@@ -111,7 +131,11 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
         </div>
         <div class="trust-item">
           <div class="trust-item-icon">✓</div>
-          <span>Mitglied der WK Burgenland</span>
+          <span>WK Burgenland zertifiziert</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>Kostenlose Erstberatung</span>
         </div>
       </div>
     </section>
@@ -121,19 +145,47 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
       <div class="container">
         <header class="section-header">
           <span class="section-subtitle">Unsere Dienstleistungen</span>
-          <h2 id="leistungen-heading">Alles rund um Heizung & Sanitär</h2>
-          <p>Von der Planung bis zur Wartung – wir bieten Ihnen alle Services aus einer Hand für Ihr Zuhause oder Geschäft.</p>
+          <h2 id="leistungen-heading">Alles rund um Heizung &amp; Sanitär</h2>
+          <p>Von der Planung bis zur Wartung – alle Services aus einer Hand, für Ihr Zuhause oder Ihren Betrieb im Südburgenland.</p>
         </header>
-        
+
         <div class="leistungen-grid">
-          {leistungen.items.map((item, i) => (
-            <article class="leistung-card anim-ready anim-fade-up">
-              <div class="leistung-icon">{leistungIcons[i] || '🔧'}</div>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-              <a href="#kontakt" class="leistung-link">Mehr erfahren</a>
+          {services.map((s, i) => (
+            <article class="leistung-card anim-ready anim-fade-up" style={`animation-delay:${i*0.08}s`}>
+              <div class="leistung-img-wrap">
+                <img src={s.image} alt={s.title} class="leistung-img" loading="lazy" />
+                <div class="leistung-icon-overlay">{s.icon}</div>
+              </div>
+              <div class="leistung-body">
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+                <a href="#kontakt" class="leistung-link">
+                  Mehr erfahren
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              </div>
             </article>
           ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA BANNER (nach Leistungen) ===== -->
+    <section class="cta-banner" aria-label="Jetzt beraten lassen">
+      <div class="container cta-banner-inner">
+        <div class="cta-banner-text">
+          <h2>Kostenlos beraten lassen</h2>
+          <p>Kein Projekt zu groß, kein Problem zu klein. Vereinbaren Sie jetzt einen unverbindlichen Beratungstermin.</p>
+        </div>
+        <div class="cta-banner-actions">
+          <a href="#kontakt" class="btn btn-light btn-large">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Formular ausfüllen
+          </a>
+          <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="btn btn-primary btn-large">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            Jetzt anrufen
+          </a>
         </div>
       </div>
     </section>
@@ -142,44 +194,44 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
     <section id="warum-wir" class="why-section" aria-labelledby="warum-wir-heading">
       <div class="container why-grid">
         <div class="why-content">
-          <span class="section-subtitle" style="color: var(--accent);">Warum Taucher Installationen</span>
-          <h2 id="warum-wir-heading">Ihr <em>zuverlässiger Partner</em> im Südburgenland</h2>
+          <span class="section-subtitle why-subtitle">Warum Taucher Installationen</span>
+          <h2 id="warum-wir-heading">Ihr <em>zuverlässiger Partner</em><br>im Südburgenland</h2>
           <p>Seit über 30 Jahren steht die Familie Taucher für handwerkliche Präzision und persönlichen Service in Jennersdorf. Als Familienbetrieb legen wir besonderen Wert auf Qualität, Zuverlässigkeit und die Zufriedenheit unserer Kunden.</p>
-          
+
           <div class="why-features">
             <div class="why-feature">
               <div class="why-feature-icon">👨‍🔧</div>
               <div class="why-feature-text">
                 <h4>Erfahrene Fachkräfte</h4>
-                <p>Unser Team besteht aus qualifizierten Installateuren mit jahrelanger Berufserfahrung.</p>
+                <p>Qualifizierte Installateure mit jahrelanger Berufserfahrung und laufender Weiterbildung.</p>
               </div>
             </div>
             <div class="why-feature">
               <div class="why-feature-icon">⏰</div>
               <div class="why-feature-text">
-                <h4>Pünktlich & Zuverlässig</h4>
-                <p>Wir halten Termine ein und arbeiten effizient, damit Sie schnell wieder Ihren Alltag genießen können.</p>
+                <h4>Pünktlich &amp; Zuverlässig</h4>
+                <p>Wir halten Termine ein – von der Beratung bis zur Fertigstellung.</p>
               </div>
             </div>
             <div class="why-feature">
               <div class="why-feature-icon">🏆</div>
               <div class="why-feature-text">
                 <h4>Höchste Qualitätsstandards</h4>
-                <p>Wir verwenden ausschließlich hochwertige Materialien und modernste Technik.</p>
+                <p>Nur hochwertige Materialien, fachgerechte Ausführung, sauber hinterlassen.</p>
               </div>
             </div>
             <div class="why-feature">
               <div class="why-feature-icon">🌿</div>
               <div class="why-feature-text">
                 <h4>Nachhaltige Lösungen</h4>
-                <p>Energieeffiziente Heizsysteme und umweltfreundliche Sanitärtechnik für die Zukunft.</p>
+                <p>Energieeffiziente Heizsysteme mit Förderberatung für eine grünere Zukunft.</p>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="why-image">
-          <img src="/images/slider_7.jpg" alt="Taucher Installationen Team bei der Arbeit" />
+          <img src="/images/slider_7.jpg" alt="Taucher Installationen – Ihr Betrieb in Jennersdorf" loading="lazy" />
           <div class="why-stats">
             <div class="why-stat">
               <span class="why-stat-number">30+</span>
@@ -200,29 +252,29 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
         <header class="section-header">
           <span class="section-subtitle">So funktioniert's</span>
           <h2 id="ablauf-heading">Ihr Projekt in 4 Schritten</h2>
-          <p>Von der ersten Kontaktaufnahme bis zur fertigen Installation – so einfach arbeiten wir.</p>
+          <p>Unkompliziert und transparent – von der ersten Anfrage bis zur fertigen Installation.</p>
         </header>
-        
+
         <div class="process-steps">
           <div class="process-step anim-ready anim-fade-up">
             <div class="process-step-number">1</div>
             <h3>Kontaktaufnahme</h3>
-            <p>Rufen Sie uns an oder schreiben Sie eine E-Mail. Wir sind für Sie da.</p>
+            <p>Rufen Sie uns an oder senden Sie uns eine Anfrage. Kostenlos und unverbindlich.</p>
           </div>
-          <div class="process-step anim-ready anim-fade-up">
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.1s">
             <div class="process-step-number">2</div>
-            <h3>Beratung & Planung</h3>
-            <p>Wir besichtigen Ihr Objekt vor Ort und erstellen ein individuelles Angebot.</p>
+            <h3>Beratung &amp; Angebot</h3>
+            <p>Wir besichtigen Ihr Objekt vor Ort und erstellen ein transparentes Festpreisangebot.</p>
           </div>
-          <div class="process-step anim-ready anim-fade-up">
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.2s">
             <div class="process-step-number">3</div>
-            <h3>Fachgerechte Installation</h3>
-            <p>Unsere Experten führen die Arbeiten professionell und sauber aus.</p>
+            <h3>Fachgerechte Ausführung</h3>
+            <p>Unser Team führt die Arbeiten professionell, sauber und termingerecht durch.</p>
           </div>
-          <div class="process-step anim-ready anim-fade-up">
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.3s">
             <div class="process-step-number">4</div>
-            <h3>Fertigstellung & Service</h3>
-            <p>Wir übergeben Ihnen das Projekt und stehen für Wartung bereit.</p>
+            <h3>Übergabe &amp; Service</h3>
+            <p>Wir übergeben das fertige Projekt und stehen für Wartung und Fragen bereit.</p>
           </div>
         </div>
       </div>
@@ -234,16 +286,16 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
         <header class="section-header">
           <span class="section-subtitle">Kundenstimmen</span>
           <h2 id="bewertungen-heading">Was unsere Kunden sagen</h2>
-          <p>Zufriedene Kunden sind unsere beste Referenz. Lesen Sie, was andere über unsere Arbeit sagen.</p>
+          <p>Zufriedene Kunden sind unsere beste Referenz – schon seit über 30 Jahren.</p>
         </header>
-        
+
         <div class="testimonials-grid">
           {testimonials.items.map((t, i) => (
-            <blockquote class="testimonial-card anim-ready anim-fade-up">
-              <div class="testimonial-stars" aria-hidden="true">★★★★★</div>
+            <blockquote class="testimonial-card anim-ready anim-fade-up" style={`animation-delay:${i*0.1}s`}>
+              <div class="testimonial-stars" aria-label="5 von 5 Sternen">★★★★★</div>
               <p class="testimonial-text">"{t.text}"</p>
               <footer class="testimonial-author">
-                <div class="testimonial-avatar">{t.name.charAt(0)}</div>
+                <div class="testimonial-avatar" aria-hidden="true">{t.name.charAt(0)}</div>
                 <div>
                   <div class="testimonial-name">{t.name}</div>
                   <div class="testimonial-location">Zufriedener Kunde</div>
@@ -260,96 +312,155 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
       <div class="container">
         <header class="section-header">
           <span class="section-subtitle">Häufige Fragen</span>
-          <h2 id="faq-heading">FAQ – Antworten auf Ihre Fragen</h2>
-          <p>Hier finden Sie Antworten auf die am häufigsten gestellten Fragen.</p>
+          <h2 id="faq-heading">Antworten auf Ihre Fragen</h2>
+          <p>Alles Wichtige auf einen Blick – und falls doch etwas offen bleibt, rufen Sie uns einfach an.</p>
         </header>
-        
+
         <div class="faq-list">
-          {faq.items.map((item, i) => (
+          {faq.items.map((item) => (
             <details class="faq-item anim-ready anim-fade-up">
               <summary>{item.q}</summary>
               <div class="faq-answer"><p>{item.a}</p></div>
             </details>
           ))}
         </div>
+
+        <div class="faq-cta">
+          <p>Noch Fragen? Wir helfen gerne persönlich weiter.</p>
+          <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            {contact.phone}
+          </a>
+        </div>
       </div>
     </section>
 
     <!-- ===== CONTACT ===== -->
     <section id="kontakt" class="contact" aria-labelledby="kontakt-heading">
-      <div class="container contact-grid">
-        <div class="contact-info">
+      <div class="container">
+        <header class="section-header">
           <span class="section-subtitle">Kontakt</span>
-          <h2 id="kontakt-heading">Lassen Sie uns sprechen</h2>
-          <p class="contact-intro">Kein Projekt ist zu groß oder zu klein. Wir freuen uns auf Ihre Anfrage und beraten Sie gerne persönlich – kostenlos und unverbindlich.</p>
-          
-          <div class="contact-details">
-            <div class="contact-item">
-              <div class="contact-icon">📞</div>
-              <div>
-                <div class="contact-label">Telefon</div>
-                <a href={`tel:${contact.phone.replace(/\s/g, '')}`} class="contact-value">{contact.phone}</a>
+          <h2 id="kontakt-heading">Schreiben Sie uns</h2>
+          <p>Kostenlose Erstberatung, unverbindliches Angebot – wir melden uns innerhalb von 24 Stunden.</p>
+        </header>
+
+        <div class="contact-grid">
+          <!-- Kontaktinfos -->
+          <div class="contact-info">
+            <div class="contact-details">
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div>
+                  <div class="contact-label">Telefon</div>
+                  <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="contact-value">{contact.phone}</a>
+                </div>
               </div>
-            </div>
-            
-            <div class="contact-item">
-              <div class="contact-icon">📱</div>
-              <div>
-                <div class="contact-label">Mobil</div>
-                <a href={`tel:${contact.mobile.replace(/\s/g, '').replace('/', '')}`} class="contact-value">{contact.mobile}</a>
+              <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <div>
+                  <div class="contact-label">Mobil / Notfall</div>
+                  <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="contact-value">{contact.mobile}</a>
+                </div>
               </div>
-            </div>
-            
-            <div class="contact-item">
-              <div class="contact-icon">✉️</div>
-              <div>
-                <div class="contact-label">E-Mail</div>
-                <a href={`mailto:${contact.email}`} class="contact-value">{contact.email}</a>
+              <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div>
+                  <div class="contact-label">E-Mail</div>
+                  <a href={`mailto:${contact.email}`} class="contact-value">{contact.email}</a>
+                </div>
               </div>
-            </div>
-            
-            <div class="contact-item">
-              <div class="contact-icon">📍</div>
-              <div>
-                <div class="contact-label">Adresse</div>
-                <a href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener" class="contact-value">{contact.address}</a>
+              <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div>
+                  <div class="contact-label">Adresse</div>
+                  <a href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer" class="contact-value">{contact.address}</a>
+                </div>
               </div>
-            </div>
-            
-            <div class="contact-item">
-              <div class="contact-icon">🕐</div>
-              <div>
-                <div class="contact-label">Öffnungszeiten</div>
-                <div class="contact-hours">
-                  {contact.hours.map((h) => (
-                    <span>{h.label}: {h.time}</span>
-                  ))}
+              <div class="contact-item">
+                <div class="contact-icon">🕐</div>
+                <div>
+                  <div class="contact-label">Öffnungszeiten</div>
+                  <div class="contact-hours">
+                    {contact.hours.map((h) => (
+                      <span>{h.label}: {h.time}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
+
+            <!-- Direkte Anruf-CTA -->
+            <div class="contact-call-cta">
+              <p>Dringend? Rufen Sie direkt an:</p>
+              <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="btn btn-primary btn-large contact-call-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                {contact.mobile} anrufen
+              </a>
+            </div>
+          </div>
+
+          <!-- Formular -->
+          <div class="contact-form-wrapper">
+            <h3 class="contact-form-title">Kostenlose Anfrage senden</h3>
+            <form class="contact-form" id="contact-form" action="#" method="POST" aria-label="Kontaktformular" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Name *</label>
+                  <input type="text" id="name" name="name" placeholder="Max Mustermann" required autocomplete="name" />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Telefon</label>
+                  <input type="tel" id="phone" name="phone" placeholder="0664 123 456" autocomplete="tel" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email">E-Mail *</label>
+                <input type="email" id="email" name="email" placeholder="max@beispiel.at" required autocomplete="email" />
+              </div>
+              <div class="form-group">
+                <label for="subject">Betreff</label>
+                <select id="subject" name="subject">
+                  <option value="">Bitte auswählen...</option>
+                  <option>Heizungsbau / Modernisierung</option>
+                  <option>Sanitärinstallation</option>
+                  <option>Badsanierung</option>
+                  <option>Wärmepumpe / Erneuerbare Energien</option>
+                  <option>Wartung / Service</option>
+                  <option>Notfall / Störung</option>
+                  <option>Sonstiges</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message">Nachricht *</label>
+                <textarea id="message" name="message" placeholder="Beschreiben Sie Ihr Anliegen kurz. Was kann ich für Sie tun?" rows="5" required></textarea>
+              </div>
+              <!-- Honeypot -->
+              <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+              <button type="submit" class="form-submit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Anfrage senden
+              </button>
+              <p class="form-note">* Pflichtfelder. Kostenlos &amp; unverbindlich. Antwort innerhalb 24h.</p>
+            </form>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="contact-form-wrapper">
-          <form class="contact-form" action="#" method="POST" aria-label="Kontaktformular">
-            <div class="form-group">
-              <label for="name">Ihr Name</label>
-              <input type="text" id="name" name="name" placeholder="Max Mustermann" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Ihre E-Mail</label>
-              <input type="email" id="email" name="email" placeholder="max@beispiel.at" required />
-            </div>
-            <div class="form-group">
-              <label for="phone">Telefon (optional)</label>
-              <input type="tel" id="phone" name="phone" placeholder="+43 123 4567890" />
-            </div>
-            <div class="form-group">
-              <label for="message">Ihre Nachricht</label>
-              <textarea id="message" name="message" placeholder="Beschreiben Sie kurz Ihr Anliegen..." rows="5" required></textarea>
-            </div>
-            <button type="submit" class="form-submit">Anfrage senden</button>
-          </form>
+    <!-- ===== LEGAL / IMPRESSUM ===== -->
+    <section id="impressum" class="legal" aria-labelledby="impressum-heading">
+      <div class="container legal-grid">
+        <div class="legal-section">
+          <h2 id="impressum-heading">Impressum</h2>
+          <address>
+            {impressum.lines.map((line) => (
+              <>{line}<br /></>
+            ))}
+          </address>
+        </div>
+        <div class="legal-section" id="datenschutz">
+          <h2>Datenschutz</h2>
+          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies soweit möglich auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben.</p>
         </div>
       </div>
     </section>
@@ -361,42 +472,42 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <img src="/images/logo.png" alt="${site.name}" class="footer-logo" />
-          <p>Ihr verlässlicher Partner für Heizung, Sanitär und Installationen in Jennersdorf und Umgebung. Familiengeführt seit 1995.</p>
+          <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="footer-logo" />
+          <p>Ihr verlässlicher Partner für Heizung, Sanitär und Installationen in Jennersdorf und dem Südburgenland. Familiengeführt seit 1995.</p>
         </div>
-        
         <div class="footer-column">
           <h4>Leistungen</h4>
           <ul>
-            <li><a href="#leistungen">Heizungsbau</a></li>
+            <li><a href="#leistungen">Heizungsbau &amp; Modernisierung</a></li>
+            <li><a href="#leistungen">Gas-, Öl- &amp; Pelletsheizungen</a></li>
+            <li><a href="#leistungen">Wärmepumpen</a></li>
             <li><a href="#leistungen">Sanitärinstallation</a></li>
-            <li><a href="#leistungen">Gasinstallation</a></li>
-            <li><a href="#leistungen">Wartung & Service</a></li>
+            <li><a href="#leistungen">Badsanierung</a></li>
+            <li><a href="#leistungen">Wartung &amp; Notdienst</a></li>
           </ul>
         </div>
-        
         <div class="footer-column">
           <h4>Unternehmen</h4>
           <ul>
             <li><a href="#warum-wir">Über uns</a></li>
-            <li><a href="#bewertungen">Bewertungen</a></li>
+            <li><a href="#ablauf">Unser Ablauf</a></li>
+            <li><a href="#bewertungen">Kundenstimmen</a></li>
             <li><a href="#faq">FAQ</a></li>
             <li><a href="#kontakt">Kontakt</a></li>
           </ul>
         </div>
-        
         <div class="footer-column">
           <h4>Kontakt</h4>
           <ul>
-            <li><a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a></li>
+            <li><a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`}>{contact.phone}</a></li>
+            <li><a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`}>{contact.mobile} (Mobil)</a></li>
             <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
             <li>{contact.address}</li>
           </ul>
         </div>
       </div>
-      
       <div class="footer-bottom">
-        <span class="footer-copyright">© 2026 {site.name}</span>
+        <span class="footer-copyright">© 2026 Taucher Installationen GmbH</span>
         <div class="footer-legal">
           <a href="#impressum">Impressum</a>
           <a href="#datenschutz">Datenschutz</a>
@@ -405,22 +516,10 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
     </div>
   </footer>
 
-  <!-- Impressum Modal Section -->
-  <section id="impressum" class="legal" style="display: none;">
-    <div class="container">
-      <h2>Impressum</h2>
-      <address>
-        {impressum.lines.map((line) => (
-          <>{line}<br/></>
-        ))}
-      </address>
-    </div>
-  </section>
-
-  <!-- Cookie Banner -->
-  <div id="cookie-banner" class="cookie-banner" style="display:none;">
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner" class="cookie-banner" hidden>
     <div class="cookie-content">
-      <p>Diese Website verwendet Cookies für die Funktionalität. <a href="#datenschutz">Mehr erfahren</a></p>
+      <p>Diese Website verwendet funktionale Cookies. <a href="#datenschutz">Datenschutz</a></p>
       <button id="cookie-accept" class="btn btn-primary">Akzeptieren</button>
     </div>
   </div>
@@ -428,53 +527,73 @@ const processIcons = ['📞', '📋', '🔨', '✅'];
 </Base>
 
 <script>
-  // Header Scroll Effect
+  // ── Header Scroll ──
   const header = document.getElementById('header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 60);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ── Mobile Menu ──
+  const toggle = document.getElementById('mobile-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  toggle.addEventListener('click', () => {
+    const open = !mobileNav.hidden;
+    mobileNav.hidden = open;
+    toggle.setAttribute('aria-expanded', String(!open));
+    document.body.style.overflow = open ? '' : 'hidden';
   });
-
-  // Scroll Animations
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('anim-visible');
-        observer.unobserve(entry.target);
-      }
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileNav.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
     });
-  }, observerOptions);
-
-  document.querySelectorAll('.anim-ready').forEach(el => {
-    observer.observe(el);
   });
 
-  // Cookie Banner
-  const cookieBanner = document.getElementById('cookie-banner');
-  const cookieAccept = document.getElementById('cookie-accept');
-  
-  if (!localStorage.getItem('cookies-accepted')) {
-    cookieBanner.style.display = 'block';
-  }
-  
-  cookieAccept.addEventListener('click', () => {
-    localStorage.setItem('cookies-accepted', 'true');
-    cookieBanner.style.display = 'none';
+  // ── Scroll Animations ──
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('anim-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.anim-ready').forEach(el => io.observe(el));
+
+  // ── Cookie Banner ──
+  const banner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept');
+  if (!localStorage.getItem('taucher-cookies-ok')) banner.hidden = false;
+  acceptBtn.addEventListener('click', () => {
+    localStorage.setItem('taucher-cookies-ok', '1');
+    banner.hidden = true;
   });
+
+  // ── Hero Slideshow ──
+  (function() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dotsContainer = document.getElementById('hero-dots');
+    if (!slides.length || !dotsContainer) return;
+    let current = 0;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.onclick = () => go(i);
+      dotsContainer.appendChild(dot);
+    });
+
+    function go(n) {
+      slides[current].classList.remove('active');
+      dotsContainer.querySelectorAll('.hero-dot')[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dotsContainer.querySelectorAll('.hero-dot')[current].classList.add('active');
+    }
+
+    setInterval(() => go(current + 1), 5000);
+  })();
 </script>
 
-<style>
-  /* Zusätzliche Styles für Smooth Scroll und Focus */
-  html {
-    scroll-padding-top: 100px;
-  }
+<style is:global>
+  html { scroll-padding-top: 90px; }
 </style>
