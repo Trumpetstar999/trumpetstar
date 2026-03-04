@@ -464,6 +464,11 @@
   #build-banner.visible { display: block; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
+  
+  .img-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .img-actions .drop-zone { margin: 0; }
+  .img-actions .btn-pick { width: 100%; justify-content: center; }
+
   </style>
 </head>
 <body>
@@ -678,7 +683,14 @@
   <section id="s-images" class="section">
     <div class="section-header">
       <h1>Alle Bilder</h1>
-      <p>Übersicht aller hochgeladenen Bilder im /public/images Ordner</p>
+      <p>Übersicht aller Bilder im /public/images Ordner</p>
+      <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap">
+        <label class="btn-upload-new" style="display:inline-flex;align-items:center;gap:0.4rem;background:var(--primary);color:#fff;padding:0.55rem 1.1rem;border-radius:50px;font-size:0.88rem;font-weight:600;cursor:pointer;border:none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Bilder hochladen
+          <input type="file" accept="image/*" multiple style="display:none" onchange="uploadNewImages(event)">
+        </label>
+      </div>
     </div>
     <div id="all-images-grid" class="grid-3"></div>
   </section>
@@ -835,18 +847,21 @@ function renderHeroSlides() {
   }
 }
 
-let pickerTargetSlide = -1;
-async function openImagePicker(slideIndex) {
-  pickerTargetSlide = slideIndex;
+// Generic Image Picker
+let _pickerCallback = null;
+
+async function openImagePickerFor(callback) {
+  _pickerCallback = callback;
   const modal = document.getElementById('img-picker-modal');
-  const grid = document.getElementById('img-picker-grid');
-  grid.innerHTML = '<p style="color:var(--text-muted)">Lade Bilder…</p>';
+  const grid  = document.getElementById('img-picker-grid');
+  grid.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Lade Bilder…</p>';
   modal.style.display = 'flex';
   try {
     const r = await fetch('api/images');
     const d = await r.json();
+    const names = Array.isArray(d) ? d.map(x => x.name) : (d.images || []);
     grid.innerHTML = '';
-    (Array.isArray(d) ? d.map(x=>x.name) : d.images || []).forEach(fname => {
+    names.forEach(fname => {
       const btn = document.createElement('button');
       btn.className = 'picker-img-btn';
       const ts = '?t=' + Date.now();
@@ -854,26 +869,33 @@ async function openImagePicker(slideIndex) {
       btn.onclick = () => selectPickerImage(fname);
       grid.appendChild(btn);
     });
+    if (!names.length) grid.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Keine Bilder vorhanden.</p>';
   } catch(e) {
-    grid.innerHTML = '<p style="color:var(--error)">Fehler beim Laden der Bilder.</p>';
+    grid.innerHTML = '<p style="color:var(--error);padding:1rem">Fehler beim Laden.</p>';
   }
+}
+
+// Convenience wrappers
+function openImagePicker(slideIndex) {
+  openImagePickerFor(fname => {
+    if (!state.hero) state.hero = {};
+    if (!state.hero.slides) state.hero.slides = [];
+    if (!state.hero.slides[slideIndex]) state.hero.slides[slideIndex] = {};
+    state.hero.slides[slideIndex].src = '/images/' + fname;
+    renderHeroSlides();
+    markDirty();
+    toast('Slide ' + (slideIndex+1) + ' geändert – Speichern!', 'info');
+  });
 }
 
 function closeImagePicker() {
   document.getElementById('img-picker-modal').style.display = 'none';
-  pickerTargetSlide = -1;
+  _pickerCallback = null;
 }
 
 function selectPickerImage(fname) {
-  if (pickerTargetSlide < 0) return;
-  if (!state.hero) state.hero = {};
-  if (!state.hero.slides) state.hero.slides = [];
-  if (!state.hero.slides[pickerTargetSlide]) state.hero.slides[pickerTargetSlide] = {};
-  state.hero.slides[pickerTargetSlide].src = '/images/' + fname;
+  if (_pickerCallback) _pickerCallback(fname);
   closeImagePicker();
-  renderHeroSlides();
-  markDirty();
-  toast('Slide ' + (pickerTargetSlide+1) + ' geändert → Speichern nicht vergessen!', 'info');
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -888,12 +910,15 @@ function renderLeistungen() {
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `<div class="card-title">Leistung ${i+1}</div>`;
-    if (fname) {
+    {
+      const f = fname || 'placeholder.jpg';
       card.appendChild(makeImageCard({
-        filename: fname,
-        src: 'site-images/' + fname,
+        filename: f,
+        src: fname ? 'site-images/' + f : '',
         label: 'Bild',
-        noAlt: true
+        noAlt: true,
+        statePath: `leistungen.items.${i}.image`,
+        onPick: (fn) => { items[i].image = '/images/' + fn; renderLeistungen(); }
       }));
     }
     const f1 = document.createElement('div');
@@ -923,7 +948,9 @@ function renderGallery() {
       altPath: `gallery.images.${i}.caption`,
       altValue: img.caption,
       altLabel: 'Bildunterschrift',
-      label: `Galerie ${i+1}`
+      label: `Galerie ${i+1}`,
+      statePath: `gallery.images.${i}.src`,
+      onPick: (fn) => { images[i].src = '/images/' + fn; renderGallery(); }
     }));
   });
   if (!images.length) {
@@ -1035,7 +1062,7 @@ function removeTestimonial(i) {
 /* ══════════════════════════════════════════════════════════════════════════
    IMAGE CARD FACTORY
 ══════════════════════════════════════════════════════════════════════════ */
-function makeImageCard({ filename, src, altPath, altValue, altLabel, label, noAlt }) {
+function makeImageCard({ filename, src, altPath, altValue, altLabel, label, noAlt, statePath, onPick }) {
   const div = document.createElement('div');
   div.className = 'img-card';
   const ts = '?t=' + Date.now();
@@ -1043,15 +1070,18 @@ function makeImageCard({ filename, src, altPath, altValue, altLabel, label, noAl
   div.innerHTML = `
     <img class="img-preview" src="${src}${ts}" alt="${filename||''}" onerror="this.src='${fallback}'">
     <div class="img-body">
-      <div class="img-name">📎 ${filename || '–'}</div>
-      <div class="drop-zone" data-target="${filename}">
-        <input type="file" accept="image/*" onchange="handleFileInput(event,'${filename}',this)">
-        <div class="dz-icon">☁</div>
-        <div class="dz-text">Bild hierher ziehen oder klicken</div>
+      <div class="img-name">📎 ${label ? label + ': ' : ''}${filename || '–'}</div>
+      <div class="img-actions">
+        <div class="drop-zone" data-target="${filename}">
+          <input type="file" accept="image/*" onchange="handleFileInput(event,'${filename}',this)">
+          <div class="dz-icon">☁</div>
+          <div class="dz-text">Hierher ziehen oder klicken</div>
+        </div>
+        <button class="btn-pick" data-pick="1">🖼 Aus Bibliothek</button>
       </div>
       ${!noAlt && altPath ? `
         <div class="field" style="margin-top:10px">
-          <label>${altLabel || 'Alt-Text / Bildunterschrift'}</label>
+          <label>${altLabel || 'Alt-Text'}</label>
           <div class="editable multiline" data-path="${altPath}">${altValue || ''}</div>
         </div>
       ` : ''}
@@ -1064,6 +1094,21 @@ function makeImageCard({ filename, src, altPath, altValue, altLabel, label, noAl
     e.preventDefault(); dz.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
     if (file) uploadImage(file, filename, div);
+  });
+  // "Aus Bibliothek" button
+  div.querySelector('[data-pick]').addEventListener('click', () => {
+    openImagePickerFor(fname => {
+      // update preview
+      div.querySelector('.img-preview').src = 'site-images/' + fname + '?t=' + Date.now();
+      div.querySelector('.img-name').textContent = '📎 ' + (label ? label + ': ' : '') + fname;
+      // update state if path provided
+      if (statePath) {
+        setNestedValue(state, statePath, '/images/' + fname);
+        markDirty();
+      }
+      if (onPick) onPick(fname);
+      toast('Bild gewählt: ' + fname + ' – Speichern!', 'info');
+    });
   });
   return div;
 }
