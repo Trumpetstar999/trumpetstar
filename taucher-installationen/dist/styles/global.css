@@ -605,15 +605,18 @@ h1, h2, h3, h4 {
   background: var(--border);
 }
 .trust-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: var(--primary-light);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
   flex-shrink: 0;
+}
+.trust-icon svg {
+  width: 20px;
+  height: 20px;
 }
 .trust-label { color: var(--text-muted); font-size: 0.76rem; font-weight: 400; display: block; margin-top: 0.05rem; }
 @media (max-width: 640px) {
