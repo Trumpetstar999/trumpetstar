@@ -138,15 +138,15 @@ h1, h2, h3, h4 {
    =================================================== */
 .site-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 1rem 0;
-  transition: background 0.35s, box-shadow 0.35s, padding 0.3s;
+  padding: 1.25rem 0;
+  transition: background 0.35s, box-shadow 0.35s, padding 0.35s;
 }
 .site-nav.scrolled {
   background: rgba(20, 20, 20, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 2px 24px rgba(0,0,0,0.4);
-  padding: 0.6rem 0;
+  padding: 0.5rem 0;
 }
 
 .nav-inner {
@@ -159,15 +159,24 @@ h1, h2, h3, h4 {
   display: flex; align-items: center; text-decoration: none;
 }
 .nav-logo {
-  height: 48px; width: auto;
+  height: 72px;
+  width: auto;
   filter: brightness(1.15) contrast(1.05);
-  background: rgba(255,255,255,0.08);
-  padding: 4px 8px;
+  background: rgba(255,255,255,0.1);
+  padding: 6px 12px;
   border-radius: 2px;
-  transition: filter 0.2s, transform 0.2s;
+  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.35s,
+              filter 0.2s,
+              transform 0.2s;
 }
 .nav-logo-link:hover .nav-logo { transform: scale(1.03); }
-.site-nav.scrolled .nav-logo { filter: brightness(1.15) contrast(1.05); }
+.site-nav.scrolled .nav-logo {
+  height: 40px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.08);
+  filter: brightness(1.15) contrast(1.05);
+}
 
 .nav-links {
   display: flex; gap: 2.25rem; list-style: none; align-items: center;
@@ -350,16 +359,19 @@ h1, h2, h3, h4 {
 .leistung-card {
   background: var(--bg);
   border-radius: 0;
-  padding: 2.25rem 2rem;
+  padding: 0;
   border-left: 4px solid transparent;
   transition: border-color 0.2s, transform 0.22s, box-shadow 0.22s, background 0.2s;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .leistung-card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0;
   height: 1px; background: var(--gray-light);
+  z-index: 1;
 }
 .leistung-card:hover {
   border-left-color: var(--orange);
@@ -368,26 +380,33 @@ h1, h2, h3, h4 {
   box-shadow: var(--shadow-md);
 }
 
-.leistung-icon {
-  font-size: 2rem; margin-bottom: 1.25rem;
-  display: block; line-height: 1;
-}
 .leistung-img {
-  display: block;
-  height: 200px;
+  width: 100%;
+  height: 220px;
   object-fit: cover;
-  margin: -2.25rem -2rem 1.5rem -2rem;
-  width: calc(100% + 4rem);
+  object-position: center;
+  display: block;
+  flex-shrink: 0;
 }
-.leistung-text h3,
-.leistung-card h3 {
-  font-size: 1.1rem; margin-bottom: 0.6rem;
-  color: var(--charcoal); font-weight: 800;
+
+.leistung-text {
+  padding: 1.5rem 1.75rem 1.75rem;
+  flex: 1;
+}
+
+.leistung-text h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--charcoal);
+  font-weight: 800;
   letter-spacing: -0.01em;
 }
-.leistung-text p,
-.leistung-card p {
-  color: var(--text-light); font-size: 0.925rem; line-height: 1.7;
+
+.leistung-text p {
+  color: var(--text-light);
+  font-size: 0.925rem;
+  line-height: 1.7;
+  margin: 0;
 }
 
 /* ===================================================

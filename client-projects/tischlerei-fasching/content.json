@@ -15,65 +15,162 @@
   },
   "variant": "D",
   "hero": {
-    "headline": "Maßarbeit,\ndie bleibt.",
+    "headline": "Maßarbeit,\ndie bleibt. !",
     "subheadline": "Wir fertigen Möbel, Küchen und Einbauten nach Ihrem Wunsch – handwerklich präzise, persönlich begleitet.",
     "cta": {
-      "primary": { "text": "Jetzt Termin anfragen", "href": "#kontakt" },
-      "secondary": { "text": "03325/8228", "href": "tel:+433325822800" }
+      "primary": {
+        "text": "Jetzt Termin anfragen",
+        "href": "#kontakt"
+      },
+      "secondary": {
+        "text": "03325/8228",
+        "href": "tel:+433325822800"
+      }
     },
     "slides": [
-      { "src": "/images/hero-1.jpg", "alt": "Tischlerei Fasching OG auf der Fachmesse – Einblick in unsere Arbeit" },
-      { "src": "/images/hero-2.jpg", "alt": "Tischlerei Fasching – Präsentation auf Fachmesse" },
-      { "src": "/images/hero-3.jpg", "alt": "Tischlerei Fasching – Handwerkliche Qualität aus Mogersdorf" },
-      { "src": "/images/hero-4.jpg", "alt": "Tischlerei Fasching – Innenausbau und Möbelplanung" },
-      { "src": "/images/hero-5.jpg", "alt": "Tischlerei Fasching – Maßarbeit für Wohnraum und Halle" }
+      {
+        "src": "/images/hero-1.jpg",
+        "alt": "Tischlerei Fasching OG auf der Fachmesse – Einblick in unsere Arbeit"
+      },
+      {
+        "src": "/images/hero-2.jpg",
+        "alt": "Tischlerei Fasching – Präsentation auf Fachmesse"
+      },
+      {
+        "src": "/images/hero-3.jpg",
+        "alt": "Tischlerei Fasching – Handwerkliche Qualität aus Mogersdorf"
+      },
+      {
+        "src": "/images/hero-4.jpg",
+        "alt": "Tischlerei Fasching – Innenausbau und Möbelplanung"
+      },
+      {
+        "src": "/images/hero-5.jpg",
+        "alt": "Tischlerei Fasching – Maßarbeit für Wohnraum und Halle"
+      }
     ]
   },
   "leistungen": {
     "headline": "Unsere Leistungen",
     "subheadline": "Vom Entwurf bis zur Montage – alles aus einer Hand.",
     "items": [
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Maßmöbel", "text": "Schränke, Sideboards, Regale – nach Ihren Maßen und Vorstellungen gefertigt." },
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Küchen", "text": "Planung und Fertigung Ihrer Traumküche – funktional, individuell, langlebig." },
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Badmöbel", "text": "Maßgefertigte Möbel fürs Bad – wasserfest, schön, praktisch." },
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Innenausbau", "text": "Wand- und Deckenverkleidungen, Böden, Türen – kompetenter Raumausbau." },
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Reparaturen", "text": "Alte Möbel reparieren, restaurieren oder auffrischen – wir geben Holz ein zweites Leben." },
-      { "image": "/images/leistung-innenausbau.jpg", "title": "Planung & Beratung", "text": "Persönliches Erstgespräch, 3D-Planung auf Wunsch, transparente Angebote." }
+      {
+        "image": "/images/leistung-1.jpg",
+        "title": "Maßmöbel",
+        "text": "Schränke, Sideboards, Regale – nach Ihren Maßen und Vorstellungen gefertigt."
+      },
+      {
+        "image": "/images/leistung-2.jpg",
+        "title": "Küchen",
+        "text": "Planung und Fertigung Ihrer Traumküche – funktional, individuell, langlebig."
+      },
+      {
+        "image": "/images/leistung-3.jpg",
+        "title": "Badmöbel",
+        "text": "Maßgefertigte Möbel fürs Bad – wasserfest, schön, praktisch."
+      },
+      {
+        "image": "/images/gallery-1.jpg",
+        "title": "Innenausbau",
+        "text": "Wand- und Deckenverkleidungen, Böden, Türen – kompetenter Raumausbau."
+      },
+      {
+        "image": "/images/gallery-2.jpg",
+        "title": "Reparaturen",
+        "text": "Alte Möbel reparieren, restaurieren oder auffrischen – wir geben Holz ein zweites Leben."
+      },
+      {
+        "image": "/images/gallery-3.jpg",
+        "title": "Planung & Beratung",
+        "text": "Persönliches Erstgespräch, 3D-Planung auf Wunsch, transparente Angebote."
+      }
     ]
   },
   "about": {
     "headline": "Familienbetrieb mit Leidenschaft",
     "text": "Seit 2010 steht Tischlerei Fasching OG für handwerkliche Präzision und persönlichen Service. Georg und Jochen Fasching führen den Betrieb mit dem Anspruch, dass jedes Stück ein Unikat ist – gefertigt in Mogersdorf, für Menschen in der Region.",
-    "highlights": ["Familiengeführt seit 2010", "Regional verwurzelt", "Persönliche Beratung", "Höchste Materialqualität"]
+    "highlights": [
+      "Familiengeführt seit 2010",
+      "Regional verwurzelt",
+      "Persönliche Beratung",
+      "Höchste Materialqualität"
+    ]
   },
   "testimonials": {
     "headline": "Was unsere Kunden sagen",
-    "_note": "PLATZHALTER – durch echte Bewertungen ersetzen",
     "items": [
-      { "name": "Familie Horvath, Jennersdorf", "text": "Die Einbauküche ist perfekt geworden. Präzise Arbeit, freundliche Beratung und pünktliche Lieferung – wir sind begeistert!" },
-      { "name": "M. Wagner, Güssing", "text": "Unser Kleiderschrank passt millimetergenau. Man merkt, dass hier echte Handwerker am Werk sind." },
-      { "name": "Fam. Schneider, Fehring", "text": "Sehr professionelle Abwicklung von der Planung bis zur Montage. Können wir nur weiterempfehlen!" }
+      {
+        "name": "Familie Horvath, Jennersdorf",
+        "text": "Die Einbauküche ist perfekt geworden. Präzise Arbeit, freundliche Beratung und pünktliche Lieferung – wir sind begeistert!"
+      },
+      {
+        "name": "M. Wagner, Güssing",
+        "text": "Unser Kleiderschrank passt millimetergenau. Man merkt, dass hier echte Handwerker am Werk sind."
+      },
+      {
+        "name": "Fam. Schneider, Fehring",
+        "text": "Sehr professionelle Abwicklung von der Planung bis zur Montage. Können wir nur weiterempfehlen!"
+      }
     ]
   },
   "gallery": {
     "headline": "Einblicke in unsere Arbeit",
     "images": [
-      { "src": "/images/gallery-1.jpg", "alt": "Maßgefertigter Wohnraum – Tischlerei Fasching OG", "caption": "Wohnraum nach Maß" },
-      { "src": "/images/gallery-2.jpg", "alt": "Badmöbel maßgefertigt – Tischlerei Fasching", "caption": "Badezimmermöbel" },
-      { "src": "/images/gallery-3.jpg", "alt": "Maßmöbel aus heimischem Holz", "caption": "Maßarbeit" },
-      { "src": "/images/gallery-4.jpg", "alt": "Hochwertiges Möbelstück – Tischlerei Fasching", "caption": "Qualitätshandwerk" },
-      { "src": "/images/gallery-5.jpg", "alt": "Einbaumöbel maßgefertigt", "caption": "Einbau nach Maß" },
-      { "src": "/images/gallery-6.jpg", "alt": "Individuelle Tischlerarbeit Fasching OG", "caption": "Individuelle Fertigung" }
+      {
+        "src": "/images/gallery-1.jpg",
+        "alt": "Maßgefertigter Wohnraum – Tischlerei Fasching OG",
+        "caption": "Wohnraum nach Maß"
+      },
+      {
+        "src": "/images/gallery-2.jpg",
+        "alt": "Badmöbel maßgefertigt – Tischlerei Fasching",
+        "caption": "Badezimmermöbel"
+      },
+      {
+        "src": "/images/gallery-3.jpg",
+        "alt": "Maßmöbel aus heimischem Holz",
+        "caption": "Maßarbeit"
+      },
+      {
+        "src": "/images/gallery-4.jpg",
+        "alt": "Hochwertiges Möbelstück – Tischlerei Fasching",
+        "caption": "Qualitätshandwerk"
+      },
+      {
+        "src": "/images/gallery-5.jpg",
+        "alt": "Einbaumöbel maßgefertigt",
+        "caption": "Einbau nach Maß"
+      },
+      {
+        "src": "/images/gallery-6.jpg",
+        "alt": "Individuelle Tischlerarbeit Fasching OG",
+        "caption": "Individuelle Fertigung"
+      }
     ]
   },
   "faq": {
     "headline": "Häufig gestellte Fragen",
     "items": [
-      { "q": "Wie lange dauert die Lieferung?", "a": "Je nach Umfang des Projekts beträgt die Fertigungszeit typischerweise 6–12 Wochen nach Auftragserteilung. Wir informieren Sie von Anfang an über realistische Zeitpläne." },
-      { "q": "In welcher Region sind Sie tätig?", "a": "Wir sind im südlichen Burgenland und der angrenzenden Steiermark tätig – von Güssing bis Fürstenfeld und Bad Radkersburg." },
-      { "q": "Was kostet eine Maßküche?", "a": "Die Kosten hängen stark von Größe, Materialien und Ausstattung ab. Gerne erstellen wir Ihnen ein individuelles Angebot nach einem kostenlosen Erstgespräch." },
-      { "q": "Welche Materialien verwenden Sie?", "a": "Wir arbeiten mit hochwertigen Massivhölzern, Furnierhölzern sowie modernen Lackoberflächen und Beschlägen führender Hersteller." },
-      { "q": "Kann ich meinen Wunsch auch digital planen lassen?", "a": "Ja – auf Wunsch erstellen wir 3D-Visualisierungen Ihrer Möbel, damit Sie sich das Ergebnis vorab genau vorstellen können." }
+      {
+        "q": "Wie lange dauert die Lieferung?",
+        "a": "Je nach Umfang des Projekts beträgt die Fertigungszeit typischerweise 6–12 Wochen nach Auftragserteilung. Wir informieren Sie von Anfang an über realistische Zeitpläne."
+      },
+      {
+        "q": "In welcher Region sind Sie tätig?",
+        "a": "Wir sind im südlichen Burgenland und der angrenzenden Steiermark tätig – von Güssing bis Fürstenfeld und Bad Radkersburg."
+      },
+      {
+        "q": "Was kostet eine Maßküche?",
+        "a": "Die Kosten hängen stark von Größe, Materialien und Ausstattung ab. Gerne erstellen wir Ihnen ein individuelles Angebot nach einem kostenlosen Erstgespräch."
+      },
+      {
+        "q": "Welche Materialien verwenden Sie?",
+        "a": "Wir arbeiten mit hochwertigen Massivhölzern, Furnierhölzern sowie modernen Lackoberflächen und Beschlägen führender Hersteller."
+      },
+      {
+        "q": "Kann ich meinen Wunsch auch digital planen lassen?",
+        "a": "Ja – auf Wunsch erstellen wir 3D-Visualisierungen Ihrer Möbel, damit Sie sich das Ergebnis vorab genau vorstellen können."
+      }
     ]
   },
   "contact": {
@@ -83,9 +180,18 @@
     "email": "office@wohnen-fasching.com",
     "address": "Mogersdorf 205, 8382 Mogersdorf",
     "hours": [
-      { "label": "Mo – Fr", "time": "07:00 – 12:00" },
-      { "label": "Mo – Fr", "time": "12:40 – 17:00" },
-      { "label": "Sa", "time": "Geschlossen" }
+      {
+        "label": "Mo – Fr",
+        "time": "07:00 – 12:00"
+      },
+      {
+        "label": "Mo – Fr",
+        "time": "12:40 – 17:00"
+      },
+      {
+        "label": "Sa",
+        "time": "Geschlossen"
+      }
     ],
     "formPlaceholder": {
       "name": "Ihr Name",
@@ -97,11 +203,21 @@
   "footer": {
     "copyright": "© 2026 Tischlerei Fasching OG",
     "links": [
-      { "text": "Impressum", "href": "#impressum" },
-      { "text": "Datenschutz", "href": "#datenschutz" }
+      {
+        "text": "Impressum",
+        "href": "#impressum"
+      },
+      {
+        "text": "Datenschutz",
+        "href": "#datenschutz"
+      }
     ],
     "social": [
-      { "name": "Facebook", "href": "https://www.facebook.com/georg.fasching.397", "icon": "facebook" }
+      {
+        "name": "Facebook",
+        "href": "https://www.facebook.com/georg.fasching.397",
+        "icon": "facebook"
+      }
     ]
   },
   "impressum": {
