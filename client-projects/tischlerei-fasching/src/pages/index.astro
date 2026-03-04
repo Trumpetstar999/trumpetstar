@@ -312,6 +312,9 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
             <p>
               <strong>Datenschutzerklärung gemäß DSGVO</strong><br /><br />
 
+              <strong>Cookies</strong><br />
+              Diese Website verwendet ausschließlich technisch notwendige Cookies. Es werden keine Tracking- oder Marketing-Cookies eingesetzt. Die Speicherung Ihrer Cookie-Einstellung erfolgt lokal in Ihrem Browser (localStorage) und wird nicht an uns übertragen.<br /><br />
+
               <strong>Verantwortlicher:</strong><br />
               Tischlerei Fasching OG, Mogersdorf 205, 8382 Mogersdorf<br />
               E-Mail: office@wohnen-fasching.com<br /><br />
@@ -456,5 +459,39 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
 
       document.querySelectorAll('.anim-ready').forEach(el => observer.observe(el));
     })();
+
+    // ── Cookie Banner ──
+    (function() {
+      const banner  = document.getElementById('cookie-banner');
+      const consent = localStorage.getItem('fasching_cookie_consent');
+      if (!banner) return;
+      if (consent) {
+        banner.classList.add('hidden');
+        return;
+      }
+      // Kurze Verzögerung damit Seite erst lädt
+      setTimeout(() => banner.classList.remove('hidden'), 800);
+
+      function dismiss(choice) {
+        localStorage.setItem('fasching_cookie_consent', choice);
+        banner.classList.add('hidden');
+      }
+      document.getElementById('cookie-accept').addEventListener('click', () => dismiss('accepted'));
+      document.getElementById('cookie-reject').addEventListener('click', () => dismiss('rejected'));
+    })();
   </script>
+
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner" class="hidden" role="region" aria-label="Cookie-Hinweis">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        Diese Website verwendet keine Tracking-Cookies. Wir setzen ausschließlich technisch notwendige Cookies ein, die für den Betrieb der Website erforderlich sind.
+        <a href="#datenschutz">Datenschutzerklärung</a>
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-accept" id="cookie-accept" aria-label="Cookies akzeptieren">Akzeptieren</button>
+        <button class="cookie-reject" id="cookie-reject" aria-label="Cookies ablehnen">Ablehnen</button>
+      </div>
+    </div>
+  </div>
 </Base>
