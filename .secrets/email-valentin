@@ -1,0 +1,13 @@
+# Valentin Email Credentials
+# DO NOT COMMIT THIS FILE
+
+EMAIL=valentin@trumpetstar.com
+PASSWORD=KJASDfas87ahsdfh!dK
+IMAP_SERVER=imap.world4you.com
+IMAP_PORT=993
+POP3_SERVER=pop3.world4you.com
+POP3_PORT=995
+SMTP_SERVER=smtp.world4you.com
+SMTP_PORT=587
+WEBMAIL=https://webmail.world4you.com
+PROVIDER=world4you

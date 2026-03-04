@@ -1,0 +1,118 @@
+{
+  "site": {
+    "name": "FIRMENNAME",
+    "tagline": "Kurzes Versprechen. In einem Satz.",
+    "description": "FIRMENNAME – LEISTUNG in ORT. Familiengeführt, regional, höchste Qualität.",
+    "url": "https://www.domain.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "FIRMENNAME | LEISTUNG – ORT",
+    "description": "Max 160 Zeichen. Enthält Hauptleistung + Ort + USP.",
+    "ogImage": "/images/og-image.jpg",
+    "canonical": "https://www.domain.at"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Headline,\ndie bleibt.",
+    "subheadline": "1-2 Sätze. Was der Kunde bekommt, warum er anrufen soll.",
+    "cta": {
+      "primary": { "text": "Jetzt Termin anfragen", "href": "#kontakt" },
+      "secondary": { "text": "TELEFON", "href": "tel:+43XXXXXXXXXX" }
+    },
+    "slides": [
+      { "src": "/images/hero-1.jpg", "alt": "FIRMENNAME – Beschreibung" },
+      { "src": "/images/hero-2.jpg", "alt": "FIRMENNAME – Beschreibung" }
+    ]
+  },
+  "leistungen": {
+    "headline": "Unsere Leistungen",
+    "subheadline": "Vom Entwurf bis zur Ausführung – alles aus einer Hand.",
+    "items": [
+      { "image": "/images/leistung-1.jpg", "title": "Leistung 1", "text": "Kurze Beschreibung der Leistung." },
+      { "image": "/images/leistung-2.jpg", "title": "Leistung 2", "text": "Kurze Beschreibung der Leistung." },
+      { "image": "/images/leistung-3.jpg", "title": "Leistung 3", "text": "Kurze Beschreibung der Leistung." },
+      { "image": "/images/gallery-1.jpg", "title": "Leistung 4", "text": "Kurze Beschreibung der Leistung." },
+      { "image": "/images/gallery-2.jpg", "title": "Leistung 5", "text": "Kurze Beschreibung der Leistung." },
+      { "image": "/images/gallery-3.jpg", "title": "Leistung 6", "text": "Kurze Beschreibung der Leistung." }
+    ]
+  },
+  "about": {
+    "headline": "Familienbetrieb mit Leidenschaft",
+    "text": "Seit XXXX steht FIRMENNAME für handwerkliche Präzision und persönlichen Service.",
+    "highlights": [
+      "Familiengeführt seit XXXX",
+      "Regional verwurzelt",
+      "Persönliche Beratung",
+      "Höchste Qualität"
+    ]
+  },
+  "testimonials": {
+    "headline": "Was unsere Kunden sagen",
+    "items": [
+      { "name": "Familie Mustermann, Ort", "text": "Sehr professionelle Arbeit. Können wir nur empfehlen!" },
+      { "name": "M. Beispiel, Ort", "text": "Pünktlich, sauber, freundlich – alles perfekt." },
+      { "name": "Fam. Test, Ort", "text": "Von der Planung bis zur Montage alles top." }
+    ]
+  },
+  "gallery": {
+    "headline": "Einblicke in unsere Arbeit",
+    "images": [
+      { "src": "/images/gallery-1.jpg", "alt": "Projekt 1 – FIRMENNAME", "caption": "Projekt 1" },
+      { "src": "/images/gallery-2.jpg", "alt": "Projekt 2 – FIRMENNAME", "caption": "Projekt 2" },
+      { "src": "/images/gallery-3.jpg", "alt": "Projekt 3 – FIRMENNAME", "caption": "Projekt 3" },
+      { "src": "/images/gallery-4.jpg", "alt": "Projekt 4 – FIRMENNAME", "caption": "Projekt 4" },
+      { "src": "/images/gallery-5.jpg", "alt": "Projekt 5 – FIRMENNAME", "caption": "Projekt 5" },
+      { "src": "/images/gallery-6.jpg", "alt": "Projekt 6 – FIRMENNAME", "caption": "Projekt 6" }
+    ]
+  },
+  "faq": {
+    "headline": "Häufig gestellte Fragen",
+    "items": [
+      { "q": "Wie lange dauert die Lieferung?", "a": "Je nach Umfang typischerweise X–Y Wochen nach Auftragserteilung." },
+      { "q": "In welcher Region sind Sie tätig?", "a": "Wir sind in REGION tätig." },
+      { "q": "Was kostet eine Beratung?", "a": "Das erste Gespräch ist kostenlos und unverbindlich." },
+      { "q": "Welche Materialien verwenden Sie?", "a": "Wir arbeiten ausschließlich mit hochwertigen Materialien führender Hersteller." }
+    ]
+  },
+  "contact": {
+    "headline": "Kontakt aufnehmen",
+    "subheadline": "Kein Projekt ist zu groß oder zu klein. Wir freuen uns auf Ihre Anfrage.",
+    "phone": "TELEFON",
+    "email": "office@domain.at",
+    "address": "Straße 1, PLZ Ort",
+    "hours": [
+      { "label": "Mo – Fr", "time": "08:00 – 17:00" },
+      { "label": "Sa", "time": "Geschlossen" }
+    ],
+    "formPlaceholder": {
+      "name": "Ihr Name",
+      "email": "Ihre E-Mail",
+      "message": "Beschreiben Sie kurz Ihr Projekt...",
+      "submit": "Anfrage senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 FIRMENNAME",
+    "links": [
+      { "text": "Impressum", "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ],
+    "social": []
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "FIRMENNAME",
+      "Straße, PLZ Ort",
+      "Tel: TELEFON",
+      "E-Mail: office@domain.at",
+      "Firmenbuch: FN XXXXXX x",
+      "UID: ATUXXXXXXXX",
+      "Gesellschafter: Vorname Nachname",
+      "Behörde: Bezirkshauptmannschaft ...",
+      "Berufsrecht: Gewerbeordnung (GewO) – www.ris.bka.gv.at"
+    ]
+  }
+}

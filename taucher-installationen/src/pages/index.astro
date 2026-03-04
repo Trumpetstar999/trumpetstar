@@ -1,0 +1,754 @@
+---
+import Base from '../layouts/Base.astro';
+import content from '../../content.json';
+
+const { site, contact, testimonials, faq, impressum } = content;
+
+const services = [
+  {
+    icon: '🔥',
+    title: 'Heizungsbau & Modernisierung',
+    desc: 'Von der Planung bis zur Inbetriebnahme – wir installieren und modernisieren Heizsysteme aller Art. Effizient, zukunftssicher und auf Ihre Bedürfnisse zugeschnitten.',
+    image: '/images/slider_2.jpg'
+  },
+  {
+    icon: '🛢️',
+    title: 'Gas-, Öl- & Pelletsheizungen',
+    desc: 'Fachgerechte Installation und Wartung von Gas-, Öl- und Pelletsheizungen. Wir beraten Sie zur optimalen Lösung für Ihre Immobilie.',
+    image: '/images/slider_4.jpg'
+  },
+  {
+    icon: '🌿',
+    title: 'Wärmepumpen & Erneuerbare',
+    desc: 'Zukunftssichere Heiztechnik: Wärmepumpen, Solarthermie und Hybridlösungen für maximale Energieeffizienz und Förderung.',
+    image: '/images/slider_8.jpg'
+  },
+  {
+    icon: '🚿',
+    title: 'Sanitärinstallationen',
+    desc: 'Komplette Rohrleitungsarbeiten, Wasserinstallationen und Montage hochwertiger Sanitärprodukte – sauber ausgeführt und schlüsselfertig.',
+    image: '/images/slider_3.jpg'
+  },
+  {
+    icon: '🛁',
+    title: 'Badsanierung',
+    desc: 'Ihr Traumbad in neuer Pracht: Wir planen und realisieren Ihre Badsanierung komplett – von der Fliese bis zur Armatur, alles aus einer Hand.',
+    image: '/images/slider_3a.jpg'
+  },
+  {
+    icon: '⚡',
+    title: 'Wartung & Notdienst',
+    desc: '24h-Notdienst bei Rohrbruch oder Heizungsausfall. Regelmäßige Wartung verlängert die Lebensdauer Ihrer Anlagen erheblich.',
+    image: '/images/slider_5a.jpg'
+  }
+];
+
+const mobileNoClean = contact.mobile.replace(/[\s\/]/g, '');
+const phoneNoClean = contact.phone.replace(/[\s\/]/g, '');
+---
+
+<Base title={`${site.name} | Heizung, Sanitär & Klima – Wien/NÖ`}>
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <span class="topbar-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Mo–Do 07:30–17:00 · Fr 07:30–14:00
+        </span>
+        <span class="topbar-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Josef Maurer-Gasse 2, 8380 Jennersdorf
+        </span>
+      </div>
+      <div class="topbar-right">
+        <a href={`tel:${mobileNoClean}`} class="topbar-notruf">
+          🔴 Notruf: {contact.mobile}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STICKY HEADER ===== -->
+  <header class="site-header at-top" id="site-header">
+    <div class="header-inner">
+      <a href="#" class="nav-logo-link" aria-label="Taucher Installationen – Startseite">
+        <img src="/logo.png" alt="Taucher Installationen GmbH" class="nav-logo" />
+      </a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#warum-wir">Über uns</a></li>
+        <li><a href="#ablauf">Ablauf</a></li>
+        <li><a href="#bewertungen">Bewertungen</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+
+      <div class="header-actions">
+        <a href="#kontakt" class="btn btn-ghost-primary btn-sm">Jetzt anfragen</a>
+        <a href={`tel:${mobileNoClean}`} class="header-notruf">
+          🔴 Notruf: {contact.mobile}
+        </a>
+      </div>
+
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Menü" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav" id="mobile-nav" hidden aria-label="Mobilnavigation">
+      <ul class="mobile-nav-links" role="list">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#warum-wir">Über uns</a></li>
+        <li><a href="#ablauf">Ablauf</a></li>
+        <li><a href="#bewertungen">Bewertungen</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+      <a href={`tel:${mobileNoClean}`} class="mobile-nav-notruf">🔴 Notruf: {contact.mobile}</a>
+      <a href={`tel:${phoneNoClean}`} class="mobile-nav-phone">{contact.phone}</a>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ===== HERO SLIDESHOW ===== -->
+    <section class="hero" aria-label="Willkommen bei Taucher Installationen">
+      <div class="hero-slides" id="hero-slides">
+        <div class="hero-slide active" style="background-image: url('/images/slider_home.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_2.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_7.jpg')"></div>
+        <div class="hero-slide" style="background-image: url('/images/slider_4.jpg')"></div>
+      </div>
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <div class="container hero-container">
+        <div class="hero-content">
+          <span class="hero-badge">
+            <span class="hero-badge-dot" aria-hidden="true"></span>
+            Ihr Experte für Heizung &amp; Sanitär
+          </span>
+          <h1>
+            Heizung, Sanitär<br>
+            <span class="accent-line">&amp; Klima aus einer Hand.</span>
+          </h1>
+          <p class="hero-sub">
+            Professionelle Installationen, 24h-Notdienst und persönliche Beratung —
+            zuverlässig, fair, mit 25&nbsp;Jahren Erfahrung.
+          </p>
+          <div class="hero-ctas">
+            <a href="#kontakt" class="btn btn-primary btn-lg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Kostenlos anfragen
+            </a>
+            <a href={`tel:${mobileNoClean}`} class="btn btn-outline-white btn-lg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+              {contact.mobile}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="hero-scroll-line"></div>
+        <span>Scroll</span>
+      </div>
+      <div class="hero-dots" id="hero-dots" role="tablist" aria-label="Slideshow Navigation"></div>
+    </section>
+
+    <!-- ===== TRUST BAR ===== -->
+    <div class="trust-bar" role="list" aria-label="Unsere Qualitätsmerkmale">
+      <div class="container trust-bar-inner">
+        <div class="trust-item" role="listitem">
+          <div class="trust-icon" aria-hidden="true">🏆</div>
+          <div>
+            <strong>25+ Jahre</strong>
+            <span class="trust-label">Erfahrung im Handwerk</span>
+          </div>
+        </div>
+        <div class="trust-item" role="listitem">
+          <div class="trust-icon" aria-hidden="true">🚨</div>
+          <div>
+            <strong>24h Notdienst</strong>
+            <span class="trust-label">Immer für Sie erreichbar</span>
+          </div>
+        </div>
+        <div class="trust-item" role="listitem">
+          <div class="trust-icon" aria-hidden="true">💰</div>
+          <div>
+            <strong>Festpreisgarantie</strong>
+            <span class="trust-label">Transparent &amp; fair</span>
+          </div>
+        </div>
+        <div class="trust-item" role="listitem">
+          <div class="trust-icon" aria-hidden="true">✅</div>
+          <div>
+            <strong>WK zertifiziert</strong>
+            <span class="trust-label">Geprüfte Qualität</span>
+          </div>
+        </div>
+        <div class="trust-item" role="listitem">
+          <div class="trust-icon" aria-hidden="true">💬</div>
+          <div>
+            <strong>Kostenlose Beratung</strong>
+            <span class="trust-label">Unverbindlich &amp; persönlich</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LEISTUNGEN ===== -->
+    <section id="leistungen" class="leistungen" aria-labelledby="leistungen-h">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">Unsere Dienstleistungen</span>
+          <h2 id="leistungen-h">Alles rund um Heizung,<br>Sanitär &amp; Klima</h2>
+          <p>Von der Planung über die Installation bis zur laufenden Wartung – alle Leistungen aus einer Hand, für Privat und Gewerbe.</p>
+        </header>
+
+        <div class="leistungen-grid">
+          {services.map((s, i) => (
+            <article class={`leistung-card anim-ready anim-fade-up delay-${i + 1}`}>
+              <div class="leistung-img-wrap">
+                <img src={s.image} alt={s.title} class="leistung-img" loading="lazy" decoding="async" />
+              </div>
+              <div class="leistung-body">
+                <div class="leistung-icon" aria-hidden="true">{s.icon}</div>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+                <a href="#kontakt" class="leistung-link" aria-label={`Mehr zu ${s.title}`}>
+                  Anfrage stellen
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== USP / TRUST SECTION ===== -->
+    <section class="usp-section" aria-label="Unsere Stärken">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">Warum wir?</span>
+          <h2>Drei gute Gründe<br>für Taucher Installationen</h2>
+        </header>
+
+        <div class="usp-grid">
+          <div class="usp-card anim-ready anim-fade-up delay-1">
+            <div class="usp-icon" aria-hidden="true">🏆</div>
+            <span class="usp-number">25+</span>
+            <div class="usp-title">Jahre Erfahrung</div>
+            <p class="usp-desc">Seit über 25 Jahren installieren und warten wir Heizungs- und Sanitäranlagen in der Region. Dieses Handwerk kennen wir in- und auswendig.</p>
+          </div>
+          <div class="usp-card anim-ready anim-fade-up delay-2">
+            <div class="usp-icon" aria-hidden="true">🚨</div>
+            <span class="usp-number">24h</span>
+            <div class="usp-title">Notdienst</div>
+            <p class="usp-desc">Rohrbruch um Mitternacht? Heizungsausfall im Winter? Wir sind rund um die Uhr erreichbar und reagieren schnell — damit Ihr Zuhause sicher bleibt.</p>
+          </div>
+          <div class="usp-card anim-ready anim-fade-up delay-3">
+            <div class="usp-icon" aria-hidden="true">💰</div>
+            <span class="usp-number">100%</span>
+            <div class="usp-title">Festpreisgarantie</div>
+            <p class="usp-desc">Unser Angebot ist unser Versprechen: Keine versteckten Kosten, keine Überraschungen. Sie wissen von Anfang an, was Sie zahlen — fair und transparent.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA BANNER ===== -->
+    <section class="cta-banner" aria-label="Jetzt Termin vereinbaren">
+      <div class="container cta-banner-inner">
+        <div class="cta-banner-text">
+          <h2>Kostenlos beraten lassen</h2>
+          <p>Kein Projekt zu groß, kein Problem zu klein. Jetzt unverbindlichen Termin anfragen.</p>
+        </div>
+        <div class="cta-banner-btns">
+          <a href="#kontakt" class="btn btn-white btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Formular ausfüllen
+          </a>
+          <a href={`tel:${phoneNoClean}`} class="btn btn-primary btn-lg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            Jetzt anrufen
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WARUM WIR ===== -->
+    <section id="warum-wir" class="why-section" aria-labelledby="warum-h">
+      <div class="why-bg-deco" aria-hidden="true"></div>
+      <div class="container why-grid">
+        <div class="why-content anim-ready anim-slide-left">
+          <span class="section-tag why-tag">Über Taucher Installationen</span>
+          <h2 id="warum-h">Ihr verlässlicher<br>Handwerkspartner</h2>
+          <p>Seit über 25 Jahren steht Taucher Installationen GmbH für handwerkliche Präzision und persönlichen Service. Als Familienbetrieb legen wir besonderen Wert auf Qualität, Zuverlässigkeit und die Zufriedenheit unserer Kunden — von der ersten Beratung bis zur fertigen Anlage.</p>
+
+          <div class="why-features">
+            <div class="why-feature">
+              <div class="why-feature-icon" aria-hidden="true">👨‍🔧</div>
+              <div class="why-feature-text">
+                <h4>Qualifizierte Fachkräfte</h4>
+                <p>Meisterbetrieb mit laufender Weiterbildung und jahrelanger Berufserfahrung.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon" aria-hidden="true">⏰</div>
+              <div class="why-feature-text">
+                <h4>Pünktlich &amp; zuverlässig</h4>
+                <p>Wir halten Termine und Fristen ein – vom ersten Gespräch bis zur Übergabe.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon" aria-hidden="true">🌿</div>
+              <div class="why-feature-text">
+                <h4>Nachhaltige Lösungen</h4>
+                <p>Energieeffiziente Systeme mit Förderberatung — für Ihre Zukunft und die Umwelt.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon" aria-hidden="true">🔒</div>
+              <div class="why-feature-text">
+                <h4>Sauber &amp; verlässlich</h4>
+                <p>Hochwertige Materialien, fachgerechte Ausführung, sauber hinterlassen.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="why-image anim-ready anim-fade-in delay-2">
+          <img src="/images/slider_7.jpg" alt="Taucher Installationen – Professioneller Betrieb" class="why-img" loading="lazy" />
+          <div class="why-stats-card">
+            <div class="why-stat">
+              <span class="why-stat-num">25+</span>
+              <span class="why-stat-lbl">Jahre Erfahrung</span>
+            </div>
+            <div class="why-stat">
+              <span class="why-stat-num">2.500+</span>
+              <span class="why-stat-lbl">Projekte</span>
+            </div>
+            <div class="why-stat">
+              <span class="why-stat-num">100%</span>
+              <span class="why-stat-lbl">Festpreis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABLAUF / PROCESS ===== -->
+    <section id="ablauf" class="process" aria-labelledby="ablauf-h">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">So funktioniert's</span>
+          <h2 id="ablauf-h">Ihr Projekt in 4 einfachen Schritten</h2>
+          <p>Unkompliziert, transparent und termingerecht – von der ersten Anfrage bis zur fertigen Installation.</p>
+        </header>
+
+        <div class="process-steps">
+          <div class="process-step anim-ready anim-fade-up delay-1">
+            <div class="process-step-num" aria-hidden="true">1</div>
+            <h3>Kontaktaufnahme</h3>
+            <p>Rufen Sie uns an oder senden Sie uns eine Anfrage. Kostenlos und vollständig unverbindlich.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up delay-2">
+            <div class="process-step-num" aria-hidden="true">2</div>
+            <h3>Beratung &amp; Angebot</h3>
+            <p>Wir besichtigen Ihr Objekt vor Ort und erstellen ein transparentes Festpreisangebot.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up delay-3">
+            <div class="process-step-num" aria-hidden="true">3</div>
+            <h3>Fachgerechte Ausführung</h3>
+            <p>Unser Team führt alle Arbeiten professionell, sauber und termingerecht durch.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up delay-4">
+            <div class="process-step-num" aria-hidden="true">4</div>
+            <h3>Übergabe &amp; Service</h3>
+            <p>Wir übergeben das fertige Projekt und bleiben als zuverlässiger Wartungspartner an Ihrer Seite.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section id="bewertungen" class="testimonials" aria-labelledby="bewertungen-h">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">Kundenstimmen</span>
+          <h2 id="bewertungen-h">Was unsere Kunden sagen</h2>
+          <p>Zufriedene Kunden sind unsere beste Referenz — seit über 25 Jahren.</p>
+        </header>
+
+        <div class="testimonials-grid">
+          {testimonials.items.map((t, i) => (
+            <blockquote class={`testimonial-card anim-ready anim-fade-up delay-${i + 1}`}>
+              <div class="testimonial-stars" aria-label="5 von 5 Sternen">★★★★★</div>
+              <p class="testimonial-text">{t.text}</p>
+              <footer class="testimonial-author">
+                <div class="testimonial-avatar" aria-hidden="true">{t.name.charAt(0)}</div>
+                <div>
+                  <div class="testimonial-name">{t.name}</div>
+                  <div class="testimonial-loc">Zufriedener Kunde</div>
+                </div>
+              </footer>
+            </blockquote>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="faq" aria-labelledby="faq-h">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">Häufige Fragen</span>
+          <h2 id="faq-h">Antworten auf Ihre Fragen</h2>
+          <p>Alles Wichtige auf einen Blick – und falls etwas offen bleibt, rufen Sie uns einfach an.</p>
+        </header>
+
+        <div class="faq-list">
+          {faq.items.map((item) => (
+            <details class="faq-item anim-ready anim-fade-up">
+              <summary>{item.q}</summary>
+              <div class="faq-answer"><p>{item.a}</p></div>
+            </details>
+          ))}
+        </div>
+
+        <div class="faq-cta">
+          <p>Noch Fragen? Wir helfen Ihnen gerne persönlich weiter.</p>
+          <a href={`tel:${phoneNoClean}`} class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            {contact.phone}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section id="kontakt" class="contact" aria-labelledby="kontakt-h">
+      <div class="container">
+        <header class="section-head anim-ready anim-fade-up">
+          <span class="section-tag">Kontakt</span>
+          <h2 id="kontakt-h">Sprechen Sie uns an</h2>
+          <p>Kostenlose Erstberatung, unverbindliches Angebot – wir melden uns innerhalb von 24 Stunden.</p>
+        </header>
+
+        <div class="contact-grid">
+          <!-- Infos -->
+          <div>
+            <h3 class="contact-info-title">Kontaktdaten</h3>
+            <p class="contact-intro">Wir sind Ihr verlässlicher Partner für alle Fragen rund um Heizung, Sanitär und Klima. Rufen Sie uns an oder schreiben Sie uns.</p>
+
+            <div class="contact-details">
+              <div class="contact-item">
+                <div class="contact-icon" aria-hidden="true">📞</div>
+                <div>
+                  <span class="contact-item-label">Telefon</span>
+                  <a href={`tel:${phoneNoClean}`} class="contact-item-value">{contact.phone}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon" aria-hidden="true">📱</div>
+                <div>
+                  <span class="contact-item-label">Mobil / Notdienst 24h</span>
+                  <a href={`tel:${mobileNoClean}`} class="contact-item-value">{contact.mobile}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon" aria-hidden="true">✉️</div>
+                <div>
+                  <span class="contact-item-label">E-Mail</span>
+                  <a href={`mailto:${contact.email}`} class="contact-item-value">{contact.email}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon" aria-hidden="true">📍</div>
+                <div>
+                  <span class="contact-item-label">Adresse</span>
+                  <a
+                    href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="contact-item-value"
+                  >{contact.address}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon" aria-hidden="true">🕐</div>
+                <div>
+                  <span class="contact-item-label">Öffnungszeiten</span>
+                  <div class="contact-hours-list">
+                    {contact.hours.map((h) => (
+                      <span>{h.label}: <strong>{h.time}</strong></span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-notruf-box">
+              <p>🚨 Dringend? Unser Notdienst ist 24/7 erreichbar:</p>
+              <a href={`tel:${mobileNoClean}`} class="btn btn-primary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                {contact.mobile} anrufen
+              </a>
+            </div>
+          </div>
+
+          <!-- Formular -->
+          <div class="contact-form-card anim-ready anim-fade-up">
+            <h3 class="contact-form-title">Kostenlose Anfrage senden</h3>
+            <form id="contact-form" action="#" method="POST" novalidate aria-label="Kontaktformular">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fname">Name *</label>
+                  <input type="text" id="fname" name="name" placeholder="Max Mustermann" required autocomplete="name" />
+                </div>
+                <div class="form-group">
+                  <label for="fphone">Telefon</label>
+                  <input type="tel" id="fphone" name="phone" placeholder="0664 ..." autocomplete="tel" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="femail">E-Mail *</label>
+                <input type="email" id="femail" name="email" placeholder="max@beispiel.at" required autocomplete="email" />
+              </div>
+              <div class="form-group">
+                <label for="fsubject">Betreff</label>
+                <select id="fsubject" name="subject">
+                  <option value="">Bitte auswählen...</option>
+                  <option>Heizungsbau / Modernisierung</option>
+                  <option>Sanitärinstallation</option>
+                  <option>Badsanierung</option>
+                  <option>Wärmepumpe / Erneuerbare Energien</option>
+                  <option>Klima / Kühlung</option>
+                  <option>Wartung / Service</option>
+                  <option>Notfall / Störung</option>
+                  <option>Sonstiges</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="fmessage">Nachricht *</label>
+                <textarea id="fmessage" name="message" placeholder="Beschreiben Sie kurz Ihr Anliegen..." rows="5" required></textarea>
+              </div>
+              <!-- Honeypot anti-spam -->
+              <input type="text" name="_hp" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <button type="submit" class="form-submit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Anfrage kostenfrei senden
+              </button>
+              <p class="form-note">* Pflichtfelder. Kostenlos &amp; unverbindlich. Antwort innerhalb 24h. Ihre Daten werden nicht weitergegeben.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== IMPRESSUM / LEGAL ===== -->
+    <section id="impressum" class="legal" aria-labelledby="impressum-h">
+      <div class="container legal-grid">
+        <div class="legal-section">
+          <h2 id="impressum-h">Impressum</h2>
+          <address>
+            {impressum.lines.map((line) => (
+              <>{line}<br /></>
+            ))}
+          </address>
+        </div>
+        <div class="legal-section" id="datenschutz">
+          <h2>Datenschutz</h2>
+          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben. Wir weisen darauf hin, dass die Datenübertragung im Internet Sicherheitslücken aufweisen kann.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="/logo.png" alt="Taucher Installationen GmbH" class="footer-logo" />
+          <p>Ihr zuverlässiger Partner für Heizung, Sanitär und Klimatechnik. Familienbetrieb mit über 25 Jahren Erfahrung in der Region.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Leistungen</h4>
+          <ul>
+            <li><a href="#leistungen">Heizungsbau</a></li>
+            <li><a href="#leistungen">Gas- &amp; Ölheizungen</a></li>
+            <li><a href="#leistungen">Wärmepumpen</a></li>
+            <li><a href="#leistungen">Sanitärinstallation</a></li>
+            <li><a href="#leistungen">Badsanierung</a></li>
+            <li><a href="#leistungen">24h Notdienst</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Unternehmen</h4>
+          <ul>
+            <li><a href="#warum-wir">Über uns</a></li>
+            <li><a href="#ablauf">Unser Ablauf</a></li>
+            <li><a href="#bewertungen">Kundenstimmen</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Kontakt</h4>
+          <ul>
+            <li><a href={`tel:${phoneNoClean}`}>{contact.phone}</a></li>
+            <li><a href={`tel:${mobileNoClean}`}>{contact.mobile} (Notdienst)</a></li>
+            <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+            <li>{contact.address}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Taucher Installationen GmbH · Alle Rechte vorbehalten</span>
+        <div class="footer-links">
+          <a href="#impressum">Impressum</a>
+          <a href="#datenschutz">Datenschutz</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner" class="cookie-banner" hidden role="dialog" aria-label="Cookie-Einstellungen">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        Diese Website verwendet funktionale Cookies für ein optimales Nutzererlebnis.
+        <a href="#datenschutz">Mehr erfahren</a>
+      </p>
+      <div class="cookie-actions">
+        <button id="cookie-reject" class="cookie-reject">Ablehnen</button>
+        <button id="cookie-accept" class="btn btn-primary btn-sm">Akzeptieren</button>
+      </div>
+    </div>
+  </div>
+
+</Base>
+
+<script>
+  // ── Header scroll behavior ──
+  const header = document.getElementById('site-header')!;
+  const updateHeader = () => {
+    const scrolled = window.scrollY > 30;
+    header.classList.toggle('scrolled', scrolled);
+    header.classList.toggle('at-top', !scrolled);
+  };
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader();
+
+  // ── Mobile Menu toggle ──
+  const toggle  = document.getElementById('mobile-toggle')!;
+  const mobileNav = document.getElementById('mobile-nav')!;
+  toggle.addEventListener('click', () => {
+    const isOpen = !mobileNav.hidden;
+    mobileNav.hidden = isOpen;
+    toggle.classList.toggle('open', !isOpen);
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  });
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileNav.hidden = true;
+      toggle.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ── Hero Slideshow ──
+  (function () {
+    const slides = document.querySelectorAll<HTMLElement>('.hero-slide');
+    const dotsEl  = document.getElementById('hero-dots');
+    if (!slides.length || !dotsEl) return;
+    let current = 0, timer: ReturnType<typeof setInterval>;
+
+    slides.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'hero-dot' + (i === 0 ? ' active' : '');
+      btn.setAttribute('aria-label', `Slide ${i + 1} von ${slides.length}`);
+      btn.setAttribute('role', 'tab');
+      btn.addEventListener('click', () => { go(i); resetTimer(); });
+      dotsEl.appendChild(btn);
+    });
+
+    function go(n: number) {
+      slides[current].classList.remove('active');
+      dotsEl!.querySelectorAll('.hero-dot')[current].classList.remove('active');
+      current = ((n % slides.length) + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dotsEl!.querySelectorAll('.hero-dot')[current].classList.add('active');
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => go(current + 1), 5500);
+    }
+
+    resetTimer();
+  })();
+
+  // ── Scroll Animations ──
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('anim-visible');
+        io.unobserve(e.target);
+      }
+    }),
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.anim-ready').forEach(el => io.observe(el));
+
+  // ── Cookie Banner ──
+  const banner    = document.getElementById('cookie-banner')!;
+  const acceptBtn = document.getElementById('cookie-accept')!;
+  const rejectBtn = document.getElementById('cookie-reject')!;
+  const COOKIE_KEY = 'taucher-cookie-consent';
+
+  if (!localStorage.getItem(COOKIE_KEY)) {
+    setTimeout(() => { banner.hidden = false; }, 800);
+  }
+  acceptBtn.addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'accepted');
+    banner.hidden = true;
+  });
+  rejectBtn.addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'rejected');
+    banner.hidden = true;
+  });
+
+  // ── Contact form basic validation ──
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name  = (form.querySelector('#fname')    as HTMLInputElement).value.trim();
+      const email = (form.querySelector('#femail')   as HTMLInputElement).value.trim();
+      const msg   = (form.querySelector('#fmessage') as HTMLTextAreaElement).value.trim();
+      if (!name || !email || !msg) {
+        alert('Bitte füllen Sie alle Pflichtfelder aus.');
+        return;
+      }
+      // Success state
+      const btn = form.querySelector('.form-submit')! as HTMLButtonElement;
+      btn.textContent = '✓ Anfrage gesendet – wir melden uns!';
+      btn.style.background = '#22c55e';
+      btn.disabled = true;
+    });
+  }
+</script>
+
+<style is:global>
+  html {
+    scroll-padding-top: calc(var(--header-h) + var(--topbar-h) + 12px);
+  }
+</style>

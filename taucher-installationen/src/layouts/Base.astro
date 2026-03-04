@@ -1,0 +1,51 @@
+---
+export interface Props {
+  title?: string;
+}
+const { title = 'Taucher Installationen GmbH' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content="Taucher Installationen GmbH - Ihr Ansprechpartner für Gas, Sanitär und Heizung in Jennersdorf und dem Südburgenland.">
+  <meta name="keywords" content="Heizung, Sanitär, Installation, Jennersdorf, Südburgenland, Gas, Wärmepumpe, Badsanierung">
+  <meta name="author" content="Taucher Installationen GmbH">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content="Ihr verlässlicher Partner für Heizungsbau, Sanitärinstallationen und moderne Energielösungen in Jennersdorf.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_AT">
+  <meta property="og:image" content="/images/slider_home.jpg">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content="Ihr verlässlicher Partner für Heizung & Sanitär in Jennersdorf.">
+  <meta name="twitter:image" content="/images/slider_home.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="apple-touch-icon" href="/images/logo.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/styles/global.css">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#2D5A3D">
+  <meta name="msapplication-TileColor" content="#2D5A3D">
+</head>
+<body>
+  <slot />
+</body>
+</html>

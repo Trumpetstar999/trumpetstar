@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trumpetstar Newsletter</title>
+<style>
+body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; }
+.container { max-width: 600px; margin: 0 auto; background: #ffffff; }
+.header { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); padding: 40px 20px; text-align: center; }
+.header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; }
+.header p { color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 16px; }
+.content { padding: 40px 30px; }
+.section { margin-bottom: 30px; }
+.section h2 { color: #1f2937; font-size: 22px; margin: 0 0 15px; }
+.section p { color: #4b5563; line-height: 1.6; font-size: 16px; margin: 0 0 15px; }
+.tip-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0; border-radius: 4px; }
+.tip-box h3 { color: #92400e; margin: 0 0 10px; font-size: 18px; }
+.tip-box p { color: #78350f; margin: 0; }
+.cta { text-align: center; margin: 30px 0; }
+.cta a { display: inline-block; background: #7c3aed; color: #ffffff; text-decoration: none; padding: 15px 30px; border-radius: 8px; font-weight: 600; font-size: 16px; }
+.footer { background: #1f2937; color: #9ca3af; padding: 30px; text-align: center; font-size: 14px; }
+.footer a { color: #a855f7; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎺 Trumpetstar Weekly</h1>
+    <p>Dein Wochen-Update für mehr Erfolg an der Trompete</p>
+  </div>
+  
+  <div class="content">
+    <div class="section">
+      <h2>Hallo {{first_name|Lieber Trumpetstar-Lernender}},</h2>
+      <p>diese Woche haben wir ein besonderes Thema für dich: <strong>Die 5-Minuten-Methode</strong>. Viele unserer Lernenden sind überrascht, wie viel Fortschritt mit nur wenigen Minuten täglicher Übung möglich ist.</p>
+    </div>
+    
+    <div class="tip-box">
+      <h3>💡 Tipp der Woche</h3>
+      <p>Konzentriere dich auf <strong>Qualität statt Quantität</strong>. Lieber 5 Minuten fokussiertes Üben als 30 Minuten halbherzig. Dein Gehirn brauht Wiederholung, keine Ermüdung!</p>
+    </div>
+    
+    <div class="section">
+      <h2>🌟 Community Spotlight</h2>
+      <p>Diese Woche möchten wir Peter aus Wien vorstellen. Mit 45 Jahren hat er begonnen – und nach nur 3 Monaten spielt er seine ersten Songs! Seine Devise: <em>"Es ist nie zu spät, Musik zu lernen."</em></p>
+      <p>Teile auch du deine Geschichte mit uns! Antworte einfach auf diese E-Mail.</p>
+    </div>
+    
+    <div class="section">
+      <h2>📅 Was kommt nächste Woche?</h2>
+      <p>Nächste Woche veröffentlichen wir ein brandneues Video: <strong>"Die 3 größten Fehler, die jeder Anfänger macht"</strong>. Bleib dran – diese Tipps werden dir Stunden frustrierenden Übens ersparen!</p>
+    </div>
+    
+    <div class="cta">
+      <a href="https://trumpetstar.app">Zur Trumpetstar App →</a>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>Trumpetstar | Mario Schulter | Austria</p>
+    <p><a href="{{unsubscribe_url}}">Newsletter abbestellen</a> | <a href="https://trumpetstar.com/impressum">Impressum</a></p>
+    <p style="margin-top: 15px; font-size: 12px;">Diese E-Mail wurde automatisch von Valentin 🎺 verschickt</p>
+  </div>
+</div>
+</body>
+</html>

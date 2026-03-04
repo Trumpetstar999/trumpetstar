@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trumpetstar Content Pipeline</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d0d0f;--surface:#18181b;--card:#23232a;--card-hover:#2a2a33;--border:#2e2e38;--text:#e4e4e7;--text-muted:#71717a;--accent:#7c3aed;--accent-light:#a78bfa;--ideas:#eab308;--scripting:#3b82f6;--thumbnail:#22c55e;--filming:#f97316;--editing:#ef4444;--published:#8b5cf6;--danger:#dc2626}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:auto}
+header{padding:20px 28px 12px;border-bottom:1px solid var(--border)}
+header h1{font-size:22px;font-weight:700;letter-spacing:-.5px}
+header p{font-size:13px;color:var(--text-muted);margin-top:2px}
+.stats{display:flex;gap:12px;padding:14px 28px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:100px;text-align:center}
+.stat .num{font-size:20px;font-weight:700}
+.stat .label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.board{display:flex;gap:14px;padding:14px 28px 28px;min-height:calc(100vh - 140px);overflow-x:auto}
+.column{background:var(--surface);border:1px solid var(--border);border-radius:10px;min-width:260px;max-width:300px;flex:1;display:flex;flex-direction:column}
+.col-header{padding:14px 16px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.col-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
+.col-dot{width:8px;height:8px;border-radius:50%}
+.col-count{background:var(--card);border-radius:12px;padding:1px 8px;font-size:12px;color:var(--text-muted)}
+.col-body{flex:1;padding:8px;overflow-y:auto;min-height:60px}
+.col-body.drag-over{background:rgba(124,58,237,.08);border-radius:0 0 10px 10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:grab;transition:all .15s}
+.card:hover{background:var(--card-hover);border-color:var(--accent)}
+.card.dragging{opacity:.4;transform:scale(.97)}
+.card-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.card-desc{font-size:12px;color:var(--text-muted);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.card-tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(124,58,237,.15);color:var(--accent-light)}
+.card-assignee{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.assignee-mario{background:rgba(234,179,8,.15);color:#eab308}
+.assignee-clawbot{background:rgba(124,58,237,.15);color:#a78bfa}
+.card-actions{display:flex;gap:4px;margin-top:8px;opacity:0;transition:opacity .15s}
+.card:hover .card-actions{opacity:1}
+.card-actions button{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer}
+.card-actions button:hover{color:var(--text);border-color:var(--accent)}
+.card-actions .del:hover{color:var(--danger);border-color:var(--danger)}
+.card-img{width:100%;border-radius:4px;margin:6px 0;max-height:120px;object-fit:cover}
+.add-btn{margin:8px;padding:8px;background:none;border:1px dashed var(--border);border-radius:6px;color:var(--text-muted);cursor:pointer;font-size:12px;text-align:center;transition:all .15s}
+.add-btn:hover{border-color:var(--accent);color:var(--accent-light)}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:480px;max-width:92vw;max-height:85vh;overflow-y:auto;padding:24px}
+.modal h2{font-size:18px;margin-bottom:16px}
+.modal label{font-size:12px;color:var(--text-muted);display:block;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
+.modal input,.modal textarea,.modal select{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:10px;font-size:13px;font-family:inherit}
+.modal textarea{min-height:80px;resize:vertical}
+.modal .script-area{min-height:160px;font-family:'SF Mono',Monaco,monospace;font-size:12px;line-height:1.5}
+.modal-btns{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+.modal-btns button{padding:8px 20px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer}
+.btn-save{background:var(--accent);color:#fff}
+.btn-save:hover{background:var(--accent-light)}
+.btn-cancel{background:var(--card);color:var(--text-muted);border:1px solid var(--border)}
+.btn-cancel:hover{color:var(--text)}
+.btn-delete{background:var(--danger);color:#fff;margin-right:auto}
+.btn-delete:hover{opacity:.8}
+.img-preview{max-width:100%;max-height:150px;border-radius:6px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+<h1>🎺 Content Pipeline</h1>
+<p>Ideas → Scripting → Thumbnail → Filming → Editing → Published</p>
+</header>
+<div class="stats" id="stats"></div>
+<div class="board" id="board"></div>
+
+<div class="modal-bg" id="modalBg">
+<div class="modal" id="modal">
+<h2 id="modalTitle">New Content</h2>
+<label>Title *</label>
+<input id="fTitle" placeholder="Content title...">
+<label>Description</label>
+<textarea id="fDesc" placeholder="What's the idea?"></textarea>
+<label>Script</label>
+<textarea id="fScript" class="script-area" placeholder="Full script or outline..."></textarea>
+<label>Image URL</label>
+<input id="fImage" placeholder="https://... or paste base64">
+<img id="fImgPreview" class="img-preview" style="display:none">
+<label>Assignee</label>
+<select id="fAssignee"><option value="Mario">Mario</option><option value="ClawBot">ClawBot</option></select>
+<label>Stage</label>
+<select id="fStage"></select>
+<label>Tags (comma separated)</label>
+<input id="fTags" placeholder="youtube, short, tutorial...">
+<div class="modal-btns">
+<button class="btn-delete" id="btnDel" style="display:none" onclick="deleteCard()">Delete</button>
+<button class="btn-cancel" onclick="closeModal()">Cancel</button>
+<button class="btn-save" onclick="saveCard()">Save</button>
+</div>
+</div>
+</div>
+
+<script>
+const STAGES = [
+  {id:'ideas',name:'Ideas',icon:'💡',color:'var(--ideas)'},
+  {id:'scripting',name:'Scripting',icon:'✍️',color:'var(--scripting)'},
+  {id:'thumbnail',name:'Thumbnail',icon:'🖼️',color:'var(--thumbnail)'},
+  {id:'filming',name:'Filming',icon:'🎬',color:'var(--filming)'},
+  {id:'editing',name:'Editing',icon:'✂️',color:'var(--editing)'},
+  {id:'published',name:'Published',icon:'🚀',color:'var(--published)'}
+];
+
+let cards = JSON.parse(localStorage.getItem('ts-pipeline') || '[]');
+let editId = null;
+let dragId = null;
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function save(){localStorage.setItem('ts-pipeline',JSON.stringify(cards))}
+
+function render(){
+  // Stats
+  const statsEl=document.getElementById('stats');
+  statsEl.innerHTML=STAGES.map(s=>{
+    const n=cards.filter(c=>c.stage===s.id).length;
+    return `<div class="stat"><div class="num" style="color:${s.color}">${n}</div><div class="label">${s.icon} ${s.name}</div></div>`;
+  }).join('');
+
+  // Board
+  const board=document.getElementById('board');
+  board.innerHTML=STAGES.map(s=>{
+    const col_cards=cards.filter(c=>c.stage===s.id).sort((a,b)=>a.order-b.order);
+    return `<div class="column">
+      <div class="col-header">
+        <div class="col-title"><span class="col-dot" style="background:${s.color}"></span>${s.icon} ${s.name}</div>
+        <span class="col-count">${col_cards.length}</span>
+      </div>
+      <div class="col-body" data-stage="${s.id}"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="dropCard(event,'${s.id}');this.classList.remove('drag-over')">
+        ${col_cards.map(c=>`
+          <div class="card" draggable="true" ondragstart="dragStart('${c.id}')" ondragend="dragEnd(event)" data-id="${c.id}" ondblclick="editCard('${c.id}')">
+            <div class="card-title">${esc(c.title)}</div>
+            ${c.desc?`<div class="card-desc">${esc(c.desc)}</div>`:''}
+            ${c.image?`<img class="card-img" src="${esc(c.image)}">`:''}
+            <div class="card-meta">
+              <div class="card-tags">${(c.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+              <span class="card-assignee assignee-${c.assignee?.toLowerCase()||'mario'}">${esc(c.assignee||'Mario')}</span>
+            </div>
+            <div class="card-actions">
+              <button onclick="editCard('${c.id}')">Edit</button>
+              <button onclick="moveCard('${c.id}',1)">→</button>
+              <button class="del" onclick="if(confirm('Delete?'))deleteById('${c.id}')">✕</button>
+            </div>
+          </div>`).join('')}
+      </div>
+      <button class="add-btn" onclick="openNew('${s.id}')">+ Add Content</button>
+    </div>`;
+  }).join('');
+}
+
+function esc(s){return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+
+function dragStart(id){dragId=id;setTimeout(()=>{const el=document.querySelector(`[data-id="${id}"]`);if(el)el.classList.add('dragging')},0)}
+function dragEnd(e){e.target.classList.remove('dragging');dragId=null}
+function dropCard(e,stage){e.preventDefault();if(!dragId)return;const c=cards.find(x=>x.id===dragId);if(c){c.stage=stage;c.updated=new Date().toISOString();save();render()}}
+
+function moveCard(id,dir){
+  const c=cards.find(x=>x.id===id);if(!c)return;
+  const idx=STAGES.findIndex(s=>s.id===c.stage);
+  const ni=idx+dir;
+  if(ni>=0&&ni<STAGES.length){c.stage=STAGES[ni].id;c.updated=new Date().toISOString();save();render()}
+}
+
+function openNew(stage){
+  editId=null;
+  document.getElementById('modalTitle').textContent='New Content';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fDesc').value='';
+  document.getElementById('fScript').value='';
+  document.getElementById('fImage').value='';
+  document.getElementById('fImgPreview').style.display='none';
+  document.getElementById('fAssignee').value='Mario';
+  document.getElementById('fTags').value='';
+  populateStages(stage);
+  document.getElementById('btnDel').style.display='none';
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function editCard(id){
+  const c=cards.find(x=>x.id===id);if(!c)return;
+  editId=id;
+  document.getElementById('modalTitle').textContent='Edit Content';
+  document.getElementById('fTitle').value=c.title||'';
+  document.getElementById('fDesc').value=c.desc||'';
+  document.getElementById('fScript').value=c.script||'';
+  document.getElementById('fImage').value=c.image||'';
+  if(c.image){document.getElementById('fImgPreview').src=c.image;document.getElementById('fImgPreview').style.display='block'}
+  else{document.getElementById('fImgPreview').style.display='none'}
+  document.getElementById('fAssignee').value=c.assignee||'Mario';
+  document.getElementById('fTags').value=(c.tags||[]).join(', ');
+  populateStages(c.stage);
+  document.getElementById('btnDel').style.display='block';
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function populateStages(sel){
+  const s=document.getElementById('fStage');
+  s.innerHTML=STAGES.map(st=>`<option value="${st.id}"${st.id===sel?' selected':''}>${st.icon} ${st.name}</option>`).join('');
+}
+
+function saveCard(){
+  const title=document.getElementById('fTitle').value.trim();
+  if(!title)return alert('Title is required');
+  const data={
+    title,
+    desc:document.getElementById('fDesc').value.trim(),
+    script:document.getElementById('fScript').value.trim(),
+    image:document.getElementById('fImage').value.trim(),
+    assignee:document.getElementById('fAssignee').value,
+    stage:document.getElementById('fStage').value,
+    tags:document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    updated:new Date().toISOString()
+  };
+  if(editId){
+    const c=cards.find(x=>x.id===editId);
+    if(c)Object.assign(c,data);
+  } else {
+    data.id=uid();data.created=new Date().toISOString();data.order=cards.filter(c=>c.stage===data.stage).length;
+    cards.push(data);
+  }
+  save();closeModal();render();
+}
+
+function deleteCard(){if(editId){deleteById(editId);closeModal()}}
+function deleteById(id){cards=cards.filter(c=>c.id!==id);save();render()}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');editId=null}
+
+document.getElementById('fImage').addEventListener('input',function(){
+  const v=this.value.trim();const p=document.getElementById('fImgPreview');
+  if(v){p.src=v;p.style.display='block'}else{p.style.display='none'}
+});
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+render();
+</script>
+</body>
+</html>
