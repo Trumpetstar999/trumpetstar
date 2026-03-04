@@ -90,13 +90,13 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <!-- ===== LEISTUNGEN ===== -->
     <section class="leistungen" id="leistungen" aria-labelledby="leistungen-title">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header anim-ready anim-fade-up">
           <h2 id="leistungen-title">{leistungen.headline}</h2>
           <p>{leistungen.subheadline}</p>
         </div>
         <div class="leistungen-grid" role="list">
-          {leistungen.items.map(item => (
-            <article class="leistung-card" role="listitem">
+          {leistungen.items.map((item, i) => (
+            <article class={`leistung-card anim-ready anim-fade-up anim-delay-${i + 1}`} role="listitem">
               {item.image && <img src={item.image} alt={item.title} class="leistung-img" loading="lazy" width="480" height="220" />}
               <div class="leistung-text">
                 <h3>{item.title}</h3>
@@ -112,12 +112,12 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <section class="about" id="about" aria-labelledby="about-title">
       <div class="container">
         <div class="about-grid">
-          <div class="about-text-col">
+          <div class="about-text-col anim-ready anim-slide-left">
             <h2 id="about-title">{about.headline}</h2>
             <p class="about-text">{about.text}</p>
             <span class="about-names">Georg & Jochen Fasching</span>
           </div>
-          <div class="about-highlights-col">
+          <div class="about-highlights-col anim-ready anim-slide-right">
             <ul class="highlights-list" role="list">
               {about.highlights.map(item => (
                 <li>
@@ -134,12 +134,12 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <!-- ===== TESTIMONIALS ===== -->
     <section class="testimonials" id="testimonials" aria-labelledby="testimonials-title">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header anim-ready anim-fade-up">
           <h2 id="testimonials-title">{testimonials.headline}</h2>
         </div>
         <div class="testimonials-grid" role="list">
-          {testimonials.items.map(item => (
-            <article class="testimonial-card" role="listitem">
+          {testimonials.items.map((item, i) => (
+            <article class={`testimonial-card anim-ready anim-fade-up anim-delay-${i + 1}`} role="listitem">
               <div class="testimonial-stars" aria-label="5 Sterne">★★★★★</div>
               <span class="testimonial-quote" aria-hidden="true">»</span>
               <blockquote>
@@ -155,12 +155,12 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <!-- ===== GALLERY ===== -->
     <section class="gallery" id="galerie" aria-labelledby="gallery-title">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header anim-ready anim-fade-up">
           <h2 id="gallery-title">{gallery.headline}</h2>
         </div>
         <div class="gallery-grid">
           {gallery.images.map((img, i) => (
-            <figure class="gallery-item">
+            <figure class={`gallery-item anim-ready anim-scale-in anim-delay-${Math.min(i + 1, 6)}`}>
               <img
                 src={img.src}
                 alt={img.alt}
@@ -178,12 +178,12 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <!-- ===== FAQ ===== -->
     <section class="faq" id="faq" aria-labelledby="faq-title">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header anim-ready anim-fade-up">
           <h2 id="faq-title">{faq.headline}</h2>
         </div>
         <div class="faq-list" role="list">
           {faq.items.map((item, i) => (
-            <details class="faq-item" role="listitem">
+            <details class={`faq-item anim-ready anim-fade-up anim-delay-${Math.min(i + 1, 4)}`} role="listitem">
               <summary id={`faq-q-${i}`}>{item.q}</summary>
               <div class="faq-answer" role="region" aria-labelledby={`faq-q-${i}`}>
                 <p>{item.a}</p>
@@ -199,7 +199,7 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
       <div class="container">
         <div class="contact-grid">
           <!-- Contact Info -->
-          <div class="contact-info">
+          <div class="contact-info anim-ready anim-slide-left">
             <h2 id="contact-title">{contact.headline}</h2>
             <p class="contact-subheadline">{contact.subheadline}</p>
             <div class="contact-info-items">
@@ -237,7 +237,7 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
           </div>
 
           <!-- Contact Form -->
-          <div class="contact-form" role="form" aria-label="Kontaktformular">
+          <div class="contact-form anim-ready anim-slide-right" role="form" aria-label="Kontaktformular">
             <form
               action={`mailto:${contact.email}`}
               method="get"
@@ -349,7 +349,9 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <div class="footer-inner">
-      <img src="/images/logo.jpg" alt="Tischlerei Fasching OG" class="footer-logo" width="90" height="36" />
+      <a href="#" aria-label="Tischlerei Fasching OG – nach oben">
+        <img src="/images/logo.jpg" alt="Tischlerei Fasching OG" class="footer-logo" width="90" height="44" />
+      </a>
       <span class="footer-copyright">{footer.copyright}</span>
       <ul class="footer-links" role="list">
         {footer.links.map(link => (
@@ -428,6 +430,25 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
       if (!prefersReducedMotion) {
         startAutoPlay();
       }
+    })();
+
+    // ── Intersection Observer für Scroll-Animationen ──
+    (function() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(el => {
+          if (el.isIntersecting) {
+            el.target.classList.add('anim-visible');
+            observer.unobserve(el.target); // einmalig, kein Re-trigger
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      document.querySelectorAll('.anim-ready').forEach(el => observer.observe(el));
     })();
   </script>
 </Base>

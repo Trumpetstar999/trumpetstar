@@ -811,12 +811,20 @@ footer.site-footer {
 }
 
 .footer-logo {
-  height: 40px; width: auto;
-  filter: brightness(0) invert(0.65);
-  transition: filter 0.2s;
-  opacity: 0.7;
+  height: 44px;
+  width: auto;
+  display: block;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 5px 10px;
+  border-radius: 2px;
+  opacity: 0.85;
+  transition: opacity 0.2s, background 0.2s;
+  /* KEIN filter — Logo nativ zeigen auf hellem Chip */
 }
-.footer-logo:hover { filter: brightness(0) invert(0.85); opacity: 1; }
+.footer-logo:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
 
 .footer-social { display: flex; gap: 1rem; align-items: center; }
 .footer-social a { color: rgba(255,255,255,0.4); transition: color 0.2s; text-decoration: none; }
@@ -831,3 +839,117 @@ footer.site-footer {
   transition: color 0.2s;
 }
 .footer-links a:hover { color: var(--orange); }
+
+
+/* ===================================================
+   ANIMATIONS — Entrance Effects
+   =================================================== */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Utility-Klassen für Animationen */
+.anim-ready {
+  opacity: 0;
+}
+.anim-ready.anim-visible {
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 0.65s;
+}
+
+.anim-fade-up.anim-visible    { animation-name: fadeUp; opacity: 1; }
+.anim-fade-in.anim-visible    { animation-name: fadeIn; opacity: 1; }
+.anim-slide-left.anim-visible { animation-name: slideInLeft; opacity: 1; }
+.anim-slide-right.anim-visible { animation-name: slideInRight; opacity: 1; }
+.anim-scale-in.anim-visible   { animation-name: scaleIn; opacity: 1; }
+
+/* Stagger-Delays für Grids */
+.anim-delay-1 { animation-delay: 0.08s; }
+.anim-delay-2 { animation-delay: 0.16s; }
+.anim-delay-3 { animation-delay: 0.24s; }
+.anim-delay-4 { animation-delay: 0.32s; }
+.anim-delay-5 { animation-delay: 0.40s; }
+.anim-delay-6 { animation-delay: 0.48s; }
+
+/* Hero-spezifisch: sofort beim Load */
+.hero-tagline {
+  animation: fadeIn 0.6s ease 0.1s both;
+}
+.hero h1 {
+  animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+.hero-headline-rule {
+  animation: slideInLeft 0.6s ease 0.5s both;
+}
+.hero-subheadline {
+  animation: fadeUp 0.6s ease 0.45s both;
+}
+.hero-cta {
+  animation: fadeUp 0.6s ease 0.6s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-ready { opacity: 1; }
+  .hero-tagline, .hero h1, .hero-headline-rule,
+  .hero-subheadline, .hero-cta {
+    animation: none;
+  }
+}
+
+/* ===================================================
+   MICRO-ANIMATIONS
+   =================================================== */
+
+/* Orange Accent-Bar wächst beim Hover auf Section-Header */
+.section-header h2::after {
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.section-header:hover h2::after {
+  width: 96px;
+}
+
+/* Gallery Image: etwas langsamerer, geschmeidigerer Zoom */
+.gallery-item img {
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* CTA Button: subtiler Glanz-Sweep */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+.btn-primary:hover::after {
+  left: 150%;
+}
