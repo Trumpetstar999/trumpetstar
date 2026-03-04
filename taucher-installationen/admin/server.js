@@ -46,7 +46,7 @@ function triggerBuild() {
   buildRunning = true;
   console.log('[build] starting…');
   exec(
-    `cd "${SITE_DIR}" && npm run build && cp -r dist/* "${WEBROOT}/" && find "${WEBROOT}" -type d -exec chmod 755 {} \; && find "${WEBROOT}" -type f -exec chmod 644 {} \;`,
+    `cd "${SITE_DIR}" && npm run build && cp -r dist/* "${WEBROOT}/" && find "${WEBROOT}" -type d -exec chmod 755 {} + && find "${WEBROOT}" -type f -exec chmod 644 {} +`,
     { timeout: 180000 },
     (err, stdout, stderr) => {
       buildRunning = false;
