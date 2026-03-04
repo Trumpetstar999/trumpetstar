@@ -1611,3 +1611,30 @@ h1, h2, h3, h4 {
 }
 .legal-page a { color: var(--primary); }
 .legal-page a:hover { color: var(--accent); }
+
+/* ===== HEADER BUTTONS ===== */
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--accent);
+}
+.btn-accent:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+.nav-actions {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
