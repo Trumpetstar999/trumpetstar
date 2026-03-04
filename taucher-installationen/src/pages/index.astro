@@ -4,38 +4,7 @@ import content from '../../content.json';
 
 const { site, contact, testimonials, faq, impressum } = content;
 
-const services = [
-  {
-    title: 'Heizungsbau & Modernisierung',
-    desc: 'Von der Planung bis zur Inbetriebnahme – wir installieren und modernisieren Heizsysteme aller Art. Effizient, zukunftssicher und auf Ihre Bedürfnisse zugeschnitten.',
-    image: '/images/slider_2.jpg'
-  },
-  {
-    title: 'Gas-, Öl- & Pelletsheizungen',
-    desc: 'Fachgerechte Installation und Wartung von Gas-, Öl- und Pelletsheizungen. Wir beraten Sie zur optimalen Lösung für Ihre Immobilie.',
-    image: '/images/slider_4.jpg'
-  },
-  {
-    title: 'Wärmepumpen & Erneuerbare',
-    desc: 'Zukunftssichere Heiztechnik: Wärmepumpen, Solarthermie und Hybridlösungen für maximale Energieeffizienz und Förderung.',
-    image: '/images/slider_8.jpg'
-  },
-  {
-    title: 'Sanitärinstallationen',
-    desc: 'Komplette Rohrleitungsarbeiten, Wasserinstallationen und Montage hochwertiger Sanitärprodukte – sauber ausgeführt und schlüsselfertig.',
-    image: '/images/slider_3.jpg'
-  },
-  {
-    title: 'Badsanierung',
-    desc: 'Ihr Traumbad in neuer Pracht: Wir planen und realisieren Ihre Badsanierung komplett – von der Fliese bis zur Armatur, alles aus einer Hand.',
-    image: '/images/slider_3a.jpg'
-  },
-  {
-    title: 'Wartung & Notdienst',
-    desc: '24h-Notdienst bei Rohrbruch oder Heizungsausfall. Regelmäßige Wartung verlängert die Lebensdauer Ihrer Anlagen erheblich.',
-    image: '/images/slider_5a.jpg'
-  }
-];
+const services = content.leistungen?.items || [];
 
 const mobileNoClean = contact.mobile.replace(/[\s\/]/g, '');
 const phoneNoClean = contact.phone.replace(/[\s\/]/g, '');
@@ -104,10 +73,9 @@ const phoneNoClean = contact.phone.replace(/[\s\/]/g, '');
     <!-- ===== HERO SLIDESHOW ===== -->
     <section class="hero" aria-label="Willkommen bei Taucher Installationen">
       <div class="hero-slides" id="hero-slides">
-        <div class="hero-slide active" style="background-image: url('/images/slider_home.jpg')"></div>
-        <div class="hero-slide" style="background-image: url('/images/slider_2.jpg')"></div>
-        <div class="hero-slide" style="background-image: url('/images/slider_7.jpg')"></div>
-        <div class="hero-slide" style="background-image: url('/images/slider_4.jpg')"></div>
+        {(content.hero?.slides || []).map((slide, i) => (
+          <div class={`hero-slide${i === 0 ? ' active' : ''}`} style={`background-image: url('${slide.src}')`}></div>
+        ))}
       </div>
       <div class="hero-overlay" aria-hidden="true"></div>
 

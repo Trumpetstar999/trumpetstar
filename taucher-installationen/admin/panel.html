@@ -415,7 +415,56 @@
     padding: 2px 8px; border-radius: 2px;
     margin-left: 8px; vertical-align: middle;
   }
-</style>
+
+  /* ── Image Picker Modal ── */
+  #img-picker-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 9999;
+    align-items: center; justify-content: center;
+  }
+  .picker-inner {
+    background: var(--bg-card); border-radius: 12px;
+    padding: 1.5rem; width: min(780px, 95vw); max-height: 80vh;
+    display: flex; flex-direction: column; gap: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .picker-header { display: flex; justify-content: space-between; align-items: center; }
+  .picker-header h3 { margin: 0; font-size: 1.1rem; color: var(--text); }
+  .picker-close { background: none; border: none; color: var(--text-muted);
+    font-size: 1.4rem; cursor: pointer; padding: 0 4px; }
+  .picker-close:hover { color: var(--text); }
+  #img-picker-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem; overflow-y: auto; padding-right: 4px;
+  }
+  .picker-img-btn {
+    background: var(--bg-card-hover); border: 2px solid var(--border);
+    border-radius: 8px; cursor: pointer; padding: 0.5rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .picker-img-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .picker-img-btn img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; }
+  .picker-img-btn span { font-size: 0.7rem; color: var(--text-muted); word-break: break-all; text-align: center; }
+  /* ── Bild auswählen Button ── */
+  .btn-pick {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: var(--primary); color: #fff; border: none;
+    padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.82rem;
+    cursor: pointer; margin-top: 6px; transition: background 0.15s;
+  }
+  .btn-pick:hover { background: var(--primary-dark); }
+  /* ── Build Banner ── */
+  #build-banner {
+    display: none; position: fixed; top: var(--header-h); left: 0; right: 0;
+    background: var(--primary); color: #fff; text-align: center;
+    padding: 0.5rem; font-size: 0.85rem; z-index: 1000;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  #build-banner.visible { display: block; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  </style>
 </head>
 <body>
 
@@ -765,17 +814,66 @@ function renderHeroSlides() {
   container.innerHTML = '';
   slides.forEach((slide, i) => {
     const fname = slide.src.split('/').pop();
-    container.appendChild(makeImageCard({
-      filename: fname,
-      src: 'site-images/' + fname,
-      altPath: `hero.slides.${i}.alt`,
-      altValue: slide.alt,
-      label: `Slide ${i+1}`
-    }));
+    const card = document.createElement('div');
+    card.className = 'img-card';
+    const ts = '?t=' + Date.now();
+    card.innerHTML = `
+      <img class="img-preview" src="site-images/${fname}${ts}" alt="${fname}"
+           onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\'><rect fill=\'%231A2540\' width=\'100%\' height=\'100%\'/></svg>'">
+      <div class="img-body">
+        <div class="img-name">📎 Slide ${i+1}: ${fname}</div>
+        <button class="btn-pick" onclick="openImagePicker(${i})">🖼 Bild auswählen</button>
+        <div class="field" style="margin-top:8px">
+          <label>Alt-Text</label>
+          <div class="editable" data-path="hero.slides.${i}.alt">${slide.alt||''}</div>
+        </div>
+      </div>`;
+    container.appendChild(card);
   });
   if (!slides.length) {
-    container.innerHTML = '<p style="color:var(--text-muted);padding:1rem;grid-column:1/-1">Keine Slides definiert. Bilder werden im content.json konfiguriert.</p>';
+    container.innerHTML = '<p style="color:var(--text-muted);padding:1rem;grid-column:1/-1">Keine Slides.</p>';
   }
+}
+
+let pickerTargetSlide = -1;
+async function openImagePicker(slideIndex) {
+  pickerTargetSlide = slideIndex;
+  const modal = document.getElementById('img-picker-modal');
+  const grid = document.getElementById('img-picker-grid');
+  grid.innerHTML = '<p style="color:var(--text-muted)">Lade Bilder…</p>';
+  modal.style.display = 'flex';
+  try {
+    const r = await fetch('api/images');
+    const d = await r.json();
+    grid.innerHTML = '';
+    (Array.isArray(d) ? d.map(x=>x.name) : d.images || []).forEach(fname => {
+      const btn = document.createElement('button');
+      btn.className = 'picker-img-btn';
+      const ts = '?t=' + Date.now();
+      btn.innerHTML = `<img src="site-images/${fname}${ts}" alt="${fname}" onerror="this.style.display='none'"><span>${fname}</span>`;
+      btn.onclick = () => selectPickerImage(fname);
+      grid.appendChild(btn);
+    });
+  } catch(e) {
+    grid.innerHTML = '<p style="color:var(--error)">Fehler beim Laden der Bilder.</p>';
+  }
+}
+
+function closeImagePicker() {
+  document.getElementById('img-picker-modal').style.display = 'none';
+  pickerTargetSlide = -1;
+}
+
+function selectPickerImage(fname) {
+  if (pickerTargetSlide < 0) return;
+  if (!state.hero) state.hero = {};
+  if (!state.hero.slides) state.hero.slides = [];
+  if (!state.hero.slides[pickerTargetSlide]) state.hero.slides[pickerTargetSlide] = {};
+  state.hero.slides[pickerTargetSlide].src = '/images/' + fname;
+  closeImagePicker();
+  renderHeroSlides();
+  markDirty();
+  toast('Slide ' + (pickerTargetSlide+1) + ' geändert → Speichern nicht vergessen!', 'info');
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1102,18 +1200,24 @@ async function checkBuildStatus() {
   try {
     const r = await fetch('api/build-status');
     const d = await r.json();
+    const banner = document.getElementById('build-banner');
     if (d.running) {
-      setBuildBadge('building', 'Baut…');
-    } else if (!d.ok) {
-      setBuildBadge('error', 'Build-Fehler');
-    } else if (d.upToDate) {
-      const t = d.distMtime ? new Date(d.distMtime).toLocaleTimeString('de-AT') : '';
-      setBuildBadge('ok', 'Live ' + t);
+      setBuildBadge('building', '⚙️ Baut…');
+      if (banner) banner.classList.add('visible');
     } else {
-      setBuildBadge('', 'Veralteter Build');
+      if (banner) banner.classList.remove('visible');
+      if (!d.ok && d.lastBuild && !d.lastBuild.ok) {
+        setBuildBadge('error', '❌ Build-Fehler');
+        toast('Build fehlgeschlagen! Seite wurde nicht aktualisiert.', 'error');
+      } else if (d.upToDate) {
+        const t = d.distMtime ? new Date(d.distMtime).toLocaleTimeString('de-AT') : '';
+        setBuildBadge('ok', '✅ Live ' + t);
+      } else {
+        setBuildBadge('', '⏳ Veralteter Build');
+      }
     }
   } catch(e) {
-    setBuildBadge('error', 'Server weg');
+    setBuildBadge('error', '❌ Server weg');
   }
 }
 function setBuildBadge(cls, text) {
@@ -1139,5 +1243,17 @@ function toast(msg, type = 'info') {
 
 window.addEventListener('DOMContentLoaded', init);
 </script>
+
+<div id="img-picker-modal" onclick="if(event.target===this)closeImagePicker()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;">
+  <div class="picker-inner">
+    <div class="picker-header">
+      <h3>🖼 Bild auswählen</h3>
+      <button class="picker-close" onclick="closeImagePicker()">✕</button>
+    </div>
+    <div id="img-picker-grid"></div>
+  </div>
+</div>
+<div id="build-banner">⚙️ Build läuft… Vorschau wird gleich aktualisiert</div>
+
 </body>
 </html>

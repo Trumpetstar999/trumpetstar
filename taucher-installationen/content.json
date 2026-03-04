@@ -15,7 +15,7 @@
   },
   "hero": {
     "headline": "Gas · Sanitär · Heizung",
-    "subheadline": "Ihr verlässlicher Partner im Südburgenland",
+    "subheadline": "hr Installateur in Jennersdorf — Professionelle Beratung,\nsorgfältige Planung und hochwertige Ausführung.",
     "cta": {
       "primary": {
         "text": "Jetzt anfragen",
@@ -25,7 +25,26 @@
         "text": "Jetzt anrufen",
         "href": "tel:+436642141285"
       }
-    }
+    },
+    "badge": "Seit 1998",
+    "slides": [
+      {
+        "src": "/images/slider_home.jpg",
+        "alt": "Taucher Installationen – Ihr Partner im Südburgenland"
+      },
+      {
+        "src": "/images/slider_2.jpg",
+        "alt": "Heizungsinstallation"
+      },
+      {
+        "src": "/images/slider_7.jpg",
+        "alt": "Sanitäre Installationen"
+      },
+      {
+        "src": "/images/slider_4.jpg",
+        "alt": "Gasinstallation"
+      }
+    ]
   },
   "leistungen": {
     "headline": "Unsere Leistungen",
@@ -34,32 +53,38 @@
       {
         "image": "/images/slider_2.jpg",
         "title": "Heizungsbau",
-        "text": "Installation und Modernisierung von Heizungssystemen aller Art – effizient und kostensparend."
+        "text": "Installation und Modernisierung von Heizungssystemen aller Art – effizient und kostensparend.",
+        "desc": "Installation und Modernisierung von Heizungssystemen aller Art – effizient und kostensparend."
       },
       {
         "image": "/images/slider_3.jpg",
         "title": "Sanitärinstallation",
-        "text": "Komplette Badsanierung, Rohrleitungsarbeiten und Installation hochwertiger Sanitärprodukte."
+        "text": "Komplette Badsanierung, Rohrleitungsarbeiten und Installation hochwertiger Sanitärprodukte.",
+        "desc": "Komplette Badsanierung, Rohrleitungsarbeiten und Installation hochwertiger Sanitärprodukte."
       },
       {
         "image": "/images/slider_4.jpg",
         "title": "Gasinstallation",
-        "text": "Fachgerechte Installation und Wartung von Gasleitungen nach höchsten Sicherheitsstandards."
+        "text": "Fachgerechte Installation und Wartung von Gasleitungen nach höchsten Sicherheitsstandards.",
+        "desc": "Fachgerechte Installation und Wartung von Gasleitungen nach höchsten Sicherheitsstandards."
       },
       {
         "image": "/images/slider_5a.jpg",
         "title": "Wartung & Service",
-        "text": "Regelmäßige Wartung für langjährige Funktionssicherheit Ihrer Anlagen."
+        "text": "Regelmäßige Wartung für langjährige Funktionssicherheit Ihrer Anlagen.",
+        "desc": "Regelmäßige Wartung für langjährige Funktionssicherheit Ihrer Anlagen."
       },
       {
         "image": "/images/slider_7.jpg",
         "title": "Reparatur & Notdienst",
-        "text": "Schnelle Hilfe bei Rohrbruch, Heizungsausfall oder Sanitärnotfällen – 24h."
+        "text": "Schnelle Hilfe bei Rohrbruch, Heizungsausfall oder Sanitärnotfällen – 24h.",
+        "desc": "Schnelle Hilfe bei Rohrbruch, Heizungsausfall oder Sanitärnotfällen – 24h."
       },
       {
         "image": "/images/slider_8.jpg",
         "title": "Energieberatung",
-        "text": "Individuelle Beratung zur Energieeffizienz und Fördermittelberatung."
+        "text": "Individuelle Beratung zur Energieeffizienz und Fördermittelberatung.",
+        "desc": "Individuelle Beratung zur Energieeffizienz und Fördermittelberatung."
       }
     ]
   },
