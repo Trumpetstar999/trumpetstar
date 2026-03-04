@@ -138,7 +138,7 @@ h1, h2, h3, h4 {
    =================================================== */
 .site-nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 1.25rem 0;
+  padding: 1rem 0;
   transition: background 0.35s, box-shadow 0.35s, padding 0.35s;
 }
 .site-nav.scrolled {
@@ -146,7 +146,7 @@ h1, h2, h3, h4 {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 2px 24px rgba(0,0,0,0.4);
-  padding: 0.5rem 0;
+  padding: 0.4rem 0;
 }
 
 .nav-inner {
@@ -159,23 +159,28 @@ h1, h2, h3, h4 {
   display: flex; align-items: center; text-decoration: none;
 }
 .nav-logo {
-  height: 72px;
+  height: 110px;
   width: auto;
-  filter: brightness(1.15) contrast(1.05);
-  background: rgba(255,255,255,0.1);
-  padding: 6px 12px;
-  border-radius: 2px;
-  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              padding 0.35s,
+  filter: brightness(1.1) contrast(1.05) drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+  background: rgba(255,255,255,0.18);
+  padding: 8px 16px;
+  border-radius: 3px;
+  border-bottom: 3px solid var(--orange);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.4s cubic-bezier(0.4, 0, 0.2, 1),
               filter 0.2s,
               transform 0.2s;
 }
-.nav-logo-link:hover .nav-logo { transform: scale(1.03); }
+.nav-logo-link:hover .nav-logo {
+  transform: scale(1.03);
+  background: rgba(255,255,255,0.24);
+}
 .site-nav.scrolled .nav-logo {
-  height: 40px;
-  padding: 4px 8px;
-  background: rgba(255,255,255,0.08);
-  filter: brightness(1.15) contrast(1.05);
+  height: 44px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.1);
+  border-bottom-width: 2px;
+  filter: brightness(1.1) contrast(1.05);
 }
 
 .nav-links {
@@ -259,7 +264,7 @@ h1, h2, h3, h4 {
 
 .hero-content {
   position: relative; z-index: 2; color: #fff;
-  max-width: 720px; padding-block: 8rem;
+  max-width: 720px; padding-block-start: 10rem; padding-block-end: 8rem;
 }
 
 .hero-tagline {
