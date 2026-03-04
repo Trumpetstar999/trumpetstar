@@ -845,6 +845,35 @@ footer.site-footer {
 }
 .footer-links a:hover { color: var(--orange); }
 
+.footer-credit {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+.footer-credit span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+}
+.footer-credit-logo {
+  height: 28px;
+  width: auto;
+  opacity: 0.55;
+  border-radius: 2px;
+  transition: opacity 0.2s;
+  background: rgba(255,255,255,0.06);
+  padding: 2px 5px;
+}
+.footer-credit a:hover .footer-credit-logo {
+  opacity: 0.9;
+}
+
 
 /* ===================================================
    ANIMATIONS — Entrance Effects
