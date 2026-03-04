@@ -1,0 +1,250 @@
+---
+import Base from '../layouts/Base.astro';
+import content from '../../content.json';
+
+const { site, hero, leistungen, about, testimonials, gallery, faq, contact, footer, impressum } = content;
+---
+<Base>
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="site-nav" aria-label="Hauptnavigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo-link" aria-label="Taucher Installationen GmbH – Startseite">
+        <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="nav-logo" width="130" height="52" />
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#about">Über uns</a></li>
+        <li><a href="#galerie">Galerie</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" aria-label="Willkommen bei Taucher Installationen GmbH">
+      {hero.slides.map((slide, i) => (
+        <div class={`hero-slide ${i === 0 ? 'active' : ''}`} data-slide={i}>
+          <img src={slide.src} alt={slide.alt} class="hero-slide-img" loading={i === 0 ? 'eager' : 'lazy'} />
+        </div>
+      ))}
+      <div class="hero-overlay"></div>
+      <div class="container hero-content">
+        <span class="hero-tagline">{site.tagline}</span>
+        <h1>{hero.headline}</h1>
+        <span class="hero-headline-rule"></span>
+        <p class="hero-subheadline">{hero.subheadline}</p>
+        <div class="hero-cta">
+          <a href={hero.cta.primary.href} class="btn btn-primary">{hero.cta.primary.text}</a>
+          <a href={hero.cta.secondary.href} class="btn btn-secondary">{hero.cta.secondary.text}</a>
+        </div>
+      </div>
+      <button class="hero-nav-btn hero-prev" aria-label="Vorheriges Bild">‹</button>
+      <button class="hero-nav-btn hero-next" aria-label="Nächstes Bild">›</button>
+      <div class="hero-controls" role="tablist" aria-label="Slide Navigation">
+        <div class="hero-dots">
+          {hero.slides.map((_, i) => (
+            <button class={`hero-dot ${i === 0 ? 'active' : ''}`} data-slide={i} role="tab" aria-label={`Slide ${i + 1}`}></button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LEISTUNGEN ===== -->
+    <section id="leistungen" class="leistungen" aria-labelledby="leistungen-heading">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="leistungen-heading">{leistungen.headline}</h2>
+          <p>{leistungen.subheadline}</p>
+        </header>
+        <div class="leistungen-grid">
+          {leistungen.items.map((item, i) => (
+            <article class="leistung-card anim-ready anim-fade-up" style={`animation-delay: ${i * 0.1}s`}>
+              <img src={item.image} alt={item.title} class="leistung-img" loading="lazy" />
+              <div class="leistung-text">
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section id="about" class="about" aria-labelledby="about-heading">
+      <div class="container about-grid">
+        <div>
+          <h2 id="about-heading">{about.headline}</h2>
+          <p class="about-text">{about.text}</p>
+          <span class="about-names">{site.name}</span>
+        </div>
+        <ul class="highlights-list" role="list">
+          {about.highlights.map((h) => (
+            <li><span class="highlight-check" aria-hidden="true">✓</span> {h}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section id="testimonials" class="testimonials" aria-labelledby="testimonials-heading">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="testimonials-heading">{testimonials.headline}</h2>
+        </header>
+        <div class="testimonials-grid">
+          {testimonials.items.map((t, i) => (
+            <blockquote class="testimonial-card anim-ready anim-fade-up" style={`animation-delay: ${i * 0.1}s`}>
+              <div class="testimonial-stars" aria-hidden="true">★★★★★</div>
+              <span class="testimonial-quote">"</span>
+              <p class="testimonial-text">{t.text}</p>
+              <footer class="testimonial-name">— {t.name}</footer>
+            </blockquote>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GALLERY ===== -->
+    <section id="galerie" class="gallery" aria-labelledby="gallery-heading">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="gallery-heading">{gallery.headline}</h2>
+        </header>
+        <div class="gallery-grid">
+          {gallery.images.map((img, i) => (
+            <figure class="gallery-item anim-ready anim-fade-in" style={`animation-delay: ${i * 0.05}s`}>
+              <img src={img.src} alt={img.alt} loading="lazy" />
+              <figcaption class="gallery-caption">{img.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="faq-heading">{faq.headline}</h2>
+        </header>
+        <div class="faq-list">
+          {faq.items.map((item, i) => (
+            <details class="faq-item anim-ready anim-fade-up" style={`animation-delay: ${i * 0.05}s`}>
+              <summary>{item.q}</summary>
+              <div class="faq-answer"><p>{item.a}</p></div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section id="kontakt" class="contact" aria-labelledby="contact-heading">
+      <div class="container contact-grid">
+        <div>
+          <h2 id="contact-heading">{contact.headline}</h2>
+          <p class="contact-subheadline">{contact.subheadline}</p>
+          <div class="contact-info-items">
+            <div class="contact-info-item">
+              <span class="contact-info-icon" aria-hidden="true">📞</span>
+              <div class="contact-info-content">
+                <strong>Telefon</strong>
+                <a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <span class="contact-info-icon" aria-hidden="true">📱</span>
+              <div class="contact-info-content">
+                <strong>Mobil</strong>
+                <a href={`tel:${contact.mobile.replace(/\s/g, '').replace('/', '')}`}>{contact.mobile}</a>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <span class="contact-info-icon" aria-hidden="true">✉️</span>
+              <div class="contact-info-content">
+                <strong>E-Mail</strong>
+                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <span class="contact-info-icon" aria-hidden="true">📍</span>
+              <div class="contact-info-content">
+                <strong>Adresse</strong>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener">{contact.address}</a>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <span class="contact-info-icon" aria-hidden="true">🕐</span>
+              <div class="contact-info-content">
+                <strong>Öffnungszeiten</strong>
+                {contact.hours.map((h) => (
+                  <span>{h.label}: {h.time}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form class="contact-form" action="#" method="POST" aria-label="Kontaktformular">
+          <div class="form-group">
+            <label for="name">{contact.formPlaceholder.name}</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="email">{contact.formPlaceholder.email}</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="message">{contact.formPlaceholder.message}</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="form-submit">{contact.formPlaceholder.submit}</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== LEGAL ===== -->
+    <section id="impressum" class="legal" aria-labelledby="impressum-heading">
+      <div class="container legal-grid">
+        <div class="legal-section">
+          <h2 id="impressum-heading">{impressum.title}</h2>
+          <address>
+            {impressum.lines.map((line) => (
+              <>{line}<br/></>
+            ))}
+          </address>
+        </div>
+        <div class="legal-section" id="datenschutz">
+          <h2>Datenschutz</h2>
+          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies soweit möglich auf freiwilliger Basis.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <img src="/images/logo.png" alt="" class="footer-logo" width="110" height="44" />
+      <span class="footer-copyright">{footer.copyright}</span>
+      <ul class="footer-links" role="list">
+        {footer.links.map((link) => (
+          <li><a href={link.href}>{link.text}</a></li>
+        ))}
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Cookie Banner -->
+  <div id="cookie-banner" class="cookie-banner" style="display:none;">
+    <div class="cookie-content">
+      <p>Diese Website verwendet Cookies für die Funktionalität. <a href="#datenschutz">Mehr erfahren</a></p>
+      <button id="cookie-accept" class="btn btn-primary">Akzeptieren</button>
+    </div>
+  </div>
+</Base>

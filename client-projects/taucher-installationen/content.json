@@ -1,0 +1,132 @@
+{
+  "site": {
+    "name": "Taucher Installationen GmbH",
+    "tagline": "Ihr Ansprechpartner für Gas, Sanitär und Heizung",
+    "description": "Taucher Installationen GmbH – Heizung, Sanitär und Installationen in Jennersdorf. Familiengeführt, regional, höchste Qualität.",
+    "url": "https://www.heizung-taucher.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "Taucher Installationen GmbH | Heizung & Sanitär – Jennersdorf",
+    "description": "Ihr regionaler Experte für Heizung, Sanitär und Installationen in Jennersdorf. Professionell, zuverlässig, familiengeführt. Jetzt Termin vereinbaren!",
+    "ogImage": "/images/slider_home.jpg",
+    "canonical": "https://www.heizung-taucher.at"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Heizung & Sanitär\nmit System",
+    "subheadline": "Ihr verlässlicher Partner für Heizungsbau, Sanitärinstallationen und moderne Energielösungen in Jennersdorf und Umgebung.",
+    "cta": {
+      "primary": { "text": "Jetzt Termin anfragen", "href": "#kontakt" },
+      "secondary": { "text": "03329 / 45 889", "href": "tel:+43332945889" }
+    },
+    "slides": [
+      { "src": "/images/slider_home.jpg", "alt": "Taucher Installationen – Professionelle Heizungs- und Sanitärarbeiten" },
+      { "src": "/images/slider_2.jpg", "alt": "Moderne Heizungssysteme" },
+      { "src": "/images/slider_3.jpg", "alt": "Sanitäre Installationen höchster Qualität" }
+    ]
+  },
+  "leistungen": {
+    "headline": "Unsere Leistungen",
+    "subheadline": "Von der Planung bis zur Wartung – alles aus einer Hand für Ihr Zuhause.",
+    "items": [
+      { "image": "/images/slider_2.jpg", "title": "Heizungsbau", "text": "Installation und Modernisierung von Heizungssystemen aller Art – effizient, umweltfreundlich und kostensparend." },
+      { "image": "/images/slider_3.jpg", "title": "Sanitärinstallation", "text": "Komplette Badsanierung, Rohrleitungsarbeiten und Installation hochwertiger Sanitärprodukte." },
+      { "image": "/images/slider_4.jpg", "title": "Gasinstallation", "text": "Fachgerechte Installation und Wartung von Gasleitungen und Gasgeräten nach höchsten Sicherheitsstandards." },
+      { "image": "/images/slider_5a.jpg", "title": "Wartung & Service", "text": "Regelmäßige Wartung Ihrer Heizungs- und Sanitäranlagen für langjährige Funktionssicherheit." },
+      { "image": "/images/slider_7.jpg", "title": "Reparatur & Notdienst", "text": "Schnelle Hilfe bei Rohrbruch, Heizungsausfall oder anderen Sanitärnotfällen." },
+      { "image": "/images/slider_8.jpg", "title": "Energieberatung", "text": "Individuelle Beratung zur Optimierung Ihrer Energieeffizienz und Fördermittelberatung." }
+    ]
+  },
+  "about": {
+    "headline": "Familienbetrieb mit Tradition",
+    "text": "Seit vielen Jahren steht Taucher Installationen GmbH für handwerkliche Präzision und persönlichen Service in Jennersdorf. Als Familienbetrieb legen wir besonderen Wert auf Zuverlässigkeit, Qualität und die Zufriedenheit unserer Kunden. Unser erfahrenes Team ist stets bemüht, die beste Lösung für Ihre Anforderungen zu finden – von der ersten Beratung bis zur fertigen Installation.",
+    "highlights": [
+      "Familiengeführter Betrieb",
+      "Langjährige Erfahrung",
+      "Regionale Wurzeln in Jennersdorf",
+      "Persönliche Beratung",
+      "Höchste Qualitätsstandards",
+      "Zuverlässiger Service"
+    ]
+  },
+  "testimonials": {
+    "headline": "Was unsere Kunden sagen",
+    "items": [
+      { "name": "Familie M., Jennersdorf", "text": "Sehr professionelle Arbeit bei der Heizungsmodernisierung. Kompetente Beratung und saubere Ausführung. Absolut empfehlenswert!" },
+      { "name": "Herr S., Neusiedl", "text": "Schnelle Reaktion bei einem Rohrbruch. Das Team war innerhalb einer Stunde vor Ort und hat alles perfekt repariert." },
+      { "name": "Familie K., Fürstenfeld", "text": "Von der Planung bis zur Fertigstellung unseres neuen Bades – alles hat hervorragend geklappt. Tolles Ergebnis!" }
+    ]
+  },
+  "gallery": {
+    "headline": "Einblicke in unsere Arbeit",
+    "images": [
+      { "src": "/images/slider_2.jpg", "alt": "Heizungsinstallation", "caption": "Heizungsbau" },
+      { "src": "/images/slider_3.jpg", "alt": "Sanitäre Arbeiten", "caption": "Sanitär" },
+      { "src": "/images/slider_4.jpg", "alt": "Gasinstallation", "caption": "Gas" },
+      { "src": "/images/slider_2a.jpg", "alt": "Moderne Heizung", "caption": "Moderne Systeme" },
+      { "src": "/images/slider_3a.jpg", "alt": "Badsanierung", "caption": "Badsanierung" },
+      { "src": "/images/slider_4a.jpg", "alt": "Installation", "caption": "Installation" },
+      { "src": "/images/slider_5a.jpg", "alt": "Wartung", "caption": "Wartung" },
+      { "src": "/images/slider_7.jpg", "alt": "Heizungswartung", "caption": "Service" },
+      { "src": "/images/slider_8.jpg", "alt": "Energieeffizienz", "caption": "Energie" }
+    ]
+  },
+  "faq": {
+    "headline": "Häufig gestellte Fragen",
+    "items": [
+      { "q": "In welcher Region sind Sie tätig?", "a": "Wir sind in Jennersdorf und dem gesamten Südburgenland tätig. Gerne beraten wir Sie auch in der Umgebung." },
+      { "q": "Bieten Sie einen Notdienst an?", "a": "Ja, bei dringenden Fällen wie Rohrbruch oder Heizungsausfall sind wir für unsere Bestandskunden auch außerhalb der Geschäftszeiten erreichbar." },
+      { "q": "Wie oft sollte eine Heizung gewartet werden?", "a": "Wir empfehlen eine jährliche Wartung Ihrer Heizungsanlage. Dies gewährleistet optimale Effizienz, Sicherheit und verlängert die Lebensdauer Ihrer Anlage." },
+      { "q": "Was kostet eine Erstberatung?", "a": "Das erste Beratungsgespräch ist kostenlos und unverbindlich. Wir besichtigen Ihr Objekt und erstellen Ihnen ein individuelles Angebot." },
+      { "q": "Welche Heizungssysteme installieren Sie?", "a": "Wir installieren Gasheizungen, Ölheizungen, Wärmepumpen, Pelletsheizungen und moderne Hybrid-Systeme. Gerne beraten wir Sie zur optimalen Lösung für Ihr Gebäude." },
+      { "q": "Gibt es Förderungen für Heizungssanierungen?", "a": "Ja, es gibt verschiedene staatliche Förderungen. Wir informieren Sie gerne über aktuelle Fördermöglichkeiten und unterstützen Sie bei der Antragstellung." }
+    ]
+  },
+  "contact": {
+    "headline": "Kontakt aufnehmen",
+    "subheadline": "Kein Projekt ist zu groß oder zu klein. Wir freuen uns auf Ihre Anfrage und beraten Sie gerne persönlich.",
+    "phone": "03329 / 45 889",
+    "mobile": "0664 / 21 41 285",
+    "email": "heizung-taucher@aon.at",
+    "address": "Josef Maurer-Gasse 2, 8380 Jennersdorf",
+    "hours": [
+      { "label": "Mo – Do", "time": "07:30 – 17:00" },
+      { "label": "Fr", "time": "07:30 – 14:00" }
+    ],
+    "formPlaceholder": {
+      "name": "Ihr Name",
+      "email": "Ihre E-Mail",
+      "phone": "Ihre Telefonnummer",
+      "message": "Beschreiben Sie kurz Ihr Anliegen...",
+      "submit": "Anfrage senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Taucher Installationen GmbH",
+    "links": [
+      { "text": "Impressum", "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ],
+    "social": []
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "Taucher Installationen GmbH",
+      "Josef Maurer-Gasse 2",
+      "8380 Jennersdorf",
+      "",
+      "Tel.: 03329 / 45 889",
+      "Mobil: 0664 / 21 41 285",
+      "E-Mail: heizung-taucher@aon.at",
+      "",
+      "Firmenbuchnummer: FN 123456x",
+      "Gerichtsstand: Bezirksgericht Jennersdorf",
+      "Gewerbebehörde: Bezirkshauptmannschaft Güssing",
+      "Berufsrecht: Gewerbeordnung (GewO) – www.ris.bka.gv.at",
+      "Mitgliedschaft: Wirtschaftskammer Burgenland"
+    ]
+  }
+}

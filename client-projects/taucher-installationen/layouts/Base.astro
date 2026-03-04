@@ -1,0 +1,21 @@
+---
+export interface Props {
+  title?: string;
+}
+const { title = 'Taucher Installationen GmbH' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content="Taucher Installationen GmbH - Ihr Ansprechpartner für Gas, Sanitär und Heizung in Jennersdorf">
+  <link rel="stylesheet" href="/styles/global.css">
+  <link rel="icon" type="image/png" href="/images/logo.png">
+</head>
+<body>
+  <slot />
+  <script is:inline src="/scripts/main.js"></script>
+</body>
+</html>
