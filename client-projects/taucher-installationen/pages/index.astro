@@ -2,52 +2,177 @@
 import Base from '../layouts/Base.astro';
 import content from '../../content.json';
 
-const { site, hero, leistungen, about, testimonials, gallery, faq, contact, footer, impressum } = content;
+const { site, hero, leistungen, about, testimonials, faq, contact, impressum } = content;
+
+// Echte Leistungen mit Bildern aus der Website
+const services = [
+  {
+    icon: '🔥',
+    title: 'Heizungsbau & Modernisierung',
+    text: 'Von der Planung bis zur Inbetriebnahme – wir installieren und modernisieren Heizsysteme aller Art. Effizient, umweltfreundlich und auf Ihre Bedürfnisse zugeschnitten.',
+    image: '/images/slider_2.jpg'
+  },
+  {
+    icon: '🛢️',
+    title: 'Gas-, Öl- & Pelletsheizungen',
+    text: 'Fachgerechte Installation und Wartung von Gas-, Öl- und Pelletsheizungen. Wir beraten Sie zur optimalen Lösung für Ihre Immobilie und Ihr Budget.',
+    image: '/images/slider_4.jpg'
+  },
+  {
+    icon: '🌿',
+    title: 'Wärmepumpen & erneuerbare Energien',
+    text: 'Zukunftssichere Heiztechnik: Wärmepumpen, Solarthermie und Hybridlösungen für maximale Energieeffizienz und staatliche Förderungen.',
+    image: '/images/slider_8.jpg'
+  },
+  {
+    icon: '🚿',
+    title: 'Sanitärinstallationen',
+    text: 'Komplette Rohrleitungsarbeiten, Wasserinstallationen und Montage hochwertiger Sanitärprodukte – sauber ausgeführt und auf Wunsch schlüsselfertig.',
+    image: '/images/slider_3.jpg'
+  },
+  {
+    icon: '🛁',
+    title: 'Badsanierung',
+    text: 'Ihr Traumbad in neuer Pracht: Wir planen und realisieren Ihre Badsanierung komplett – von der Fliese bis zur Armatur, alles aus einer Hand.',
+    image: '/images/slider_3a.jpg'
+  },
+  {
+    icon: '⚡',
+    title: 'Wartung & Notdienst',
+    text: 'Regelmäßige Wartung verlängert die Lebensdauer Ihrer Anlagen. Bei Notfällen (Rohrbruch, Heizungsausfall) reagieren wir schnell und zuverlässig.',
+    image: '/images/slider_5a.jpg'
+  }
+];
 ---
-<Base>
-  <!-- ===== NAVIGATION ===== -->
-  <nav class="site-nav" aria-label="Hauptnavigation">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo-link" aria-label="Taucher Installationen GmbH – Startseite">
-        <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="nav-logo" width="130" height="52" />
+
+<Base title={`${site.name} | Heizung & Sanitär – Jennersdorf`}>
+
+  <!-- ===== STICKY HEADER ===== -->
+  <header class="site-header" id="header">
+    <div class="header-inner">
+      <a href="#" class="nav-logo-link" aria-label="Taucher Installationen – Startseite">
+        <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="nav-logo" />
       </a>
-      <ul class="nav-links" role="list">
-        <li><a href="#leistungen">Leistungen</a></li>
-        <li><a href="#about">Über uns</a></li>
-        <li><a href="#galerie">Galerie</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
-      </ul>
+
+      <nav class="nav-desktop" aria-label="Hauptnavigation">
+        <ul class="nav-links" role="list">
+          <li><a href="#leistungen">Leistungen</a></li>
+          <li><a href="#warum-wir">Über uns</a></li>
+          <li><a href="#ablauf">Ablauf</a></li>
+          <li><a href="#bewertungen">Bewertungen</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-cta">
+        <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="header-phone">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          {contact.phone}
+        </a>
+        <a href="#kontakt" class="nav-cta-btn">Jetzt anfragen</a>
+      </div>
+
+      <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </nav>
+
+    <!-- Mobile Nav -->
+    <div class="mobile-nav" id="mobile-nav" hidden>
+      <ul class="mobile-nav-links" role="list">
+        <li><a href="#leistungen">Leistungen</a></li>
+        <li><a href="#warum-wir">Über uns</a></li>
+        <li><a href="#ablauf">Ablauf</a></li>
+        <li><a href="#bewertungen">Bewertungen</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="#kontakt" class="mobile-nav-cta">Jetzt anfragen</a>
+      <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="mobile-nav-phone">{contact.phone}</a>
+    </div>
+  </header>
 
   <main id="main-content">
 
-    <!-- ===== HERO ===== -->
-    <section class="hero" aria-label="Willkommen bei Taucher Installationen GmbH">
-      {hero.slides.map((slide, i) => (
-        <div class={`hero-slide ${i === 0 ? 'active' : ''}`} data-slide={i}>
-          <img src={slide.src} alt={slide.alt} class="hero-slide-img" loading={i === 0 ? 'eager' : 'lazy'} />
+    <!-- ===== HERO (Split-Layout) ===== -->
+    <section class="hero" aria-label="Willkommen bei Taucher Installationen">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Kompetent seit 1995
+          </span>
+          <h1>Heizung &amp; Sanitär<br><em>mit System</em></h1>
+          <p class="hero-subtitle">Ihr Partner für moderne Heiztechnik, Sanitärinstallationen und Energieeffizienz im Südburgenland. Familiengeführt, zuverlässig, persönlich.</p>
+
+          <div class="hero-ctas">
+            <a href="#kontakt" class="btn btn-primary btn-large">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              Jetzt anfragen
+            </a>
+            <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="btn btn-secondary btn-large">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+              Notruf {contact.mobile}
+            </a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-number">30+</span>
+              <span class="hero-stat-label">Jahre Erfahrung</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-number">2.500+</span>
+              <span class="hero-stat-label">Zufriedene Kunden</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-number">24/7</span>
+              <span class="hero-stat-label">Notdienst</span>
+            </div>
+          </div>
         </div>
-      ))}
-      <div class="hero-overlay"></div>
-      <div class="container hero-content">
-        <span class="hero-tagline">{site.tagline}</span>
-        <h1>{hero.headline}</h1>
-        <span class="hero-headline-rule"></span>
-        <p class="hero-subheadline">{hero.subheadline}</p>
-        <div class="hero-cta">
-          <a href={hero.cta.primary.href} class="btn btn-primary">{hero.cta.primary.text}</a>
-          <a href={hero.cta.secondary.href} class="btn btn-secondary">{hero.cta.secondary.text}</a>
+
+        <div class="hero-visual">
+          <div class="hero-image-wrapper">
+            <img src="/images/slider_home.jpg" alt="Professionelle Heizungsinstallation – Taucher GmbH" class="hero-image" />
+            <div class="hero-image-badge">
+              <div class="hero-image-badge-icon">🏆</div>
+              <div class="hero-image-badge-text">
+                <strong>TOP-Bewertung</strong>
+                4.9/5 Kundenzufriedenheit
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <button class="hero-nav-btn hero-prev" aria-label="Vorheriges Bild">‹</button>
-      <button class="hero-nav-btn hero-next" aria-label="Nächstes Bild">›</button>
-      <div class="hero-controls" role="tablist" aria-label="Slide Navigation">
-        <div class="hero-dots">
-          {hero.slides.map((_, i) => (
-            <button class={`hero-dot ${i === 0 ? 'active' : ''}`} data-slide={i} role="tab" aria-label={`Slide ${i + 1}`}></button>
-          ))}
+
+      <!-- Scroll indicator -->
+      <a href="#trust" class="hero-scroll-hint" aria-label="Nach unten scrollen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </a>
+    </section>
+
+    <!-- ===== TRUST BAR ===== -->
+    <section class="trust-bar" id="trust">
+      <div class="container trust-bar-content">
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>Fachgerechte Ausführung</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>Faire, transparente Preise</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>Regionales Familienunternehmen</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>WK Burgenland zertifiziert</span>
+        </div>
+        <div class="trust-item">
+          <div class="trust-item-icon">✓</div>
+          <span>Kostenlose Erstberatung</span>
         </div>
       </div>
     </section>
@@ -56,16 +181,25 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <section id="leistungen" class="leistungen" aria-labelledby="leistungen-heading">
       <div class="container">
         <header class="section-header">
-          <h2 id="leistungen-heading">{leistungen.headline}</h2>
-          <p>{leistungen.subheadline}</p>
+          <span class="section-subtitle">Unsere Dienstleistungen</span>
+          <h2 id="leistungen-heading">Alles rund um Heizung &amp; Sanitär</h2>
+          <p>Von der Planung bis zur Wartung – alle Services aus einer Hand, für Ihr Zuhause oder Ihren Betrieb im Südburgenland.</p>
         </header>
+
         <div class="leistungen-grid">
-          {leistungen.items.map((item, i) => (
-            <article class="leistung-card anim-ready anim-fade-up" style={`animation-delay: ${i * 0.1}s`}>
-              <img src={item.image} alt={item.title} class="leistung-img" loading="lazy" />
-              <div class="leistung-text">
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
+          {services.map((s, i) => (
+            <article class="leistung-card anim-ready anim-fade-up" style={`animation-delay:${i*0.08}s`}>
+              <div class="leistung-img-wrap">
+                <img src={s.image} alt={s.title} class="leistung-img" loading="lazy" />
+                <div class="leistung-icon-overlay">{s.icon}</div>
+              </div>
+              <div class="leistung-body">
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+                <a href="#kontakt" class="leistung-link">
+                  Mehr erfahren
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
               </div>
             </article>
           ))}
@@ -73,53 +207,138 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
       </div>
     </section>
 
-    <!-- ===== ABOUT ===== -->
-    <section id="about" class="about" aria-labelledby="about-heading">
-      <div class="container about-grid">
-        <div>
-          <h2 id="about-heading">{about.headline}</h2>
-          <p class="about-text">{about.text}</p>
-          <span class="about-names">{site.name}</span>
+    <!-- ===== CTA BANNER (nach Leistungen) ===== -->
+    <section class="cta-banner" aria-label="Jetzt beraten lassen">
+      <div class="container cta-banner-inner">
+        <div class="cta-banner-text">
+          <h2>Kostenlos beraten lassen</h2>
+          <p>Kein Projekt zu groß, kein Problem zu klein. Vereinbaren Sie jetzt einen unverbindlichen Beratungstermin.</p>
         </div>
-        <ul class="highlights-list" role="list">
-          {about.highlights.map((h) => (
-            <li><span class="highlight-check" aria-hidden="true">✓</span> {h}</li>
-          ))}
-        </ul>
+        <div class="cta-banner-actions">
+          <a href="#kontakt" class="btn btn-light btn-large">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Formular ausfüllen
+          </a>
+          <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="btn btn-primary btn-large">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            Jetzt anrufen
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WARUM WIR ===== -->
+    <section id="warum-wir" class="why-section" aria-labelledby="warum-wir-heading">
+      <div class="container why-grid">
+        <div class="why-content">
+          <span class="section-subtitle why-subtitle">Warum Taucher Installationen</span>
+          <h2 id="warum-wir-heading">Ihr <em>zuverlässiger Partner</em><br>im Südburgenland</h2>
+          <p>Seit über 30 Jahren steht die Familie Taucher für handwerkliche Präzision und persönlichen Service in Jennersdorf. Als Familienbetrieb legen wir besonderen Wert auf Qualität, Zuverlässigkeit und die Zufriedenheit unserer Kunden.</p>
+
+          <div class="why-features">
+            <div class="why-feature">
+              <div class="why-feature-icon">👨‍🔧</div>
+              <div class="why-feature-text">
+                <h4>Erfahrene Fachkräfte</h4>
+                <p>Qualifizierte Installateure mit jahrelanger Berufserfahrung und laufender Weiterbildung.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon">⏰</div>
+              <div class="why-feature-text">
+                <h4>Pünktlich &amp; Zuverlässig</h4>
+                <p>Wir halten Termine ein – von der Beratung bis zur Fertigstellung.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon">🏆</div>
+              <div class="why-feature-text">
+                <h4>Höchste Qualitätsstandards</h4>
+                <p>Nur hochwertige Materialien, fachgerechte Ausführung, sauber hinterlassen.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="why-feature-icon">🌿</div>
+              <div class="why-feature-text">
+                <h4>Nachhaltige Lösungen</h4>
+                <p>Energieeffiziente Heizsysteme mit Förderberatung für eine grünere Zukunft.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="why-image">
+          <img src="/images/slider_7.jpg" alt="Taucher Installationen – Ihr Betrieb in Jennersdorf" loading="lazy" />
+          <div class="why-stats">
+            <div class="why-stat">
+              <span class="why-stat-number">30+</span>
+              <span class="why-stat-label">Jahre Erfahrung</span>
+            </div>
+            <div class="why-stat">
+              <span class="why-stat-number">2.5k</span>
+              <span class="why-stat-label">Projekte</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABLAUF/PROZESS ===== -->
+    <section id="ablauf" class="process" aria-labelledby="ablauf-heading">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-subtitle">So funktioniert's</span>
+          <h2 id="ablauf-heading">Ihr Projekt in 4 Schritten</h2>
+          <p>Unkompliziert und transparent – von der ersten Anfrage bis zur fertigen Installation.</p>
+        </header>
+
+        <div class="process-steps">
+          <div class="process-step anim-ready anim-fade-up">
+            <div class="process-step-number">1</div>
+            <h3>Kontaktaufnahme</h3>
+            <p>Rufen Sie uns an oder senden Sie uns eine Anfrage. Kostenlos und unverbindlich.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.1s">
+            <div class="process-step-number">2</div>
+            <h3>Beratung &amp; Angebot</h3>
+            <p>Wir besichtigen Ihr Objekt vor Ort und erstellen ein transparentes Festpreisangebot.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.2s">
+            <div class="process-step-number">3</div>
+            <h3>Fachgerechte Ausführung</h3>
+            <p>Unser Team führt die Arbeiten professionell, sauber und termingerecht durch.</p>
+          </div>
+          <div class="process-step anim-ready anim-fade-up" style="animation-delay:0.3s">
+            <div class="process-step-number">4</div>
+            <h3>Übergabe &amp; Service</h3>
+            <p>Wir übergeben das fertige Projekt und stehen für Wartung und Fragen bereit.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ===== TESTIMONIALS ===== -->
-    <section id="testimonials" class="testimonials" aria-labelledby="testimonials-heading">
+    <section id="bewertungen" class="testimonials" aria-labelledby="bewertungen-heading">
       <div class="container">
         <header class="section-header">
-          <h2 id="testimonials-heading">{testimonials.headline}</h2>
+          <span class="section-subtitle">Kundenstimmen</span>
+          <h2 id="bewertungen-heading">Was unsere Kunden sagen</h2>
+          <p>Zufriedene Kunden sind unsere beste Referenz – schon seit über 30 Jahren.</p>
         </header>
+
         <div class="testimonials-grid">
           {testimonials.items.map((t, i) => (
-            <blockquote class="testimonial-card anim-ready anim-fade-up" style={`animation-delay: ${i * 0.1}s`}>
-              <div class="testimonial-stars" aria-hidden="true">★★★★★</div>
-              <span class="testimonial-quote">"</span>
-              <p class="testimonial-text">{t.text}</p>
-              <footer class="testimonial-name">— {t.name}</footer>
+            <blockquote class="testimonial-card anim-ready anim-fade-up" style={`animation-delay:${i*0.1}s`}>
+              <div class="testimonial-stars" aria-label="5 von 5 Sternen">★★★★★</div>
+              <p class="testimonial-text">"{t.text}"</p>
+              <footer class="testimonial-author">
+                <div class="testimonial-avatar" aria-hidden="true">{t.name.charAt(0)}</div>
+                <div>
+                  <div class="testimonial-name">{t.name}</div>
+                  <div class="testimonial-location">Zufriedener Kunde</div>
+                </div>
+              </footer>
             </blockquote>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== GALLERY ===== -->
-    <section id="galerie" class="gallery" aria-labelledby="gallery-heading">
-      <div class="container">
-        <header class="section-header">
-          <h2 id="gallery-heading">{gallery.headline}</h2>
-        </header>
-        <div class="gallery-grid">
-          {gallery.images.map((img, i) => (
-            <figure class="gallery-item anim-ready anim-fade-in" style={`animation-delay: ${i * 0.05}s`}>
-              <img src={img.src} alt={img.alt} loading="lazy" />
-              <figcaption class="gallery-caption">{img.caption}</figcaption>
-            </figure>
           ))}
         </div>
       </div>
@@ -129,98 +348,156 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
     <section id="faq" class="faq" aria-labelledby="faq-heading">
       <div class="container">
         <header class="section-header">
-          <h2 id="faq-heading">{faq.headline}</h2>
+          <span class="section-subtitle">Häufige Fragen</span>
+          <h2 id="faq-heading">Antworten auf Ihre Fragen</h2>
+          <p>Alles Wichtige auf einen Blick – und falls doch etwas offen bleibt, rufen Sie uns einfach an.</p>
         </header>
+
         <div class="faq-list">
-          {faq.items.map((item, i) => (
-            <details class="faq-item anim-ready anim-fade-up" style={`animation-delay: ${i * 0.05}s`}>
+          {faq.items.map((item) => (
+            <details class="faq-item anim-ready anim-fade-up">
               <summary>{item.q}</summary>
               <div class="faq-answer"><p>{item.a}</p></div>
             </details>
           ))}
         </div>
+
+        <div class="faq-cta">
+          <p>Noch Fragen? Wir helfen gerne persönlich weiter.</p>
+          <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            {contact.phone}
+          </a>
+        </div>
       </div>
     </section>
 
     <!-- ===== CONTACT ===== -->
-    <section id="kontakt" class="contact" aria-labelledby="contact-heading">
-      <div class="container contact-grid">
-        <div>
-          <h2 id="contact-heading">{contact.headline}</h2>
-          <p class="contact-subheadline">{contact.subheadline}</p>
-          <div class="contact-info-items">
-            <div class="contact-info-item">
-              <span class="contact-info-icon" aria-hidden="true">📞</span>
-              <div class="contact-info-content">
-                <strong>Telefon</strong>
-                <a href={`tel:${contact.phone.replace(/\s/g, '')}`}>{contact.phone}</a>
+    <section id="kontakt" class="contact" aria-labelledby="kontakt-heading">
+      <div class="container">
+        <header class="section-header">
+          <span class="section-subtitle">Kontakt</span>
+          <h2 id="kontakt-heading">Schreiben Sie uns</h2>
+          <p>Kostenlose Erstberatung, unverbindliches Angebot – wir melden uns innerhalb von 24 Stunden.</p>
+        </header>
+
+        <div class="contact-grid">
+          <!-- Kontaktinfos -->
+          <div class="contact-info">
+            <div class="contact-details">
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div>
+                  <div class="contact-label">Telefon</div>
+                  <a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`} class="contact-value">{contact.phone}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <div>
+                  <div class="contact-label">Mobil / Notfall</div>
+                  <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="contact-value">{contact.mobile}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div>
+                  <div class="contact-label">E-Mail</div>
+                  <a href={`mailto:${contact.email}`} class="contact-value">{contact.email}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div>
+                  <div class="contact-label">Adresse</div>
+                  <a href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer" class="contact-value">{contact.address}</a>
+                </div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">🕐</div>
+                <div>
+                  <div class="contact-label">Öffnungszeiten</div>
+                  <div class="contact-hours">
+                    {contact.hours.map((h) => (
+                      <span>{h.label}: {h.time}</span>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="contact-info-item">
-              <span class="contact-info-icon" aria-hidden="true">📱</span>
-              <div class="contact-info-content">
-                <strong>Mobil</strong>
-                <a href={`tel:${contact.mobile.replace(/\s/g, '').replace('/', '')}`}>{contact.mobile}</a>
-              </div>
+
+            <!-- Direkte Anruf-CTA -->
+            <div class="contact-call-cta">
+              <p>Dringend? Rufen Sie direkt an:</p>
+              <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="btn btn-primary btn-large contact-call-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                {contact.mobile} anrufen
+              </a>
             </div>
-            <div class="contact-info-item">
-              <span class="contact-info-icon" aria-hidden="true">✉️</span>
-              <div class="contact-info-content">
-                <strong>E-Mail</strong>
-                <a href={`mailto:${contact.email}`}>{contact.email}</a>
+          </div>
+
+          <!-- Formular -->
+          <div class="contact-form-wrapper">
+            <h3 class="contact-form-title">Kostenlose Anfrage senden</h3>
+            <form class="contact-form" id="contact-form" action="#" method="POST" aria-label="Kontaktformular" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Name *</label>
+                  <input type="text" id="name" name="name" placeholder="Max Mustermann" required autocomplete="name" />
+                </div>
+                <div class="form-group">
+                  <label for="phone">Telefon</label>
+                  <input type="tel" id="phone" name="phone" placeholder="0664 123 456" autocomplete="tel" />
+                </div>
               </div>
-            </div>
-            <div class="contact-info-item">
-              <span class="contact-info-icon" aria-hidden="true">📍</span>
-              <div class="contact-info-content">
-                <strong>Adresse</strong>
-                <a href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener">{contact.address}</a>
+              <div class="form-group">
+                <label for="email">E-Mail *</label>
+                <input type="email" id="email" name="email" placeholder="max@beispiel.at" required autocomplete="email" />
               </div>
-            </div>
-            <div class="contact-info-item">
-              <span class="contact-info-icon" aria-hidden="true">🕐</span>
-              <div class="contact-info-content">
-                <strong>Öffnungszeiten</strong>
-                {contact.hours.map((h) => (
-                  <span>{h.label}: {h.time}</span>
-                ))}
+              <div class="form-group">
+                <label for="subject">Betreff</label>
+                <select id="subject" name="subject">
+                  <option value="">Bitte auswählen...</option>
+                  <option>Heizungsbau / Modernisierung</option>
+                  <option>Sanitärinstallation</option>
+                  <option>Badsanierung</option>
+                  <option>Wärmepumpe / Erneuerbare Energien</option>
+                  <option>Wartung / Service</option>
+                  <option>Notfall / Störung</option>
+                  <option>Sonstiges</option>
+                </select>
               </div>
-            </div>
+              <div class="form-group">
+                <label for="message">Nachricht *</label>
+                <textarea id="message" name="message" placeholder="Beschreiben Sie Ihr Anliegen kurz. Was kann ich für Sie tun?" rows="5" required></textarea>
+              </div>
+              <!-- Honeypot -->
+              <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+              <button type="submit" class="form-submit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Anfrage senden
+              </button>
+              <p class="form-note">* Pflichtfelder. Kostenlos &amp; unverbindlich. Antwort innerhalb 24h.</p>
+            </form>
           </div>
         </div>
-
-        <form class="contact-form" action="#" method="POST" aria-label="Kontaktformular">
-          <div class="form-group">
-            <label for="name">{contact.formPlaceholder.name}</label>
-            <input type="text" id="name" name="name" required />
-          </div>
-          <div class="form-group">
-            <label for="email">{contact.formPlaceholder.email}</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-          <div class="form-group">
-            <label for="message">{contact.formPlaceholder.message}</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
-          </div>
-          <button type="submit" class="form-submit">{contact.formPlaceholder.submit}</button>
-        </form>
       </div>
     </section>
 
-    <!-- ===== LEGAL ===== -->
+    <!-- ===== LEGAL / IMPRESSUM ===== -->
     <section id="impressum" class="legal" aria-labelledby="impressum-heading">
       <div class="container legal-grid">
         <div class="legal-section">
-          <h2 id="impressum-heading">{impressum.title}</h2>
+          <h2 id="impressum-heading">Impressum</h2>
           <address>
             {impressum.lines.map((line) => (
-              <>{line}<br/></>
+              <>{line}<br /></>
             ))}
           </address>
         </div>
         <div class="legal-section" id="datenschutz">
           <h2>Datenschutz</h2>
-          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies soweit möglich auf freiwilliger Basis.</p>
+          <p>Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf unseren Seiten personenbezogene Daten erhoben werden, erfolgt dies soweit möglich auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche Zustimmung nicht an Dritte weitergegeben.</p>
         </div>
       </div>
     </section>
@@ -229,22 +506,119 @@ const { site, hero, leistungen, about, testimonials, gallery, faq, contact, foot
 
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
-    <div class="footer-inner">
-      <img src="/images/logo.png" alt="" class="footer-logo" width="110" height="44" />
-      <span class="footer-copyright">{footer.copyright}</span>
-      <ul class="footer-links" role="list">
-        {footer.links.map((link) => (
-          <li><a href={link.href}>{link.text}</a></li>
-        ))}
-      </ul>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="/images/logo.png" alt="Taucher Installationen GmbH" class="footer-logo" />
+          <p>Ihr verlässlicher Partner für Heizung, Sanitär und Installationen in Jennersdorf und dem Südburgenland. Familiengeführt seit 1995.</p>
+        </div>
+        <div class="footer-column">
+          <h4>Leistungen</h4>
+          <ul>
+            <li><a href="#leistungen">Heizungsbau &amp; Modernisierung</a></li>
+            <li><a href="#leistungen">Gas-, Öl- &amp; Pelletsheizungen</a></li>
+            <li><a href="#leistungen">Wärmepumpen</a></li>
+            <li><a href="#leistungen">Sanitärinstallation</a></li>
+            <li><a href="#leistungen">Badsanierung</a></li>
+            <li><a href="#leistungen">Wartung &amp; Notdienst</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Unternehmen</h4>
+          <ul>
+            <li><a href="#warum-wir">Über uns</a></li>
+            <li><a href="#ablauf">Unser Ablauf</a></li>
+            <li><a href="#bewertungen">Kundenstimmen</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#kontakt">Kontakt</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Kontakt</h4>
+          <ul>
+            <li><a href={`tel:${contact.phone.replace(/[\s\/]/g, '')}`}>{contact.phone}</a></li>
+            <li><a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`}>{contact.mobile} (Mobil)</a></li>
+            <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+            <li>{contact.address}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">© 2026 Taucher Installationen GmbH</span>
+        <div class="footer-legal">
+          <a href="#impressum">Impressum</a>
+          <a href="#datenschutz">Datenschutz</a>
+        </div>
+      </div>
     </div>
   </footer>
 
-  <!-- Cookie Banner -->
-  <div id="cookie-banner" class="cookie-banner" style="display:none;">
+  <!-- ===== FLOATING CALL BUTTON (Mobile) ===== -->
+  <a href={`tel:${contact.mobile.replace(/[\s\/]/g, '')}`} class="fab-call" aria-label="Jetzt anrufen" id="fab-call">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+    <span>Anrufen</span>
+  </a>
+
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner" class="cookie-banner" hidden>
     <div class="cookie-content">
-      <p>Diese Website verwendet Cookies für die Funktionalität. <a href="#datenschutz">Mehr erfahren</a></p>
+      <p>Diese Website verwendet funktionale Cookies. <a href="#datenschutz">Datenschutz</a></p>
       <button id="cookie-accept" class="btn btn-primary">Akzeptieren</button>
     </div>
   </div>
+
 </Base>
+
+<script>
+  // ── Header Scroll ──
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 60);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ── Mobile Menu ──
+  const toggle = document.getElementById('mobile-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  toggle.addEventListener('click', () => {
+    const open = !mobileNav.hidden;
+    mobileNav.hidden = open;
+    toggle.setAttribute('aria-expanded', String(!open));
+    document.body.style.overflow = open ? '' : 'hidden';
+  });
+  // Close on link click
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileNav.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    });
+  });
+
+  // ── Scroll Animations ──
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('anim-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.anim-ready').forEach(el => io.observe(el));
+
+  // ── FAB visibility (only show after hero) ──
+  const fab = document.getElementById('fab-call');
+  const fabObserver = new IntersectionObserver(([e]) => {
+    fab.classList.toggle('fab-visible', !e.isIntersecting);
+  }, { threshold: 0.1 });
+  fabObserver.observe(document.querySelector('.hero'));
+
+  // ── Cookie Banner ──
+  const banner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept');
+  if (!localStorage.getItem('taucher-cookies-ok')) banner.hidden = false;
+  acceptBtn.addEventListener('click', () => {
+    localStorage.setItem('taucher-cookies-ok', '1');
+    banner.hidden = true;
+  });
+</script>
+
+<style is:global>
+  html { scroll-padding-top: 90px; }
+</style>
