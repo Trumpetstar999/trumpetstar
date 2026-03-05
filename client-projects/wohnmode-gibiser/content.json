@@ -1,0 +1,169 @@
+{
+  "site": {
+    "name": "Wohnmode Gibiser",
+    "tagline": "Raumausstatter · Bodenleger · Tapezierer – Heiligenkreuz im Lafnitztal",
+    "description": "Wohnmode Gibiser: Innenbeschattung, Vorhänge, Sitzmöbel-Tapezierungen, Bodenbeläge und komplette Innenausstattung – Meisterbetrieb seit 1904 im Südburgenland.",
+    "url": "https://www.wohnmode-gibiser.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "Wohnmode Gibiser | Raumausstatter & Tapezierer – Heiligenkreuz",
+    "description": "Meisterbetrieb seit 1904. Innenbeschattung, Vorhänge, Sitzmöbel, Bodenbeläge & komplette Innenausstattung aus einer Hand. Persönliche Beratung im Südburgenland.",
+    "ogImage": "/images/hero-1.jpg",
+    "canonical": "https://www.wohnmode-gibiser.at"
+  },
+  "hero": {
+    "headline": "Wohnmode Gibiser",
+    "subheadline": "Ihr verlässlicher Partner seit 120 Jahren für Raumausstattung, Bodenbeläge & Tapezierarbeiten in Heiligenkreuz im Lafnitztal",
+    "slides": [
+      { "src": "/images/hero-1.jpg", "alt": "Warmer Wohnraum mit Vorhängen und Sitzmöbeln" },
+      { "src": "/images/hero-2.jpg", "alt": "Lichtdurchflutetes Wohnzimmer mit Holzparkett" },
+      { "src": "/images/hero-3.jpg", "alt": "Handgefertigte Sitzmöbel und Stoffmuster" },
+      { "src": "/images/hero-4.jpg", "alt": "Individuelle Innenbeschattung mit modernen Stoffen" }
+    ],
+    "cta": {
+      "primary": { "text": "Beratung anfragen", "href": "#kontakt" },
+      "secondary": { "text": "03326 / 22 72", "href": "tel:+4333262272" }
+    }
+  },
+  "leistungen": {
+    "headline": "Unsere Leistungen",
+    "subheadline": "Alles aus einer Hand – von der Beratung bis zur Fertigstellung",
+    "items": [
+      {
+        "image": "/images/service-beschattung.jpg",
+        "title": "Innenbeschattung",
+        "text": "Rollos, Plissees, Jalousien und Sonnenschutzsysteme – maßgefertigt, energieeffizient und perfekt montiert."
+      },
+      {
+        "image": "/images/service-vorhaenge.jpg",
+        "title": "Vorhänge & Fensterdekorationen",
+        "text": "Individuelle Stoffe, hochwertige Konfektion und saubere Montage für Räume mit Charakter."
+      },
+      {
+        "image": "/images/service-tapezierung.jpg",
+        "title": "Sitzmöbel-Tapezierungen",
+        "text": "Neupolsterung, Bezugswechsel und Restaurierung – damit Ihre Lieblingsstücke wieder wie neu wirken."
+      },
+      {
+        "image": "/images/service-boeden.jpg",
+        "title": "Bodenbeläge",
+        "text": "Vinyl, Designbeläge und Teppiche – langlebig, pflegeleicht und professionell verlegt."
+      },
+      {
+        "image": "/images/service-innenausstattung.jpg",
+        "title": "Innenausstattung & Tapezierarbeiten",
+        "text": "Wandgestaltung, Tapeten und komplette Raumkonzepte – harmonisch abgestimmt auf Ihren Stil."
+      },
+      {
+        "image": "/images/service-beratung.jpg",
+        "title": "Beratung vor Ort",
+        "text": "Wir kommen zu Ihnen, nehmen Maße und zeigen passende Materialien direkt in Ihrem Zuhause."
+      }
+    ]
+  },
+  "about": {
+    "headline": "Über 120 Jahre Wohnmode",
+    "text": "Seit 1904 steht Wohnmode Gibiser für handwerkliche Präzision und persönliche Beratung. Bernd Gibiser führt den Meisterbetrieb gemeinsam mit Ulli, Erich und Olga bereits in vierter Generation – mit Leidenschaft für Stoffe, Möbel und zeitgemäße Innenraumkonzepte.",
+    "highlights": [
+      "Familienbetrieb seit 1904 – 4. Generation",
+      "Bernd Gibiser: Tapezierer- & Raumausstattermeister seit 1993",
+      "Persönliche Beratung bei Ihnen vor Ort",
+      "Eigene Werkstatt für Polster- & Näharbeiten"
+    ]
+  },
+  "gallery": {
+    "headline": "Einblicke in unsere Arbeit",
+    "images": [
+      { "src": "/images/gallery-1.jpg", "alt": "Wohnraum mit Stoffpaneelen und Sitznische", "caption": "Fensterdekoration & Stoffpaneele" },
+      { "src": "/images/gallery-2.jpg", "alt": "Moderner Wohnbereich mit Maßvorhängen", "caption": "Vorhänge & Dekoration" },
+      { "src": "/images/gallery-3.jpg", "alt": "Tapezierte Wand mit warmen Farben", "caption": "Tapezierarbeiten" },
+      { "src": "/images/gallery-4.jpg", "alt": "Holzboden und Lounge-Bereich", "caption": "Bodenbeläge" },
+      { "src": "/images/gallery-5.jpg", "alt": "Polsterbank mit maßgefertigten Kissen", "caption": "Sitzmöbel-Tapezierung" },
+      { "src": "/images/gallery-6.jpg", "alt": "Atelier mit Stoffmustern und Beratungstisch", "caption": "Beratung im Atelier" }
+    ]
+  },
+  "testimonials": {
+    "headline": "Was Kund:innen sagen",
+    "items": [
+      {
+        "name": "Familie M., Heiligenkreuz",
+        "text": "Von der Beratung bis zur Montage lief alles reibungslos. Unsere neuen Vorhänge machen den Raum komplett."
+      },
+      {
+        "name": "Herr M. S., Jennersdorf",
+        "text": "Das alte Sofa wurde perfekt neu gepolstert – hochwertige Stoffe und spürbare Handarbeit."
+      },
+      {
+        "name": "Familie K., Pinkatal",
+        "text": "Neuer Boden, Sonnenschutz und Dekoration in einem Projekt – termintreu und extrem sauber gearbeitet."
+      }
+    ]
+  },
+  "faq": {
+    "headline": "Häufig gestellte Fragen",
+    "items": [
+      {
+        "q": "Bieten Sie Beratung vor Ort an?",
+        "a": "Ja, wir kommen zu Ihnen, sehen die Räume und bringen Stoff- sowie Materialmuster direkt mit."
+      },
+      {
+        "q": "Wie lange dauert eine Sitzmöbel-Tapezierung?",
+        "a": "Je nach Umfang zwischen 2 und 4 Wochen. Beim Beratungstermin erhalten Sie einen verbindlichen Zeitplan."
+      },
+      {
+        "q": "Welche Regionen betreuen Sie?",
+        "a": "Wir sind im Südburgenland zuhause und arbeiten im Pinkatal, Jennersdorf sowie den umliegenden Gemeinden."
+      },
+      {
+        "q": "Können auch ältere Möbel restauriert werden?",
+        "a": "Absolut. Wir reparieren Gestelle, erneuern Polsterungen und beziehen Ihr Lieblingsstück mit neuen Stoffen."
+      },
+      {
+        "q": "Gibt es ein Geschäftslokal zum Vorbeischauen?",
+        "a": "Ja – unser Atelier in der Oberen Hauptstraße 14 in Heiligenkreuz zeigt Stoffe, Sonnenschutz und Bodenmuster."
+      }
+    ]
+  },
+  "contact": {
+    "headline": "Kontakt",
+    "subheadline": "Schreiben Sie uns oder vereinbaren Sie eine persönliche Beratung",
+    "phone": "03326 / 22 72",
+    "mobile": "",
+    "email": "office@wohnmode-gibiser.at",
+    "address": "Obere Hauptstraße 14, 7561 Heiligenkreuz im Lafnitztal",
+    "hours": [
+      { "label": "Mo – Fr", "time": "08:00 – 12:00 & 14:00 – 18:00" },
+      { "label": "Sa", "time": "08:00 – 12:00" }
+    ],
+    "hoursNotice": "Termine außerhalb der Öffnungszeiten nach Vereinbarung",
+    "formPlaceholder": {
+      "name": "Ihr Name",
+      "email": "Ihre E-Mail",
+      "message": "Wie können wir helfen?",
+      "submit": "Nachricht senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Wohnmode Gibiser",
+    "links": [
+      { "text": "Impressum", "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ]
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "Wohnmode Gibiser",
+      "Obere Hauptstraße 14",
+      "7561 Heiligenkreuz im Lafnitztal, Österreich",
+      "Telefon: 03326 / 22 72",
+      "E-Mail: office@wohnmode-gibiser.at",
+      "Inhaber & Verantwortlich: Bernd Gibiser",
+      "Gewerbewortlaut: Tapezierer, Dekorateure und Raumausstatter",
+      "Behörde: Bezirkshauptmannschaft Jennersdorf",
+      "Gewerbeordnung: www.ris.bka.gv.at"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wohnmode Gibiser Admin</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="/site-images/logo.jpg" alt="Gibiser" class="logo" onerror="this.style.display='none'">
+        <h1>Gibiser Admin</h1>
+      </div>
+      
+      <nav class="sidebar-nav" id="main-nav">
+        <!-- Navigation wird per JS gerendert -->
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main">
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <h2 id="page-title">Dashboard</h2>
+        </div>
+        <div class="top-bar-right">
+          <span id="build-indicator" class="build-status outdated">⚠️ Veraltet</span>
+          <button id="save-btn" class="btn btn-primary">💾 Speichern</button>
+        </div>
+      </header>
+      
+      <div class="content" id="main-content">
+        <!-- Content wird per JS gerendert -->
+      </div>
+    </main>
+  </div>
+  
+  <script src="/app.js"></script>
+</body>
+</html>
