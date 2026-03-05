@@ -78,6 +78,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   }]);
                   console.log('[Auth] Daily login star awarded');
                 }
+
+                // Push user data to App B
+                try {
+                  const syncUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/push-sync`;
+                  await fetch(syncUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      event: 'LOGIN',
+                      user_id: session.user.id,
+                      user_email: session.user.email,
+                      user_metadata: session.user.user_metadata,
+                    }),
+                  });
+                } catch (syncError) {
+                  console.warn('[Sync] Failed to push login to App B:', syncError);
+                }
               } catch (error) {
                 console.error('Error logging login:', error);
               }

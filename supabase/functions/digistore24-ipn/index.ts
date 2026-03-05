@@ -390,6 +390,32 @@ async function processIpnEvent(
         // Don't fail the whole process for email errors
       }
     }
+
+    // 6b. Push purchase/plan update to App B (fire-and-forget)
+    if (['PURCHASE', 'RENEWAL', 'REFUND', 'CHARGEBACK', 'CANCELLATION'].includes(normalized.event_type)) {
+      try {
+        const pushSyncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push-sync`;
+        await fetch(pushSyncUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: `PURCHASE_${normalized.event_type}`,
+            user_email: normalized.email,
+            user_id: userId,
+            plan_key: product.plan_key || 'FREE',
+            product_id: normalized.product_id,
+            product_name: product.name,
+            order_id: normalized.order_id,
+            amount: normalized.amount,
+            currency: normalized.currency,
+            period_end: normalized.period_end,
+          }),
+        });
+      } catch (syncErr) {
+        console.warn('[Sync] Failed to push purchase to App B:', syncErr);
+        // Never fail IPN processing for sync errors
+      }
+    }
     
     // 7. Upsert into digistore24_customers
     try {
