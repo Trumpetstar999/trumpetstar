@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { DashboardStats } from './DashboardStats';
 import { TopUsersTable } from './TopUsersTable';
 import { RecentActivityList } from './RecentActivityList';
@@ -5,41 +6,54 @@ import { ActivityCharts } from './ActivityCharts';
 import { VimeoErrorsList } from './VimeoErrorsList';
 import { PlanStatsCards } from './PlanStatsCards';
 
+const fadeUp = (delay: number) => ({
+  hidden: { opacity: 0, y: 22 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: 'easeOut' as const, delay },
+  },
+});
+
+const SectionLabel = ({ children }: { children: React.ReactNode }) => (
+  <h2 className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-widest mb-3 flex items-center gap-2">
+    <span className="inline-block w-3 h-px bg-[#D1D5DB]" />
+    {children}
+    <span className="flex-1 h-px bg-[#F3F4F6]" />
+  </h2>
+);
+
 export function AdminDashboard() {
   return (
-    <div className="space-y-6">
-      {/* Plan Stats */}
-      <section>
-        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
-          Nutzer nach Plan
-        </h2>
+    <div className="space-y-8">
+
+      <motion.section variants={fadeUp(0)} initial="hidden" animate="show">
+        <SectionLabel>Nutzer nach Plan</SectionLabel>
         <PlanStatsCards />
-      </section>
+      </motion.section>
 
-      {/* KPI Cards */}
-      <section>
-        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
-          Übersicht
-        </h2>
+      <motion.section variants={fadeUp(0.12)} initial="hidden" animate="show">
+        <SectionLabel>Übersicht</SectionLabel>
         <DashboardStats />
-      </section>
+      </motion.section>
 
-      {/* Charts */}
-      <section>
-        <h2 className="text-sm font-medium text-[#6B7280] uppercase tracking-wide mb-3">
-          Aktivität
-        </h2>
+      <motion.section variants={fadeUp(0.24)} initial="hidden" animate="show">
+        <SectionLabel>Aktivität</SectionLabel>
         <ActivityCharts />
-      </section>
+      </motion.section>
 
-      {/* Vimeo Errors */}
-      <VimeoErrorsList />
+      <motion.section variants={fadeUp(0.36)} initial="hidden" animate="show">
+        <VimeoErrorsList />
+      </motion.section>
 
-      {/* Top Users Tables */}
-      <TopUsersTable />
+      <motion.section variants={fadeUp(0.44)} initial="hidden" animate="show">
+        <TopUsersTable />
+      </motion.section>
 
-      {/* Recent Activity */}
-      <RecentActivityList />
+      <motion.section variants={fadeUp(0.52)} initial="hidden" animate="show">
+        <RecentActivityList />
+      </motion.section>
+
     </div>
   );
 }
