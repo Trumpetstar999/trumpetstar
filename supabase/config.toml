@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.capture-lead]
 verify_jwt = false
+
+[functions.push-sync]
+verify_jwt = false
