@@ -35,12 +35,13 @@ app.use(basicAuth({
 app.use(express.json({ limit: '2mb' }));
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+const ADMIN_DIST = path.join(__dirname, 'frontend-dist');
+app.use(express.static(ADMIN_DIST));
 app.use('/site-images', express.static(IMAGES_DIR));
 
-// Redirect root to index.html
+// SPA fallback
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(ADMIN_DIST, 'index.html'));
 });
 
 // ════════════════════════════════════════════════════════════════════════
