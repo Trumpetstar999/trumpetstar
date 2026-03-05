@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Verify admin via JWT
+    // Verify caller is an authenticated admin
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -57,10 +57,20 @@ Deno.serve(async (req) => {
 
     let imported = 0;
     let skipped = 0;
-    let errors: string[] = [];
+    const errors: string[] = [];
+
+    // Pre-fetch all existing auth users once (avoid N+1 listUsers calls)
+    const { data: allAuthData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    const existingAuthMap = new Map<string, string>(); // email → user_id
+    for (const u of allAuthData?.users ?? []) {
+      if (u.email) existingAuthMap.set(u.email.toLowerCase(), u.id);
+    }
 
     for (const row of rows) {
       try {
+        const email = row.email?.toLowerCase().trim();
+        if (!email) { skipped++; continue; }
+
         const isActive = row.payment_status?.trim() === 'Zahlungen aktiv';
         const subscriptionStatus = isActive ? 'active' : 'cancelled';
 
@@ -68,7 +78,7 @@ Deno.serve(async (req) => {
         const revenueRaw = row.total_revenue?.replace(/[^0-9,.]/g, '').replace(',', '.') ?? '0';
         const revenue = parseFloat(revenueRaw) || 0;
 
-        // Parse dates (DD.MM.YYYY or YYYY-MM-DD)
+        // Parse DD.MM.YYYY → YYYY-MM-DD
         const parseDate = (str: string): string | null => {
           if (!str) return null;
           const parts = str.trim().split('.');
@@ -81,11 +91,33 @@ Deno.serve(async (req) => {
         const firstPurchaseAt = parseDate(row.first_payment_at);
         const nextPaymentAt = parseDate(row.next_payment_at);
 
-        // 1. Upsert customer
-        const { data: customer, error: custErr } = await supabase
+        // ── 1. Ensure Auth account exists ────────────────────────────────────
+        let authUserId = existingAuthMap.get(email) ?? null;
+
+        if (!authUserId) {
+          // Invite creates the account and sends a magic-link invitation email
+          const { data: inviteData, error: inviteErr } = await supabase.auth.admin.inviteUserByEmail(
+            email,
+            {
+              data: {
+                first_name: row.first_name?.trim() || null,
+                last_name: row.last_name?.trim() || null,
+              },
+            }
+          );
+          if (inviteErr) {
+            errors.push(`${email}: Auth invite failed – ${inviteErr.message}`);
+            continue;
+          }
+          authUserId = inviteData.user.id;
+          existingAuthMap.set(email, authUserId);
+        }
+
+        // ── 2. Upsert CRM customer record ────────────────────────────────────
+        const { error: custErr } = await supabase
           .from('digistore24_customers')
           .upsert({
-            email: row.email?.toLowerCase().trim(),
+            email,
             first_name: row.first_name?.trim() || null,
             last_name: row.last_name?.trim() || null,
             country: row.country?.trim() || null,
@@ -93,31 +125,20 @@ Deno.serve(async (req) => {
             total_revenue: revenue,
             total_purchases: 1,
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'email', ignoreDuplicates: false })
-          .select('id')
-          .single();
+          }, { onConflict: 'email', ignoreDuplicates: false });
 
         if (custErr) {
-          errors.push(`${row.email}: Customer upsert failed – ${custErr.message}`);
+          errors.push(`${email}: Customer upsert failed – ${custErr.message}`);
           continue;
         }
 
-        // 2. Find matching auth user by email
-        const { data: authUsers } = await supabase.auth.admin.listUsers();
-        const matchedUser = authUsers?.users?.find(
-          (u) => u.email?.toLowerCase() === row.email?.toLowerCase().trim()
-        );
-
-        // user_id is nullable — only set it when there's a real Auth account
-        const userId = matchedUser?.id ?? null;
-
-        // 3. Upsert subscription
+        // ── 3. Upsert subscription ───────────────────────────────────────────
         const { error: subErr } = await supabase
           .from('digistore24_subscriptions')
           .upsert({
             digistore_order_id: row.order_id?.trim(),
             digistore_product_id: row.product_id?.trim(),
-            user_id: userId,
+            user_id: authUserId,
             status: subscriptionStatus,
             current_period_start: firstPurchaseAt,
             current_period_end: nextPaymentAt,
@@ -126,16 +147,16 @@ Deno.serve(async (req) => {
           }, { onConflict: 'digistore_order_id', ignoreDuplicates: false });
 
         if (subErr) {
-          errors.push(`${row.email}: Subscription upsert failed – ${subErr.message}`);
+          errors.push(`${email}: Subscription upsert failed – ${subErr.message}`);
           continue;
         }
 
-        // 4. If auth user exists and subscription is active → set membership to PRO
-        if (matchedUser && isActive) {
+        // ── 4. Set PRO membership if subscription is active ──────────────────
+        if (isActive) {
           await supabase
             .from('user_memberships')
             .upsert({
-              user_id: matchedUser.id,
+              user_id: authUserId,
               plan_key: 'PRO',
               current_plan: 'PRO',
               plan_rank: 3,
