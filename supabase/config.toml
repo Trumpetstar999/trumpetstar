@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.push-sync]
 verify_jwt = false
+
+[functions.digistore24-csv-import]
+verify_jwt = false
