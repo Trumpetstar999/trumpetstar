@@ -265,6 +265,32 @@ Deno.serve(async (req) => {
       } catch (syncErr) {
         console.warn("[capture-lead] push-sync error (non-fatal):", syncErr);
       }
+
+      // 7) Fire-and-forget POST to Google Sheets webhook
+      try {
+        const googleSheetUrl = Deno.env.get("GOOGLE_SHEET_WEBHOOK_URL");
+        if (googleSheetUrl) {
+          fetch(googleSheetUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: cleanEmail,
+              first_name: cleanName,
+              last_name: "",
+              segment: cleanSegment,
+              source: "trumpetstar-app",
+              language: lang,
+              created_at: new Date().toISOString(),
+            }),
+          }).then(async (r) => {
+            const t = await r.text();
+            if (!r.ok) console.warn("[capture-lead] Google Sheet webhook failed:", r.status, t);
+            else console.log("[capture-lead] Google Sheet webhook OK:", t);
+          }).catch((e) => console.warn("[capture-lead] Google Sheet webhook error (non-fatal):", e));
+        }
+      } catch (gsErr) {
+        console.warn("[capture-lead] Google Sheet webhook error (non-fatal):", gsErr);
+      }
     }
 
     return new Response(
