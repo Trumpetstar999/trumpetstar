@@ -205,7 +205,9 @@ serve(async (req) => {
       messages = [{ role: 'user', content: body.message }];
     }
     
-    const { mode = "mixed", language = "de", userPlanKey = "FREE", userName = "", includeRecording = false, recordingContext = null } = body;
+    const { mode = "mixed", language = "de", userName = "", includeRecording = false, recordingContext = null } = body;
+    // NOTE: userPlanKey from the client body is intentionally ignored for security.
+    // The plan is always resolved server-side from the authenticated user's membership record.
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -216,6 +218,26 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // SECURITY: Resolve plan server-side from the authenticated user's membership.
+    // Never trust the client-supplied userPlanKey.
+    let serverPlanKey = "FREE";
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || "");
+      const { data: authData } = await anonClient.auth.getUser(token);
+      if (authData?.user?.id) {
+        const { data: membershipData } = await supabase
+          .from("user_memberships")
+          .select("plan_key")
+          .eq("user_id", authData.user.id)
+          .maybeSingle();
+        if (membershipData?.plan_key) {
+          serverPlanKey = membershipData.plan_key;
+        }
+      }
+    }
 
     // Get the last user message for context retrieval
     const lastUserMessage = messages.filter((m: Message) => m.role === "user").pop()?.content || "";
@@ -232,13 +254,13 @@ serve(async (req) => {
     let contextChunks: string[] = [];
     let usedSourceIds: string[] = [];
 
-    // Map plan to allowed levels
+    // Map plan to allowed levels using server-resolved plan key
     const planHierarchy: Record<string, string[]> = {
       FREE: ["FREE"],
       BASIC: ["FREE", "BASIC"],
       PREMIUM: ["FREE", "BASIC", "PREMIUM"],
     };
-    const allowedPlans = planHierarchy[userPlanKey] || ["FREE"];
+    const allowedPlans = planHierarchy[serverPlanKey] || ["FREE"];
 
     // Detect special query types
     // Note names pattern: c1, cis1, d1, dis1, e1, f1, fis1, g1, gis1, a1, b1, h1, c2, cis2, d2, dis2, e2, f2, fis2, g2, gis2, a2, b2, h2, c3
