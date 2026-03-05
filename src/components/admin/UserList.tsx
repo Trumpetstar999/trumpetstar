@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus, MoreHorizontal, Trash2, KeyRound, Download, Mail, RefreshCw } from 'lucide-react';
+import { Search, Users, Star, Video, Calendar, GraduationCap, Loader2, Shield, ShieldCheck, User, Crown, Sparkles, UserPlus, MoreHorizontal, Trash2, KeyRound, Download, Mail, RefreshCw, LogIn, Euro } from 'lucide-react';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
@@ -48,6 +48,9 @@ interface UserProfile {
   is_teacher: boolean;
   role?: AppRole | null;
   plan_key?: string | null;
+  login_count?: number;
+  last_login?: string | null;
+  customer_value?: number | null;
 }
 
 interface UserDetail extends UserProfile {
@@ -119,8 +122,8 @@ export function UserList() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
-      // Fetch profiles, roles, memberships, and auth emails in parallel
-      const [profilesRes, rolesRes, membershipsRes, emailsRes] = await Promise.all([
+      // Fetch profiles, roles, memberships, auth emails, login stats and customer values in parallel
+      const [profilesRes, rolesRes, membershipsRes, emailsRes, loginStatsRes, customerValuesRes] = await Promise.all([
         supabase.from('profiles').select('*').order('created_at', { ascending: false }),
         supabase.from('user_roles').select('user_id, role'),
         supabase.from('user_memberships').select('user_id, plan_key'),
@@ -129,6 +132,16 @@ export function UserList() {
               headers: { Authorization: `Bearer ${session.access_token}` },
             }).then(r => r.ok ? r.json() : { users: [] }).catch(() => ({ users: [] }))
           : Promise.resolve({ users: [] }),
+        // Count logins and get last login per user from activity_logs
+        supabase
+          .from('activity_logs')
+          .select('user_id, created_at')
+          .eq('action', 'login')
+          .order('created_at', { ascending: false }),
+        // Get customer revenue from digistore24_customers by email
+        supabase
+          .from('digistore24_customers')
+          .select('email, total_revenue'),
       ]);
 
       if (profilesRes.error) throw profilesRes.error;
@@ -141,16 +154,37 @@ export function UserList() {
         emailMap[u.id] = { email: u.email, last_sign_in_at: u.last_sign_in_at };
       }
 
+      // Build login stats map: userId -> { count, last_login }
+      const loginStatsMap: Record<string, { count: number; last_login: string | null }> = {};
+      for (const log of (loginStatsRes.data || [])) {
+        if (!loginStatsMap[log.user_id]) {
+          loginStatsMap[log.user_id] = { count: 0, last_login: log.created_at };
+        }
+        loginStatsMap[log.user_id].count += 1;
+      }
+
+      // Build customer value map: email -> total_revenue
+      const customerValueMap: Record<string, number> = {};
+      for (const c of (customerValuesRes.data || [])) {
+        customerValueMap[c.email.toLowerCase()] = parseFloat(String(c.total_revenue)) || 0;
+      }
+
       console.log('Fetched profiles:', profiles.length, '| emails:', Object.keys(emailMap).length);
 
       const usersWithData = profiles.map(profile => {
         const userRole = roles.find(r => r.user_id === profile.id);
         const userMembership = memberships.find(m => m.user_id === profile.id);
+        const loginStats = loginStatsMap[profile.id] || { count: 0, last_login: null };
+        const userEmail = emailMap[profile.id]?.email?.toLowerCase() || null;
+        const customerValue = userEmail ? (customerValueMap[userEmail] ?? null) : null;
         return {
           ...profile,
           email: emailMap[profile.id]?.email || null,
           role: userRole?.role || null,
           plan_key: userMembership?.plan_key || 'FREE',
+          login_count: loginStats.count,
+          last_login: loginStats.last_login,
+          customer_value: customerValue,
         };
       });
 
@@ -509,13 +543,16 @@ export function UserList() {
 
   // Export users to CSV
   const handleExportUsers = () => {
-    const headers = ['Name', 'E-Mail', 'Plan', 'Berechtigung', 'Lehrer', 'Registriert'];
+    const headers = ['Name', 'E-Mail', 'Plan', 'Berechtigung', 'Lehrer', 'Anmeldungen', 'Letzter Login', 'Kundenwert (€)', 'Registriert'];
     const csvData = filteredUsers.map(user => [
       user.display_name || 'Unbekannt',
       user.email || '-',
       plans.find(p => p.key === user.plan_key)?.display_name || 'Free',
       getRoleLabel(user.role),
       user.is_teacher ? 'Ja' : 'Nein',
+      user.login_count ?? 0,
+      user.last_login ? format(new Date(user.last_login), 'dd.MM.yyyy HH:mm', { locale: de }) : '-',
+      user.customer_value != null ? user.customer_value.toFixed(2) : '-',
       formatDate(user.created_at),
     ]);
 
@@ -656,22 +693,31 @@ export function UserList() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-[#F5F7FA]">
-                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Nutzer
                     </th>
-                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      E-Mail
+                    </th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Plan
                     </th>
-                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Berechtigung
                     </th>
-                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Lehrer
                     </th>
-                    <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
-                      Registriert
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Anmeldungen
                     </th>
-                    <th className="px-5 py-3 text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Letzter Login
+                    </th>
+                    <th className="px-4 py-3 text-left text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
+                      Kundenwert
+                    </th>
+                    <th className="px-4 py-3 text-right text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide">
                       Aktionen
                     </th>
                   </tr>
@@ -687,7 +733,7 @@ export function UserList() {
                           index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
                         }`}
                       >
-                        <td className="px-5 py-3">
+                        <td className="px-4 py-3">
                           <button
                             onClick={() => fetchUserDetail(user.id)}
                             className="flex items-center gap-3 hover:underline text-left"
@@ -703,7 +749,13 @@ export function UserList() {
                             </span>
                           </button>
                         </td>
-                        <td className="px-5 py-3">
+                        {/* E-Mail */}
+                        <td className="px-4 py-3 text-sm text-[#6B7280] max-w-[180px]">
+                          <span className="truncate block" title={user.email || undefined}>
+                            {user.email || '-'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
                           {updatingPlan === user.id ? (
                             <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                           ) : (
@@ -739,7 +791,7 @@ export function UserList() {
                             </Select>
                           )}
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-4 py-3">
                           {updatingRole === user.id ? (
                             <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
                           ) : (
@@ -782,7 +834,7 @@ export function UserList() {
                             </Select>
                           )}
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             {updatingTeacher === user.id ? (
                               <Loader2 className="w-4 h-4 animate-spin text-[#6B7280]" />
@@ -794,10 +846,29 @@ export function UserList() {
                             )}
                           </div>
                         </td>
-                        <td className="px-5 py-3 text-sm text-[#6B7280]">
-                          {formatDate(user.created_at)}
+                        {/* Anmeldungen */}
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1.5 text-sm text-[#6B7280]">
+                            <LogIn className="w-3.5 h-3.5 text-[#9CA3AF]" />
+                            <span className="font-medium text-[#374151]">{user.login_count ?? 0}</span>
+                          </div>
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        {/* Letzter Login */}
+                        <td className="px-4 py-3 text-sm text-[#6B7280] whitespace-nowrap">
+                          {user.last_login ? format(new Date(user.last_login), 'dd.MM.yy HH:mm', { locale: de }) : '-'}
+                        </td>
+                        {/* Kundenwert */}
+                        <td className="px-4 py-3">
+                          {user.customer_value != null && user.customer_value > 0 ? (
+                            <div className="flex items-center gap-1 text-sm font-semibold text-emerald-700">
+                              <Euro className="w-3.5 h-3.5" />
+                              {user.customer_value.toFixed(2)}
+                            </div>
+                          ) : (
+                            <span className="text-sm text-[#9CA3AF]">–</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
