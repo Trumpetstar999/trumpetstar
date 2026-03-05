@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,8 +13,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
+    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+    if (!SMTP_PASSWORD) throw new Error("SMTP_PASSWORD is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -30,7 +31,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Determine language: default to 'de'
     const lang = ["de", "en", "es"].includes(locale) ? locale : "de";
 
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       type: "magiclink",
       email: email.trim().toLowerCase(),
       options: {
-        redirectTo: redirectTo || SUPABASE_URL,
+        redirectTo: redirectTo || "https://trumpetstar.lovable.app/app",
       },
     });
 
@@ -82,7 +82,6 @@ Deno.serve(async (req) => {
         magicLink
       );
     } else {
-      // Fallback templates
       const fallback: Record<string, { subject: string; body: string }> = {
         de: {
           subject: "Dein Login-Link für Trumpetstar",
@@ -101,33 +100,28 @@ Deno.serve(async (req) => {
       htmlBody = fallback[lang].body;
     }
 
-    // Send via Resend
-    const resendRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
+    // Send via SMTP (world4you.com)
+    const transporter = nodemailer.createTransport({
+      host: "smtp.world4you.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "Valentin@trumpetstar.com",
+        pass: SMTP_PASSWORD,
       },
-      body: JSON.stringify({
-        from: "Trumpetstar <noreply@trumpetstar.app>",
-        to: [email.trim().toLowerCase()],
-        subject,
-        html: htmlBody,
-      }),
     });
 
-    const resendData = await resendRes.json();
+    const info = await transporter.sendMail({
+      from: '"Trumpetstar" <Valentin@trumpetstar.com>',
+      to: email.trim().toLowerCase(),
+      subject,
+      html: htmlBody,
+    });
 
-    if (!resendRes.ok) {
-      console.error("Resend error:", resendData);
-      return new Response(
-        JSON.stringify({ error: "Failed to send email", details: resendData }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    console.log("[send-magic-link] Email sent:", info.messageId);
 
     return new Response(
-      JSON.stringify({ success: true, messageId: resendData.id }),
+      JSON.stringify({ success: true, messageId: info.messageId }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
