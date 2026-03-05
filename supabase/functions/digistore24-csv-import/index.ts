@@ -108,11 +108,8 @@ Deno.serve(async (req) => {
           (u) => u.email?.toLowerCase() === row.email?.toLowerCase().trim()
         );
 
-        // We need a user_id for the subscription. Use a placeholder UUID derived from the order if no auth user exists.
-        // digistore24_subscriptions requires user_id but if there's no auth user we use a consistent deterministic UUID from the order.
-        // Since there is no auth user, we use a "ghost" approach: store the customer's internal id in a separate field.
-        // The table requires user_id NOT NULL — we'll use the customer's id (as uuid) as a stand-in.
-        const userId = matchedUser?.id ?? customer.id;
+        // user_id is nullable — only set it when there's a real Auth account
+        const userId = matchedUser?.id ?? null;
 
         // 3. Upsert subscription
         const { error: subErr } = await supabase

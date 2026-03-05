@@ -596,7 +596,7 @@ export type Database = {
           id: string
           status: Database["public"]["Enums"]["digistore24_subscription_status"]
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           cancel_at_period_end?: boolean
@@ -609,7 +609,7 @@ export type Database = {
           id?: string
           status?: Database["public"]["Enums"]["digistore24_subscription_status"]
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           cancel_at_period_end?: boolean
@@ -622,7 +622,7 @@ export type Database = {
           id?: string
           status?: Database["public"]["Enums"]["digistore24_subscription_status"]
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
