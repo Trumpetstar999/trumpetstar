@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
           type: "magiclink",
           email: cleanEmail,
           options: {
-            redirectTo: `${SUPABASE_URL.replace('.supabase.co', '.lovable.app')}/app`,
+            redirectTo: `https://trumpetstar.lovable.app/app`,
           },
         });
 
@@ -239,6 +239,40 @@ Deno.serve(async (req) => {
       } catch (emailErr) {
         console.error("Email sending error:", emailErr);
         // Don't fail the whole request if email fails
+      }
+    }
+
+    // 6) Push new lead to ClawBot Command (receive-sync)
+    if (isNewUser) {
+      try {
+        const syncSecret = Deno.env.get("SYNC_SECRET");
+        const syncTargetUrl = Deno.env.get("SYNC_TARGET_URL");
+        if (syncSecret && syncTargetUrl) {
+          const syncRes = await fetch(syncTargetUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-sync-secret": syncSecret,
+            },
+            body: JSON.stringify({
+              event: "NEW_LEAD",
+              user_email: cleanEmail,
+              first_name: cleanName,
+              segment: cleanSegment,
+              language: lang,
+              source: sanitize(source) ?? "landing",
+              synced_at: new Date().toISOString(),
+            }),
+          });
+          const syncText = await syncRes.text();
+          if (!syncRes.ok) {
+            console.warn("[capture-lead] push-sync to ClawBot failed:", syncRes.status, syncText);
+          } else {
+            console.log("[capture-lead] push-sync to ClawBot OK:", syncText);
+          }
+        }
+      } catch (syncErr) {
+        console.warn("[capture-lead] push-sync error (non-fatal):", syncErr);
       }
     }
 
