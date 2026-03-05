@@ -145,7 +145,8 @@ async function getSetting(
 
 // Validate IPN secret
 function validateSecret(payload: Record<string, any>, expectedSecret: string): boolean {
-  if (!expectedSecret) return true; // No secret configured = skip validation
+  // SECURITY: Reject all requests when no secret is configured — never skip validation
+  if (!expectedSecret) return false;
   
   const providedSecret = 
     payload.sha_sign || 

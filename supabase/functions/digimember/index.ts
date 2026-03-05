@@ -255,6 +255,55 @@ async function getUpgradeLinks(supabaseClient: any): Promise<Record<string, stri
   return links;
 }
 
+// Admin-only actions that require authentication
+const ADMIN_ONLY_ACTIONS = new Set([
+  'sync-products',
+  'get-products',
+  'update-product-mapping',
+  'get-plans',
+  'get-plan-stats',
+  'debug-membership',
+]);
+
+async function requireAdmin(req: Request): Promise<{ userId: string } | Response> {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  const anonClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY') || '');
+  const { data: authData, error: authError } = await anonClient.auth.getUser(token);
+
+  if (authError || !authData?.user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Check admin role using service-role client
+  const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const { data: roleData } = await serviceClient
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', authData.user.id)
+    .eq('role', 'admin')
+    .maybeSingle();
+
+  if (!roleData) {
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return { userId: authData.user.id };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -267,6 +316,12 @@ Deno.serve(async (req) => {
     const action = url.searchParams.get('action');
     
     console.log(`DigiMember function called with action: ${action}`);
+
+    // Enforce admin authentication for all admin-only actions
+    if (action && ADMIN_ONLY_ACTIONS.has(action)) {
+      const adminCheck = await requireAdmin(req);
+      if (adminCheck instanceof Response) return adminCheck;
+    }
     
     // Action: Sync all products
     if (action === 'sync-products') {
