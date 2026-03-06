@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
 import { useRealtimeTable } from '@/hooks/useRealtimeTable';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Send, RefreshCw, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
+import { Send, RefreshCw, CheckCircle, XCircle, Clock, Search, MousePointerClick } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EmailLogEntry {
@@ -20,11 +20,12 @@ interface EmailLogEntry {
   sequence_id: string | null;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   sent: { label: 'Gesendet', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle },
   queued: { label: 'In Warteschlange', color: 'text-amber-600 bg-amber-50', icon: Clock },
   failed: { label: 'Fehler', color: 'text-red-600 bg-red-50', icon: XCircle },
   opened: { label: 'Geöffnet', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
+  clicked: { label: 'Geklickt', color: 'text-violet-600 bg-violet-50', icon: MousePointerClick },
 };
 
 export function EmailLogTab() {

@@ -14,7 +14,7 @@ interface QueueItem {
   created_at: string | null;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   pending: { label: 'Ausstehend', color: 'text-amber-600 bg-amber-50', icon: Clock },
   processing: { label: 'Wird gesendet', color: 'text-blue-600 bg-blue-50', icon: Loader2 },
   sent: { label: 'Gesendet', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle },
