@@ -1471,6 +1471,8 @@ export type Database = {
       }
       mailbox_emails: {
         Row: {
+          ai_draft: string | null
+          ai_draft_at: string | null
           body_html: string | null
           body_text: string | null
           created_at: string | null
@@ -1479,6 +1481,7 @@ export type Database = {
           from_name: string | null
           has_attachments: boolean | null
           id: string
+          imap_uid: number | null
           is_flagged: boolean | null
           is_read: boolean | null
           is_starred: boolean | null
@@ -1491,6 +1494,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          ai_draft?: string | null
+          ai_draft_at?: string | null
           body_html?: string | null
           body_text?: string | null
           created_at?: string | null
@@ -1499,6 +1504,7 @@ export type Database = {
           from_name?: string | null
           has_attachments?: boolean | null
           id?: string
+          imap_uid?: number | null
           is_flagged?: boolean | null
           is_read?: boolean | null
           is_starred?: boolean | null
@@ -1511,6 +1517,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          ai_draft?: string | null
+          ai_draft_at?: string | null
           body_html?: string | null
           body_text?: string | null
           created_at?: string | null
@@ -1519,6 +1527,7 @@ export type Database = {
           from_name?: string | null
           has_attachments?: boolean | null
           id?: string
+          imap_uid?: number | null
           is_flagged?: boolean | null
           is_read?: boolean | null
           is_starred?: boolean | null
