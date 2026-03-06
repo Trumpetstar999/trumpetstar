@@ -95,6 +95,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 } catch (syncError) {
                   console.warn('[Sync] Failed to push login to App B:', syncError);
                 }
+
+                // Enroll user into lead pipeline & email automation
+                try {
+                  const enrollUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/enroll-lead`;
+                  await fetch(enrollUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      user_id: session.user.id,
+                      email: session.user.email,
+                      display_name: session.user.user_metadata?.display_name || '',
+                      segment: session.user.user_metadata?.segment || 'adult',
+                      language: session.user.user_metadata?.language || 'de',
+                      source: 'signup',
+                    }),
+                  });
+                } catch (enrollError) {
+                  console.warn('[Enroll] Failed to enroll lead:', enrollError);
+                }
               } catch (error) {
                 console.error('Error logging login:', error);
               }
