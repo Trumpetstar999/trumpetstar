@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
 import { useRealtimeTable } from '@/hooks/useRealtimeTable';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Send, RefreshCw, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
+import { Send, RefreshCw, CheckCircle, XCircle, Clock, Search, MousePointerClick } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface EmailLogEntry {
@@ -20,11 +20,12 @@ interface EmailLogEntry {
   sequence_id: string | null;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
   sent: { label: 'Gesendet', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle },
   queued: { label: 'In Warteschlange', color: 'text-amber-600 bg-amber-50', icon: Clock },
   failed: { label: 'Fehler', color: 'text-red-600 bg-red-50', icon: XCircle },
   opened: { label: 'Geöffnet', color: 'text-blue-600 bg-blue-50', icon: CheckCircle },
+  clicked: { label: 'Geklickt', color: 'text-violet-600 bg-violet-50', icon: MousePointerClick },
 };
 
 export function EmailLogTab() {
@@ -113,16 +114,24 @@ export function EmailLogTab() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-          <div key={key} className={`admin-card p-3 flex items-center gap-3 ${cfg.color}`}>
-            <cfg.icon className="w-5 h-5" />
-            <div>
-              <div className="text-lg font-bold">{logs.filter(l => (l.status || 'queued') === key).length}</div>
-              <div className="text-xs">{cfg.label}</div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
+          const Icon = cfg.icon;
+          const count = key === 'clicked'
+            ? logs.filter(l => !!l.clicked_at).length
+            : key === 'opened'
+            ? logs.filter(l => !!l.opened_at).length
+            : logs.filter(l => (l.status || 'queued') === key).length;
+          return (
+            <div key={key} className={`admin-card p-3 flex items-center gap-3 ${cfg.color}`}>
+              <Icon className="w-5 h-5" />
+              <div>
+                <div className="text-lg font-bold">{count}</div>
+                <div className="text-xs">{cfg.label}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {loading ? <div className="text-slate-400 text-sm py-8 text-center">Lade...</div> : (
@@ -130,7 +139,7 @@ export function EmailLogTab() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-100">
-                {['Empfänger', 'Betreff', 'Status', 'Gesendet', 'Geöffnet'].map(h => (
+                {['Empfänger', 'Betreff', 'Status', 'Gesendet', 'Geöffnet', 'Geklickt'].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -138,6 +147,7 @@ export function EmailLogTab() {
             <tbody>
               {filtered.map(log => {
                 const info = statusInfo(log.status);
+                const Icon = info.icon;
                 return (
                   <tr key={log.id} className="border-b border-slate-50 hover:bg-slate-50/50">
                     <td className="px-4 py-3">
@@ -147,21 +157,28 @@ export function EmailLogTab() {
                     <td className="px-4 py-3 text-sm text-slate-600 max-w-[200px] truncate">{log.subject}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${info.color}`}>
-                        <info.icon className="w-3 h-3" />
+                        <Icon className="w-3 h-3" />
                         {info.label}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-500">
                       {log.sent_at ? format(new Date(log.sent_at), 'dd.MM.yy HH:mm') : '—'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-500">
-                      {log.opened_at ? format(new Date(log.opened_at), 'dd.MM.yy HH:mm') : '—'}
+                    <td className="px-4 py-3 text-xs">
+                      {log.opened_at
+                        ? <span className="text-blue-600 font-medium">{format(new Date(log.opened_at), 'dd.MM.yy HH:mm')}</span>
+                        : <span className="text-slate-400">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      {log.clicked_at
+                        ? <span className="text-violet-600 font-medium">{format(new Date(log.clicked_at), 'dd.MM.yy HH:mm')}</span>
+                        : <span className="text-slate-400">—</span>}
                     </td>
                   </tr>
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="px-4 py-12 text-center text-slate-400 text-sm">Keine E-Mails gefunden</td></tr>
+                <tr><td colSpan={6} className="px-4 py-12 text-center text-slate-400 text-sm">Keine E-Mails gefunden</td></tr>
               )}
             </tbody>
           </table>
