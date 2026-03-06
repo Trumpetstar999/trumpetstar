@@ -584,6 +584,78 @@ export type Database = {
         }
         Relationships: []
       }
+      digistore24_shipments: {
+        Row: {
+          address_city: string | null
+          address_country: string | null
+          address_full: string | null
+          address_street: string | null
+          address_zip: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          notes: string | null
+          order_id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          raw_data: Json | null
+          shipped_at: string | null
+          shipped_by: string | null
+          status: string
+          tracking_code: string | null
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          address_city?: string | null
+          address_country?: string | null
+          address_full?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          raw_data?: Json | null
+          shipped_at?: string | null
+          shipped_by?: string | null
+          status?: string
+          tracking_code?: string | null
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          address_city?: string | null
+          address_country?: string | null
+          address_full?: string | null
+          address_street?: string | null
+          address_zip?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          raw_data?: Json | null
+          shipped_at?: string | null
+          shipped_by?: string | null
+          status?: string
+          tracking_code?: string | null
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       digistore24_subscriptions: {
         Row: {
           cancel_at_period_end: boolean
