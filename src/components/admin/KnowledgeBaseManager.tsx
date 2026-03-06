@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
-  BookOpen, Package, HelpCircle, Link2, Building2,
-  Plus, Trash2, Save, RefreshCw, Edit3, Check, X
+  Package, HelpCircle, Link2, Building2,
+  Plus, Trash2, Save, RefreshCw, Download
 } from 'lucide-react';
 
 interface Product { name: string; typ: string; preis: string; kauflink: string; beschreibung: string; }
@@ -62,6 +62,7 @@ export function KnowledgeBaseManager() {
   const [activeTab, setActiveTab] = useState('firma');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
 
   const load = async () => {
@@ -95,6 +96,48 @@ export function KnowledgeBaseManager() {
       toast.success('✅ Wissensdatenbank gespeichert!');
     }
     setSaving(false);
+  };
+
+  const syncFromDigistore = async () => {
+    setSyncing(true);
+    const { data, error } = await supabase
+      .from('digistore24_products')
+      .select('name, checkout_url, plan_key, digistore_product_id')
+      .eq('is_active', true)
+      .order('name');
+    if (error) {
+      toast.error('Fehler beim Laden der Digistore24-Produkte: ' + error.message);
+      setSyncing(false);
+      return;
+    }
+    const synced: Product[] = (data || []).map(p => ({
+      name: p.name,
+      typ: p.plan_key ?? 'FREE',
+      preis: '',
+      kauflink: p.checkout_url
+        ? p.checkout_url
+        : `https://www.digistore24.com/product/${p.digistore_product_id}`,
+      beschreibung: '',
+    }));
+    // Merge: keep existing entries that aren't in synced list, add/update synced ones
+    setKb(k => {
+      const existingMap = new Map(k.produkte.map(p => [p.name, p]));
+      synced.forEach(p => {
+        if (existingMap.has(p.name)) {
+          const ex = existingMap.get(p.name)!;
+          existingMap.set(p.name, {
+            ...ex,
+            typ: p.typ,
+            kauflink: p.kauflink || ex.kauflink,
+          });
+        } else {
+          existingMap.set(p.name, p);
+        }
+      });
+      return { ...k, produkte: Array.from(existingMap.values()) };
+    });
+    toast.success(`✅ ${synced.length} Produkte aus Digistore24 synchronisiert!`);
+    setSyncing(false);
   };
 
   const updateFirma = (field: keyof Company, val: string) =>
@@ -204,6 +247,17 @@ export function KnowledgeBaseManager() {
         {/* Produkte */}
         {activeTab === 'produkte' && (
           <div className="space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <p className="text-xs text-slate-500">{kb.produkte.length} Produkte in der Wissensdatenbank</p>
+              <button
+                onClick={syncFromDigistore}
+                disabled={syncing}
+                className="admin-btn flex items-center gap-2 text-sm"
+              >
+                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {syncing ? 'Synchronisiere…' : 'Sync von Digistore24'}
+              </button>
+            </div>
             {kb.produkte.map((p, i) => (
               <div key={i} className="border border-slate-100 rounded-xl p-4 space-y-3 bg-slate-50/50">
                 <div className="flex items-center justify-between">
