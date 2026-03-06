@@ -313,7 +313,8 @@ export function MailboxPanel() {
                 {selectedEmail.from_name && <span className="text-slate-400"> &lt;{selectedEmail.from_email}&gt;</span>}
               </div>
               <div className="text-xs text-slate-400 mt-0.5">
-                {selectedEmail.received_at ? format(new Date(selectedEmail.received_at), 'dd.MM.yyyy HH:mm') : ''}
+                {(() => { const d = selectedEmail.received_at || selectedEmail.sent_at || selectedEmail.created_at; return d ? format(new Date(d), 'dd.MM.yyyy HH:mm') : ''; })()}
+                {selectedEmail.folder === 'sent' && <span className="ml-1 text-slate-300">· An: {selectedEmail.to_email}</span>}
               </div>
             </div>
             <div className="flex items-center gap-2">
