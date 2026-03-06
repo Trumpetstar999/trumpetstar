@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useRealtimeTable } from '@/hooks/useRealtimeTable';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Trash2, RefreshCw, Clock, CheckCircle, XCircle, Play, Loader2 } from 'lucide-react';
@@ -12,6 +11,11 @@ interface QueueItem {
   scheduled_for: string;
   status: string | null;
   created_at: string | null;
+  // Joined
+  lead_email: string | null;
+  lead_name: string | null;
+  template_subject: string | null;
+  template_name: string | null;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -23,8 +27,46 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 export function QueueTab() {
-  const { data: queue, loading, refetch } = useRealtimeTable<QueueItem>('email_queue');
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+
+  const fetchQueue = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('email_queue')
+      .select(`
+        id, lead_id, template_id, scheduled_for, status, created_at,
+        leads ( email, first_name, name ),
+        email_templates ( subject_de, display_name )
+      `)
+      .order('scheduled_for', { ascending: true })
+      .limit(500);
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    const enriched: QueueItem[] = (data || []).map((row: any) => ({
+      id: row.id,
+      lead_id: row.lead_id,
+      template_id: row.template_id,
+      scheduled_for: row.scheduled_for,
+      status: row.status,
+      created_at: row.created_at,
+      lead_email: row.leads?.email ?? null,
+      lead_name: row.leads?.first_name || row.leads?.name || null,
+      template_subject: row.email_templates?.subject_de ?? null,
+      template_name: row.email_templates?.display_name ?? null,
+    }));
+
+    setQueue(enriched);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
   async function processQueue() {
     setProcessing(true);
@@ -38,7 +80,7 @@ export function QueueTab() {
       const data = await res.json();
       if (res.ok) {
         toast.success(`${data.sent || 0} E-Mails gesendet, ${data.failed || 0} fehlgeschlagen`);
-        refetch();
+        fetchQueue();
       } else {
         toast.error(data.error || 'Fehler beim Verarbeiten');
       }
@@ -53,14 +95,14 @@ export function QueueTab() {
     const { error } = await supabase.from('email_queue').update({ status: 'cancelled' } as any).eq('id', id);
     if (error) { toast.error(error.message); return; }
     toast.success('Abgebrochen');
-    refetch();
+    fetchQueue();
   }
 
   async function deleteItem(id: string) {
     const { error } = await supabase.from('email_queue').delete().eq('id', id);
     if (error) { toast.error(error.message); return; }
     toast.success('Gelöscht');
-    refetch();
+    fetchQueue();
   }
 
   const statusInfo = (s: string | null) => STATUS_CONFIG[s || 'pending'] || STATUS_CONFIG.pending;
@@ -74,14 +116,14 @@ export function QueueTab() {
             {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
             Queue verarbeiten
           </button>
-          <button onClick={refetch} className="admin-btn flex items-center gap-2">
+          <button onClick={fetchQueue} className="admin-btn flex items-center gap-2">
             <RefreshCw className="w-4 h-4" /> Aktualisieren
           </button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
           const Icon = cfg.icon;
           return (
@@ -101,7 +143,7 @@ export function QueueTab() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-100">
-                {['Lead ID', 'Template', 'Geplant für', 'Status', ''].map(h => (
+                {['Empfänger', 'Betreff', 'Geplant für', 'Status', ''].map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -109,16 +151,23 @@ export function QueueTab() {
             <tbody>
               {queue.map(item => {
                 const info = statusInfo(item.status);
+                const Icon = info.icon;
                 return (
                   <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                    <td className="px-4 py-3 font-mono text-xs text-slate-500">{item.lead_id?.slice(0, 8) || '—'}...</td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-500">{item.template_id?.slice(0, 8) || '—'}...</td>
-                    <td className="px-4 py-3 text-sm text-slate-600">
+                    <td className="px-4 py-3">
+                      <div className="text-sm font-medium text-slate-700">{item.lead_email || '—'}</div>
+                      {item.lead_name && <div className="text-xs text-slate-400">{item.lead_name}</div>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm text-slate-600 max-w-xs truncate">{item.template_subject || '—'}</div>
+                      {item.template_name && <div className="text-xs text-slate-400">{item.template_name}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">
                       {format(new Date(item.scheduled_for), 'dd.MM.yy HH:mm')}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${info.color}`}>
-                        <info.icon className="w-3 h-3" />
+                        <Icon className="w-3 h-3" />
                         {info.label}
                       </span>
                     </td>
