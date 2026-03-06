@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useRealtimeTable } from '@/hooks/useRealtimeTable';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Trash2, RefreshCw, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Trash2, RefreshCw, Clock, CheckCircle, XCircle, Play, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface QueueItem {
@@ -15,6 +16,7 @@ interface QueueItem {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending: { label: 'Ausstehend', color: 'text-amber-600 bg-amber-50', icon: Clock },
+  processing: { label: 'Wird gesendet', color: 'text-blue-600 bg-blue-50', icon: Loader2 },
   sent: { label: 'Gesendet', color: 'text-emerald-600 bg-emerald-50', icon: CheckCircle },
   failed: { label: 'Fehler', color: 'text-red-600 bg-red-50', icon: XCircle },
   cancelled: { label: 'Abgebrochen', color: 'text-slate-500 bg-slate-100', icon: XCircle },
@@ -22,6 +24,30 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
 
 export function QueueTab() {
   const { data: queue, loading, refetch } = useRealtimeTable<QueueItem>('email_queue');
+  const [processing, setProcessing] = useState(false);
+
+  async function processQueue() {
+    setProcessing(true);
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(`${supabaseUrl}/functions/v1/process-email-queue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ batch_size: 50 }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`${data.sent || 0} E-Mails gesendet, ${data.failed || 0} fehlgeschlagen`);
+        refetch();
+      } else {
+        toast.error(data.error || 'Fehler beim Verarbeiten');
+      }
+    } catch (e) {
+      toast.error('Fehler: ' + String(e));
+    } finally {
+      setProcessing(false);
+    }
+  }
 
   async function cancelItem(id: string) {
     const { error } = await supabase.from('email_queue').update({ status: 'cancelled' } as any).eq('id', id);
@@ -43,9 +69,15 @@ export function QueueTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-600">Geplante E-Mails in der Warteschlange.</p>
-        <button onClick={refetch} className="admin-btn flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" /> Aktualisieren
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={processQueue} disabled={processing} className="admin-btn-primary flex items-center gap-2">
+            {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+            Queue verarbeiten
+          </button>
+          <button onClick={refetch} className="admin-btn flex items-center gap-2">
+            <RefreshCw className="w-4 h-4" /> Aktualisieren
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
