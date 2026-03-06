@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   User, Phone, Target, TrendingUp, Edit2, X, Check, Plus,
-  Search, List, Star, Activity, LayoutList
+  Search, List, Star, Activity, LayoutList, Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -60,6 +60,7 @@ export function LeadsCRMPanel() {
   const [loadingActivities, setLoadingActivities] = useState(false);
   const [newActivity, setNewActivity] = useState({ type: 'note', description: '' });
   const [showActivityForm, setShowActivityForm] = useState(false);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
 
   const filtered = leads.filter(l =>
     !search ||
@@ -95,6 +96,15 @@ export function LeadsCRMPanel() {
     refetch();
   }
 
+  async function deleteLead(leadId: string) {
+    const { error } = await supabase.from('leads').delete().eq('id', leadId);
+    if (error) { toast.error('Fehler beim Löschen'); return; }
+    toast.success('Lead gelöscht');
+    setDeletingLeadId(null);
+    if (selectedLead?.id === leadId) setSelectedLead(null);
+    refetch();
+  }
+
   async function addActivity() {
     if (!selectedLead || !newActivity.description.trim()) return;
     const { error } = await supabase.from('lead_activities').insert({
@@ -107,14 +117,12 @@ export function LeadsCRMPanel() {
     toast.success('Aktivität hinzugefügt');
     setNewActivity({ type: 'note', description: '' });
     setShowActivityForm(false);
-    // refresh activities
     const { data } = await supabase
       .from('lead_activities')
       .select('*')
       .eq('lead_id', selectedLead.id)
       .order('created_at', { ascending: false });
     setActivities((data || []) as LeadActivity[]);
-    // update last_contact_at
     await supabase.from('leads').update({ last_contact_at: new Date().toISOString() } as any).eq('id', selectedLead.id);
     refetch();
   }
@@ -211,12 +219,38 @@ export function LeadsCRMPanel() {
                     {format(new Date(lead.created_at), 'dd.MM.yy')}
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => openLead(lead)}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Details
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openLead(lead)}
+                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Details
+                      </button>
+                      {deletingLeadId === lead.id ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => deleteLead(lead.id)}
+                            className="text-xs text-red-600 hover:text-red-700 font-medium"
+                          >
+                            Ja, löschen
+                          </button>
+                          <button
+                            onClick={() => setDeletingLeadId(null)}
+                            className="text-xs text-slate-500 hover:text-slate-700"
+                          >
+                            Nein
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeletingLeadId(lead.id)}
+                          className="p-1 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          title="Lead löschen"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -243,17 +277,35 @@ export function LeadsCRMPanel() {
                 {byStage(stage.id).map(lead => (
                   <div
                     key={lead.id}
-                    onClick={() => openLead(lead)}
-                    className="admin-card p-3 cursor-pointer hover:shadow-md transition-shadow"
+                    className="admin-card p-3 hover:shadow-md transition-shadow group relative"
                   >
-                    <div className="font-medium text-sm text-slate-900 truncate">{lead.name || lead.first_name || lead.email}</div>
-                    <div className="text-xs text-slate-500 truncate mt-0.5">{lead.email}</div>
-                    {(lead.score || 0) > 0 && (
-                      <div className="mt-2 flex items-center gap-1">
-                        <div className="flex-1 h-1 rounded-full bg-slate-100 overflow-hidden">
-                          <div className="h-full bg-blue-400 rounded-full" style={{ width: `${Math.min(100, lead.score || 0)}%` }} />
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => openLead(lead)}
+                    >
+                      <div className="font-medium text-sm text-slate-900 truncate pr-6">{lead.name || lead.first_name || lead.email}</div>
+                      <div className="text-xs text-slate-500 truncate mt-0.5">{lead.email}</div>
+                      {(lead.score || 0) > 0 && (
+                        <div className="mt-2 flex items-center gap-1">
+                          <div className="flex-1 h-1 rounded-full bg-slate-100 overflow-hidden">
+                            <div className="h-full bg-blue-400 rounded-full" style={{ width: `${Math.min(100, lead.score || 0)}%` }} />
+                          </div>
+                          <span className="text-[10px] text-slate-400">{lead.score}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400">{lead.score}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeletingLeadId(deletingLeadId === lead.id ? null : lead.id); }}
+                      className="absolute top-2 right-2 p-1 rounded text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                      title="Lead löschen"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                    {deletingLeadId === lead.id && (
+                      <div className="mt-2 pt-2 border-t border-red-100 flex items-center gap-2">
+                        <span className="text-[10px] text-red-600">Löschen?</span>
+                        <button onClick={() => deleteLead(lead.id)} className="text-[10px] text-red-600 font-semibold hover:underline">Ja</button>
+                        <button onClick={() => setDeletingLeadId(null)} className="text-[10px] text-slate-400 hover:underline">Nein</button>
                       </div>
                     )}
                   </div>
@@ -277,9 +329,26 @@ export function LeadsCRMPanel() {
                 <h2 className="font-semibold text-slate-900">{selectedLead.name || selectedLead.first_name || selectedLead.email}</h2>
                 <p className="text-sm text-slate-500">{selectedLead.email}</p>
               </div>
-              <button onClick={() => setSelectedLead(null)} className="p-2 rounded-lg hover:bg-slate-100">
-                <X className="w-5 h-5 text-slate-500" />
-              </button>
+              <div className="flex items-center gap-2">
+                {deletingLeadId === selectedLead.id ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-red-600">Wirklich löschen?</span>
+                    <button onClick={() => deleteLead(selectedLead.id)} className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Ja</button>
+                    <button onClick={() => setDeletingLeadId(null)} className="text-xs bg-slate-100 px-2 py-1 rounded hover:bg-slate-200">Nein</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setDeletingLeadId(selectedLead.id)}
+                    className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                    title="Lead löschen"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+                <button onClick={() => setSelectedLead(null)} className="p-2 rounded-lg hover:bg-slate-100">
+                  <X className="w-5 h-5 text-slate-500" />
+                </button>
+              </div>
             </div>
 
             <div className="p-6 space-y-6">

@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.fetch-emails]
 verify_jwt = false
+
+[functions.enroll-lead]
+verify_jwt = false
