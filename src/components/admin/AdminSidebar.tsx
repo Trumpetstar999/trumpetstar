@@ -148,14 +148,31 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
               )} />
               
               {!collapsed && (
-                <span className="truncate">{item.label}</span>
+                <>
+                  <span className="truncate flex-1">{item.label}</span>
+                  {badges[item.id] > 0 && (
+                    <span className="ml-auto text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none flex-shrink-0">
+                      {badges[item.id]}
+                    </span>
+                  )}
+                </>
               )}
               
               {/* Tooltip for collapsed state */}
               {collapsed && (
                 <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-lg">
                   {item.label}
+                  {badges[item.id] > 0 && (
+                    <span className="ml-1.5 text-[10px] font-bold bg-red-500 text-white px-1 py-0.5 rounded-full">
+                      {badges[item.id]}
+                    </span>
+                  )}
                 </div>
+              )}
+              
+              {/* Collapsed badge dot */}
+              {collapsed && badges[item.id] > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
               )}
             </button>
           );
