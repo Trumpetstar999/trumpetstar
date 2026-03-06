@@ -284,7 +284,7 @@ export function MailboxPanel() {
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <span className="text-[10px] text-slate-400">
-                  {email.received_at ? format(new Date(email.received_at), 'dd.MM') : ''}
+                  {(() => { const d = email.received_at || email.sent_at || email.created_at; return d ? format(new Date(d), 'dd.MM') : ''; })()}
                 </span>
                 <button onClick={e => toggleStar(email, e)} className={`${email.is_starred ? 'text-amber-400' : 'text-slate-200 hover:text-slate-400'}`}>
                   <Star className="w-3.5 h-3.5" fill={email.is_starred ? 'currentColor' : 'none'} />
