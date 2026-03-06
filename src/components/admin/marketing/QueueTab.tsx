@@ -82,15 +82,18 @@ export function QueueTab() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-          <div key={key} className={`admin-card p-3 flex items-center gap-3 ${cfg.color}`}>
-            <cfg.icon className="w-5 h-5" />
-            <div>
-              <div className="text-lg font-bold">{queue.filter(q => (q.status || 'pending') === key).length}</div>
-              <div className="text-xs">{cfg.label}</div>
+        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
+          const Icon = cfg.icon;
+          return (
+            <div key={key} className={`admin-card p-3 flex items-center gap-3 ${cfg.color}`}>
+              <Icon className="w-5 h-5" />
+              <div>
+                <div className="text-lg font-bold">{queue.filter(q => (q.status || 'pending') === key).length}</div>
+                <div className="text-xs">{cfg.label}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {loading ? <div className="text-slate-400 text-sm py-8 text-center">Lade...</div> : (
