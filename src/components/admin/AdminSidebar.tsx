@@ -19,7 +19,8 @@ import {
   Target,
   GitBranch,
   Search,
-  Inbox
+  Inbox,
+  BookOpen
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -36,6 +37,7 @@ const menuItems = [
   { id: 'marketing', label: 'E-Mail Automationen', icon: GitBranch },
   { id: 'seo', label: 'SEO Center', icon: Search },
   { id: 'mailbox', label: 'Postfach', icon: Inbox },
+  { id: 'knowledge', label: 'Wissensdatenbank', icon: BookOpen },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
   { id: 'musicxml', label: 'MusicXML', icon: Music },

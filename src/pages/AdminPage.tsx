@@ -24,6 +24,7 @@ import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { DrumBeatManager } from '@/components/admin/DrumBeatManager';
 import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 // InboxManager removed – using MailboxPanel instead
+import { KnowledgeBaseManager } from '@/components/admin/KnowledgeBaseManager';
 import { ReviewSettingsManager } from '@/components/admin/ReviewSettingsManager';
 import { LeadsCRMPanel } from '@/components/admin/LeadsCRMPanel';
 import { EmailAutomationsPanel } from '@/components/admin/EmailAutomationsPanel';
@@ -35,7 +36,7 @@ import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -145,6 +146,7 @@ export default function AdminPage() {
       case 'marketing': return 'E-Mail Automationen';
       case 'seo': return 'SEO Center';
       case 'mailbox': return 'Postfach';
+      case 'knowledge': return 'Wissensdatenbank';
       case 'levels': return 'Levels & Showcases';
       case 'pdfs': return 'PDFs / Noten';
       case 'musicxml': return 'MusicXML';
@@ -171,6 +173,7 @@ export default function AdminPage() {
       case 'marketing': return 'E-Mail Sequenzen, Templates und Automatisierungen';
       case 'seo': return 'Keyword Map, Content Plan und Link-Tasks';
       case 'mailbox': return 'E-Mails empfangen, lesen und senden';
+      case 'knowledge': return 'Produkte, FAQs und Links – Valentin liest diese Datenbank für E-Mail-Entwürfe';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
@@ -247,6 +250,7 @@ export default function AdminPage() {
           {activeTab === 'seo' && <SeoCenterPanel />}
 
           {activeTab === 'mailbox' && <MailboxPanel />}
+          {activeTab === 'knowledge' && <KnowledgeBaseManager />}
 
           {activeTab === 'levels' && (
             <div className="space-y-6">
