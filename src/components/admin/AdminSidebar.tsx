@@ -20,7 +20,8 @@ import {
   GitBranch,
   Search,
   Inbox,
-  BookOpen
+  BookOpen,
+  Truck
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -38,6 +39,7 @@ const menuItems = [
   { id: 'seo', label: 'SEO Center', icon: Search },
   { id: 'mailbox', label: 'Postfach', icon: Inbox },
   { id: 'knowledge', label: 'Wissensdatenbank', icon: BookOpen },
+  { id: 'shipping', label: 'Versand', icon: Truck },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
   { id: 'musicxml', label: 'MusicXML', icon: Music },
