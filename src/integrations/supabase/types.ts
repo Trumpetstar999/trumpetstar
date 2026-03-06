@@ -1159,6 +1159,30 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_base_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       knowledge_chunks: {
         Row: {
           chunk_text: string
