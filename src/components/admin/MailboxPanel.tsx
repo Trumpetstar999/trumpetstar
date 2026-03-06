@@ -136,9 +136,14 @@ export function MailboxPanel() {
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const bodyHtml = compose.html || textToHtml(compose.text);
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
+        },
         body: JSON.stringify({
           to: compose.to,
           subject: compose.subject,
@@ -148,24 +153,29 @@ export function MailboxPanel() {
       });
       const data = await res.json();
       if (res.ok) {
+        const sentAt = new Date().toISOString();
         // 1. Gesendet-Kopie in mailbox_emails speichern
-        await supabase.from('mailbox_emails').insert({
+        const { error: insertError } = await supabase.from('mailbox_emails').insert({
           from_email: 'Valentin@trumpetstar.com',
           from_name: 'Valentin von Trumpetstar',
           to_email: compose.to,
           subject: compose.subject,
           body_text: compose.text || '',
           body_html: bodyHtml,
-          snippet: (compose.text || compose.html || '').slice(0, 100),
+          snippet: (compose.text || compose.html || '').slice(0, 150),
           folder: 'sent',
           is_read: true,
-          sent_at: new Date().toISOString(),
+          sent_at: sentAt,
+          received_at: sentAt,
         } as any);
+
+        if (insertError) {
+          console.error('[Mailbox] Insert sent copy failed:', insertError);
+        }
 
         // 2. Original-Mail als "bearbeitet" markieren (is_flagged = true)
         if (replySourceId) {
           await supabase.from('mailbox_emails').update({ is_flagged: true } as any).eq('id', replySourceId);
-          // Aktualisiere selectedEmail lokal wenn noch geöffnet
           if (selectedEmail?.id === replySourceId) {
             setSelectedEmail({ ...selectedEmail, is_flagged: true });
           }
@@ -274,7 +284,7 @@ export function MailboxPanel() {
               </div>
               <div className="flex flex-col items-end gap-1 flex-shrink-0">
                 <span className="text-[10px] text-slate-400">
-                  {email.received_at ? format(new Date(email.received_at), 'dd.MM') : ''}
+                  {(() => { const d = email.received_at || email.sent_at || email.created_at; return d ? format(new Date(d), 'dd.MM') : ''; })()}
                 </span>
                 <button onClick={e => toggleStar(email, e)} className={`${email.is_starred ? 'text-amber-400' : 'text-slate-200 hover:text-slate-400'}`}>
                   <Star className="w-3.5 h-3.5" fill={email.is_starred ? 'currentColor' : 'none'} />
@@ -303,7 +313,8 @@ export function MailboxPanel() {
                 {selectedEmail.from_name && <span className="text-slate-400"> &lt;{selectedEmail.from_email}&gt;</span>}
               </div>
               <div className="text-xs text-slate-400 mt-0.5">
-                {selectedEmail.received_at ? format(new Date(selectedEmail.received_at), 'dd.MM.yyyy HH:mm') : ''}
+                {(() => { const d = selectedEmail.received_at || selectedEmail.sent_at || selectedEmail.created_at; return d ? format(new Date(d), 'dd.MM.yyyy HH:mm') : ''; })()}
+                {selectedEmail.folder === 'sent' && <span className="ml-1 text-slate-300">· An: {selectedEmail.to_email}</span>}
               </div>
             </div>
             <div className="flex items-center gap-2">
