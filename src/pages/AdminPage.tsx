@@ -24,13 +24,17 @@ import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { DrumBeatManager } from '@/components/admin/DrumBeatManager';
 import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 import { ReviewSettingsManager } from '@/components/admin/ReviewSettingsManager';
+import { LeadsCRMPanel } from '@/components/admin/LeadsCRMPanel';
+import { EmailAutomationsPanel } from '@/components/admin/EmailAutomationsPanel';
+import { SeoCenterPanel } from '@/components/admin/SeoCenterPanel';
+import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -136,6 +140,10 @@ export default function AdminPage() {
     switch (activeTab) {
       case 'dashboard': return 'Dashboard';
       case 'users': return 'Nutzerverwaltung';
+      case 'leads': return 'Leads & CRM';
+      case 'marketing': return 'E-Mail Automationen';
+      case 'seo': return 'SEO Center';
+      case 'mailbox': return 'Postfach';
       case 'levels': return 'Levels & Showcases';
       case 'pdfs': return 'PDFs / Noten';
       case 'musicxml': return 'MusicXML';
@@ -157,6 +165,10 @@ export default function AdminPage() {
     switch (activeTab) {
       case 'dashboard': return 'Übersicht aller wichtigen Kennzahlen';
       case 'users': return 'Nutzer verwalten und bearbeiten';
+      case 'leads': return 'Lead-Pipeline, CRM und Aktivitäten';
+      case 'marketing': return 'E-Mail Sequenzen, Templates und Automatisierungen';
+      case 'seo': return 'Keyword Map, Content Plan und Link-Tasks';
+      case 'mailbox': return 'E-Mails empfangen, lesen und senden';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
@@ -224,6 +236,14 @@ export default function AdminPage() {
           {activeTab === 'dashboard' && <AdminDashboard />}
 
           {activeTab === 'users' && <UserList />}
+
+          {activeTab === 'leads' && <LeadsCRMPanel />}
+
+          {activeTab === 'marketing' && <EmailAutomationsPanel />}
+
+          {activeTab === 'seo' && <SeoCenterPanel />}
+
+          {activeTab === 'mailbox' && <MailboxPanel />}
 
           {activeTab === 'levels' && (
             <div className="space-y-6">

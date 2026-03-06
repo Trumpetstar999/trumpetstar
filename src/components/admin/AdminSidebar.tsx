@@ -15,7 +15,11 @@ import {
   CreditCard,
   Music2,
   Mail,
-  Star
+  Star,
+  Target,
+  GitBranch,
+  Search,
+  Inbox
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -28,6 +32,10 @@ interface AdminSidebarProps {
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'users', label: 'Nutzer', icon: Users },
+  { id: 'leads', label: 'Leads & CRM', icon: Target },
+  { id: 'marketing', label: 'E-Mail Automationen', icon: GitBranch },
+  { id: 'seo', label: 'SEO Center', icon: Search },
+  { id: 'mailbox', label: 'Postfach', icon: Inbox },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
   { id: 'musicxml', label: 'MusicXML', icon: Music },
