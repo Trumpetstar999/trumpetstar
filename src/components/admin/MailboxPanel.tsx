@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 
 interface MailboxEmail {
   id: string;
+  imap_uid: number | null;
   from_email: string;
   from_name: string | null;
   to_email: string;
@@ -21,6 +22,8 @@ interface MailboxEmail {
   is_read: boolean | null;
   is_starred: boolean | null;
   is_flagged: boolean | null;
+  ai_draft: string | null;
+  ai_draft_at: string | null;
   received_at: string | null;
   sent_at: string | null;
   created_at: string | null;
@@ -28,6 +31,7 @@ interface MailboxEmail {
 
 const FOLDERS = [
   { id: 'inbox', label: 'Posteingang', icon: Inbox },
+  { id: 'drafts', label: 'Entwürfe', icon: PenSquare },
   { id: 'sent', label: 'Gesendet', icon: Send },
   { id: 'starred', label: 'Markiert', icon: Star },
   { id: 'flagged', label: 'Flagged', icon: Flag },
@@ -46,8 +50,10 @@ export function MailboxPanel() {
   const folderEmails = emails.filter(e => {
     if (activeFolder === 'starred') return e.is_starred;
     if (activeFolder === 'flagged') return e.is_flagged;
+    if (activeFolder === 'drafts') return !!e.ai_draft;
     return (e.folder || 'inbox') === activeFolder;
   });
+  const draftsCount = emails.filter(e => !!e.ai_draft).length;
 
   const filtered = folderEmails.filter(e =>
     !search ||
@@ -160,6 +166,9 @@ export function MailboxPanel() {
               {f.id === 'inbox' && unreadCount > 0 && (
                 <span className="text-xs bg-blue-500 text-white px-1.5 py-0.5 rounded-full">{unreadCount}</span>
               )}
+              {f.id === 'drafts' && draftsCount > 0 && (
+                <span className="text-xs bg-amber-500 text-white px-1.5 py-0.5 rounded-full">{draftsCount}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -254,15 +263,44 @@ export function MailboxPanel() {
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Original E-Mail */}
             {selectedEmail.body_html ? (
               <iframe
                 srcDoc={selectedEmail.body_html}
-                className="w-full min-h-[400px] border-0"
+                className="w-full min-h-[300px] border-0"
                 title="E-Mail Inhalt"
               />
             ) : (
               <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">{selectedEmail.body_text}</pre>
+            )}
+
+            {/* Valentin AI Draft */}
+            {selectedEmail.ai_draft && (
+              <div className="border border-amber-200 rounded-xl overflow-hidden">
+                <div className="bg-amber-50 px-4 py-2.5 flex items-center justify-between border-b border-amber-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-amber-800">✍️ Valentin's Entwurf</span>
+                    {selectedEmail.ai_draft_at && (
+                      <span className="text-xs text-amber-500">
+                        {format(new Date(selectedEmail.ai_draft_at), 'dd.MM.yyyy HH:mm')}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setCompose({ to: selectedEmail.from_email, subject: `Re: ${selectedEmail.subject}`, html: '', text: selectedEmail.ai_draft || '' });
+                      setShowCompose(true);
+                    }}
+                    className="admin-btn text-xs flex items-center gap-1"
+                  >
+                    <Reply className="w-3 h-3" /> Entwurf senden
+                  </button>
+                </div>
+                <div className="p-4 bg-white">
+                  <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">{selectedEmail.ai_draft}</pre>
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -23,6 +23,7 @@ import { FeatureFlagManager } from '@/components/admin/FeatureFlagManager';
 import { Digistore24Manager } from '@/components/admin/Digistore24Manager';
 import { DrumBeatManager } from '@/components/admin/DrumBeatManager';
 import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
+// InboxManager removed – using MailboxPanel instead
 import { ReviewSettingsManager } from '@/components/admin/ReviewSettingsManager';
 import { LeadsCRMPanel } from '@/components/admin/LeadsCRMPanel';
 import { EmailAutomationsPanel } from '@/components/admin/EmailAutomationsPanel';
@@ -34,7 +35,7 @@ import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -154,6 +155,7 @@ export default function AdminPage() {
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
       case 'features': return 'Feature Flags';
+      case 'inbox': return 'Postfach';
       case 'emails': return 'E-Mail Templates';
       case 'reviews': return 'Google Reviews';
       case 'system': return 'Systemstatus';
@@ -179,6 +181,7 @@ export default function AdminPage() {
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
       case 'features': return 'Menüpunkte und Features ein-/ausblenden';
+      case 'inbox': return 'Eingehende E-Mails und Valentin\'s AI-Entwürfe';
       case 'emails': return 'E-Mail-Vorlagen bearbeiten und verwalten';
       case 'reviews': return 'Google Review Link und Prompt-Regeln konfigurieren';
       case 'system': return 'Systemstatus und Einstellungen';
