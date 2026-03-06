@@ -757,6 +757,168 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          clicked_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          opened_at: string | null
+          recipient_email: string
+          recipient_name: string | null
+          sent_at: string | null
+          sequence_id: string | null
+          status: string | null
+          subject: string
+          template_id: string | null
+        }
+        Insert: {
+          clicked_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          sequence_id?: string | null
+          status?: string | null
+          subject: string
+          template_id?: string | null
+        }
+        Update: {
+          clicked_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          sequence_id?: string | null
+          status?: string | null
+          subject?: string
+          template_id?: string | null
+        }
+        Relationships: []
+      }
+      email_queue: {
+        Row: {
+          created_at: string | null
+          id: string
+          lead_id: string | null
+          scheduled_for: string
+          status: string | null
+          template_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          scheduled_for: string
+          status?: string | null
+          template_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          lead_id?: string | null
+          scheduled_for?: string
+          status?: string | null
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_queue_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequence_steps: {
+        Row: {
+          condition_type: string | null
+          created_at: string | null
+          delay_days: number | null
+          delay_hours: number | null
+          id: string
+          is_active: boolean | null
+          sequence_id: string | null
+          step_order: number
+          template_id: string | null
+        }
+        Insert: {
+          condition_type?: string | null
+          created_at?: string | null
+          delay_days?: number | null
+          delay_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          sequence_id?: string | null
+          step_order: number
+          template_id?: string | null
+        }
+        Update: {
+          condition_type?: string | null
+          created_at?: string | null
+          delay_days?: number | null
+          delay_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          sequence_id?: string | null
+          step_order?: number
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequence_steps_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequences: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          segment_id: string | null
+          trigger_event: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          segment_id?: string | null
+          trigger_event?: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          segment_id?: string | null
+          trigger_event?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequences_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "lead_segments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_templates: {
         Row: {
           body_html_de: string
@@ -1098,44 +1260,148 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_activities: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          lead_id: string | null
+          metadata: Json | null
+          performed_by: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          metadata?: Json | null
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_segments: {
+        Row: {
+          characteristics: Json | null
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          characteristics?: Json | null
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          characteristics?: Json | null
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
+          activity_score: number | null
+          assignee: string | null
           auth_user_id: string | null
+          converted_at: string | null
           created_at: string
           email: string
+          first_contact_at: string | null
           first_name: string | null
           id: string
           language: string | null
+          last_contact_at: string | null
+          lifetime_value: number | null
+          name: string | null
+          notes: string | null
+          phone: string | null
+          product_interest: string | null
+          score: number | null
           segment: string | null
           source: string | null
+          stage: string | null
+          tags: string[] | null
           utm_campaign: string | null
           utm_content: string | null
           utm_medium: string | null
           utm_source: string | null
         }
         Insert: {
+          activity_score?: number | null
+          assignee?: string | null
           auth_user_id?: string | null
+          converted_at?: string | null
           created_at?: string
           email: string
+          first_contact_at?: string | null
           first_name?: string | null
           id?: string
           language?: string | null
+          last_contact_at?: string | null
+          lifetime_value?: number | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          product_interest?: string | null
+          score?: number | null
           segment?: string | null
           source?: string | null
+          stage?: string | null
+          tags?: string[] | null
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
         }
         Update: {
+          activity_score?: number | null
+          assignee?: string | null
           auth_user_id?: string | null
+          converted_at?: string | null
           created_at?: string
           email?: string
+          first_contact_at?: string | null
           first_name?: string | null
           id?: string
           language?: string | null
+          last_contact_at?: string | null
+          lifetime_value?: number | null
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          product_interest?: string | null
+          score?: number | null
           segment?: string | null
           source?: string | null
+          stage?: string | null
+          tags?: string[] | null
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
@@ -1200,6 +1466,69 @@ export type Database = {
           title_es?: string | null
           updated_at?: string
           vimeo_showcase_id?: string
+        }
+        Relationships: []
+      }
+      mailbox_emails: {
+        Row: {
+          body_html: string | null
+          body_text: string | null
+          created_at: string | null
+          folder: string | null
+          from_email: string
+          from_name: string | null
+          has_attachments: boolean | null
+          id: string
+          is_flagged: boolean | null
+          is_read: boolean | null
+          is_starred: boolean | null
+          message_id: string | null
+          received_at: string | null
+          sent_at: string | null
+          snippet: string | null
+          subject: string
+          to_email: string
+          updated_at: string | null
+        }
+        Insert: {
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string | null
+          folder?: string | null
+          from_email: string
+          from_name?: string | null
+          has_attachments?: boolean | null
+          id?: string
+          is_flagged?: boolean | null
+          is_read?: boolean | null
+          is_starred?: boolean | null
+          message_id?: string | null
+          received_at?: string | null
+          sent_at?: string | null
+          snippet?: string | null
+          subject?: string
+          to_email: string
+          updated_at?: string | null
+        }
+        Update: {
+          body_html?: string | null
+          body_text?: string | null
+          created_at?: string | null
+          folder?: string | null
+          from_email?: string
+          from_name?: string | null
+          has_attachments?: boolean | null
+          id?: string
+          is_flagged?: boolean | null
+          is_read?: boolean | null
+          is_starred?: boolean | null
+          message_id?: string | null
+          received_at?: string | null
+          sent_at?: string | null
+          snippet?: string | null
+          subject?: string
+          to_email?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2053,6 +2382,116 @@ export type Database = {
             columns: ["level_id"]
             isOneToOne: false
             referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_content_items: {
+        Row: {
+          assets: Json | null
+          cluster: string | null
+          content_type: string | null
+          created_at: string | null
+          cta_target: string | null
+          id: string
+          intent: string | null
+          internal_links: string[] | null
+          keyword: string | null
+          llm_prompt: string | null
+          outline: string | null
+          priority: string | null
+          publish_date: string | null
+          quality_checks: Json | null
+          quality_score: number | null
+          schema_type: string | null
+          status: string | null
+          target_url: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assets?: Json | null
+          cluster?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          cta_target?: string | null
+          id?: string
+          intent?: string | null
+          internal_links?: string[] | null
+          keyword?: string | null
+          llm_prompt?: string | null
+          outline?: string | null
+          priority?: string | null
+          publish_date?: string | null
+          quality_checks?: Json | null
+          quality_score?: number | null
+          schema_type?: string | null
+          status?: string | null
+          target_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assets?: Json | null
+          cluster?: string | null
+          content_type?: string | null
+          created_at?: string | null
+          cta_target?: string | null
+          id?: string
+          intent?: string | null
+          internal_links?: string[] | null
+          keyword?: string | null
+          llm_prompt?: string | null
+          outline?: string | null
+          priority?: string | null
+          publish_date?: string | null
+          quality_checks?: Json | null
+          quality_score?: number | null
+          schema_type?: string | null
+          status?: string | null
+          target_url?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_link_tasks: {
+        Row: {
+          anchor_text: string | null
+          content_item_id: string | null
+          created_at: string | null
+          from_url: string
+          id: string
+          reason: string | null
+          status: string | null
+          to_url: string
+        }
+        Insert: {
+          anchor_text?: string | null
+          content_item_id?: string | null
+          created_at?: string | null
+          from_url: string
+          id?: string
+          reason?: string | null
+          status?: string | null
+          to_url: string
+        }
+        Update: {
+          anchor_text?: string | null
+          content_item_id?: string | null
+          created_at?: string | null
+          from_url?: string
+          id?: string
+          reason?: string | null
+          status?: string | null
+          to_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_link_tasks_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "seo_content_items"
             referencedColumns: ["id"]
           },
         ]
