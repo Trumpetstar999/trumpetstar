@@ -20,7 +20,8 @@ import {
   GitBranch,
   Search,
   Inbox,
-  BookOpen
+  BookOpen,
+  Truck
 } from 'lucide-react';
 import { useState } from 'react';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
