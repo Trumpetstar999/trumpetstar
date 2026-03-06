@@ -113,18 +113,36 @@ export function MailboxPanel() {
     }
   }
 
+  function textToHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      // **bold**
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // URLs
+      .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color:#2563eb">$1</a>')
+      // Zeilenumbrüche
+      .replace(/\n/g, '<br>')
+      // In Absätze aufteilen (doppelte Leerzeilen)
+      .replace(/(<br>){2,}/g, '</p><p style="margin:0 0 12px 0">')
+      .replace(/^/, '<p style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#1e293b;margin:0 0 12px 0">')
+      .replace(/$/, '</p>');
+  }
+
   async function sendEmail() {
     if (!compose.to.trim() || !compose.subject.trim()) { toast.error('Empfänger und Betreff erforderlich'); return; }
     setSending(true);
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const bodyHtml = compose.html || textToHtml(compose.text);
       const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         body: JSON.stringify({
           to: compose.to,
           subject: compose.subject,
-          html: compose.html || `<p>${compose.text}</p>`,
+          html: bodyHtml,
           text: compose.text || compose.html,
         }),
       });
@@ -137,7 +155,7 @@ export function MailboxPanel() {
           to_email: compose.to,
           subject: compose.subject,
           body_text: compose.text || '',
-          body_html: compose.html || `<p>${compose.text}</p>`,
+          body_html: bodyHtml,
           snippet: (compose.text || compose.html || '').slice(0, 100),
           folder: 'sent',
           is_read: true,
