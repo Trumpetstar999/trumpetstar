@@ -3,8 +3,8 @@ import { useRealtimeTable } from '@/hooks/useRealtimeTable';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
-  Inbox, Send, Star, Flag, Trash2, RefreshCw, Mail, MailOpen,
-  PenSquare, Search, ChevronRight, X, Reply, Loader2, AlertCircle
+  Inbox, Send, Star, Flag, Trash2, RefreshCw, Mail,
+  PenSquare, Search, X, Reply, Loader2, CheckCircle2
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -46,6 +46,8 @@ export function MailboxPanel() {
   const [syncing, setSyncing] = useState(false);
   const [compose, setCompose] = useState({ to: '', subject: '', html: '', text: '' });
   const [sending, setSending] = useState(false);
+  // Track which inbox email is the "source" for the current compose reply
+  const [replySourceId, setReplySourceId] = useState<string | null>(null);
 
   const folderEmails = emails.filter(e => {
     if (activeFolder === 'starred') return e.is_starred;
@@ -123,9 +125,33 @@ export function MailboxPanel() {
       });
       const data = await res.json();
       if (res.ok) {
+        // 1. Gesendet-Kopie in mailbox_emails speichern
+        await supabase.from('mailbox_emails').insert({
+          from_email: 'Valentin@trumpetstar.com',
+          from_name: 'Valentin von Trumpetstar',
+          to_email: compose.to,
+          subject: compose.subject,
+          body_text: compose.text || '',
+          body_html: compose.html || `<p>${compose.text}</p>`,
+          snippet: (compose.text || compose.html || '').slice(0, 100),
+          folder: 'sent',
+          is_read: true,
+          sent_at: new Date().toISOString(),
+        } as any);
+
+        // 2. Original-Mail als "bearbeitet" markieren (is_flagged = true)
+        if (replySourceId) {
+          await supabase.from('mailbox_emails').update({ is_flagged: true } as any).eq('id', replySourceId);
+          // Aktualisiere selectedEmail lokal wenn noch geöffnet
+          if (selectedEmail?.id === replySourceId) {
+            setSelectedEmail({ ...selectedEmail, is_flagged: true });
+          }
+        }
+
         toast.success('E-Mail gesendet!');
         setShowCompose(false);
         setCompose({ to: '', subject: '', html: '', text: '' });
+        setReplySourceId(null);
         refetch();
       } else {
         toast.error(data.error || 'Fehler beim Senden');
@@ -214,6 +240,11 @@ export function MailboxPanel() {
                   <span className={`text-sm truncate ${!email.is_read ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>
                     {email.from_name || email.from_email}
                   </span>
+                  {email.is_flagged && activeFolder !== 'flagged' && (
+                    <span className="flex-shrink-0 flex items-center gap-0.5 text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                      <CheckCircle2 className="w-2.5 h-2.5" /> bearbeitet
+                    </span>
+                  )}
                 </div>
                 <div className={`text-xs truncate mt-0.5 ${!email.is_read ? 'font-medium text-slate-800' : 'text-slate-600'}`}>{email.subject}</div>
                 <div className="text-xs text-slate-400 truncate mt-0.5">{email.snippet || email.body_text?.slice(0, 60) || ''}</div>
@@ -236,7 +267,14 @@ export function MailboxPanel() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-start justify-between">
             <div className="flex-1">
-              <h2 className="font-semibold text-slate-900 text-lg">{selectedEmail.subject}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="font-semibold text-slate-900 text-lg">{selectedEmail.subject}</h2>
+                {selectedEmail.is_flagged && (
+                  <span className="flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    <CheckCircle2 className="w-3 h-3" /> bearbeitet
+                  </span>
+                )}
+              </div>
               <div className="text-sm text-slate-500 mt-1">
                 Von: <strong>{selectedEmail.from_name || selectedEmail.from_email}</strong>
                 {selectedEmail.from_name && <span className="text-slate-400"> &lt;{selectedEmail.from_email}&gt;</span>}
@@ -248,6 +286,7 @@ export function MailboxPanel() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
+                  setReplySourceId(selectedEmail.id);
                   setCompose({ to: selectedEmail.from_email, subject: `Re: ${selectedEmail.subject}`, html: '', text: '' });
                   setShowCompose(true);
                 }}
@@ -289,6 +328,7 @@ export function MailboxPanel() {
                   </div>
                   <button
                     onClick={() => {
+                      setReplySourceId(selectedEmail.id);
                       setCompose({ to: selectedEmail.from_email, subject: `Re: ${selectedEmail.subject}`, html: '', text: selectedEmail.ai_draft || '' });
                       setShowCompose(true);
                     }}
@@ -308,11 +348,11 @@ export function MailboxPanel() {
 
       {/* Compose Modal */}
       {showCompose && (
-        <div className="fixed inset-0 z-50 flex items-end justify-end p-4 bg-black/20" onClick={() => setShowCompose(false)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-end p-4 bg-black/20" onClick={() => { setShowCompose(false); setReplySourceId(null); }}>
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 rounded-t-2xl bg-slate-50">
               <h3 className="font-semibold text-sm text-slate-900">Neue E-Mail</h3>
-              <button onClick={() => setShowCompose(false)} className="p-1.5 rounded-lg hover:bg-slate-200">
+              <button onClick={() => { setShowCompose(false); setReplySourceId(null); }} className="p-1.5 rounded-lg hover:bg-slate-200">
                 <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
