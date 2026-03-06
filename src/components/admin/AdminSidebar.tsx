@@ -58,6 +58,32 @@ const menuItems = [
 
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [unreadEmails, setUnreadEmails] = useState(0);
+  const [pendingShipments, setPendingShipments] = useState(0);
+
+  useEffect(() => {
+    async function fetchCounts() {
+      const [emailRes, shipRes] = await Promise.all([
+        supabase.from('mailbox_emails').select('id', { count: 'exact', head: true }).eq('is_read', false).eq('folder', 'inbox'),
+        supabase.from('digistore24_shipments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]);
+      setUnreadEmails(emailRes.count ?? 0);
+      setPendingShipments(shipRes.count ?? 0);
+    }
+    fetchCounts();
+
+    const channel = supabase.channel('sidebar_counts')
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'mailbox_emails' }, fetchCounts)
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'digistore24_shipments' }, fetchCounts)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const badges: Record<string, number> = {
+    mailbox: unreadEmails,
+    shipping: pendingShipments,
+  };
 
   return (
     <aside 
