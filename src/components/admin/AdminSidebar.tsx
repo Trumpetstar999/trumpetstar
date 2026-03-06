@@ -23,7 +23,8 @@ import {
   BookOpen,
   Truck
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 interface AdminSidebarProps {
