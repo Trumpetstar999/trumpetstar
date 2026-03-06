@@ -136,9 +136,14 @@ export function MailboxPanel() {
     try {
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const bodyHtml = compose.html || textToHtml(compose.text);
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
+        },
         body: JSON.stringify({
           to: compose.to,
           subject: compose.subject,
@@ -148,24 +153,29 @@ export function MailboxPanel() {
       });
       const data = await res.json();
       if (res.ok) {
+        const sentAt = new Date().toISOString();
         // 1. Gesendet-Kopie in mailbox_emails speichern
-        await supabase.from('mailbox_emails').insert({
+        const { error: insertError } = await supabase.from('mailbox_emails').insert({
           from_email: 'Valentin@trumpetstar.com',
           from_name: 'Valentin von Trumpetstar',
           to_email: compose.to,
           subject: compose.subject,
           body_text: compose.text || '',
           body_html: bodyHtml,
-          snippet: (compose.text || compose.html || '').slice(0, 100),
+          snippet: (compose.text || compose.html || '').slice(0, 150),
           folder: 'sent',
           is_read: true,
-          sent_at: new Date().toISOString(),
+          sent_at: sentAt,
+          received_at: sentAt,
         } as any);
+
+        if (insertError) {
+          console.error('[Mailbox] Insert sent copy failed:', insertError);
+        }
 
         // 2. Original-Mail als "bearbeitet" markieren (is_flagged = true)
         if (replySourceId) {
           await supabase.from('mailbox_emails').update({ is_flagged: true } as any).eq('id', replySourceId);
-          // Aktualisiere selectedEmail lokal wenn noch geöffnet
           if (selectedEmail?.id === replySourceId) {
             setSelectedEmail({ ...selectedEmail, is_flagged: true });
           }
