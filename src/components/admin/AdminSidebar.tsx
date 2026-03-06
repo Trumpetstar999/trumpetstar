@@ -23,7 +23,8 @@ import {
   BookOpen,
   Truck
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 interface AdminSidebarProps {
@@ -57,6 +58,32 @@ const menuItems = [
 
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [unreadEmails, setUnreadEmails] = useState(0);
+  const [pendingShipments, setPendingShipments] = useState(0);
+
+  useEffect(() => {
+    async function fetchCounts() {
+      const [emailRes, shipRes] = await Promise.all([
+        supabase.from('mailbox_emails').select('id', { count: 'exact', head: true }).eq('is_read', false).eq('folder', 'inbox'),
+        supabase.from('digistore24_shipments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      ]);
+      setUnreadEmails(emailRes.count ?? 0);
+      setPendingShipments(shipRes.count ?? 0);
+    }
+    fetchCounts();
+
+    const channel = supabase.channel('sidebar_counts')
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'mailbox_emails' }, fetchCounts)
+      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'digistore24_shipments' }, fetchCounts)
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const badges: Record<string, number> = {
+    mailbox: unreadEmails,
+    shipping: pendingShipments,
+  };
 
   return (
     <aside 
@@ -121,14 +148,31 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
               )} />
               
               {!collapsed && (
-                <span className="truncate">{item.label}</span>
+                <>
+                  <span className="truncate flex-1">{item.label}</span>
+                  {badges[item.id] > 0 && (
+                    <span className="ml-auto text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none flex-shrink-0">
+                      {badges[item.id]}
+                    </span>
+                  )}
+                </>
               )}
               
               {/* Tooltip for collapsed state */}
               {collapsed && (
                 <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-lg">
                   {item.label}
+                  {badges[item.id] > 0 && (
+                    <span className="ml-1.5 text-[10px] font-bold bg-red-500 text-white px-1 py-0.5 rounded-full">
+                      {badges[item.id]}
+                    </span>
+                  )}
                 </div>
+              )}
+              
+              {/* Collapsed badge dot */}
+              {collapsed && badges[item.id] > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
               )}
             </button>
           );
