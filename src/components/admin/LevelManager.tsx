@@ -573,6 +573,9 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         {!level.is_active && (
                           <Badge variant="secondary">Inaktiv</Badge>
                         )}
+                        <Badge variant="outline" className="text-xs">
+                          {LANGUAGE_OPTIONS.find(l => l.value === level.language)?.label || '🇩🇪 Deutsch'}
+                        </Badge>
                         <Badge className={`${DIFFICULTY_BADGE_COLORS[level.difficulty]}`}>
                           {DIFFICULTY_OPTIONS.find(d => d.value === level.difficulty)?.label || 'Anfänger'}
                         </Badge>
