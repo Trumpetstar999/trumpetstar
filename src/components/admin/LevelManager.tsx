@@ -93,11 +93,13 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [editForm, setEditForm] = useState({ 
     title: '', title_en: '', title_es: '',
     description: '', description_en: '', description_es: '',
-    required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 
+    required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0,
+    language: 'de' as LevelLanguage,
   });
   const [newLevel, setNewLevel] = useState({ 
     title: '', title_en: '', title_es: '',
-    vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0 
+    vimeo_showcase_id: '', required_plan_key: 'FREE' as PlanKey, difficulty: 'basics' as Difficulty, sort_order: 0,
+    language: 'de' as LevelLanguage,
   });
   const [isAdding, setIsAdding] = useState(false);
   
