@@ -128,8 +128,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }, [selectedVideo, setIsVideoPlaying]);
   
   useEffect(() => {
-    fetchLevels();
-  }, []);
+    fetchLevels(language);
+  }, [language]);
 
   // Fetch recent videos when user is available - no dependency on levels
   useEffect(() => {
@@ -207,14 +207,19 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     }
   }
 
-  async function fetchLevels() {
+  async function fetchLevels(userLanguage: typeof language = language) {
     setIsLoading(true);
     try {
-      // Fetch active levels
+      // Determine which language key to filter by
+      // ES and SL users fall back to DE since no dedicated content exists
+      const langFilter = (userLanguage === 'en') ? 'en' : 'de';
+
+      // Fetch active levels filtered by language
       const { data: levelsData, error: levelsError } = await supabase
         .from('levels')
         .select('*')
         .eq('is_active', true)
+        .or(`language.eq.${langFilter},language.eq.all,language.is.null`)
         .order('sort_order', { ascending: true });
 
       if (levelsError) throw levelsError;
