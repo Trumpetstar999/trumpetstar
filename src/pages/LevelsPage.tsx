@@ -128,8 +128,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }, [selectedVideo, setIsVideoPlaying]);
   
   useEffect(() => {
-    fetchLevels();
-  }, []);
+    fetchLevels(language);
+  }, [language]);
 
   // Fetch recent videos when user is available - no dependency on levels
   useEffect(() => {
