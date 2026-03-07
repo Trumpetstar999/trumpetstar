@@ -129,9 +129,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   
   useEffect(() => {
     fetchLevels(language);
-    // Reset active level when language changes so user isn't stuck on a
-    // level that doesn't exist in the new language's filtered set
-    setActiveLevel('recent');
   }, [language]);
 
   // Fetch recent videos when user is available - no dependency on levels
@@ -267,19 +264,21 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           completions: 0,
         });
 
-        // Group videos by section, or create a default "Alle Videos" section
-        const sections: LocalizedSection[] = levelSections.length > 0
-          ? levelSections.map((section) => ({
+        // Group videos by section, sorted by sort_order ascending
+        const sortedSections = [...levelSections].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+        const sortedVideos = [...levelVideos].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+        const sections: LocalizedSection[] = sortedSections.length > 0
+          ? sortedSections.map((section) => ({
               id: section.id,
               title: section.title,
-              videos: levelVideos
+              videos: sortedVideos
                 .filter(v => v.section_id === section.id)
                 .map(mapVideo),
             }))
           : [{
               id: `${level.id}-default`,
               title: 'Alle Videos',
-              videos: levelVideos.map(mapVideo),
+              videos: sortedVideos.map(mapVideo),
             }];
 
         // Use new required_plan_key field, fallback to mapping from old field
@@ -302,6 +301,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       });
 
       setLevels(transformedLevels);
+      // Always default to the first level (Level 1) sorted by sort_order
+      if (transformedLevels.length > 0) {
+        setActiveLevel(transformedLevels[0].id);
+      }
     } catch (error) {
       console.error('Error fetching levels:', error);
     } finally {
