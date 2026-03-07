@@ -122,6 +122,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
         ...level,
         required_plan_key: (level.required_plan_key as PlanKey) || 'FREE',
         difficulty: (level.difficulty as Difficulty) || 'beginner',
+        language: (level.language as LevelLanguage) || 'de',
       }));
       setLevels(mappedLevels);
       setOriginalLevels(mappedLevels);
