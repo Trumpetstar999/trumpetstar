@@ -129,9 +129,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   
   useEffect(() => {
     fetchLevels(language);
-    // Reset active level when language changes so user isn't stuck on a
-    // level that doesn't exist in the new language's filtered set
-    setActiveLevel('recent');
   }, [language]);
 
   // Fetch recent videos when user is available - no dependency on levels
@@ -302,6 +299,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       });
 
       setLevels(transformedLevels);
+      // Always default to the first level (Level 1) sorted by sort_order
+      if (transformedLevels.length > 0) {
+        setActiveLevel(transformedLevels[0].id);
+      }
     } catch (error) {
       console.error('Error fetching levels:', error);
     } finally {
