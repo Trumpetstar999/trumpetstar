@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
+type LevelLanguage = 'all' | 'de' | 'en' | 'es' | 'sl';
 
 interface Level {
   id: string;
@@ -40,6 +41,7 @@ interface Level {
   is_active: boolean;
   required_plan_key: PlanKey;
   difficulty: Difficulty;
+  language: LevelLanguage;
 }
 
 const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
