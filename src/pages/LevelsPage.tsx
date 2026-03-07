@@ -129,6 +129,9 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   
   useEffect(() => {
     fetchLevels(language);
+    // Reset active level when language changes so user isn't stuck on a
+    // level that doesn't exist in the new language's filtered set
+    setActiveLevel('recent');
   }, [language]);
 
   // Fetch recent videos when user is available - no dependency on levels
@@ -210,9 +213,14 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   async function fetchLevels(userLanguage: typeof language = language) {
     setIsLoading(true);
     try {
-      // Determine which language key to filter by
-      // ES and SL users fall back to DE since no dedicated content exists
-      const langFilter = (userLanguage === 'en') ? 'en' : 'de';
+      // Determine which language key to filter by:
+      // EN  → show levels tagged 'en' or 'all'
+      // ES  → show levels tagged 'es' or 'all'
+      // DE / SL (no dedicated SL content) → show levels tagged 'de' or 'all'
+      let langFilter: string;
+      if (userLanguage === 'en') langFilter = 'en';
+      else if (userLanguage === 'es') langFilter = 'es';
+      else langFilter = 'de'; // de + sl fall back to de
 
       // Fetch active levels filtered by language
       const { data: levelsData, error: levelsError } = await supabase
