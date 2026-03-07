@@ -113,7 +113,7 @@ export function MusicXMLPage() {
       toast.error(`Upgrade auf ${PLAN_DISPLAY_NAMES[doc.plan_required as PlanKey]} erforderlich`);
       return;
     }
-    navigate(`/musicxml/${doc.id}`);
+    navigate(`/app/musicxml/${doc.id}`);
   };
   if (isLoading) {
     return (
