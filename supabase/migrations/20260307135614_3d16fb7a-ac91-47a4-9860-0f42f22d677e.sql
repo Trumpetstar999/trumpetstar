@@ -1,0 +1,1 @@
+ALTER TABLE public.email_queue ADD CONSTRAINT email_queue_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.email_templates(id) ON DELETE SET NULL;
