@@ -177,6 +177,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
           sort_order: level.sort_order,
           difficulty: level.difficulty,
           required_plan_key: level.required_plan_key,
+          language: level.language,
         };
         
         console.log(`Updating level ${level.id} (${level.title}):`, updateData);
@@ -423,6 +424,24 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
               </Select>
             </div>
             <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Sprache:</span>
+              <Select
+                value={newLevel.language}
+                onValueChange={(value) => setNewLevel({ ...newLevel, language: value as LevelLanguage })}
+              >
+                <SelectTrigger className="w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGE_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Reihenfolge:</span>
               <Input
                 type="number"
@@ -505,6 +524,24 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                             </SelectTrigger>
                             <SelectContent>
                               {DIFFICULTY_OPTIONS.map(option => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Sprache:</span>
+                          <Select
+                            value={editForm.language}
+                            onValueChange={(value) => setEditForm({ ...editForm, language: value as LevelLanguage })}
+                          >
+                            <SelectTrigger className="w-44">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {LANGUAGE_OPTIONS.map(option => (
                                 <SelectItem key={option.value} value={option.value}>
                                   {option.label}
                                 </SelectItem>
@@ -601,6 +638,22 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                         </SelectTrigger>
                         <SelectContent>
                           {DIFFICULTY_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {/* Inline Language Selector */}
+                      <Select
+                        value={level.language}
+                        onValueChange={(value) => setLevels(prev => prev.map(l => l.id === level.id ? { ...l, language: value as LevelLanguage } : l))}
+                      >
+                        <SelectTrigger className="w-32 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {LANGUAGE_OPTIONS.map(option => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
