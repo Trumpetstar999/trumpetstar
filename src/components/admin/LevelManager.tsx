@@ -70,6 +70,14 @@ const PLAN_OPTIONS: { value: PlanKey; label: string }[] = [
   { value: 'PRO', label: 'Pro' },
 ];
 
+const LANGUAGE_OPTIONS: { value: LevelLanguage; label: string }[] = [
+  { value: 'all', label: '🌍 Alle Sprachen' },
+  { value: 'de', label: '🇩🇪 Deutsch' },
+  { value: 'en', label: '🇬🇧 Englisch' },
+  { value: 'es', label: '🇪🇸 Spanisch' },
+  { value: 'sl', label: '🇸🇮 Slowenisch' },
+];
+
 const PLAN_BADGE_COLORS: Record<PlanKey, string> = {
   FREE: 'bg-muted text-muted-foreground',
   BASIC: 'bg-primary/10 text-primary',
