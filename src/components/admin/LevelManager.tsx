@@ -233,6 +233,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       sort_order: sortOrder,
       required_plan_key: newLevel.required_plan_key,
       difficulty: newLevel.difficulty,
+      language: newLevel.language,
     });
 
     if (error) {
@@ -240,7 +241,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       console.error(error);
     } else {
       toast.success('Level erstellt');
-      setNewLevel({ title: '', title_en: '', title_es: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'basics', sort_order: 0 });
+      setNewLevel({ title: '', title_en: '', title_es: '', vimeo_showcase_id: '', required_plan_key: 'FREE', difficulty: 'basics', sort_order: 0, language: 'de' });
       setIsAdding(false);
       fetchLevels();
     }
@@ -259,6 +260,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
         required_plan_key: editForm.required_plan_key,
         difficulty: editForm.difficulty,
         sort_order: editForm.sort_order,
+        language: editForm.language,
       })
       .eq('id', id);
 
@@ -320,6 +322,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       required_plan_key: level.required_plan_key,
       difficulty: level.difficulty,
       sort_order: level.sort_order,
+      language: level.language,
     });
   }
 
