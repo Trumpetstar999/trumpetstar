@@ -116,6 +116,8 @@ const App = () => {
                         <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
+                        {/* Legacy redirect: old /musicxml/:id links */}
+                        <Route path="/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
