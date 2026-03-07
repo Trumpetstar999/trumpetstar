@@ -233,7 +233,38 @@ Deno.serve(async (req) => {
       console.error("[capture-lead] Email error (non-fatal):", emailErr);
     }
 
-    // 6) Push new lead to ClawBot Command (receive-sync)
+    // 6) Enroll lead in email sequence (always fire, enroll-lead handles de-duplication)
+    try {
+      const enrollRes = await fetch(
+        `${SUPABASE_URL}/functions/v1/enroll-lead`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+          },
+          body: JSON.stringify({
+            user_id: authUserId,
+            email: cleanEmail,
+            display_name: cleanName,
+            segment: cleanSegment,
+            language: lang,
+            source: sanitize(source) ?? "landing",
+          }),
+        }
+      );
+      const enrollData = await enrollRes.json();
+      if (!enrollRes.ok) {
+        console.error("[capture-lead] enroll-lead failed:", enrollData);
+      } else {
+        console.log("[capture-lead] enroll-lead result:", enrollData);
+      }
+    } catch (enrollErr) {
+      console.error("[capture-lead] enroll-lead error (non-fatal):", enrollErr);
+    }
+
+    // 7) Push new lead to ClawBot Command (receive-sync)
     if (isNewUser) {
       try {
         const syncSecret = Deno.env.get("SYNC_SECRET");
@@ -266,7 +297,7 @@ Deno.serve(async (req) => {
         console.warn("[capture-lead] push-sync error (non-fatal):", syncErr);
       }
 
-      // 7) Fire-and-forget POST to Google Sheets webhook
+      // 8) Fire-and-forget POST to Google Sheets webhook
       try {
         const googleSheetUrl = Deno.env.get("GOOGLE_SHEET_WEBHOOK_URL");
         if (googleSheetUrl) {
