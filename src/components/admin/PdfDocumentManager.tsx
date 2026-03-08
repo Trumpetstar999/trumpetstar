@@ -283,6 +283,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file_url: pdfUrl,
         page_count: data.page_count || 0,
         cover_image_url: coverImageUrl,
+        order_link: data.order_link || null,
       };
 
       console.log('Saving PDF with payload:', { ...payload, pdf_file_url: '...' });
