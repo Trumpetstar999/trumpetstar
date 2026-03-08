@@ -337,3 +337,40 @@
 .cursor-playing #custom-cursor-overlay {
   animation: cursor-pulse 0.8s ease-in-out infinite;
 }
+
+/* ── Staff Range Selector – native range slider styling ─────────── */
+.staff-range input[type="range"]::-webkit-slider-thumb,
+input[type="range"].range-thumb-white::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(99,179,237,0.8);
+  box-shadow: 0 0 6px rgba(99,179,237,0.5);
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+input[type="range"]:focus {
+  outline: none;
+}
