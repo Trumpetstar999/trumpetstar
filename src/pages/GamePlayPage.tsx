@@ -183,6 +183,7 @@ export default function GamePlayPage() {
         isMicActive={isMicActive}
         showDebug={showDebug}
         onToggleDebug={() => setShowDebug(prev => !prev)}
+        debugInfo={debugInfo as Record<string, unknown>}
       />
 
       <GameCanvas notesRef={notesRef} particlesRef={particlesRef} isRunning={gameState.isRunning} />
