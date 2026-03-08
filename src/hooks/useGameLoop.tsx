@@ -212,7 +212,7 @@ export function useGameLoop(settings: GameSettings) {
     }
 
     rafRef.current = requestAnimationFrame(tick);
-  }, [getSpeed, spawnNote]);
+  }, [getSpeed, spawnNote, addMissParticles]);
 
   const startGame = useCallback(() => {
     notesRef.current = [];
