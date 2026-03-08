@@ -838,6 +838,18 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
                 />
               </div>
+
+              {/* Order Link */}
+              <div>
+                <Label>Bestelllink (optional)</Label>
+                <Input
+                  className="mt-1.5"
+                  placeholder="https://..."
+                  value={formData.order_link}
+                  onChange={(e) => setFormData(prev => ({ ...prev, order_link: e.target.value }))}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Wird als „Buch bestellen"-Button unter dem Cover angezeigt</p>
+              </div>
             </div>
           </div>
 

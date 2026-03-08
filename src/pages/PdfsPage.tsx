@@ -296,6 +296,7 @@ export function PdfsPage() {
                     downloadProgress={progress}
                     isCached={cached}
                     coverImageUrl={pdf.cover_image_url}
+                    orderLink={pdf.order_link}
                     onClick={() => handleSelectPdf(pdf.id)}
                   />
                 );
