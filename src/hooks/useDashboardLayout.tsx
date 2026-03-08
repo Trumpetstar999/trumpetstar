@@ -8,7 +8,6 @@ export type WidgetId =
   | 'notes-todo'
   | 'feedback-chat'
   | 'classroom'
-  | 'statistics'
   | 'game-highscore'
   | 'recent-videos'
   | 'weekly-goals'
