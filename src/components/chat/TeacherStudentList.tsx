@@ -119,11 +119,26 @@ export function TeacherStudentList({ isOpen, onClose, embedded = false, onSelect
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-[15px] text-gray-900 truncate">
-                      {student.studentProfile?.display_name || 'Unbekannt'}
-                    </span>
+                    <div className="flex flex-col min-w-0">
+                      {student.studentProfile?.display_name ? (
+                        <>
+                          <span className="font-medium text-[15px] text-gray-900 truncate">
+                            {student.studentProfile.display_name}
+                          </span>
+                          {student.studentEmail && (
+                            <span className="text-[11px] text-gray-400 truncate">
+                              {student.studentEmail}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="font-medium text-[15px] text-gray-900 truncate">
+                          {student.studentEmail || 'Unbekannt'}
+                        </span>
+                      )}
+                    </div>
                     {student.lastMessageTime && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 shrink-0 ml-2">
                         {formatDistanceToNow(new Date(student.lastMessageTime), { addSuffix: true, locale: de })}
                       </span>
                     )}
