@@ -219,8 +219,114 @@ export function WeeklyStarsWidget() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.25 }}
-            className="space-y-3"
+            className="flex flex-col h-full gap-3"
           >
+            {/* Month header with navigation */}
+            <div className="flex items-center justify-between shrink-0">
+              <button
+                onClick={handlePrevMonth}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4 text-white/70" />
+              </button>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={format(currentMonth, 'yyyy-MM')}
+                  initial={{ opacity: 0, y: slideDir * 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -slideDir * 8 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2"
+                >
+                  <span className="text-sm font-semibold text-white">
+                    {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3.5 h-3.5 text-reward-gold fill-reward-gold" />
+                    <span className="text-sm font-bold text-white">{totalMonthStars}</span>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+              <button
+                onClick={handleNextMonth}
+                disabled={isCurrentMonth}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4 text-white/70" />
+              </button>
+            </div>
+
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 gap-1 shrink-0">
+              {WEEKDAY_LABELS_DE.map(l => (
+                <div key={l} className="text-center text-[10px] text-white/40 font-medium py-0.5">{l}</div>
+              ))}
+            </div>
+
+            {/* Calendar grid — fills remaining space */}
+            <div className="flex-1 min-h-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={format(currentMonth, 'yyyy-MM') + '-grid'}
+                initial={{ opacity: 0, x: slideDir * 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -slideDir * 30 }}
+                transition={{ duration: 0.25 }}
+                className="grid grid-cols-7 gap-1 h-full"
+              >
+                {monthDays.map((day, i) => {
+                  if (!day) return <div key={`empty-${i}`} />;
+                  const key = format(day, 'yyyy-MM-dd');
+                  const stars = monthStars[key] || 0;
+                  const today = isToday(day);
+                  const hasStars = stars > 0;
+
+                  return (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, scale: 0.7 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.012, duration: 0.2 }}
+                      className={`
+                        relative aspect-square rounded-lg flex flex-col items-center justify-center gap-0.5
+                        ${hasStars
+                          ? 'bg-reward-gold/25 ring-1 ring-reward-gold/50'
+                          : today
+                            ? 'bg-white/15 ring-1 ring-white/30'
+                            : 'bg-white/5'
+                        }
+                      `}
+                    >
+                      <span className={`text-[11px] font-semibold leading-none ${
+                        hasStars ? 'text-reward-gold' : today ? 'text-white' : 'text-white/60'
+                      }`}>
+                        {format(day, 'd')}
+                      </span>
+                      {hasStars && (
+                        <div className="flex items-center gap-0.5">
+                          <Star className="w-2.5 h-2.5 text-reward-gold fill-reward-gold" />
+                          {stars > 1 && (
+                            <span className="text-[9px] font-bold text-reward-gold leading-none">{stars}</span>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </AnimatePresence>
+            </div>
+
+            {totalMonthStars === 0 && (
+              <p className="text-center text-white/50 text-xs py-1 shrink-0">{t('widgets.watchVideosForStars')}</p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+      </div>
+    </div>
+  );
+}
             {/* Month header with navigation */}
             <div className="flex items-center justify-between">
               <button
