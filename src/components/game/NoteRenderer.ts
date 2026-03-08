@@ -141,7 +141,7 @@ export function renderGame(
         // ♭ needs a slightly larger font to appear visually the same size as the note head
         // ♯ is narrower so standard size works; both offset left with clear gap
         const isFlat = accidentalSymbol === '♭';
-        const accidentalSize = isFlat ? noteRadius * 3.2 : lineSpacing * 0.9;
+        const accidentalSize = isFlat ? noteRadius * 3.2 : lineSpacing * 1.4;
         ctx.font = `${accidentalSize}px serif`;
         ctx.fillStyle = GOLD;
         ctx.textBaseline = 'middle';
