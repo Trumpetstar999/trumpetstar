@@ -77,6 +77,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     pdf_file: null as File | null,
     cover_image: null as File | null,
     cover_image_url: '' as string | null,
+    order_link: '' as string,
   });
 
   // Fetch PDFs

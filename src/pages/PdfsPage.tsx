@@ -32,6 +32,7 @@ interface PdfDocument {
   sort_index: number;
   language?: string | null;
   cover_image_url?: string | null;
+  order_link?: string | null;
 }
 
 interface AudioTrack {
