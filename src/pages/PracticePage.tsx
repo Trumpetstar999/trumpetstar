@@ -51,21 +51,21 @@ function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, 
 
   return (
     <div className="group relative bg-white/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-      <div className="flex">
-        {/* Thumbnail — prominent left column */}
-        <div className="relative w-36 sm:w-44 shrink-0 bg-slate-900">
+      <div className="flex items-stretch">
+        {/* Thumbnail — height-filling left column */}
+        <div className="relative w-36 sm:w-44 shrink-0 self-stretch bg-slate-900 min-h-[120px]">
           {videoThumbs.length > 0 ? (
             <>
               {videoThumbs.length === 1 ? (
-                <img src={videoThumbs[0]} alt="" className="w-full h-full object-cover" />
+                <img src={videoThumbs[0]} alt="" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
-                <div className="grid grid-cols-2 h-full">
+                <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
                   {[0, 1, 2, 3].map(i => (
-                    <div key={i} className="relative overflow-hidden aspect-video">
+                    <div key={i} className="relative overflow-hidden">
                       {videoThumbs[i] ? (
-                        <img src={videoThumbs[i]} alt="" className="w-full h-full object-cover" />
+                        <img src={videoThumbs[i]} alt="" className="absolute inset-0 w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full bg-slate-800" />
+                        <div className="absolute inset-0 bg-slate-800" />
                       )}
                     </div>
                   ))}
@@ -73,7 +73,7 @@ function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, 
               )}
               <button
                 onClick={onPlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               >
                 <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
                   <Play className="w-5 h-5 text-slate-900 ml-0.5" />
@@ -81,12 +81,12 @@ function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, 
               </button>
             </>
           ) : (
-            <div className="h-full min-h-[110px] flex items-center justify-center bg-slate-800">
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
               <Music className="w-8 h-8 text-slate-500" />
             </div>
           )}
           {/* Index badge */}
-          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+          <div className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
             <span className="text-[10px] font-bold text-white">#{index + 1}</span>
           </div>
         </div>
