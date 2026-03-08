@@ -21,6 +21,7 @@ import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMembership } from '@/hooks/useMembership';
 import { useNavigate } from 'react-router-dom';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
