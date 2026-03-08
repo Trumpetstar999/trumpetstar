@@ -40,6 +40,7 @@ export interface StudentChatInfo {
     display_name: string | null;
     avatar_url: string | null;
   } | null;
+  studentEmail: string | null;
   lastMessage: string | null;
   lastMessageTime: string | null;
   unreadCount: number;
@@ -305,6 +306,22 @@ export function useTeacherStudentChats() {
         .select('id, display_name, avatar_url')
         .in('id', studentIds);
 
+      // Fetch emails via admin edge function
+      let emailMap: Record<string, string> = {};
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const resp = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users?action=list-users`,
+          { headers: { Authorization: `Bearer ${session?.access_token}` } }
+        );
+        const json = await resp.json();
+        if (json.success && json.users) {
+          for (const u of json.users) {
+            emailMap[u.id] = u.email || '';
+          }
+        }
+      } catch { /* email fetch is non-critical */ }
+
       // Find chats for each student
       const { data: allChats } = await supabase
         .from('video_chats')
@@ -392,6 +409,7 @@ export function useTeacherStudentChats() {
             chatId,
             studentId,
             studentProfile: profile || null,
+            studentEmail: emailMap[studentId] || null,
             lastMessage: lastMessagePreview,
             lastMessageTime: lastMsg?.created_at || null,
             unreadCount: unreadCount || 0
