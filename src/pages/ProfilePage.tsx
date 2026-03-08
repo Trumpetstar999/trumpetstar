@@ -158,7 +158,7 @@ export function ProfilePage() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={visibleWidgets.map(w => w.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 gap-4">
-            {visibleWidgets.map((widget, index) => (
+            {visibleWidgets.filter(w => KNOWN_WIDGET_IDS.includes(w.id)).map((widget, index) => (
               <DashboardWidget
                 key={widget.id}
                 id={widget.id}
