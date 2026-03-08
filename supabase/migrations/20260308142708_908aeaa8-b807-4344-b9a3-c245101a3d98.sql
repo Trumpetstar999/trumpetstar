@@ -1,0 +1,1 @@
+ALTER TABLE public.pdf_documents ADD COLUMN IF NOT EXISTS order_link TEXT NULL;
