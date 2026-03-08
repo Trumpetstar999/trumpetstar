@@ -88,7 +88,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">Tonart</label>
-            <Select value={settings.key} onValueChange={v => onUpdate({ key: v })}>
+            <Select value={settings.key} onValueChange={handleKeyChange}>
               <SelectTrigger
                 className="h-9 text-sm border-0"
                 style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.9)' }}
