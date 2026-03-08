@@ -31,6 +31,7 @@ interface PdfDocument {
   created_at: string;
   levels?: { title: string } | null;
   cover_image_url?: string | null;
+  order_link?: string | null;
 }
 
 interface Level {

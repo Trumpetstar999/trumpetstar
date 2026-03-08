@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Lock, Download, CheckCircle2, Loader2 } from 'lucide-react';
+import { Lock, Download, CheckCircle2, Loader2, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
@@ -15,6 +15,7 @@ interface PdfBookCardProps {
   downloadProgress: number;
   isCached: boolean;
   coverImageUrl?: string | null;
+  orderLink?: string | null;
   onClick: () => void;
 }
 
