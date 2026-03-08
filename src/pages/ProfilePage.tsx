@@ -21,6 +21,7 @@ import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMembership } from '@/hooks/useMembership';
 import { useNavigate } from 'react-router-dom';
+import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
@@ -59,6 +60,7 @@ export function ProfilePage() {
   const { t } = useLanguage();
   const { planKey } = useMembership();
   const navigate = useNavigate();
+  const { isEnabled } = useFeatureFlags();
   const {
     visibleWidgets,
     isEditing,
@@ -157,7 +159,10 @@ export function ProfilePage() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={visibleWidgets.map(w => w.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 gap-4">
-            {visibleWidgets.filter(w => KNOWN_WIDGET_IDS.includes(w.id)).map((widget, index) => (
+            {visibleWidgets
+              .filter(w => KNOWN_WIDGET_IDS.includes(w.id))
+              .filter(w => w.id !== 'classroom' || isEnabled('menu_classroom'))
+              .map((widget, index) => (
               <DashboardWidget
                 key={widget.id}
                 id={widget.id}
