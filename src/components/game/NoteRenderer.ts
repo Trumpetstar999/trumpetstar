@@ -138,10 +138,16 @@ export function renderGame(
       // Accidental (if sharp/flat) — symbol depends on key signature
       const accidentalSymbol = getNoteAccidentalSymbol(note.midi, key);
       if (accidentalSymbol) {
-        ctx.font = `${lineSpacing * 0.9}px serif`;
+        // ♭ needs a slightly larger font to appear visually the same size as the note head
+        // ♯ is narrower so standard size works; both offset left with clear gap
+        const isFlat = accidentalSymbol === '♭';
+        const accidentalSize = isFlat ? noteRadius * 2.4 : lineSpacing * 0.9;
+        ctx.font = `${accidentalSize}px serif`;
         ctx.fillStyle = GOLD;
         ctx.textBaseline = 'middle';
-        ctx.fillText(accidentalSymbol, x - noteRadius * 2.8, y);
+        // gap of 1× noteRadius between accidental right-edge and note left-edge
+        const offsetX = isFlat ? noteRadius * 3.2 : noteRadius * 2.8;
+        ctx.fillText(accidentalSymbol, x - offsetX, y);
       }
     }
   }
