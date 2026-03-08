@@ -286,27 +286,27 @@ export function PracticePage() {
 
         {/* ── RIGHT: Journal & Todos ─────────────────────────────────────── */}
         <div
-          className="glass rounded-2xl overflow-hidden opacity-0 animate-fade-in lg:sticky lg:top-6"
+          className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-0 animate-fade-in lg:sticky lg:top-6"
           style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
         >
           <Tabs value={activeJournalTab} onValueChange={setActiveJournalTab} className="w-full">
-            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-border/50">
-              <TabsList className="bg-secondary/50 p-1 rounded-xl">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-slate-100">
+              <TabsList className="bg-slate-100 p-1 rounded-xl">
                 <TabsTrigger
                   value="journal"
-                  className="gap-1.5 px-4 py-2 rounded-lg text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                  className="gap-1.5 px-4 py-2 rounded-lg text-sm text-slate-600 data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   Journal
                 </TabsTrigger>
                 <TabsTrigger
                   value="todos"
-                  className="gap-1.5 px-4 py-2 rounded-lg text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                  className="gap-1.5 px-4 py-2 rounded-lg text-sm text-slate-600 data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
                 >
                   <CheckSquare className="w-3.5 h-3.5" />
                   Aufgaben
                   {activeTodos.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-bold">
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-xs font-bold">
                       {activeTodos.length}
                     </span>
                   )}
@@ -336,9 +336,9 @@ export function PracticePage() {
                 ))
               ) : (
                 <div className="text-center py-12">
-                  <BookOpen className="w-10 h-10 mx-auto mb-3 text-primary/30" />
-                  <p className="text-muted-foreground text-sm">Noch keine Einträge</p>
-                  <Button size="sm" variant="outline" className="mt-3 gap-1.5" onClick={() => setJournalDialogOpen(true)}>
+                  <BookOpen className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-500 text-sm">Noch keine Einträge</p>
+                  <Button size="sm" variant="outline" className="mt-3 gap-1.5 border-slate-200 text-slate-600 hover:bg-slate-50" onClick={() => setJournalDialogOpen(true)}>
                     <Plus className="w-3.5 h-3.5" /> Ersten Eintrag erstellen
                   </Button>
                 </div>
@@ -352,8 +352,8 @@ export function PracticePage() {
                   {activeTodos.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Offen ({activeTodos.length})</h3>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Offen ({activeTodos.length})</h3>
                       </div>
                       <div className="space-y-2">
                         {activeTodos.map(todo => (
@@ -366,7 +366,7 @@ export function PracticePage() {
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Erledigt ({completedTodos.length})</h3>
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Erledigt ({completedTodos.length})</h3>
                       </div>
                       <div className="space-y-2">
                         {completedTodos.map(todo => (
@@ -378,9 +378,9 @@ export function PracticePage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <CheckSquare className="w-10 h-10 mx-auto mb-3 text-primary/30" />
-                  <p className="text-muted-foreground text-sm">Keine Aufgaben</p>
-                  <Button size="sm" variant="outline" className="mt-3 gap-1.5" onClick={() => setTodoDialogOpen(true)}>
+                  <CheckSquare className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-500 text-sm">Keine Aufgaben</p>
+                  <Button size="sm" variant="outline" className="mt-3 gap-1.5 border-slate-200 text-slate-600 hover:bg-slate-50" onClick={() => setTodoDialogOpen(true)}>
                     <Plus className="w-3.5 h-3.5" /> Aufgabe erstellen
                   </Button>
                 </div>
