@@ -122,8 +122,9 @@ export function WeeklyStarsWidget() {
 
   return (
     <div className="space-y-3">
+    <div className="flex flex-col h-full space-y-3">
       {/* Tab switcher */}
-      <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1">
+      <div className="flex items-center gap-1 bg-white/5 rounded-xl p-1 shrink-0">
         {(['week', 'month'] as ViewMode[]).map(mode => (
           <button
             key={mode}
@@ -137,6 +138,7 @@ export function WeeklyStarsWidget() {
         ))}
       </div>
 
+      <div className="flex-1 min-h-0">
       <AnimatePresence mode="wait">
         {viewMode === 'week' ? (
           <motion.div
@@ -145,10 +147,10 @@ export function WeeklyStarsWidget() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25 }}
-            className="space-y-3"
+            className="flex flex-col h-full gap-3"
           >
             {/* Week header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-white/60" />
                 <span className="text-sm text-white/60">{t('widgets.thisWeek')}</span>
@@ -160,16 +162,16 @@ export function WeeklyStarsWidget() {
               </div>
             </div>
 
-            {/* Bar chart */}
-            <div className="flex items-end justify-between gap-2 h-28">
+            {/* Bar chart — flex-1 fills remaining height */}
+            <div className="flex-1 min-h-0 flex items-end justify-between gap-2">
               {weekData.map((day, index) => {
                 const heightPercent = day.stars > 0 ? (day.stars / maxStars) * 100 : 0;
-                const actualHeight = Math.max(heightPercent, day.stars > 0 ? 20 : 8);
+                const actualHeight = Math.max(heightPercent, day.stars > 0 ? 20 : 6);
                 return (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-1.5">
-                    <div className="relative w-full h-20 flex items-end justify-center">
+                  <div key={index} className="flex-1 flex flex-col items-center gap-1.5 h-full">
+                    <div className="relative w-full flex-1 flex items-end justify-center">
                       <div
-                        className={`w-full max-w-8 rounded-t-lg transition-all duration-700 ease-out ${
+                        className={`w-full max-w-10 rounded-t-lg transition-all duration-700 ease-out ${
                           day.isToday
                             ? 'bg-gradient-to-t from-reward-gold to-amber-400 shadow-lg shadow-reward-gold/30'
                             : day.stars > 0
@@ -190,7 +192,7 @@ export function WeeklyStarsWidget() {
                         </div>
                       )}
                     </div>
-                    <span className={`text-[11px] font-medium ${day.isToday ? 'text-reward-gold' : 'text-white/60'}`}>
+                    <span className={`text-[11px] font-medium shrink-0 ${day.isToday ? 'text-reward-gold' : 'text-white/60'}`}>
                       {day.dayLabel}
                     </span>
                   </div>
@@ -198,6 +200,7 @@ export function WeeklyStarsWidget() {
               })}
             </div>
 
+            <div className="shrink-0">
             {totalWeekStars === 0 && (
               <p className="text-center text-white/50 text-xs py-1">{t('widgets.watchVideosForStars')}</p>
             )}
@@ -207,6 +210,7 @@ export function WeeklyStarsWidget() {
             {totalWeekStars >= 7 && (
               <p className="text-center text-reward-gold text-xs font-medium">{t('widgets.fantasticWeek')}</p>
             )}
+            </div>
           </motion.div>
         ) : (
           <motion.div
