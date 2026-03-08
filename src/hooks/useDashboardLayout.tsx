@@ -8,7 +8,6 @@ export type WidgetId =
   | 'notes-todo'
   | 'feedback-chat'
   | 'classroom'
-  | 'statistics'
   | 'game-highscore'
   | 'recent-videos'
   | 'weekly-goals'
@@ -30,7 +29,6 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'notes-todo', visible: true, order: 4 },
   { id: 'feedback-chat', visible: true, order: 5, isPremium: true },
   { id: 'classroom', visible: true, order: 6, isPremium: true },
-  { id: 'statistics', visible: true, order: 7, isOptional: true },
   { id: 'practice-sessions', visible: true, order: 8 },
   { id: 'game-highscore', visible: true, order: 9 },
   { id: 'review', visible: true, order: 10 },
