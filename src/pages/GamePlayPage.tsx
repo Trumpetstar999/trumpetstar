@@ -186,7 +186,7 @@ export default function GamePlayPage() {
         debugInfo={debugInfo as unknown as Record<string, unknown>}
       />
 
-      <GameCanvas notesRef={notesRef} particlesRef={particlesRef} isRunning={gameState.isRunning} />
+      <GameCanvas notesRef={notesRef} particlesRef={particlesRef} isRunning={gameState.isRunning} gameKey={settings.key} />
 
       <GameStatusBar
         sfxEnabled={settings.sfxEnabled}

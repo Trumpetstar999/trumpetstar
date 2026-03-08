@@ -155,12 +155,19 @@ export function getLedgerLines(staffPos: number): number[] {
   return lines;
 }
 
-// Accidental type for a note
-export function getNoteAccidental(midi: number): 'sharp' | 'flat' | 'natural' | null {
+// Returns true if this key should use flats for accidentals
+export function keyUsesFlats(key: string): boolean {
+  const sig = KEY_SIGNATURES[key] ?? 0;
+  return sig < 0;
+}
+
+// Returns the accidental symbol to display for a given midi note in a given key
+// Returns '♯', '♭', or null (no accidental needed)
+export function getNoteAccidentalSymbol(midi: number, key: string): '♯' | '♭' | null {
   const noteInOctave = midi % 12;
-  const hasAccidental = [1, 3, 6, 8, 10].includes(noteInOctave);
-  if (!hasAccidental) return null;
-  return 'sharp'; // default to sharp, key signature handling adjusts this
+  const isChromatic = [1, 3, 6, 8, 10].includes(noteInOctave);
+  if (!isChromatic) return null;
+  return keyUsesFlats(key) ? '♭' : '♯';
 }
 
 // Range presets

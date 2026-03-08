@@ -6,9 +6,10 @@ interface GameCanvasProps {
   notesRef: React.RefObject<GameNote[]>;
   particlesRef: React.RefObject<Particle[]>;
   isRunning: boolean;
+  gameKey?: string;
 }
 
-export function GameCanvas({ notesRef, particlesRef, isRunning }: GameCanvasProps) {
+export function GameCanvas({ notesRef, particlesRef, isRunning, gameKey = 'C' }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number | null>(null);
 
@@ -31,13 +32,14 @@ export function GameCanvas({ notesRef, particlesRef, isRunning }: GameCanvasProp
       rect.height,
       notesRef.current ?? [],
       particlesRef.current ?? [],
-      performance.now()
+      performance.now(),
+      gameKey
     );
 
     if (isRunning) {
       rafRef.current = requestAnimationFrame(draw);
     }
-  }, [isRunning, notesRef, particlesRef]);
+  }, [isRunning, notesRef, particlesRef, gameKey]);
 
   useEffect(() => {
     if (isRunning) {

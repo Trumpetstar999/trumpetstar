@@ -1,4 +1,4 @@
-import { midiToStaffPosition, getLedgerLines, NOTE_NAMES_SHARP } from './constants';
+import { midiToStaffPosition, getLedgerLines, getNoteAccidentalSymbol } from './constants';
 import type { GameNote, Particle } from '@/hooks/useGameLoop';
 
 const GOLD = '#FFCC00';
@@ -13,16 +13,14 @@ const bgImg = new Image();
 bgImg.src = '/images/game-background.png?v=' + Date.now();
 bgImg.onload = () => { bgImage = bgImg; bgLoaded = true; };
 
-// Treble clef SVG path (simplified)
-const TREBLE_CLEF_SCALE = 0.035;
-
 export function renderGame(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
   notes: GameNote[],
   particles: Particle[],
-  _time: number
+  _time: number,
+  key: string = 'C'
 ) {
   ctx.clearRect(0, 0, width, height);
 
@@ -137,14 +135,13 @@ export function renderGame(
       }
       ctx.stroke();
 
-      // Accidental (if sharp/flat)
-      const noteInOctave = note.midi % 12;
-      const isSharp = [1, 3, 6, 8, 10].includes(noteInOctave);
-      if (isSharp) {
+      // Accidental (if sharp/flat) — symbol depends on key signature
+      const accidentalSymbol = getNoteAccidentalSymbol(note.midi, key);
+      if (accidentalSymbol) {
         ctx.font = `${lineSpacing * 0.9}px serif`;
         ctx.fillStyle = GOLD;
         ctx.textBaseline = 'middle';
-        ctx.fillText('♯', x - noteRadius * 2.8, y);
+        ctx.fillText(accidentalSymbol, x - noteRadius * 2.8, y);
       }
     }
   }
