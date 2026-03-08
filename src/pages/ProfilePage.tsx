@@ -59,7 +59,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
     case 'review':
       return <ReviewCard />;
     default:
-      return <div className="text-white/50 text-center py-8">{t('widgets.comingSoon')}</div>;
+      return null;
   }
 }
 
