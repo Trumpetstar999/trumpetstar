@@ -47,80 +47,112 @@ function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, 
   const videoCount = session.sections.reduce((a, s) => a + s.items.filter(i => i.item_type === 'vimeo_video').length, 0);
   const pdfCount = session.sections.reduce((a, s) => a + s.items.filter(i => i.item_type === 'pdf').length, 0);
   const pauseCount = session.sections.reduce((a, s) => a + s.items.filter(i => i.item_type === 'pause').length, 0);
+  const nonEmptySections = session.sections.filter(s => s.items.length > 0);
 
   return (
-    <div className="group relative bg-card/60 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+    <div className="group relative bg-white/95 backdrop-blur-sm border border-white/40 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
       <div className="flex">
-        {/* Thumbnail strip */}
-        <div className="relative w-28 shrink-0 bg-muted/30">
+        {/* Thumbnail — prominent left column */}
+        <div className="relative w-36 sm:w-44 shrink-0 bg-slate-900">
           {videoThumbs.length > 0 ? (
-            <div className="grid grid-cols-2 grid-rows-2 h-full">
-              {[0, 1, 2, 3].map(i => (
-                <div key={i} className="relative overflow-hidden">
-                  {videoThumbs[i] ? (
-                    <img src={videoThumbs[i]} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-muted/20" />
-                  )}
+            <>
+              {videoThumbs.length === 1 ? (
+                <img src={videoThumbs[0]} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="grid grid-cols-2 h-full">
+                  {[0, 1, 2, 3].map(i => (
+                    <div key={i} className="relative overflow-hidden aspect-video">
+                      {videoThumbs[i] ? (
+                        <img src={videoThumbs[i]} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-slate-800" />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
               <button
                 onClick={onPlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               >
-                <div className="w-10 h-10 rounded-full bg-primary/90 flex items-center justify-center shadow-lg">
-                  <Play className="w-4 h-4 text-primary-foreground ml-0.5" />
+                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
+                  <Play className="w-5 h-5 text-slate-900 ml-0.5" />
                 </div>
               </button>
-            </div>
+            </>
           ) : (
-            <div className="h-full min-h-[90px] flex items-center justify-center">
-              <Music className="w-7 h-7 text-muted-foreground/30" />
+            <div className="h-full min-h-[110px] flex items-center justify-center bg-slate-800">
+              <Music className="w-8 h-8 text-slate-500" />
             </div>
           )}
+          {/* Index badge */}
+          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+            <span className="text-[10px] font-bold text-white">#{index + 1}</span>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0 p-3 flex flex-col justify-between">
+        <div className="flex-1 min-w-0 p-3.5 flex flex-col justify-between">
           <div>
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-foreground text-sm truncate">{session.name}</h3>
-              <span className="text-[10px] text-muted-foreground bg-muted/50 rounded-full px-1.5 py-0.5 shrink-0">#{index + 1}</span>
-            </div>
-            <div className="flex items-center gap-2.5 mt-1.5 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(session.estimatedDuration)}</span>
-              {videoCount > 0 && <span className="flex items-center gap-1"><Video className="w-3 h-3" />{videoCount}</span>}
-              {pdfCount > 0 && <span className="flex items-center gap-1"><FileText className="w-3 h-3" />{pdfCount}</span>}
-              {pauseCount > 0 && <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{pauseCount}</span>}
-            </div>
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {session.sections.filter(s => s.items.length > 0).slice(0, 3).map(sec => (
-                <span key={sec.id} className="text-[9px] bg-primary/10 text-primary rounded-full px-1.5 py-0.5">
-                  {sec.title} ({sec.items.length})
+            <h3 className="font-bold text-slate-900 text-base leading-tight truncate">{session.name}</h3>
+
+            {/* Meta row */}
+            <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500 font-medium">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                {formatDuration(session.estimatedDuration)}
+              </span>
+              {videoCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <Video className="w-3.5 h-3.5 text-slate-400" />{videoCount}
                 </span>
-              ))}
+              )}
+              {pdfCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5 text-slate-400" />{pdfCount}
+                </span>
+              )}
+              {pauseCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <Timer className="w-3.5 h-3.5 text-slate-400" />{pauseCount}
+                </span>
+              )}
             </div>
+
+            {/* Section tags */}
+            {nonEmptySections.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {nonEmptySections.slice(0, 4).map(sec => (
+                  <span key={sec.id} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 rounded-full px-2 py-0.5 font-medium">
+                    {sec.title} ({sec.items.length})
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/30">
-            <span className="text-[10px] text-muted-foreground/60 truncate">
-              {session.last_used_at ? `Zuletzt: ${new Date(session.last_used_at).toLocaleDateString('de')}` : 'Noch nicht gespielt'}
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-slate-100">
+            <span className="text-[10px] text-slate-400">
+              {session.last_used_at
+                ? `Zuletzt: ${new Date(session.last_used_at).toLocaleDateString('de')}`
+                : 'Noch nicht gespielt'}
             </span>
             <div className="flex gap-0.5 shrink-0">
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary" onClick={onPlay} title="Abspielen">
-                <Play className="w-3 h-3" />
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50" onClick={onPlay} title="Abspielen">
+                <Play className="w-3.5 h-3.5" />
               </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary" onClick={onEdit} title="Bearbeiten">
-                <Edit className="w-3 h-3" />
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50" onClick={onEdit} title="Bearbeiten">
+                <Edit className="w-3.5 h-3.5" />
               </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary" onClick={onDuplicate} title="Duplizieren">
-                <Copy className="w-3 h-3" />
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50" onClick={onDuplicate} title="Duplizieren">
+                <Copy className="w-3.5 h-3.5" />
               </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary" onClick={onShare} title="Teilen">
-                <Share2 className="w-3 h-3" />
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-blue-600 hover:bg-blue-50" onClick={onShare} title="Teilen">
+                <Share2 className="w-3.5 h-3.5" />
               </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={onDelete} title="Löschen">
-                <Trash2 className="w-3 h-3" />
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-slate-400 hover:text-red-500 hover:bg-red-50" onClick={onDelete} title="Löschen">
+                <Trash2 className="w-3.5 h-3.5" />
               </Button>
             </div>
           </div>
@@ -254,27 +286,27 @@ export function PracticePage() {
 
         {/* ── RIGHT: Journal & Todos ─────────────────────────────────────── */}
         <div
-          className="glass rounded-2xl overflow-hidden opacity-0 animate-fade-in lg:sticky lg:top-6"
+          className="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg opacity-0 animate-fade-in lg:sticky lg:top-6"
           style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}
         >
           <Tabs value={activeJournalTab} onValueChange={setActiveJournalTab} className="w-full">
-            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-border/50">
-              <TabsList className="bg-secondary/50 p-1 rounded-xl">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-slate-100">
+              <TabsList className="bg-slate-100 p-1 rounded-xl">
                 <TabsTrigger
                   value="journal"
-                  className="gap-1.5 px-4 py-2 rounded-lg text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                  className="gap-1.5 px-4 py-2 rounded-lg text-sm text-slate-600 data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   Journal
                 </TabsTrigger>
                 <TabsTrigger
                   value="todos"
-                  className="gap-1.5 px-4 py-2 rounded-lg text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300"
+                  className="gap-1.5 px-4 py-2 rounded-lg text-sm text-slate-600 data-[state=active]:bg-primary data-[state=active]:text-white transition-all duration-300"
                 >
                   <CheckSquare className="w-3.5 h-3.5" />
                   Aufgaben
                   {activeTodos.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-bold">
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 text-xs font-bold">
                       {activeTodos.length}
                     </span>
                   )}
@@ -304,9 +336,9 @@ export function PracticePage() {
                 ))
               ) : (
                 <div className="text-center py-12">
-                  <BookOpen className="w-10 h-10 mx-auto mb-3 text-primary/30" />
-                  <p className="text-muted-foreground text-sm">Noch keine Einträge</p>
-                  <Button size="sm" variant="outline" className="mt-3 gap-1.5" onClick={() => setJournalDialogOpen(true)}>
+                  <BookOpen className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-500 text-sm">Noch keine Einträge</p>
+                  <Button size="sm" variant="outline" className="mt-3 gap-1.5 border-slate-200 text-slate-600 hover:bg-slate-50" onClick={() => setJournalDialogOpen(true)}>
                     <Plus className="w-3.5 h-3.5" /> Ersten Eintrag erstellen
                   </Button>
                 </div>
@@ -320,8 +352,8 @@ export function PracticePage() {
                   {activeTodos.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Offen ({activeTodos.length})</h3>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Offen ({activeTodos.length})</h3>
                       </div>
                       <div className="space-y-2">
                         {activeTodos.map(todo => (
@@ -334,7 +366,7 @@ export function PracticePage() {
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Erledigt ({completedTodos.length})</h3>
+                        <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Erledigt ({completedTodos.length})</h3>
                       </div>
                       <div className="space-y-2">
                         {completedTodos.map(todo => (
@@ -346,9 +378,9 @@ export function PracticePage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <CheckSquare className="w-10 h-10 mx-auto mb-3 text-primary/30" />
-                  <p className="text-muted-foreground text-sm">Keine Aufgaben</p>
-                  <Button size="sm" variant="outline" className="mt-3 gap-1.5" onClick={() => setTodoDialogOpen(true)}>
+                  <CheckSquare className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-500 text-sm">Keine Aufgaben</p>
+                  <Button size="sm" variant="outline" className="mt-3 gap-1.5 border-slate-200 text-slate-600 hover:bg-slate-50" onClick={() => setTodoDialogOpen(true)}>
                     <Plus className="w-3.5 h-3.5" /> Aufgabe erstellen
                   </Button>
                 </div>
