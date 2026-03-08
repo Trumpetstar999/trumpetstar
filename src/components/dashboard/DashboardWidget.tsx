@@ -68,7 +68,7 @@ export const DashboardWidget = forwardRef<HTMLDivElement, DashboardWidgetProps>(
             <GripVertical className="w-4 h-4 text-white/70" />
           </div>
         )}
-        <div className={cn(!noPadding && "p-5")}>
+        <div className={cn(!noPadding && "p-5", "h-full")}>
           {children}
         </div>
       </div>
