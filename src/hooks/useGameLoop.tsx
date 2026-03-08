@@ -178,6 +178,7 @@ export function useGameLoop(settings: GameSettings) {
       if (note.x <= 0.08 && note.active && !note.missed) {
         note.missed = true;
         note.active = false;
+        addMissParticles(note.x, midiToStaffPosition(note.midi));
         setGameState(prev => {
           const newLives = prev.lives - 1;
           if (newLives <= 0) {
