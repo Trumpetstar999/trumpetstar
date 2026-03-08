@@ -40,6 +40,7 @@ export interface StudentChatInfo {
     display_name: string | null;
     avatar_url: string | null;
   } | null;
+  studentEmail: string | null;
   lastMessage: string | null;
   lastMessageTime: string | null;
   unreadCount: number;
