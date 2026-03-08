@@ -60,6 +60,7 @@ export function ProfilePage() {
   const { t } = useLanguage();
   const { planKey } = useMembership();
   const navigate = useNavigate();
+  const { isEnabled } = useFeatureFlags();
   const {
     visibleWidgets,
     isEditing,
