@@ -3,7 +3,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 export type WidgetId = 
   | 'profile'
-  | 'stars-progress'
   | 'calendar'
   | 'recordings'
   | 'notes-todo'
