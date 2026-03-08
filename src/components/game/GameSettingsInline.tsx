@@ -39,12 +39,14 @@ function isIPad(): boolean {
 
 export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlineProps) {
   const handleMinChange = (midi: number) => {
-    const name = midi.toString();
-    onUpdate({ rangeMinMidi: midi, rangeMin: name });
+    onUpdate({ rangeMinMidi: midi, rangeMin: `${midi}` });
   };
   const handleMaxChange = (midi: number) => {
-    const name = midi.toString();
-    onUpdate({ rangeMaxMidi: midi, rangeMax: name });
+    onUpdate({ rangeMaxMidi: midi, rangeMax: `${midi}` });
+  };
+  const handleKeyChange = (key: string) => {
+    const range = KEY_DEFAULT_RANGE[key] ?? { minMidi: 60, maxMidi: 79 };
+    onUpdate({ key, rangeMinMidi: range.minMidi, rangeMin: `${range.minMidi}`, rangeMaxMidi: range.maxMidi, rangeMax: `${range.maxMidi}` });
   };
 
   return (
