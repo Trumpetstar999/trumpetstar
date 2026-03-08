@@ -110,11 +110,8 @@ export function renderGame(
       ctx.fillStyle = `rgba(255, 204, 0, ${alpha * 0.5})`;
       ctx.fill();
     } else if (note.missed) {
-      // Missed: red transparent
-      ctx.beginPath();
-      ctx.ellipse(x, y, noteRadius * 1.2, noteRadius, 0, 0, Math.PI * 2);
-      ctx.fillStyle = RED;
-      ctx.fill();
+      // Missed: skip rendering — explosion particles handle the visual
+      continue;
     } else {
       // Active note
       ctx.beginPath();

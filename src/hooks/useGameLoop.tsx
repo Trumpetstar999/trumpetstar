@@ -89,7 +89,7 @@ export function useGameLoop(settings: GameSettings) {
   }, [settings.key]);
 
   const addHitParticles = useCallback((x: number, staffPos: number) => {
-    const canvasY = 0.5 - staffPos * 0.02; // approximate
+    const canvasY = 0.5 - staffPos * 0.02;
     for (let i = 0; i < 12; i++) {
       const angle = (Math.PI * 2 * i) / 12;
       particlesRef.current.push({
@@ -99,6 +99,22 @@ export function useGameLoop(settings: GameSettings) {
         life: 1, maxLife: 1,
         size: 2 + Math.random() * 3,
         color: `hsl(48, 100%, ${50 + Math.random() * 20}%)`,
+      });
+    }
+  }, []);
+
+  const addMissParticles = useCallback((x: number, staffPos: number) => {
+    const canvasY = 0.5 - staffPos * 0.02;
+    for (let i = 0; i < 18; i++) {
+      const angle = (Math.PI * 2 * i) / 18;
+      const speed = 0.08 + Math.random() * 0.18;
+      particlesRef.current.push({
+        x, y: canvasY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1, maxLife: 1,
+        size: 3 + Math.random() * 4,
+        color: `hsl(${350 + Math.random() * 20}, 90%, ${50 + Math.random() * 15}%)`,
       });
     }
   }, []);
