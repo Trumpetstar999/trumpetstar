@@ -147,7 +147,7 @@ export function renderGame(
         ctx.textBaseline = 'middle';
         // gap of 1× noteRadius between accidental right-edge and note left-edge
         const offsetX = isFlat ? noteRadius * 4.0 : noteRadius * 2.8;
-        const offsetY = isFlat ? noteRadius * 0.6 : 0;
+        const offsetY = isFlat ? noteRadius * 0.3 : 0;
         ctx.fillText(accidentalSymbol, x - offsetX, y - offsetY);
       }
     }
