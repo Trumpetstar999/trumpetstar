@@ -3,7 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Trophy, Calendar, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+
+interface UserProfile {
+  display_name: string | null;
+  avatar_url: string | null;
+}
 
 type FilterPeriod = 'today' | 'week' | 'all';
 
@@ -23,6 +29,17 @@ export function GameHighscores() {
   const [filter, setFilter] = useState<FilterPeriod>('all');
   const [scores, setScores] = useState<HighscoreEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('profiles')
+      .select('display_name, avatar_url')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => setProfile(data));
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -60,11 +77,28 @@ export function GameHighscores() {
     { key: 'all', label: 'Alle' },
   ];
 
+  const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Spieler';
+  const initials = displayName.slice(0, 2).toUpperCase();
+
   return (
     <div className="p-4 space-y-4">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-2">
         <Trophy className="w-5 h-5 text-[hsl(var(--reward-gold))]" />
         <h2 className="text-lg font-bold text-white">Highscores</h2>
+      </div>
+
+      {/* Player profile header */}
+      <div className="glass rounded-xl p-3 flex items-center gap-3">
+        <Avatar className="w-10 h-10 shrink-0">
+          <AvatarImage src={profile?.avatar_url ?? undefined} />
+          <AvatarFallback className="bg-white/10 text-white text-xs font-bold">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <p className="text-white font-semibold text-sm truncate">{displayName}</p>
+          <p className="text-white/40 text-[11px] truncate">{user?.email}</p>
+        </div>
       </div>
 
       {/* Filters */}
@@ -96,7 +130,7 @@ export function GameHighscores() {
           {scores.map((s, i) => (
             <div key={s.id} className="glass rounded-xl p-3 flex items-center gap-3">
               <div className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold',
+                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
                 i === 0 ? 'bg-[hsl(var(--reward-gold))]/20 text-[hsl(var(--reward-gold))]' :
                 i === 1 ? 'bg-white/10 text-white/70' :
                 i === 2 ? 'bg-orange-500/20 text-orange-400' :
@@ -104,8 +138,17 @@ export function GameHighscores() {
               )}>
                 #{i + 1}
               </div>
+              <Avatar className="w-7 h-7 shrink-0">
+                <AvatarImage src={profile?.avatar_url ?? undefined} />
+                <AvatarFallback className="bg-white/10 text-white text-[10px] font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 min-w-0">
-                <div className="text-white font-bold text-sm">{s.score} pts</div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-white font-bold text-sm">{s.score} pts</span>
+                  <span className="text-white/50 text-[11px] truncate">{displayName}</span>
+                </div>
                 <div className="text-white/40 text-[10px] flex items-center gap-2">
                   <span className="flex items-center gap-0.5"><Flame className="w-3 h-3" />{s.best_streak}</span>
                   <span>Lv.{s.level_reached}</span>
@@ -113,7 +156,7 @@ export function GameHighscores() {
                   <span>{s.scale_key} {s.scale_type}</span>
                 </div>
               </div>
-              <div className="text-white/30 text-[10px] flex items-center gap-1">
+              <div className="text-white/30 text-[10px] flex items-center gap-1 shrink-0">
                 <Calendar className="w-3 h-3" />
                 {new Date(s.created_at).toLocaleDateString('de-DE')}
               </div>
