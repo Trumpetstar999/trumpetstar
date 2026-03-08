@@ -68,10 +68,10 @@ function NoteHead({ midi, color }: { midi: number; color: string }) {
           fontSize="8" fill={color} fontWeight="bold"
         >#</text>
       )}
-      {/* Round note head */}
-      <circle
+      {/* Note head — slightly oval like real notation */}
+      <ellipse
         cx="48" cy={`${pct}%`}
-        r="5.5"
+        rx="6.5" ry="5"
         fill={color}
         style={{ filter: `drop-shadow(0 0 4px ${color})` }}
       />
