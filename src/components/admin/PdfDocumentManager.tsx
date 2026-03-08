@@ -31,6 +31,7 @@ interface PdfDocument {
   created_at: string;
   levels?: { title: string } | null;
   cover_image_url?: string | null;
+  order_link?: string | null;
 }
 
 interface Level {
@@ -76,6 +77,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
     pdf_file: null as File | null,
     cover_image: null as File | null,
     cover_image_url: '' as string | null,
+    order_link: '' as string,
   });
 
   // Fetch PDFs
@@ -281,6 +283,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file_url: pdfUrl,
         page_count: data.page_count || 0,
         cover_image_url: coverImageUrl,
+        order_link: data.order_link || null,
       };
 
       console.log('Saving PDF with payload:', { ...payload, pdf_file_url: '...' });
@@ -358,6 +361,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file: null,
         cover_image: null,
         cover_image_url: pdf.cover_image_url || null,
+        order_link: pdf.order_link || '',
       });
     } else {
       setEditingPdf(null);
@@ -374,6 +378,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file: null,
         cover_image: null,
         cover_image_url: null,
+        order_link: '',
       });
     }
     setIsDialogOpen(true);
@@ -832,6 +837,18 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
                   checked={formData.is_active}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
                 />
+              </div>
+
+              {/* Order Link */}
+              <div>
+                <Label>Bestelllink (optional)</Label>
+                <Input
+                  className="mt-1.5"
+                  placeholder="https://..."
+                  value={formData.order_link}
+                  onChange={(e) => setFormData(prev => ({ ...prev, order_link: e.target.value }))}
+                />
+                <p className="text-xs text-muted-foreground mt-1">Wird als „Buch bestellen"-Button unter dem Cover angezeigt</p>
               </div>
             </div>
           </div>

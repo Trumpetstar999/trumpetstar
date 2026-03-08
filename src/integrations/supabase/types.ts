@@ -1891,6 +1891,7 @@ export type Database = {
           is_active: boolean
           language: string | null
           level_id: string | null
+          order_link: string | null
           page_count: number
           pdf_file_url: string
           plan_required: string
@@ -1910,6 +1911,7 @@ export type Database = {
           is_active?: boolean
           language?: string | null
           level_id?: string | null
+          order_link?: string | null
           page_count?: number
           pdf_file_url: string
           plan_required?: string
@@ -1929,6 +1931,7 @@ export type Database = {
           is_active?: boolean
           language?: string | null
           level_id?: string | null
+          order_link?: string | null
           page_count?: number
           pdf_file_url?: string
           plan_required?: string
