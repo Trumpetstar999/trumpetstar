@@ -160,30 +160,9 @@ export default function GamePlayPage() {
         </div>
       )}
 
-      {/* Mic status indicator (top-right) */}
-      {micActivated && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-2 bg-black/50 rounded-full px-3 py-1.5">
-          {isListening ? (
-            <Mic className="w-3.5 h-3.5 text-emerald-400" />
-          ) : (
-            <MicOff className="w-3.5 h-3.5 text-red-400" />
-          )}
-          <Activity
-            className={`w-3.5 h-3.5 ${isMicActive ? 'text-emerald-400' : 'text-white/30'}`}
-          />
-          {/* Debug toggle button */}
-          <button
-            onClick={() => setShowDebug(prev => !prev)}
-            className="ml-1"
-          >
-            <Bug className={`w-3.5 h-3.5 ${showDebug ? 'text-amber-400' : 'text-white/30'}`} />
-          </button>
-        </div>
-      )}
-
       {/* Debug overlay */}
       {showDebug && micActivated && (
-        <div className="absolute top-12 right-3 z-30 bg-black/80 rounded-lg p-3 text-xs font-mono text-white/80 space-y-1 min-w-[220px]">
+        <div className="absolute top-16 right-3 z-30 bg-black/80 rounded-lg p-3 text-xs font-mono text-white/80 space-y-1 min-w-[220px]">
           <div>🔊 Ctx: <span className={debugInfo.audioContextState === 'running' ? 'text-emerald-400' : 'text-red-400'}>{debugInfo.audioContextState}</span></div>
           <div>📊 Rate: {debugInfo.sampleRate}Hz</div>
           <div>🎤 Track: <span className={debugInfo.trackState === 'live' ? 'text-emerald-400' : 'text-red-400'}>{debugInfo.trackState}</span> {debugInfo.trackMuted ? '🔇' : ''}</div>
@@ -197,7 +176,15 @@ export default function GamePlayPage() {
         </div>
       )}
 
-      <GameHUD gameState={gameState} />
+      <GameHUD
+        gameState={gameState}
+        micActivated={micActivated}
+        isListening={isListening}
+        isMicActive={isMicActive}
+        showDebug={showDebug}
+        onToggleDebug={() => setShowDebug(prev => !prev)}
+        debugInfo={debugInfo as unknown as Record<string, unknown>}
+      />
 
       <GameCanvas notesRef={notesRef} particlesRef={particlesRef} isRunning={gameState.isRunning} />
 
