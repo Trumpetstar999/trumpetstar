@@ -25,8 +25,7 @@ export interface WidgetConfig {
 
 const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'profile', visible: true, order: 0 },
-  { id: 'stars-progress', visible: true, order: 1 },
-  { id: 'calendar', visible: true, order: 2 },
+  { id: 'calendar', visible: true, order: 1 },
   { id: 'recordings', visible: true, order: 3 },
   { id: 'notes-todo', visible: true, order: 4 },
   { id: 'feedback-chat', visible: true, order: 5, isPremium: true },
