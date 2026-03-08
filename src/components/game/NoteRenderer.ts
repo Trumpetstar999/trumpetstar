@@ -135,14 +135,13 @@ export function renderGame(
       }
       ctx.stroke();
 
-      // Accidental (if sharp/flat)
-      const noteInOctave = note.midi % 12;
-      const isSharp = [1, 3, 6, 8, 10].includes(noteInOctave);
-      if (isSharp) {
+      // Accidental (if sharp/flat) — symbol depends on key signature
+      const accidentalSymbol = getNoteAccidentalSymbol(note.midi, key);
+      if (accidentalSymbol) {
         ctx.font = `${lineSpacing * 0.9}px serif`;
         ctx.fillStyle = GOLD;
         ctx.textBaseline = 'middle';
-        ctx.fillText('♯', x - noteRadius * 2.8, y);
+        ctx.fillText(accidentalSymbol, x - noteRadius * 2.8, y);
       }
     }
   }
