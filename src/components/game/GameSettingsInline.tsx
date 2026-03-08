@@ -1,9 +1,29 @@
 import { Settings2, Info } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { KEY_NAMES, SCALE_DISPLAY_NAMES, CONFIDENCE_THRESHOLDS } from './constants';
+import { KEY_NAMES, SCALE_DISPLAY_NAMES, CONFIDENCE_THRESHOLDS, getScaleNotes } from './constants';
 import { StaffRangeSelector } from './StaffRangeSelector';
 import type { GameSettings } from '@/hooks/useGameSettings';
+
+// Default comfortable range per key for Bb trumpet (written pitch)
+// Keeps the range within the 5-line staff + a few ledger lines
+const KEY_DEFAULT_RANGE: Record<string, { minMidi: number; maxMidi: number }> = {
+  'C':  { minMidi: 60, maxMidi: 79 }, // C4–G5
+  'G':  { minMidi: 62, maxMidi: 79 }, // D4–G5
+  'D':  { minMidi: 62, maxMidi: 81 }, // D4–A5
+  'A':  { minMidi: 64, maxMidi: 81 }, // E4–A5
+  'E':  { minMidi: 64, maxMidi: 83 }, // E4–B5
+  'B':  { minMidi: 59, maxMidi: 83 }, // B3–B5
+  'F#': { minMidi: 54, maxMidi: 78 }, // F#3–F#5
+  'C#': { minMidi: 61, maxMidi: 78 }, // C#4–F#5
+  'F':  { minMidi: 60, maxMidi: 77 }, // C4–F5
+  'Bb': { minMidi: 58, maxMidi: 77 }, // Bb3–F5
+  'Eb': { minMidi: 63, maxMidi: 75 }, // Eb4–Eb5
+  'Ab': { minMidi: 56, maxMidi: 80 }, // Ab3–Ab5
+  'Db': { minMidi: 61, maxMidi: 78 }, // Db4–F#5
+  'Gb': { minMidi: 54, maxMidi: 78 }, // Gb3–F#5
+  'Cb': { minMidi: 59, maxMidi: 77 }, // B3–F5
+};
 
 interface GameSettingsInlineProps {
   settings: GameSettings;
