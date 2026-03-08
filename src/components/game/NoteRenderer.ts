@@ -1,4 +1,4 @@
-import { midiToStaffPosition, getLedgerLines, NOTE_NAMES_SHARP } from './constants';
+import { midiToStaffPosition, getLedgerLines, getNoteAccidentalSymbol } from './constants';
 import type { GameNote, Particle } from '@/hooks/useGameLoop';
 
 const GOLD = '#FFCC00';
@@ -13,16 +13,14 @@ const bgImg = new Image();
 bgImg.src = '/images/game-background.png?v=' + Date.now();
 bgImg.onload = () => { bgImage = bgImg; bgLoaded = true; };
 
-// Treble clef SVG path (simplified)
-const TREBLE_CLEF_SCALE = 0.035;
-
 export function renderGame(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
   notes: GameNote[],
   particles: Particle[],
-  _time: number
+  _time: number,
+  key: string = 'C'
 ) {
   ctx.clearRect(0, 0, width, height);
 
