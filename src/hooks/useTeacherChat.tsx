@@ -409,6 +409,7 @@ export function useTeacherStudentChats() {
             chatId,
             studentId,
             studentProfile: profile || null,
+            studentEmail: emailMap[studentId] || null,
             lastMessage: lastMessagePreview,
             lastMessageTime: lastMsg?.created_at || null,
             unreadCount: unreadCount || 0
