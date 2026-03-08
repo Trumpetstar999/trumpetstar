@@ -35,31 +35,24 @@ import { PracticeSessionsWidget } from '@/components/dashboard/widgets/PracticeS
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
+const KNOWN_WIDGET_IDS: WidgetId[] = [
+  'profile', 'calendar', 'recordings', 'notes-todo', 'feedback-chat',
+  'classroom', 'statistics', 'game-highscore', 'practice-sessions', 'review',
+];
+
 function WidgetContent({ id }: { id: WidgetId }) {
-  const { t } = useLanguage();
   switch (id) {
-    case 'profile':
-      return <ProfileWidget />;
-    case 'calendar':
-      return <WeeklyStarsWidget />;
-    case 'recordings':
-      return <RecordingsWidget />;
-    case 'notes-todo':
-      return <NotesTodosWidget />;
-    case 'feedback-chat':
-      return <FeedbackChatWidget />;
-    case 'classroom':
-      return <ClassroomWidget />;
-    case 'statistics':
-      return <StatisticsWidget />;
-    case 'game-highscore':
-      return <GameHighscoreWidget />;
-    case 'practice-sessions':
-      return <PracticeSessionsWidget />;
-    case 'review':
-      return <ReviewCard />;
-    default:
-      return null;
+    case 'profile':        return <ProfileWidget />;
+    case 'calendar':       return <WeeklyStarsWidget />;
+    case 'recordings':     return <RecordingsWidget />;
+    case 'notes-todo':     return <NotesTodosWidget />;
+    case 'feedback-chat':  return <FeedbackChatWidget />;
+    case 'classroom':      return <ClassroomWidget />;
+    case 'statistics':     return <StatisticsWidget />;
+    case 'game-highscore': return <GameHighscoreWidget />;
+    case 'practice-sessions': return <PracticeSessionsWidget />;
+    case 'review':         return <ReviewCard />;
+    default:               return null;
   }
 }
 
