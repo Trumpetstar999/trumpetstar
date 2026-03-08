@@ -361,6 +361,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file: null,
         cover_image: null,
         cover_image_url: pdf.cover_image_url || null,
+        order_link: pdf.order_link || '',
       });
     } else {
       setEditingPdf(null);
@@ -377,6 +378,7 @@ export function PdfDocumentManager({ onManageAudio }: PdfDocumentManagerProps) {
         pdf_file: null,
         cover_image: null,
         cover_image_url: null,
+        order_link: '',
       });
     }
     setIsDialogOpen(true);
