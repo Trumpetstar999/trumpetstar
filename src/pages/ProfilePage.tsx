@@ -35,31 +35,24 @@ import { PracticeSessionsWidget } from '@/components/dashboard/widgets/PracticeS
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
+const KNOWN_WIDGET_IDS: WidgetId[] = [
+  'profile', 'calendar', 'recordings', 'notes-todo', 'feedback-chat',
+  'classroom', 'statistics', 'game-highscore', 'practice-sessions', 'review',
+];
+
 function WidgetContent({ id }: { id: WidgetId }) {
-  const { t } = useLanguage();
   switch (id) {
-    case 'profile':
-      return <ProfileWidget />;
-    case 'calendar':
-      return <WeeklyStarsWidget />;
-    case 'recordings':
-      return <RecordingsWidget />;
-    case 'notes-todo':
-      return <NotesTodosWidget />;
-    case 'feedback-chat':
-      return <FeedbackChatWidget />;
-    case 'classroom':
-      return <ClassroomWidget />;
-    case 'statistics':
-      return <StatisticsWidget />;
-    case 'game-highscore':
-      return <GameHighscoreWidget />;
-    case 'practice-sessions':
-      return <PracticeSessionsWidget />;
-    case 'review':
-      return <ReviewCard />;
-    default:
-      return <div className="text-white/50 text-center py-8">{t('widgets.comingSoon')}</div>;
+    case 'profile':        return <ProfileWidget />;
+    case 'calendar':       return <WeeklyStarsWidget />;
+    case 'recordings':     return <RecordingsWidget />;
+    case 'notes-todo':     return <NotesTodosWidget />;
+    case 'feedback-chat':  return <FeedbackChatWidget />;
+    case 'classroom':      return <ClassroomWidget />;
+    case 'statistics':     return <StatisticsWidget />;
+    case 'game-highscore': return <GameHighscoreWidget />;
+    case 'practice-sessions': return <PracticeSessionsWidget />;
+    case 'review':         return <ReviewCard />;
+    default:               return null;
   }
 }
 
@@ -165,7 +158,7 @@ export function ProfilePage() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={visibleWidgets.map(w => w.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 gap-4">
-            {visibleWidgets.map((widget, index) => (
+            {visibleWidgets.filter(w => KNOWN_WIDGET_IDS.includes(w.id)).map((widget, index) => (
               <DashboardWidget
                 key={widget.id}
                 id={widget.id}
