@@ -40,8 +40,6 @@ function WidgetContent({ id }: { id: WidgetId }) {
   switch (id) {
     case 'profile':
       return <ProfileWidget />;
-    case 'stars-progress':
-      return <StarsProgressWidget />;
     case 'calendar':
       return <WeeklyStarsWidget />;
     case 'recordings':
