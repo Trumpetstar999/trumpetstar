@@ -37,7 +37,7 @@ import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 const KNOWN_WIDGET_IDS: WidgetId[] = [
   'profile', 'calendar', 'recordings', 'notes-todo', 'feedback-chat',
-  'classroom', 'statistics', 'game-highscore', 'practice-sessions', 'review',
+  'classroom', 'game-highscore', 'practice-sessions', 'review',
 ];
 
 function WidgetContent({ id }: { id: WidgetId }) {
@@ -48,7 +48,6 @@ function WidgetContent({ id }: { id: WidgetId }) {
     case 'notes-todo':     return <NotesTodosWidget />;
     case 'feedback-chat':  return <FeedbackChatWidget />;
     case 'classroom':      return <ClassroomWidget />;
-    case 'statistics':     return <StatisticsWidget />;
     case 'game-highscore': return <GameHighscoreWidget />;
     case 'practice-sessions': return <PracticeSessionsWidget />;
     case 'review':         return <ReviewCard />;
