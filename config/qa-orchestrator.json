@@ -119,21 +119,27 @@
       "title": "PDF double-fetch on blob URL in usePdfCache",
       "severity": "High",
       "priority": "P1",
-      "status": "open"
+      "status": "closed",
+      "closedAt": "2026-03-09",
+      "closedBy": "seppl-checker-weekly-2026-03-09"
     },
     {
       "id": "TS-QA-PDF-002",
       "title": "handleRetry calls onClose() instead of reloading PDF",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open"
+      "status": "closed",
+      "closedAt": "2026-03-09",
+      "closedBy": "seppl-checker-weekly-2026-03-09"
     },
     {
       "id": "TS-QA-PDF-003",
       "title": "isCached stale closure in PdfsPage useEffect",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open"
+      "status": "closed",
+      "closedAt": "2026-03-09",
+      "closedBy": "seppl-checker-weekly-2026-03-09"
     },
     {
       "id": "TS-QA-DB-001",
@@ -141,6 +147,38 @@
       "severity": "Low",
       "priority": "P3",
       "status": "open"
+    },
+    {
+      "id": "TS-QA-EMAIL-001",
+      "title": "Cross-Project Tracking: Pixel → rhnhhjidsnrlwxtbarvf, Log → Haupt-Projekt — Tracking kann silent broken sein",
+      "severity": "High",
+      "priority": "P1",
+      "status": "open",
+      "openedAt": "2026-03-09"
+    },
+    {
+      "id": "TS-QA-EMAIL-002",
+      "title": "email_log RLS TO public — anon-User können alle E-Mail-Logs lesen (Empfänger, Betreff)",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open",
+      "openedAt": "2026-03-09"
+    },
+    {
+      "id": "TS-QA-EMAIL-003",
+      "title": "SMTP tls.rejectUnauthorized = false — schwache TLS-Verifikation",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-09"
+    },
+    {
+      "id": "TS-QA-DEP-001",
+      "title": "xlsx Prototype Pollution + ReDoS (kein Fix verfügbar)",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-09"
     }
   ]
 }

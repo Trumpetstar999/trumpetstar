@@ -1,0 +1,47 @@
+{
+  "date": "2026-03-09",
+  "env": "prod",
+  "go_no_go": "GO",
+  "p0_count": 0,
+  "p1_count": 1,
+  "p2_count": 2,
+  "p3_count": 3,
+  "top_risks": [
+    "TS-QA-EMAIL-001: Cross-Project Tracking — Log in main project, pixel calls separate project rhnhhjidsnrlwxtbarvf. Tracking may be silently broken if secondary project SUPABASE_URL is misconfigured.",
+    "TS-QA-EMAIL-002: email_log RLS TO public — anon users can read ALL email_log rows (recipient emails, subjects). Fix: restrict SELECT to authenticated/admin.",
+    "TS-QA-DEP-001: xlsx Prototype Pollution + ReDoS (no fix available) — no immediate exploit vector found in current usage"
+  ],
+  "next_steps": [
+    "1. Verify rhnhhjidsnrlwxtbarvf project secrets: SUPABASE_URL must point to main project osgrjouxwpnokfvzztji",
+    "2. Apply email_log RLS fix: restrict SELECT TO authenticated WHERE role IN (admin, teacher)",
+    "3. Harden SMTP: tls.rejectUnauthorized = true in send-email/index.ts",
+    "4. Clarify agent_log table existence and RLS status in Supabase dashboard"
+  ],
+  "commit": "04256d7",
+  "fixesApplied": [],
+  "bugs_closed": [
+    "TS-QA-PDF-001",
+    "TS-QA-PDF-002",
+    "TS-QA-PDF-003"
+  ],
+  "bugs_new": [
+    "TS-QA-EMAIL-001",
+    "TS-QA-EMAIL-002",
+    "TS-QA-EMAIL-003"
+  ],
+  "bugs_still_open": [
+    "TS-QA-DB-001"
+  ],
+  "modules_checked": [
+    "PDF (A)",
+    "Email-Tracking (B)",
+    "RLS/Security (C)",
+    "Edge Functions (D)",
+    "Frontend Secrets (E)",
+    "TypeScript (F)",
+    "Dependencies (G)"
+  ],
+  "ts_errors": 0,
+  "npm_audit_high": 16,
+  "npm_audit_critical": 0
+}
