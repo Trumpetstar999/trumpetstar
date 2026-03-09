@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
 
     // ── 4. Mark as sent ──────────────────────────────────────────────────────
     if (logId) {
-      await supabase.rpc("mark_email_sent", { p_id: logId }).then(() => {}).catch(() => {});
+      try { await supabase.rpc("mark_email_sent", { p_id: logId }); } catch (_) { /* ignore */ }
     }
 
     return new Response(
