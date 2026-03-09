@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       port: 587,
       secure: false,
       auth: { user: "Valentin@trumpetstar.com", pass: SMTP_PASSWORD },
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: true },
     });
 
     const info = await transporter.sendMail({
