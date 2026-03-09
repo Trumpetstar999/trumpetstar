@@ -1,127 +1,125 @@
-# Wochenreport — SEO-Karl | KW10 / März 2026
+# Wochenreport – KW10 / 2026
+
+**Erstellt:** 09. März 2026  
 **Agent:** SEO-Karl (Trumpetstar SEO Sub-Agent)  
-**Produktion:** 2026-03-02  
-**Status:** ✅ Vollständig geliefert
+**Workflow-Version:** 1.0  
 
 ---
 
-## Assets dieser Woche
+## Assets-Tabelle
 
-| Titel | Typ | Primärkeyword | Wörter (ca.) | Status |
-|---|---|---|---|---|
-| Trompetenansatz: Das komplette Grundlagen-Handbuch | Pillar-Artikel | trompetenansatz | 2.300 | ✅ Final |
-| Hohe Töne auf der Trompete spielen — 6 Übungen | Support-Artikel 1 | hohe töne trompete | 1.100 | ✅ Final |
-| Trompete lernen mit Kindern — ab welchem Alter? | Support-Artikel 2 | trompete lernen kinder alter | 1.050 | ✅ Final |
-| Bläserklasse Trompete — Was Eltern wissen müssen | Support-Artikel 3 | bläserklasse trompete eltern | 1.000 | ✅ Final |
-| 6× Social Snippets (FB/IG/LI) | Social Content | diverse | ~550 | ✅ Final |
-| Newsletter-Draft: "Dein Ansatz entscheidet" | Newsletter | trompetenansatz / level-1 | ~380 | ✅ Final |
-| Internal Linking Map (14 Links) | Linking Map | — | — | ✅ Final |
-| FAQ Schema JSON-LD (4 Artikel) | On-Page Pack | — | — | ✅ Final |
+| # | Asset | Datei | Status | Wörter (ca.) | Primärkeyword |
+|---|---|---|---|---|---|
+| 1 | Pillar-Artikel | pillar.md | ✅ Fertig | ~2.400 | Trompete lernen Erwachsene |
+| 2 | Support-Artikel 1 | support-1.md | ✅ Fertig | ~1.200 | Trompete täglich üben |
+| 3 | Support-Artikel 2 | support-2.md | ✅ Fertig | ~1.400 | hohe Töne Trompete |
+| 4 | Support-Artikel 3 | support-3.md | ✅ Fertig | ~1.500 | Trompete online lernen |
+| 5 | Social Snippets (6×) | social-snippets.md | ✅ Fertig | ~700 | Mix |
+| 6 | Newsletter-Draft | newsletter.md | ✅ Fertig | ~400 | – |
+| 7 | Internal Linking Map | linking-map.md | ✅ Fertig | ~600 | – |
+| 8 | Schema JSON-LD | schema.md | ✅ Fertig | ~500 | – |
+| 9 | Wochenreport | wochenreport.md | ✅ Fertig | ~400 | – |
 
-**Gesamtwörter Artikel:** ~5.450  
-**Gesamtdateien produziert:** 8
-
----
-
-## Keyword-Coverage KW10
-
-| Keyword | Cluster | Intent | Zielpersona | Artikel |
-|---|---|---|---|---|
-| trompetenansatz | Ansatz & Tonbildung | Informational → Consideration | Anfänger, Wiedereinsteiger | Pillar |
-| trompetenansatz richtig lernen | Ansatz & Tonbildung | Informational | Anfänger | Pillar |
-| trompetenansatz verbessern | Ansatz & Tonbildung | Informational | Intermediate | Pillar |
-| lippenspannung trompete | Ansatz & Tonbildung | Informational | Anfänger | Pillar |
-| trompetenansatz übungen | Ansatz & Tonbildung | Informational | Anfänger | Pillar |
-| hohe töne trompete spielen | Hohe Töne & Ausdauer | Informational | Fortgeschrittene Anfänger | Support-1 |
-| trompete hohes c | Hohe Töne & Ausdauer | Informational | Intermediate | Support-1 |
-| lippenausdauer trompete | Hohe Töne & Ausdauer | Informational | Intermediate | Support-1 |
-| high notes trompete übungen | Hohe Töne & Ausdauer | Informational | Intermediate | Support-1 |
-| trompete lernen kinder alter | Kinder & Bläserklasse | Informational | Eltern | Support-2 |
-| trompete kinder ab wann | Kinder & Bläserklasse | Informational | Eltern | Support-2 |
-| trompete anfänger kind | Kinder & Bläserklasse | Informational | Eltern | Support-2 |
-| bläserklasse trompete eltern | Kinder & Bläserklasse | Informational | Eltern | Support-3 |
-| bläserklasse trompete schule | Kinder & Bläserklasse | Informational | Eltern / Lehrer | Support-3 |
-| trompete musikschule kind | Kinder & Bläserklasse | Informational | Eltern | Support-3 |
+**Total Content-Volumen:** ~9.100 Wörter  
+**Alle Deliverables erfüllt:** ✅ A, B, C, D, E, F
 
 ---
 
-## Themen-Cluster KW10
+## Keyword-Cluster KW10
 
-| Cluster | Abgedeckt? | Artikel |
-|---|---|---|
-| Ansatz & Tonbildung | ✅ Pillar-Artikel | /blog/trompetenansatz |
-| Hohe Töne & Ausdauer | ✅ Support-1 | /blog/hohe-toene-trompete |
-| Kinder & Bläserklasse | ✅ Support-2 + Support-3 | /blog/trompete-kinder-alter + /blog/blaesserklasse-trompete-eltern |
-| Übeplan & Motivation | ⚠️ Nur teilweise (via interne Links) | Bestehend: /blog/trompete-ueben-routine |
-
----
-
-## QA-Check (vor Ablage)
-
-| Check | Ergebnis |
-|---|---|
-| Kein Keyword-Stuffing | ✅ Keyword-Dichte geprüft, natürliche Verteilung |
-| Kurze Sätze, klare Absätze | ✅ Max. 3–4 Zeilen pro Absatz, aktive Sprache |
-| CTA in jedem Artikel | ✅ Soft CTA (2–3×) + Hard CTA am Ende in allen Artikeln |
-| Interne Links in jedem Artikel | ✅ 3–5 interne Links pro Artikel |
-| Keine erfundenen Zahlen/Studien | ✅ Alle Angaben auf allgemeinem pädagogischen Konsens basierend |
-| Keine medizinischen Claims | ✅ "Schmerzen" als Warnsignal, keine Heilversprechen |
-| Keine AI-Phrasen | ✅ Manuell geprüft |
-| Alle CTAs → www.trumpetstar.app | ✅ |
-| Conversion Hooks integriert | ✅ Level-System, QR-Videos, Playalongs, Bläserklasse-tauglich |
-| Mini-Config-Header in allen Artikeln | ✅ |
-
----
-
-## Annahmen & Risiken [Assumption-Log]
-
-| # | Annahme | Risiko | Empfehlung |
+| Cluster | Pillar / Support | Primärkeyword | Intent |
 |---|---|---|---|
-| A1 | Web-Search war nicht verfügbar (Brave API Key fehlt) — Keyword-Auswahl basiert auf Fach-Know-how und Marktkenntnis | Mittel — möglicherweise bessere Keyword-Chancen übersehen | Brave API Key konfigurieren für KW11 |
-| A2 | Preisangaben für Unterricht/Leihinstrument sind Schätzwerte für DACH-Markt | Niedrig — nur als Orientierung formuliert, keine konkreten Zusagen | Vor Publikation lokal validieren |
-| A3 | Keyword-Suchvolumen und Wettbewerbs-Schwierigkeit nicht via Tool gemessen | Mittel — Auswahl könnte suboptimal sein | Ahrefs/Semrush-Validierung empfohlen |
-| A4 | Slug für Support-3 mit Tippfehler korrigiert: "blaesserklasse" (doppel-s) ist konsistent gehalten; im Deployment auf korrekte Weiterleitung achten | Niedrig | Canonical-URL festlegen |
+| Anfänger/Basics | Pillar | Trompete lernen Erwachsene | Informational/Navigational |
+| Üben & Routine | Support 1 | Trompete täglich üben | Informational |
+| Hohe Töne | Support 2 | hohe Töne Trompete | Informational |
+| Online/Digital | Support 3 | Trompete online lernen | Commercial/Informational |
 
 ---
 
-## Technische ToDos (SEO)
+## QA-Checklist
 
-- [ ] Brave API Key für SEO-Karl konfigurieren (`openclaw configure --section web`)
-- [ ] FAQ Schema JSON-LD in CMS / `<head>` der neuen Artikel einbinden (→ `schema.md`)
-- [ ] Rücklinks in bestehende Artikel einbauen (laut Linking Map: 3 Artikel betroffen)
-- [ ] Canonical URLs für alle neuen Seiten setzen
-- [ ] Open Graph / Twitter Card Tags für neue Artikel prüfen
-- [ ] Sitemap nach Publishing aktualisieren (XML-Sitemap)
-- [ ] PageSpeed-Check nach Deployment (Bilder lazy-load, CLS)
-- [ ] Redirects prüfen: kein 404 auf neuen Slugs nach Deploy
-
----
-
-## Next Week Plan — KW11 (Vorschau)
-
-- **Pillar-Kandidat:** "Trompete Atmung und Stütze" — Cluster Atmung & Stütze (noch nicht abgedeckt, hohe Suchintention bei Anfängern)
-- **Support-Kandidaten:**
-  - "Trompete Atemübungen täglich" (Long-Tail, hohe Praxis-Relevanz)
-  - "Zungentechnik Trompete Anfänger" (Staccato / Doppelzunge — häufige Suchanfrage)
-  - "Trompete Motivation verloren — was tun?" (Emotional intent, Conversion-nähe hoch)
-- **Newsletter-Thema:** "Du übst falsch — und weißt es nicht" (Aufmerksamkeits-Hook, führt zu Übeplan-Content)
-- **Technischer Fokus:** Schema.org HowTo-Markup für Pillar-Artikel nachziehen
-
----
-
-## Vorausschau Cluster-Abdeckung (nach KW10)
-
-| Cluster | Status |
+| Check | Status |
 |---|---|
-| Ansatz & Tonbildung | ✅ Pillar vorhanden |
-| Hohe Töne & Ausdauer | ✅ Support vorhanden |
-| Kinder & Bläserklasse | ✅ 2× Support vorhanden |
-| Übeplan & Motivation | ⚠️ Nur bestehend — KW11 Pillar-Kandidat |
-| Atmung & Stütze | ❌ Noch nicht abgedeckt — **KW11 Priorität** |
-| Notenlesen & Musiktheorie | ❌ Noch nicht abgedeckt |
-| Fortgeschrittene Technik (Jazz, Solosp.) | ❌ Noch nicht abgedeckt |
+| Kein Keyword-Stuffing | ✅ |
+| Lesbarkeit (Flesch-ähnlich, kurze Sätze) | ✅ |
+| CTA vorhanden (alle Artikel) | ✅ |
+| Interne Links gesetzt | ✅ |
+| Keine erfundenen Studien/Zitate | ✅ |
+| Keine medizinischen Heilversprechen | ✅ |
+| Keine urheberrechtlich geschützten Noten | ✅ |
+| Keine AI-typischen Phrasen | ✅ |
+| Jeder Artikel endet mit konkretem nächsten Schritt | ✅ |
+| Schema JSON-LD vorhanden | ✅ |
+| Meta-Daten (Titel ≤60, Description ≤155) | ✅ |
+| URL-Slugs definiert | ✅ |
 
 ---
 
-*Produziert von SEO-Karl | Trumpetstar SEO Sub-Agent | KW10 2026*  
-*Commit: feat(seo): KW10 2026 — SEO-Karl weekly content package*
+## Annahmen & Risiken
+
+### Annahmen
+
+1. **Keyword-Daten:** Da kein Perplexity API Key verfügbar ist, basieren die Keyword-Entscheidungen auf Branchenwissen und typischen DACH-Suchintent-Mustern für Musikinstrument-Learning. Empfehlung: Mit echten SEO-Tools (Ahrefs, SEMrush, Google Search Console) verifizieren.
+
+2. **Blog-Domain:** Angenommen wird trumpetstar.com/blog als Blog-Domain und trumpetstar.app als App/Register-Domain (wie in der Aufgabe angegeben).
+
+3. **Bestehende Artikel:** Kein Zugriff auf bestehende Blog-Inhalte. Retro-Link-Empfehlungen in der Linking Map sind hypothetisch.
+
+4. **WordPress-Implementierung:** JSON-LD Schemas sind als Copy-Paste bereit. Falls Yoast SEO oder RankMath genutzt wird, müssen diese manuell in Custom Fields eingefügt werden.
+
+### Risiken
+
+| Risiko | Wahrscheinlichkeit | Maßnahme |
+|---|---|---|
+| Keyword-Suchvolumen niedriger als geschätzt | Mittel | Google Search Console nach 4 Wochen prüfen |
+| Duplicate Content mit bestehenden Artikeln | Niedrig | Vor Publish gegen bestehende URLs prüfen |
+| CTA-Link-Änderungen (App-Domain) | Niedrig | Links in allen Files auf aktuelle Domain prüfen |
+| Fehlende Bilder/Alt-Texte | Hoch | Jeder Artikel braucht 1–3 Bilder mit Alt-Text bei Implementierung |
+
+---
+
+## Empfehlungen für die Implementierung
+
+1. **Reihenfolge:** Pillar zuerst veröffentlichen, dann Support-Artikel (2–3 Tage Abstand)
+2. **Bilder:** Jeder Artikel braucht ein Featured Image + 1–2 Inline-Bilder mit Keyword-Alt-Text
+3. **Interne Links:** Nach Veröffentlichung aller 4 Artikel die Linking Map umsetzen
+4. **Schema:** JSON-LD pro Artikel in Custom Code-Block (oder Yoast Schema-Editor)
+5. **Newsletter:** Versand empfohlen nach Veröffentlichung von mind. 2 Artikeln (Di/Mi KW11)
+
+---
+
+## Next Week Plan – KW11 / 2026
+
+**Vorgeschlagenes Thema-Cluster:** Trompete für Kinder & Eltern
+
+| # | Content | Vorgeschlagenes Keyword | Zielgruppe |
+|---|---|---|---|
+| Pillar | Trompete lernen für Kinder | trompete lernen kinder | Eltern |
+| Support A | Trompete oder Flügelhorn – was passt für mein Kind? | trompete flügelhorn kind | Eltern |
+| Support B | Erste Trompete für Kinder kaufen | trompete kinder kaufen | Eltern Shopping |
+| Support C | Bläserklasse: Was Eltern wissen sollten | bläserklasse trompete | Eltern/Lehrer |
+
+**Rationale:** Eltern-Zielgruppe ist eine der stärksten Conversion-Gruppen für Trumpetstar (kaufen für Kinder, schieben an). Thema hat konsistentes Suchvolumen im Frühjahr (Anmeldezeitraum für Musikschulen).
+
+**Keyword-Recherche-Empfehlung für KW11:** Google People Also Ask für "Trompete Kinder lernen" manuell prüfen.
+
+---
+
+## Metriken-Tracking (für 4-Wochen-Review)
+
+| Artikel | URL | Erwartete Indexierung | Check-Datum |
+|---|---|---|---|
+| Pillar | /blog/trompete-lernen-erwachsene | ~2–5 Tage nach Publish | 30. März 2026 |
+| Support 1 | /blog/trompete-taeglich-ueben | ~2–5 Tage nach Publish | 30. März 2026 |
+| Support 2 | /blog/trompete-hohe-toene | ~2–5 Tage nach Publish | 30. März 2026 |
+| Support 3 | /blog/trompete-online-lernen | ~2–5 Tage nach Publish | 30. März 2026 |
+
+**KPIs für 90-Tage-Review:**
+- Impressions (GSC): Zielmarge > 1.000 pro Monat pro Artikel
+- CTR: > 3%
+- Ranking: Top 20 für Primärkeywords nach 60 Tagen
+- Conversions /register: mind. 5 direkte Signups aus Blog-Traffic
+
+---
+
+*SEO-Karl | KW10/2026 | Trumpetstar Weekly SEO Workflow*

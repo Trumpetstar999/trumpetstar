@@ -1,11 +1,141 @@
-# FAQ Schema JSON-LD — KW10 / März 2026
-**Für alle 4 Artikel: Pillar + Support 1–3**  
-**Standard:** schema.org/FAQPage  
-**Hinweise:** Nur faktische Antworten — keine medizinischen Versprechen, keine erfundenen Zahlen/Studien
+# Schema.org JSON-LD – KW10 / 2026
+
+**Zweck:** Strukturierte Daten für alle KW10-Artikel  
+**Implementierung:** In den `<head>` oder vor `</body>` des jeweiligen Artikels einbetten  
 
 ---
 
-## 1. Pillar — /blog/trompetenansatz
+## 1. Pillar-Artikel – HowTo + FAQ Schema
+
+**Artikel:** Trompete lernen als Erwachsener  
+**URL:** /blog/trompete-lernen-erwachsene  
+
+```json
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://trumpetstar.com/blog/trompete-lernen-erwachsene#article",
+      "headline": "Trompete lernen als Erwachsener – So geht's wirklich",
+      "description": "Schritt-für-Schritt-Guide für Erwachsene und Wiedereinsteiger: Ansatz, Übungsplan, häufige Fehler und strukturiertes Lernen mit Trumpetstar.",
+      "url": "https://trumpetstar.com/blog/trompete-lernen-erwachsene",
+      "datePublished": "2026-03-09",
+      "dateModified": "2026-03-09",
+      "author": {
+        "@type": "Organization",
+        "name": "Trumpetstar",
+        "url": "https://trumpetstar.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Trumpetstar",
+        "url": "https://trumpetstar.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://trumpetstar.com/logo.png"
+        }
+      },
+      "inLanguage": "de"
+    },
+    {
+      "@type": "HowTo",
+      "name": "Trompete lernen als Erwachsener – Schritt für Schritt",
+      "description": "Wie Erwachsene und Wiedereinsteiger strukturiert Trompete lernen.",
+      "totalTime": "PT8W",
+      "estimatedCost": {
+        "@type": "MonetaryAmount",
+        "currency": "EUR",
+        "value": "0"
+      },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Instrument vorbereiten",
+          "text": "Ventile ölen, Mundstück einsetzen, Instrument auf Raumtemperatur bringen."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Körperhaltung einnehmen",
+          "text": "Aufrecht stehen oder sitzen, Schultern locker, Brust offen."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Buzzing üben",
+          "text": "2 Minuten nur mit dem Mundstück buzzen, um den Ansatz zu aktivieren."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Erste Töne spielen",
+          "text": "C4 anstreben – ruhig, mit Zwerchfell, ohne Mundstückdruck."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Pause einlegen",
+          "text": "Nach 10–15 Minuten Lippen entspannen. Nicht überüben."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Mit welchem Alter ist es zu spät, Trompete zu lernen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Es gibt kein 'zu spät' für das Trompetespielen als Hobby. Selbst mit 50 oder 60 Jahren können Erwachsene das Instrument erlernen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie lange dauert es, bis man Trompete spielen kann?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Erste erkennbare Melodien: 4–8 Wochen. Erste komplette Stücke: 3–6 Monate. Komfortables Spielen im Ensemble: 1–2 Jahre."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie viel Zeit muss ich täglich investieren?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "10–20 Minuten täglich sind ideal für Einsteiger. Kontinuität schlägt Dauer – 7× 10 Minuten sind besser als 1× 70 Minuten."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Muss ich ein teures Instrument kaufen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nein. Eine gute Einsteiger-Trompete (200–500 €) reicht für die ersten 2–3 Jahre problemlos."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kann ich Trompete lernen, wenn ich kein Notenlesen kann?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ja. Trumpetstar startet mit einfachen Systemen und führt Notenlesen schrittweise ein. Du brauchst kein Vorwissen."
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 2. Support-1 Schema – FAQ
+
+**Artikel:** Trompete täglich üben  
+**URL:** /blog/trompete-taeglich-ueben  
 
 ```json
 {
@@ -14,50 +144,26 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Wie lange dauert es, einen guten Trompetenansatz zu entwickeln?",
+      "name": "Wie oft sollte ein Anfänger Trompete üben?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Für Anfänger dauert es in der Regel 3 bis 6 Monate, bis sich der Ansatz stabil und natürlich anfühlt. Tägliches Üben von mindestens 10 Minuten beschleunigt diesen Prozess deutlich."
+        "text": "Täglich, auch wenn es nur 10 Minuten sind. Frequenz ist entscheidender als Dauer beim Aufbau des Ansatzes."
       }
     },
     {
       "@type": "Question",
-      "name": "Kann ich meinen Trompetenansatz selbst korrigieren?",
+      "name": "Wann sehe ich erste Fortschritte beim Trompete lernen?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Kleinere Anpassungen wie das Reduzieren von Mundstückdruck oder die Öffnungsweite des Mundes lassen sich selbst korrigieren. Größere Umstellungen – etwa ein Wechsel des Ansatz-Typs – sollten mit Unterstützung eines erfahrenen Lehrers erfolgen."
+        "text": "Nach 7–14 Tagen täglichem Üben wird der Ton stabiler. Nach 4 Wochen spielst du erste erkennbare Melodien."
       }
     },
     {
       "@type": "Question",
-      "name": "Darf der Trompetenansatz beim Spielen schmerzen?",
+      "name": "Was mache ich, wenn meine Lippen nach 5 Minuten erschöpft sind?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Nein. Ein leichtes Kribbeln nach einer längeren Übungseinheit ist normal, aber Schmerzen, Taubheit oder Schwellungen sind Warnsignale. In diesen Fällen sollte eine Pause eingelegt und der Mundstückdruck reduziert werden."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Welches Mundstück ist für Trompeten-Anfänger am besten geeignet?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Ein mittelgroßes Standardmundstück wie das Bach 7C oder Yamaha 11B4 ist für die meisten Anfänger ein guter Ausgangspunkt. Ein zu kleines Mundstück fördert zu viel Druck und sollte vermieden werden."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Was ist der Unterschied zwischen Ansatz und Embouchure?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Beide Begriffe beschreiben dasselbe: die Position und Nutzung der Lippen und Mundmuskulatur beim Spielen. 'Ansatz' ist der deutsche Begriff, 'Embouchure' der französischstämmige internationale Fachbegriff."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Wie oft sollte ich meinen Trompetenansatz täglich trainieren?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Tägliche Einheiten von 10 bis 15 Minuten mit Fokus auf den Ansatz sind effektiver als seltene, lange Übungseinheiten. Kurze, regelmäßige Wiederholungen festigen den Muskelaufbau nachhaltiger."
+        "text": "Das ist normal in den ersten 1–2 Wochen. Höre auf, warte 1–2 Stunden und versuche es kurz nochmal. Der Aufbau dauert – nicht drängen."
       }
     }
   ]
@@ -66,7 +172,85 @@
 
 ---
 
-## 2. Support-1 — /blog/hohe-toene-trompete
+## 3. Support-2 Schema – FAQ + HowTo (Hohe Töne)
+
+**Artikel:** Hohe Töne Trompete  
+**URL:** /blog/trompete-hohe-toene  
+
+```json
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "HowTo",
+      "name": "Hohe Töne auf der Trompete lernen",
+      "description": "Systematischer Aufbau des Hochregisters auf der Trompete.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Fundament prüfen",
+          "text": "G4 und A4 sauber spielen können, bevor das Hochregister angegangen wird."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Lippenübungen ohne Instrument",
+          "text": "10 Minuten täglich Buzzing mit dem Mundstück, Tonhöhe nur durch Lippenspannung verändern."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Slurs einführen",
+          "text": "C4–G4–C5 als gebundene Figuren spielen, ohne Druck, mit vollem Ton."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Skalenarbeit in höherer Lage",
+          "text": "Tonleitern schrittweise nach oben transponieren, jede Woche um einen Ton erweitern."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Warum klingen meine hohen Töne so eng und gepresst?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Zu viel Mundstückdruck und zu wenig Luftgeschwindigkeit. Slur-Übungen ohne Druck helfen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Kann jeder das hohe C lernen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Anatomisch ja – mit ausreichend Zeit und Methode. C5 ist für die meisten Trompeter erreichbar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Wie lange dauert es, bis das hohe C sitzt?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Hohes G (G5): 3–6 Monate. Hohes C (C5): 6–12 Monate bei gutem Fundament."
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 4. Support-3 Schema – FAQ (Online lernen)
+
+**Artikel:** Trompete online lernen  
+**URL:** /blog/trompete-online-lernen  
 
 ```json
 {
@@ -75,42 +259,34 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Ab wann kann ich das hohe C auf der Trompete spielen?",
+      "name": "Kann ich Trompete wirklich ohne Präsenzlehrer lernen?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Das hängt vom individuellen Fortschritt ab. Viele Spieler erreichen das hohe C nach 6 bis 12 Monaten regelmäßigem Üben. Mit gezieltem Flexibilitätstraining kann der Prozess beschleunigt werden."
+        "text": "Ja, mit dem richtigen System. Video-Feedback und strukturierte Level können einen Großteil dessen ersetzen, was ein Präsenzlehrer leistet."
       }
     },
     {
       "@type": "Question",
-      "name": "Sollen hohe Töne auf der Trompete schmerzen?",
+      "name": "Wie lange dauert es, mit einem Online-Kurs erste Töne zu spielen?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Nein. Hohe Töne entstehen durch Lippenspannung und schnellen Luftstrom, nicht durch Druck. Bei Schmerzen sollte die Übungseinheit beendet und der Mundstückdruck reduziert werden."
+        "text": "Am ersten Tag. Mit einer guten Anleitung spielst du erste Melodien innerhalb der ersten 2 Wochen."
       }
     },
     {
       "@type": "Question",
-      "name": "Hilft ein kleineres Mundstück für hohe Töne auf der Trompete?",
+      "name": "Sind kostenlose Kurse ausreichend?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Kurzfristig kann ein kleineres Mundstück die obere Lage erleichtern, langfristig begrenzt es aber den Klang in der Mittellage. Für die meisten Spieler ist ein mittelgroßes Standardmundstück die bessere Wahl."
+        "text": "Für erste Orientierung ja. Für ernsthaftes Lernen fehlt meist die Struktur und das Notenmaterial."
       }
     },
     {
       "@type": "Question",
-      "name": "Wie trainiere ich meine Lippenausdauer für hohe Töne?",
+      "name": "Funktioniert Online-Lernen auch für Kinder?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Lippenausdauer wird durch tägliche kurze Übungseinheiten aufgebaut – Lip Slurs, Long Tones und halbtonweise Progressionen sind die wirksamsten Methoden. 5 bis 10 Minuten täglich sind effektiver als seltene lange Sessions."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Was tun, wenn ein hoher Ton partout nicht kommt?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Eine Übungspause von einer Woche kann helfen, da der Körper Gelerntes auch in Ruhephasen festigt. Nach der Pause gelingt der Ton oft plötzlich besser. Erzwungenes tägliches Üben ohne Pause führt hingegen zu Stagnation."
+        "text": "Ab ca. 8–9 Jahren, wenn ein Elternteil dabei ist und hilft. Jüngere Kinder profitieren mehr von Präsenzunterricht."
       }
     }
   ]
@@ -119,111 +295,25 @@
 
 ---
 
-## 3. Support-2 — /blog/trompete-kinder-alter
+## 5. Organization Schema (einmalig im Site-Header)
 
 ```json
 {
   "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Ab welchem Alter können Kinder Trompete lernen?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Die meisten Kinder können ab 7 Jahren mit der Trompete beginnen. Entscheidend sind die motorische Entwicklung der Hände und die Eigenmotivation des Kindes. Mit kleineren Instrumenten (z.B. Pockettrumpet) ist ein Start auch früher möglich."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Wie lange sollten Kinder täglich Trompete üben?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Für Kinder sind 10 bis 15 Minuten tägliches Üben ideal. Regelmäßige kurze Einheiten sind deutlich effektiver als seltene lange Sessions, da die Konzentrationsspanne bei Kindern kürzer ist."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Muss mein Kind Noten lesen können, bevor es Trompete lernt?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Nein. Das Notenlesen wird parallel zum Instrumentalspiel erlernt und gehört zum normalen Lehrplan. Kinder müssen keine Vorkenntnisse mitbringen."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Soll ich für mein Kind eine Trompete kaufen oder leihen?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Für den Einstieg empfiehlt sich Leihen. Viele Musikschulen und Instrumentenhändler bieten Leihinstrumente an. So ist das finanzielle Risiko gering, falls das Kind nach einiger Zeit ein anderes Instrument bevorzugt."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Wie motiviere ich mein Kind zum Trompeten-Üben?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Kurze tägliche Einheiten, spielerische Lernmethoden und Anerkennung durch Zuhören und Loben sind die wirksamsten Motivatoren. Gamifizierte Lernplattformen mit Level-Systemen und Badges können Kinder zusätzlich begeistern."
-      }
-    }
-  ]
+  "@type": "EducationalOrganization",
+  "name": "Trumpetstar",
+  "url": "https://trumpetstar.com",
+  "sameAs": [
+    "https://trumpetstar.app",
+    "https://www.facebook.com/trumpetstar",
+    "https://www.instagram.com/trumpetstar"
+  ],
+  "description": "Digitale Trompetenschule mit strukturierten Levels, Noten, Videos und Playalongs. Für Anfänger, Wiedereinsteiger und Fortgeschrittene.",
+  "areaServed": ["DE", "AT", "CH"],
+  "inLanguage": "de"
 }
 ```
 
 ---
 
-## 4. Support-3 — /blog/blaesserklasse-trompete-eltern
-
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Was ist eine Bläserklasse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "In einer Bläserklasse lernt eine ganze Schulklasse gemeinsam ein Blasinstrument. Das Modell ist in Deutschland, Österreich und der Schweiz verbreitet und startet meist ab Klasse 3 oder 4. Kinder wählen zwischen verschiedenen Instrumenten wie Trompete, Klarinette oder Saxofon."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Muss ich als Elternteil selbst Musik spielen können, um mein Kind in der Bläserklasse zu unterstützen?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Nein. Eltern müssen kein Instrument spielen. Regelmäßiges Zuhören, Loben und das Einrichten eines festen Übeplatzes zu Hause reicht aus, um Kinder sinnvoll zu begleiten."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Wie lange dauert eine Bläserklasse?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Bläserklassen dauern in der Regel ein bis zwei Schuljahre. Danach können Kinder, die Freude am Instrument gefunden haben, in eine Musikschule, einen Verein oder ein Schulorchester wechseln."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Soll mein Kind in der Bläserklasse täglich zu Hause üben?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Ja, tägliches Üben zu Hause ist entscheidend für den Fortschritt. 10 bis 15 Minuten täglich reichen für Kinder in der Bläserklasse aus. Der Schulunterricht allein bietet meistens nicht genug Wiederholungen."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Kann mein Kind das Instrument in der Bläserklasse wechseln?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "In vielen Bläserklassen ist nach einer Eingewöhnungsphase ein Instrumentenwechsel möglich. Die genauen Regelungen hängen von der Schule und der Lehrkraft ab. Ein Gespräch mit der Musiklehrerin oder dem Musiklehrer klärt die Möglichkeiten."
-      }
-    }
-  ]
-}
-```
-
----
-
-*Alle Schema-Blöcke sind ready-to-paste in den `<head>` oder per CMS-Plugin einzubinden.*  
-*Keine medizinischen Claims, keine erfundenen Studien. Alle Antworten sachlich und prüfbar.*
+*KW10/2026 | Trumpetstar Schema Pack*

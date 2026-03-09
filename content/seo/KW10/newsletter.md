@@ -1,68 +1,62 @@
-# Newsletter-Draft — KW10 / März 2026
-**Typ:** E-Mail-Newsletter  
-**Wörter:** ~380  
-**Zielgruppe:** Bestandsnutzer + Interessenten (DACH)  
-**Thema:** Frühjahrs-Motivation + Ansatz-Tipp + Level-System  
-**CTA:** Trumpetstar Level-1 Starter Plan starten  
-**Status:** ✅ Final
+# Newsletter-Draft – KW10 / 2026
+
+**Betreff:** 🎺 Warum 10 Minuten täglich mehr bringen als 1 Stunde am Wochenende  
+**Subheadline:** + Neue Artikel im Blog: Hohe Töne, Übungsroutine, Online-Lernen  
+**Zielgruppe:** Anfänger, Wiedereinsteiger, Eltern  
+**Haupt-CTA:** www.trumpetstar.app/register  
 
 ---
 
-**Betreff:** 🎺 Dein Ansatz entscheidet — und hier ist der Beweis
+Hey [Vorname],
 
-**Preview-Text:** Warum 10 Minuten täglich mehr bringen als jede Wochenend-Session
+eine Frage: Wie viele Minuten hast du diese Woche Trompete gespielt?
 
----
+Wenn die Antwort "weniger als geplant" ist – du bist nicht allein. Und es liegt fast nie an Motivation oder Talent.
 
-Hallo [Vorname],
-
-März ist der Monat, in dem viele Neujahrsvorsätze entweder Fahrt aufnehmen — oder leise sterben.
-
-Wenn du dir vorgenommen hast, Trompete zu lernen (oder wieder zu lernen): Wie läuft's?
-
-Falls du gerade feststeckst oder das Gefühl hast, kaum voranzukommen, liegt das meistens an einem einzigen Punkt: **dem Ansatz**.
+Es liegt meistens an einem falschen Bild davon, wie Lernen funktioniert.
 
 ---
 
-### Was der Ansatz mit allem zu tun hat
+**Die Wahrheit über Fortschritt auf der Trompete:**
 
-Der Trompetenansatz ist kein Detail. Er ist das Fundament. Wer mit zu viel Druck, zu breitem Mund oder falscher Lippenspannung spielt, baut auf Sand — egal wie fleißig er übt.
+Der Ansatz – die Lippenmuskulatur, die für jeden Ton verantwortlich ist – baut sich durch tägliche Wiederholung auf. Nicht durch lange Sessions am Wochenende.
 
-Die gute Nachricht: Der Ansatz ist keine Frage von Talent. Er ist trainierbar. Und mit den richtigen Übungen geht es schneller, als die meisten denken.
+10 Minuten täglich > 70 Minuten einmal die Woche.
 
-Wir haben dazu gerade einen ausführlichen Guide veröffentlicht: **"Trompetenansatz — Das komplette Grundlagen-Handbuch"**. Darin findest du:
+Das ist keine Motivations-Phrase. Das ist Physiologie.
 
-- Die 4 Ansatz-Typen (welcher zu dir passt)
-- 5 häufige Fehler + konkrete Fixes
-- Eine 4-Wochen-Aufbau-Routine
-- 5 Übungen für den Alltag — auch ohne Trompete machbar
-
-→ [Zum vollständigen Guide](https://www.trumpetstar.app/blog/trompetenansatz)
+Wer täglich übt, gibt dem Gehirn täglich neue Signale zum Verarbeiten (während des Schlafs!). Wer selten übt, startet jedes Mal fast von vorne.
 
 ---
 
-### Frühjahrsaktion: Level-1 Starter Plan
+**Diese Woche im Trumpetstar Blog:**
 
-Passend dazu: Unser **Level-1 Starter Plan (PDF)** ist jetzt kostenlos verfügbar.
+📖 [Trompete lernen als Erwachsener – Der komplette Guide](https://trumpetstar.com/blog/trompete-lernen-erwachsene)  
+Für Einsteiger und Wiedereinsteiger: Alles, was du wirklich brauchst – Schritt für Schritt.
 
-Er enthält:
-- 4 Wochen strukturierter Übungsplan (10 Min./Tag)
-- QR-Codes zu Video-Anleitungen
-- Checkliste für den Ansatz-Aufbau
-- Progression-Tracker zum Ausdrucken
+📖 [10-Minuten-Übungsroutine für Anfänger](https://trumpetstar.com/blog/trompete-taeglich-ueben)  
+Wie du eine Session strukturierst, Fortschritte misst und nie mehr ratlos vor dem Instrument stehst.
 
-Ideal für Einsteiger, Wiedereinsteiger — und für alle, die merken, dass sie auf Autopilot geübt haben.
-
-**→ [Jetzt kostenlosen Starter Plan sichern](https://www.trumpetstar.app/register)**
+📖 [Hohe Töne auf der Trompete – Technik & Fehler](https://trumpetstar.com/blog/trompete-hohe-toene)  
+Warum Druck der falsche Weg ist – und was wirklich funktioniert.
 
 ---
 
-Noch eine Woche. Zehn Minuten täglich. Dein Ansatz wird sich bis Ende März verwandeln — wenn du anfängst.
+**Ein konkreter Tipp für diese Woche:**
 
-Musik ab,  
-**Dein Trumpetstar-Team** 🎺
+Nimm dich 1× auf. Handy reicht. Einmal vor dem Üben, einmal danach. Dann dieselbe Aufnahme in 4 Wochen.
+
+Du wirst überrascht sein, was du hörst.
 
 ---
 
-*Du erhältst diese E-Mail, weil du dich bei Trumpetstar angemeldet hast. [Abmelden]*  
-*www.trumpetstar.app | Alle Rechte vorbehalten*
+Wenn du noch kein Trumpetstar-Konto hast: Level 1 ist kostenlos, auf Deutsch, mit Noten + Playalongs. Kein Abo-Zweck, kein Risiko.
+
+**👉 [Hier kostenlos starten – www.trumpetstar.app/register](https://www.trumpetstar.app/register)**
+
+Viel Spaß beim Üben heute,  
+**Das Trumpetstar-Team**
+
+---
+
+*Trumpetstar – Die digitale Trompetenschule | [Abmelden](https://trumpetstar.app/unsubscribe) | [Datenschutz](https://trumpetstar.app/privacy)*
