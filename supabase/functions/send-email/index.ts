@@ -7,8 +7,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Track-Function auf Marios eigenem Supabase-Projekt (hat keine Lovable-Zugriffsbeschränkungen)
-const TRACK_BASE = "https://rhnhhjidsnrlwxtbarvf.supabase.co/functions/v1/track";
+// Track-Function im eigenen Projekt
+const TRACK_BASE = `${Deno.env.get("SUPABASE_URL")}/functions/v1/track`;
 
 // ─── Tracking Helpers ─────────────────────────────────────────────────────────
 
@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       port: 587,
       secure: false,
       auth: { user: "Valentin@trumpetstar.com", pass: SMTP_PASSWORD },
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: true },
     });
 
     const info = await transporter.sendMail({
