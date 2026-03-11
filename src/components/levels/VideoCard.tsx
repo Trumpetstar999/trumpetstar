@@ -44,11 +44,11 @@ export function VideoCard({ video, onClick, index = 0 }: VideoCardProps) {
       }}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-video overflow-hidden bg-black">
         <img
           src={video.thumbnail}
           alt={displayTitle}
-          className="w-full h-full object-cover rounded-t-lg transition-transform duration-500 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
         {/* Gradient overlay */}
