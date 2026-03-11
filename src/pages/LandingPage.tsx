@@ -15,7 +15,7 @@ export default function LandingPage() {
   const [checking, setChecking] = useState(true);
   const { t } = useLanguage();
 
-  // Check session and redirect if logged in
+  // Check session and redirect if logged in; track landing page view for non-logged-in visitors
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -27,6 +27,13 @@ export default function LandingPage() {
         }]).then(() => {});
         navigate('/app', { replace: true });
       } else {
+        // Track landingpage view (anonymous visitor)
+        supabase.from('landing_page_views').insert([{
+          path: window.location.pathname,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent.slice(0, 200),
+          language: navigator.language || null,
+        }]).then(() => {});
         setChecking(false);
       }
     });
