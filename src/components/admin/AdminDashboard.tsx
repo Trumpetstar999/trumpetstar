@@ -5,6 +5,7 @@ import { RecentActivityList } from './RecentActivityList';
 import { ActivityCharts } from './ActivityCharts';
 import { VimeoErrorsList } from './VimeoErrorsList';
 import { PlanStatsCards } from './PlanStatsCards';
+import { LandingPageViewsCard } from './LandingPageViewsCard';
 
 const fadeUp = (delay: number) => ({
   hidden: { opacity: 0, y: 22 },
