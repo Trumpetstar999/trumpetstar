@@ -38,6 +38,11 @@ export function AdminDashboard() {
         <DashboardStats />
       </motion.section>
 
+      <motion.section variants={fadeUp(0.20)} initial="hidden" animate="show">
+        <SectionLabel>Landingpage-Aufrufe</SectionLabel>
+        <LandingPageViewsCard />
+      </motion.section>
+
       <motion.section variants={fadeUp(0.24)} initial="hidden" animate="show">
         <SectionLabel>Aktivität</SectionLabel>
         <ActivityCharts />
