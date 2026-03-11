@@ -1,4 +1,3 @@
-import nodemailer from "npm:nodemailer";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -7,8 +6,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Track-Function im eigenen Projekt
 const TRACK_BASE = `${Deno.env.get("SUPABASE_URL")}/functions/v1/track`;
+const EMAIL_PROXY_URL = "http://72.60.17.112/email-proxy/send";
 
 // ─── Tracking Helpers ─────────────────────────────────────────────────────────
 
@@ -20,13 +19,11 @@ function clickTrackUrl(logId: string, targetUrl: string): string {
   return `${TRACK_BASE}?type=click&id=${logId}&url=${encodeURIComponent(targetUrl)}`;
 }
 
-/** Inject 1x1 open-tracking pixel before </body> */
 function injectOpenPixel(html: string, pixelUrl: string): string {
   const tag = `<img src="${pixelUrl}" width="1" height="1" style="display:none;border:0;" alt="" />`;
   return html.includes("</body>") ? html.replace("</body>", `${tag}</body>`) : html + tag;
 }
 
-/** Wrap <a href="..."> with click-tracking redirect */
 function wrapLinks(html: string, logId: string): string {
   return html.replace(/href="(https?:\/\/[^"]+)"/gi, (_, url) => {
     if (url.includes("/track?") || url.includes("unsubscribe")) return `href="${url}"`;
@@ -42,12 +39,12 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const SMTP_PASSWORD       = Deno.env.get("SMTP_PASSWORD");
+    const EMAIL_PROXY_SECRET  = Deno.env.get("EMAIL_PROXY_SECRET");
     const SUPABASE_URL        = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_ANON_KEY   = Deno.env.get("SUPABASE_ANON_KEY")!;
     const SUPABASE_SRK        = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!SMTP_PASSWORD) throw new Error("SMTP_PASSWORD is not configured");
+    if (!EMAIL_PROXY_SECRET) throw new Error("EMAIL_PROXY_SECRET is not configured");
 
     const body = await req.json();
     const { to, subject, html, text, from_name, reply_to, recipient_name, template_id, sequence_id } = body;
@@ -59,14 +56,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Use service role key if available, anon key as fallback (RPC functions allow anon)
     const supabase = createClient(
       SUPABASE_URL,
       SUPABASE_SRK || SUPABASE_ANON_KEY,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    // ── 1. Create email_log entry via RPC (SECURITY DEFINER → bypasses RLS) ──
+    // ── 1. Create email_log entry ────────────────────────────────────────────
     let logId: string | undefined;
     try {
       const { data } = await supabase.rpc("insert_email_log", {
@@ -89,25 +85,37 @@ Deno.serve(async (req) => {
       finalHtml = wrapLinks(finalHtml, logId);
     }
 
-    // ── 3. Send via SMTP ─────────────────────────────────────────────────────
-    const transporter = nodemailer.createTransport({
-      host: "smtp.world4you.com",
-      port: 587,
-      secure: false,
-      auth: { user: "Valentin@trumpetstar.com", pass: SMTP_PASSWORD },
-      tls: { rejectUnauthorized: true },
-    });
+    // ── 3. Send via HTTP Proxy (routes SMTP through VPS) ────────────────────
+    const fromAddress = "Valentin@trumpetstar.com";
+    const fromDisplay = from_name || "Valentin von Trumpetstar";
 
-    const info = await transporter.sendMail({
-      from:    `"${from_name || "Valentin von Trumpetstar"}" <Valentin@trumpetstar.com>`,
+    const proxyPayload = {
+      from:     `"${fromDisplay}" <${fromAddress}>`,
       to,
       subject,
-      html:    finalHtml,
-      text:    text || "",
-      replyTo: reply_to || "Valentin@trumpetstar.com",
+      html:     finalHtml,
+      text:     text || "",
+      replyTo:  reply_to || fromAddress,
+    };
+
+    const proxyRes = await fetch(EMAIL_PROXY_URL, {
+      method:  "POST",
+      headers: {
+        "Content-Type":   "application/json",
+        "x-proxy-secret": EMAIL_PROXY_SECRET,
+      },
+      body: JSON.stringify(proxyPayload),
     });
 
-    console.log("[send-email] Sent:", info.messageId, "to:", to, "logId:", logId);
+    if (!proxyRes.ok) {
+      const errText = await proxyRes.text();
+      throw new Error(`Proxy error ${proxyRes.status}: ${errText}`);
+    }
+
+    const proxyData = await proxyRes.json().catch(() => ({}));
+    const messageId = proxyData.messageId || proxyData.message_id || "proxy-sent";
+
+    console.log("[send-email] Sent via proxy:", messageId, "to:", to, "logId:", logId);
 
     // ── 4. Mark as sent ──────────────────────────────────────────────────────
     if (logId) {
@@ -115,7 +123,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, messageId: info.messageId, logId }),
+      JSON.stringify({ success: true, messageId, logId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
