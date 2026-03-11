@@ -1363,6 +1363,33 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_page_views: {
+        Row: {
+          id: string
+          language: string | null
+          path: string
+          referrer: string | null
+          user_agent: string | null
+          visited_at: string
+        }
+        Insert: {
+          id?: string
+          language?: string | null
+          path?: string
+          referrer?: string | null
+          user_agent?: string | null
+          visited_at?: string
+        }
+        Update: {
+          id?: string
+          language?: string | null
+          path?: string
+          referrer?: string | null
+          user_agent?: string | null
+          visited_at?: string
+        }
+        Relationships: []
+      }
       lead_activities: {
         Row: {
           activity_type: string
