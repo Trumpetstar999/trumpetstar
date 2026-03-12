@@ -37,6 +37,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
   const updateStatus = useUpdateInvoiceStatus();
   const finalizeInvoice = useFinalizeInvoice();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (!invoiceId) return null;
 
