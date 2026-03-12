@@ -102,7 +102,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
     let customerId = values.customer_id;
 
     if (!isNewCustomer && !customerId) {
-      alert('Bitte einen Kunden auswählen.');
+      import('sonner').then(({ toast }) => toast.error('Bitte einen Kunden auswählen.'));
       return;
     }
 
