@@ -119,15 +119,6 @@ export function generateInvoiceHTML(
 </head>
 <body>
 
-<!-- PRINT/CLOSE BUTTONS -->
-<div class="no-print" style="position:fixed;top:14px;right:14px;z-index:999;display:flex;gap:8px;">
-  <button onclick="window.print()" style="padding:9px 18px;background:#2c3e50;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-    🖨️ Als PDF speichern
-  </button>
-  <button onclick="window.close()" style="padding:9px 14px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;cursor:pointer;">
-    ✕ Schließen
-  </button>
-</div>
 
 <div class="page-wrap">
 
