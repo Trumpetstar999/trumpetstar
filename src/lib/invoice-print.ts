@@ -188,7 +188,7 @@ export async function generateInvoiceHTML(
         </tr>
         <tr>
           <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0;font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 0 3cm;font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
         </tr>
       </table>
     </td>
