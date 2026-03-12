@@ -32,6 +32,7 @@ const EMPTY: Omit<Customer, 'id' | 'created_at' | 'updated_at'> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function CustomersPanel() {
+  const qc = useQueryClient();
   const { data: customers = [], isLoading } = useCustomers();
   const createCustomer = useCreateCustomer();
   const updateCustomer = useUpdateCustomer();
