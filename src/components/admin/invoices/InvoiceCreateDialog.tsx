@@ -101,6 +101,11 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
   async function onSubmit(values: FormValues) {
     let customerId = values.customer_id;
 
+    if (!isNewCustomer && !customerId) {
+      alert('Bitte einen Kunden auswählen.');
+      return;
+    }
+
     if (isNewCustomer) {
       const newCust = await createCustomer.mutateAsync({
         name: values.new_customer_name,
