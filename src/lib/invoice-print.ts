@@ -171,7 +171,7 @@ export async function generateInvoiceHTML(
 
     <!-- Logo + Rechnungsinfo rechts -->
     <td style="vertical-align:top;text-align:right;width:45%;">
-      <div style="margin-bottom:14px;">${logoHtml}</div>
+      <div style="margin-bottom:3cm;">${logoHtml}</div>
       <table style="margin-left:auto;min-width:160px;">
         <tr>
           <td colspan="2" style="padding-bottom:6px;">
