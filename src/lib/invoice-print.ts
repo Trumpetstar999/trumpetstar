@@ -237,8 +237,8 @@ export async function generateInvoiceHTML(
     <td style="text-align:right;color:#555;padding-top:6px;">€&nbsp;${formatCurrency(invoice.paid_amount)}</td>
   </tr>
   <tr style="border-top:2px solid #2c3e50;">
-    <td style="font-weight:700;font-size:11pt;padding:8px 10px 4px;">Zu zahlender Betrag EUR</td>
-    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px 4px;">€&nbsp;${formatCurrency(remaining)}</td>
+    <td style="font-weight:700;font-size:11pt;padding:8px 10px 3cm;">Zu zahlender Betrag EUR</td>
+    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px 3cm;">€&nbsp;${formatCurrency(remaining)}</td>
   </tr>
 </table>
 
