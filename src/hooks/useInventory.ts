@@ -1,7 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { InventoryItem, InventoryMovement } from '@/types/invoice';
+import type { InventoryItem, InventoryMovement, Product } from '@/types/invoice';
 import { toast } from 'sonner';
+
+export function useProducts() {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+      if (error) throw error;
+      return data as Product[];
+    },
+  });
+}
 
 export function useInventory() {
   return useQuery({
@@ -57,6 +72,56 @@ export function useAddStock() {
       qc.invalidateQueries({ queryKey: ['inventory'] });
       qc.invalidateQueries({ queryKey: ['inventory-movements'] });
       toast.success('Lagerbestand aktualisiert');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useSetStock() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      productId,
+      quantity,
+      reason,
+    }: {
+      productId: string;
+      quantity: number;
+      reason: string;
+    }) => {
+      // Get current quantity first
+      const { data: inv } = await supabase
+        .from('inventory')
+        .select('quantity_on_hand')
+        .eq('product_id', productId)
+        .maybeSingle();
+
+      const current = inv?.quantity_on_hand ?? 0;
+      const diff = quantity - current;
+
+      // Upsert inventory
+      const { error: upsertError } = await supabase
+        .from('inventory')
+        .upsert({ product_id: productId, quantity_on_hand: quantity, updated_at: new Date().toISOString() }, { onConflict: 'product_id' });
+      if (upsertError) throw upsertError;
+
+      // Log correction movement
+      if (diff !== 0) {
+        const { error: movErr } = await supabase
+          .from('inventory_movements')
+          .insert({
+            product_id: productId,
+            quantity_change: diff,
+            movement_type: 'correction',
+            reason: reason || 'Manuelle Korrektur',
+          });
+        if (movErr) throw movErr;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inventory'] });
+      qc.invalidateQueries({ queryKey: ['inventory-movements'] });
+      toast.success('Bestand gesetzt');
     },
     onError: (e: Error) => toast.error(e.message),
   });
