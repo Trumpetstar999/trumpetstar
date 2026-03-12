@@ -308,7 +308,7 @@ export async function printInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {
   const logoDataUrl = await getLogoDataUrl();
-  const html = generateInvoiceHTML(invoice, logoDataUrl);
+  const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
   // Use hidden iframe — no popup required
   const existing = document.getElementById('invoice-print-frame');
@@ -338,15 +338,11 @@ export async function downloadInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {
   const logoDataUrl = await getLogoDataUrl();
-  const html = generateInvoiceHTML(invoice, logoDataUrl);
+  const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  // Open in hidden iframe and trigger print-to-PDF via browser dialog
-  // For a true client-side download without a library, we open the HTML
-  // in a blob URL which the user can save via the browser's print-to-PDF
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
-  // Create a temporary hidden iframe
   const existing = document.getElementById('invoice-download-frame');
   if (existing) existing.remove();
 
