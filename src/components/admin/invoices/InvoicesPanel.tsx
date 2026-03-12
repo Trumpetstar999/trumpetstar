@@ -3,9 +3,10 @@ import { InvoiceList } from './InvoiceList';
 import { InvoiceCreateDialog } from './InvoiceCreateDialog';
 import { InvoiceDetailDialog } from './InvoiceDetailDialog';
 import { InventoryPanel } from './InventoryPanel';
-import { Receipt, Package } from 'lucide-react';
+import { CustomersPanel } from './CustomersPanel';
+import { Receipt, Package, Users } from 'lucide-react';
 
-type Tab = 'invoices' | 'inventory';
+type Tab = 'invoices' | 'customers' | 'inventory';
 
 export function InvoicesPanel() {
   const [tab, setTab] = useState<Tab>('invoices');
@@ -24,6 +25,13 @@ export function InvoicesPanel() {
           Rechnungen
         </button>
         <button
+          onClick={() => setTab('customers')}
+          className={`admin-tab ${tab === 'customers' ? 'admin-tab-active' : ''}`}
+        >
+          <Users className="w-4 h-4" />
+          Kunden
+        </button>
+        <button
           onClick={() => setTab('inventory')}
           className={`admin-tab ${tab === 'inventory' ? 'admin-tab-active' : ''}`}
         >
@@ -38,6 +46,8 @@ export function InvoicesPanel() {
           onCreate={() => setCreateOpen(true)}
         />
       )}
+
+      {tab === 'customers' && <CustomersPanel />}
 
       {tab === 'inventory' && <InventoryPanel />}
 
