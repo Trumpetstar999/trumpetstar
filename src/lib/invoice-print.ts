@@ -171,7 +171,7 @@ export async function generateInvoiceHTML(
 
     <!-- Logo + Rechnungsinfo rechts -->
     <td style="vertical-align:top;text-align:right;width:45%;">
-      <div style="margin-bottom:14px;">${logoHtml}</div>
+      <div style="margin-bottom:3cm;">${logoHtml}</div>
       <table style="margin-left:auto;min-width:160px;">
         <tr>
           <td colspan="2" style="padding-bottom:6px;">
@@ -188,7 +188,7 @@ export async function generateInvoiceHTML(
         </tr>
         <tr>
           <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0;font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 0 3cm;font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
         </tr>
       </table>
     </td>
@@ -237,8 +237,8 @@ export async function generateInvoiceHTML(
     <td style="text-align:right;color:#555;padding-top:6px;">€&nbsp;${formatCurrency(invoice.paid_amount)}</td>
   </tr>
   <tr style="border-top:2px solid #2c3e50;">
-    <td style="font-weight:700;font-size:11pt;padding:8px 10px 4px;">Zu zahlender Betrag EUR</td>
-    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px 4px;">€&nbsp;${formatCurrency(remaining)}</td>
+    <td style="font-weight:700;font-size:11pt;padding:8px 10px 3cm;">Zu zahlender Betrag EUR</td>
+    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px 3cm;">€&nbsp;${formatCurrency(remaining)}</td>
   </tr>
 </table>
 
