@@ -145,6 +145,16 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setEditOpen(true)}
+                className="gap-1.5"
+              >
+                <Pencil className="w-4 h-4" />
+                Rechnung bearbeiten
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => printInvoice(invoice as any)}
                 className="gap-1.5"
               >
@@ -186,6 +196,12 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
           </div>
         )}
       </DialogContent>
+
+      {/* Edit dialog — nested outside main dialog content */}
+      <InvoiceEditDialog
+        invoiceId={editOpen ? invoiceId : null}
+        onClose={() => setEditOpen(false)}
+      />
     </Dialog>
   );
 }
