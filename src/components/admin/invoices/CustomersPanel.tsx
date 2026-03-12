@@ -151,8 +151,7 @@ export function CustomersPanel() {
       setImportCount(imported);
       if (imported > 0) {
         toast.success(`${imported} Kunden importiert`);
-        // Refresh customers list
-        window.location.reload();
+        qc.invalidateQueries({ queryKey: ['customers'] });
       } else {
         toast.info('Keine neuen Kunden zum Importieren gefunden');
       }
