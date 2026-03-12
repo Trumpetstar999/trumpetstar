@@ -247,23 +247,34 @@ ${invoice.notes ? `<p style="margin-top:10px;font-size:9pt;"><strong>Anmerkung:<
 
 <!-- ═══ ZAHLUNGSINFO ═══ -->
 <div class="payment-box">
-  <strong style="font-size:9pt;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong><br><br>
-  <table style="width:auto;">
+  <table style="width:100%;">
     <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">Kontoinhaber</td>
-      <td style="font-weight:600;">${COMPANY.kontoinhaber}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">IBAN</td>
-      <td style="font-family:monospace;font-size:9pt;font-weight:600;">${COMPANY.iban}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">BIC</td>
-      <td>${COMPANY.bic}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">Bank</td>
-      <td>${COMPANY.bank}</td>
+      <td style="vertical-align:top;padding-right:16px;">
+        <strong style="font-size:9pt;display:block;margin-bottom:8px;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong>
+        <table style="width:auto;">
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Kontoinhaber</td>
+            <td style="font-weight:600;font-size:8.5pt;">${COMPANY.kontoinhaber}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">IBAN</td>
+            <td style="font-family:monospace;font-size:8.5pt;font-weight:600;">${COMPANY.iban}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">BIC</td>
+            <td style="font-size:8.5pt;">${COMPANY.bic}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Bank</td>
+            <td style="font-size:8.5pt;">${COMPANY.bank}</td>
+          </tr>
+        </table>
+      </td>
+      <td style="vertical-align:top;text-align:center;padding-left:8px;border-left:1px solid #d1d5db;">
+        <img src="${qrDataUrl}" alt="EPC QR Code" style="width:100px;height:100px;display:block;margin:0 auto 4px;">
+        <span style="font-size:6.5pt;color:#777;display:block;">GiroCode / EPC QR</span>
+        <span style="font-size:6.5pt;color:#777;display:block;">Scannen zum Bezahlen</span>
+      </td>
     </tr>
   </table>
 </div>
