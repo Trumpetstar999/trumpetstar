@@ -265,10 +265,9 @@ ${invoice.notes ? `<p style="margin-top:10px;font-size:9pt;"><strong>Anmerkung:<
 </html>`;
 }
 
-// Convert local image to base64 data URL for embedding in print window
+// Convert local image to base64 data URL for embedding
 async function getLogoDataUrl(): Promise<string | undefined> {
   try {
-    // Dynamic import of the logo asset
     const logoModule = await import('@/assets/trumpetstar-logo.png');
     const logoUrl = logoModule.default;
     const response = await fetch(logoUrl);
@@ -288,12 +287,27 @@ export async function printInvoice(
 ) {
   const logoDataUrl = await getLogoDataUrl();
   const html = generateInvoiceHTML(invoice, logoDataUrl);
-  const win = window.open('', '_blank');
-  if (!win) return;
-  win.document.write(html);
-  win.document.close();
-  // Give images time to load before triggering print dialog
-  win.onload = () => {
-    setTimeout(() => win.focus(), 200);
+
+  // Use hidden iframe — no popup required
+  const existing = document.getElementById('invoice-print-frame');
+  if (existing) existing.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'invoice-print-frame';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;visibility:hidden;';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentDocument || iframe.contentWindow?.document;
+  if (!doc) return;
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  // Wait for resources (logo image) to load, then print
+  iframe.onload = () => {
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    }, 300);
   };
 }
