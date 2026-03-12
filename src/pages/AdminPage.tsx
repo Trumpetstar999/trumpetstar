@@ -31,13 +31,14 @@ import { EmailAutomationsPanel } from '@/components/admin/EmailAutomationsPanel'
 import { SeoCenterPanel } from '@/components/admin/SeoCenterPanel';
 import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { ShippingPanel } from '@/components/admin/ShippingPanel';
+import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -149,6 +150,7 @@ export default function AdminPage() {
       case 'mailbox': return 'Postfach';
       case 'knowledge': return 'Wissensdatenbank';
       case 'shipping': return 'Versand';
+      case 'invoices': return 'Rechnungen';
       case 'levels': return 'Levels & Showcases';
       case 'pdfs': return 'PDFs / Noten';
       case 'musicxml': return 'MusicXML';
@@ -177,6 +179,7 @@ export default function AdminPage() {
       case 'mailbox': return 'E-Mails empfangen, lesen und senden';
       case 'knowledge': return 'Produkte, FAQs und Links – Valentin liest diese Datenbank für E-Mail-Entwürfe';
       case 'shipping': return 'Offene Versandbestellungen aus Digistore24 verwalten und als versendet markieren';
+      case 'invoices': return 'Rechnungen erstellen, drucken und Lagerbestand verwalten';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
@@ -255,6 +258,7 @@ export default function AdminPage() {
           {activeTab === 'mailbox' && <MailboxPanel />}
           {activeTab === 'knowledge' && <KnowledgeBaseManager />}
           {activeTab === 'shipping' && <ShippingPanel />}
+          {activeTab === 'invoices' && <InvoicesPanel />}
 
           {activeTab === 'levels' && (
             <div className="space-y-6">
