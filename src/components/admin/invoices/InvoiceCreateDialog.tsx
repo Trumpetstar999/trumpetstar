@@ -147,7 +147,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto bg-white border border-gray-200 shadow-xl p-0 rounded-xl">
+      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto bg-white border border-gray-200 shadow-xl p-0 rounded-xl [&>button:last-child]:hidden">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 z-10 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Neue Rechnung erstellen</h2>
