@@ -3,11 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Printer, CheckCircle, Loader2 } from 'lucide-react';
+import { Printer, CheckCircle, Loader2, Pencil } from 'lucide-react';
 import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
 import { printInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice } from '@/types/invoice';
+import { InvoiceEditDialog } from './InvoiceEditDialog';
 
 const STATUS_LABELS: Record<Invoice['status'], string> = {
   draft: 'Entwurf',
@@ -36,6 +37,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
   const updateStatus = useUpdateInvoiceStatus();
   const finalizeInvoice = useFinalizeInvoice();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (!invoiceId) return null;
 
@@ -143,6 +145,16 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setEditOpen(true)}
+                className="gap-1.5"
+              >
+                <Pencil className="w-4 h-4" />
+                Rechnung bearbeiten
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => printInvoice(invoice as any)}
                 className="gap-1.5"
               >
@@ -184,6 +196,12 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
           </div>
         )}
       </DialogContent>
+
+      {/* Edit dialog — nested outside main dialog content */}
+      <InvoiceEditDialog
+        invoiceId={editOpen ? invoiceId : null}
+        onClose={() => setEditOpen(false)}
+      />
     </Dialog>
   );
 }
