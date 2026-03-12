@@ -179,6 +179,7 @@ export default function AdminPage() {
       case 'mailbox': return 'E-Mails empfangen, lesen und senden';
       case 'knowledge': return 'Produkte, FAQs und Links – Valentin liest diese Datenbank für E-Mail-Entwürfe';
       case 'shipping': return 'Offene Versandbestellungen aus Digistore24 verwalten und als versendet markieren';
+      case 'invoices': return 'Rechnungen erstellen, drucken und Lagerbestand verwalten';
       case 'levels': return 'Vimeo Showcases importieren und verwalten';
       case 'pdfs': return 'PDF-Noten mit Audio-Begleitung verwalten';
       case 'musicxml': return 'MusicXML Dokumente mit Audio-Tracks verwalten';
