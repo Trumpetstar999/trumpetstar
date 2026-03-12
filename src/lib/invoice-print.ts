@@ -1,5 +1,6 @@
 import type { Invoice, Customer, InvoiceItem } from '@/types/invoice';
 import { formatCurrency, formatDate, getVatNote } from './vat';
+import QRCode from 'qrcode';
 
 const COMPANY = {
   name: 'Trumpetstar GmbH',
@@ -15,15 +16,45 @@ const COMPANY = {
   kontoinhaber: 'Trumpetstar GmbH',
 };
 
-export function generateInvoiceHTML(
+/** EPC-QR (GiroCode) — SEPA Credit Transfer standard */
+async function generateEpcQrCode(invoice: Invoice): Promise<string> {
+  const amount = (invoice.total_gross - invoice.paid_amount).toFixed(2);
+  const reference = invoice.invoice_number ?? '';
+  // EPC QR Code format (version 002, UTF-8)
+  const epcData = [
+    'BCD',
+    '002',
+    '1',
+    'SCT',
+    COMPANY.bic,
+    COMPANY.kontoinhaber,
+    COMPANY.iban,
+    `EUR${amount}`,
+    '',
+    '',
+    `Rechnung ${reference}`,
+  ].join('\n');
+
+  return QRCode.toDataURL(epcData, {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: 140,
+    color: { dark: '#1a1a1a', light: '#ffffff' },
+  });
+}
+
+export async function generateInvoiceHTML(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] },
   logoDataUrl?: string
-): string {
+): Promise<string> {
   const customer = invoice.customer;
   const hasUid = !!customer.uid_number;
   const vatNote = getVatNote(invoice.country as 'AT' | 'DE', hasUid);
   const vatLabel = invoice.vat_rate === 0 ? 'Reverse Charge' : `USt. ${invoice.vat_rate}%`;
   const remaining = invoice.total_gross - invoice.paid_amount;
+
+  // Generate EPC QR code
+  const qrDataUrl = await generateEpcQrCode(invoice);
 
   const itemRows = (invoice.items || [])
     .map((item, i) => {
@@ -216,23 +247,34 @@ ${invoice.notes ? `<p style="margin-top:10px;font-size:9pt;"><strong>Anmerkung:<
 
 <!-- ═══ ZAHLUNGSINFO ═══ -->
 <div class="payment-box">
-  <strong style="font-size:9pt;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong><br><br>
-  <table style="width:auto;">
+  <table style="width:100%;">
     <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">Kontoinhaber</td>
-      <td style="font-weight:600;">${COMPANY.kontoinhaber}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">IBAN</td>
-      <td style="font-family:monospace;font-size:9pt;font-weight:600;">${COMPANY.iban}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">BIC</td>
-      <td>${COMPANY.bic}</td>
-    </tr>
-    <tr>
-      <td style="padding:1px 16px 1px 0;color:#555;">Bank</td>
-      <td>${COMPANY.bank}</td>
+      <td style="vertical-align:top;padding-right:16px;">
+        <strong style="font-size:9pt;display:block;margin-bottom:8px;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong>
+        <table style="width:auto;">
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Kontoinhaber</td>
+            <td style="font-weight:600;font-size:8.5pt;">${COMPANY.kontoinhaber}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">IBAN</td>
+            <td style="font-family:monospace;font-size:8.5pt;font-weight:600;">${COMPANY.iban}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">BIC</td>
+            <td style="font-size:8.5pt;">${COMPANY.bic}</td>
+          </tr>
+          <tr>
+            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Bank</td>
+            <td style="font-size:8.5pt;">${COMPANY.bank}</td>
+          </tr>
+        </table>
+      </td>
+      <td style="vertical-align:top;text-align:center;padding-left:8px;border-left:1px solid #d1d5db;">
+        <img src="${qrDataUrl}" alt="EPC QR Code" style="width:100px;height:100px;display:block;margin:0 auto 4px;">
+        <span style="font-size:6.5pt;color:#777;display:block;">GiroCode / EPC QR</span>
+        <span style="font-size:6.5pt;color:#777;display:block;">Scannen zum Bezahlen</span>
+      </td>
     </tr>
   </table>
 </div>
@@ -277,7 +319,7 @@ export async function printInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {
   const logoDataUrl = await getLogoDataUrl();
-  const html = generateInvoiceHTML(invoice, logoDataUrl);
+  const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
   // Use hidden iframe — no popup required
   const existing = document.getElementById('invoice-print-frame');
@@ -307,15 +349,11 @@ export async function downloadInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {
   const logoDataUrl = await getLogoDataUrl();
-  const html = generateInvoiceHTML(invoice, logoDataUrl);
+  const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  // Open in hidden iframe and trigger print-to-PDF via browser dialog
-  // For a true client-side download without a library, we open the HTML
-  // in a blob URL which the user can save via the browser's print-to-PDF
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
-  // Create a temporary hidden iframe
   const existing = document.getElementById('invoice-download-frame');
   if (existing) existing.remove();
 
