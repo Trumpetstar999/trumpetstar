@@ -159,7 +159,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="invoice-form px-6 py-5 space-y-6">
 
           {/* ── Kunde ── */}
           <section>

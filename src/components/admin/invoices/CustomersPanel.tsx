@@ -341,7 +341,7 @@ export function CustomersPanel() {
             </div>
           </DialogHeader>
 
-          <div className="px-6 py-5 space-y-4">
+          <div className="invoice-form px-6 py-5 space-y-4">
             {/* Name + Firma */}
             <div className="grid grid-cols-2 gap-3">
               <div>

@@ -303,6 +303,49 @@
   color: var(--admin-text-muted);
 }
 
+/* ── Invoice Form: clean white inputs, no pill shape ────────────────── */
+.invoice-form input,
+.invoice-form select,
+.invoice-form textarea,
+.invoice-form [data-radix-select-trigger],
+.invoice-form button[role="combobox"] {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #CBD5E1 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+.invoice-form input:focus,
+.invoice-form select:focus,
+.invoice-form textarea:focus {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  outline: none !important;
+}
+
+.invoice-form input::placeholder,
+.invoice-form textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+.invoice-form label,
+.invoice-form .text-muted-foreground {
+  color: #64748B !important;
+}
+
+.invoice-form .text-foreground {
+  color: #0F172A !important;
+}
+
+/* Select trigger inside invoice-form */
+.invoice-form [data-radix-select-trigger] {
+  height: 36px !important;
+  padding: 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
 /* Status Badges */
 .admin-badge {
   display: inline-flex;
