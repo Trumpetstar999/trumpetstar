@@ -150,6 +150,7 @@ export default function AdminPage() {
       case 'mailbox': return 'Postfach';
       case 'knowledge': return 'Wissensdatenbank';
       case 'shipping': return 'Versand';
+      case 'invoices': return 'Rechnungen';
       case 'levels': return 'Levels & Showcases';
       case 'pdfs': return 'PDFs / Noten';
       case 'musicxml': return 'MusicXML';
