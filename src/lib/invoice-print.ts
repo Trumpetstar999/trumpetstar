@@ -1,5 +1,6 @@
 import type { Invoice, Customer, InvoiceItem } from '@/types/invoice';
 import { formatCurrency, formatDate, getVatNote } from './vat';
+import QRCode from 'qrcode';
 
 const COMPANY = {
   name: 'Trumpetstar GmbH',
@@ -15,7 +16,34 @@ const COMPANY = {
   kontoinhaber: 'Trumpetstar GmbH',
 };
 
-export function generateInvoiceHTML(
+/** EPC-QR (GiroCode) — SEPA Credit Transfer standard */
+async function generateEpcQrCode(invoice: Invoice): Promise<string> {
+  const amount = (invoice.total_gross - invoice.paid_amount).toFixed(2);
+  const reference = invoice.invoice_number ?? '';
+  // EPC QR Code format (version 002, UTF-8)
+  const epcData = [
+    'BCD',
+    '002',
+    '1',
+    'SCT',
+    COMPANY.bic,
+    COMPANY.kontoinhaber,
+    COMPANY.iban,
+    `EUR${amount}`,
+    '',
+    '',
+    `Rechnung ${reference}`,
+  ].join('\n');
+
+  return QRCode.toDataURL(epcData, {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: 140,
+    color: { dark: '#1a1a1a', light: '#ffffff' },
+  });
+}
+
+export async function generateInvoiceHTML(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] },
   logoDataUrl?: string
 ): string {
