@@ -302,3 +302,34 @@ export async function printInvoice(
     }, 300);
   };
 }
+
+export async function downloadInvoice(
+  invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
+) {
+  const logoDataUrl = await getLogoDataUrl();
+  const html = generateInvoiceHTML(invoice, logoDataUrl);
+
+  // Open in hidden iframe and trigger print-to-PDF via browser dialog
+  // For a true client-side download without a library, we open the HTML
+  // in a blob URL which the user can save via the browser's print-to-PDF
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary hidden iframe
+  const existing = document.getElementById('invoice-download-frame');
+  if (existing) existing.remove();
+
+  const iframe = document.createElement('iframe');
+  iframe.id = 'invoice-download-frame';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;visibility:hidden;';
+  iframe.src = url;
+  document.body.appendChild(iframe);
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }, 400);
+  };
+}
