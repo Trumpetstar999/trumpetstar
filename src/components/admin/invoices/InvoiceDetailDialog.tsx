@@ -3,11 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Printer, CheckCircle, Loader2 } from 'lucide-react';
+import { Printer, CheckCircle, Loader2, Pencil } from 'lucide-react';
 import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
 import { printInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice } from '@/types/invoice';
+import { InvoiceEditDialog } from './InvoiceEditDialog';
 
 const STATUS_LABELS: Record<Invoice['status'], string> = {
   draft: 'Entwurf',
