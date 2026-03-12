@@ -258,6 +258,7 @@ export default function AdminPage() {
           {activeTab === 'mailbox' && <MailboxPanel />}
           {activeTab === 'knowledge' && <KnowledgeBaseManager />}
           {activeTab === 'shipping' && <ShippingPanel />}
+          {activeTab === 'invoices' && <InvoicesPanel />}
 
           {activeTab === 'levels' && (
             <div className="space-y-6">
