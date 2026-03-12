@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
+import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +101,11 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
 
   async function onSubmit(values: FormValues) {
     let customerId = values.customer_id;
+
+    if (!isNewCustomer && !customerId) {
+      toast.error('Bitte einen Kunden auswählen.');
+      return;
+    }
 
     if (isNewCustomer) {
       const newCust = await createCustomer.mutateAsync({
