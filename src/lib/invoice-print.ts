@@ -46,12 +46,15 @@ async function generateEpcQrCode(invoice: Invoice): Promise<string> {
 export async function generateInvoiceHTML(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] },
   logoDataUrl?: string
-): string {
+): Promise<string> {
   const customer = invoice.customer;
   const hasUid = !!customer.uid_number;
   const vatNote = getVatNote(invoice.country as 'AT' | 'DE', hasUid);
   const vatLabel = invoice.vat_rate === 0 ? 'Reverse Charge' : `USt. ${invoice.vat_rate}%`;
   const remaining = invoice.total_gross - invoice.paid_amount;
+
+  // Generate EPC QR code
+  const qrDataUrl = await generateEpcQrCode(invoice);
 
   const itemRows = (invoice.items || [])
     .map((item, i) => {
