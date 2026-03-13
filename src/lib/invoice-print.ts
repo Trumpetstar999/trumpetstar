@@ -1,7 +1,6 @@
 import type { Invoice, Customer, InvoiceItem } from '@/types/invoice';
 import { formatCurrency, formatDate, getVatNote } from './vat';
 import QRCode from 'qrcode';
-import html2pdf from 'html2pdf.js';
 
 const COMPANY = {
   name: 'Trumpetstar GmbH',
@@ -21,18 +20,13 @@ const COMPANY = {
 async function generateEpcQrCode(invoice: Invoice): Promise<string> {
   const amount = (invoice.total_gross - invoice.paid_amount).toFixed(2);
   const reference = invoice.invoice_number ?? '';
-  // EPC QR Code format (version 002, UTF-8)
   const epcData = [
-    'BCD',
-    '002',
-    '1',
-    'SCT',
+    'BCD', '002', '1', 'SCT',
     COMPANY.bic,
     COMPANY.kontoinhaber,
     COMPANY.iban,
     `EUR${amount}`,
-    '',
-    '',
+    '', '',
     `Rechnung ${reference}`,
   ].join('\n');
 
@@ -54,7 +48,6 @@ export async function generateInvoiceHTML(
   const vatLabel = invoice.vat_rate === 0 ? 'Reverse Charge' : `USt. ${invoice.vat_rate}%`;
   const remaining = invoice.total_gross - invoice.paid_amount;
 
-  // Generate EPC QR code
   const qrDataUrl = await generateEpcQrCode(invoice);
 
   const itemRows = (invoice.items || [])
@@ -78,6 +71,9 @@ export async function generateInvoiceHTML(
   const logoHtml = logoDataUrl
     ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:70px;object-fit:contain;">`
     : `<div style="font-size:22pt;font-weight:800;letter-spacing:-0.5px;line-height:1;color:#1a1a1a;">TRUMPET<br><span style="color:#c0392b;">STAR</span></div>`;
+
+  // Use px-based spacing for html2canvas compatibility (113px ≈ 3cm at 96dpi)
+  const gap3cm = '113px';
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -151,13 +147,11 @@ export async function generateInvoiceHTML(
 </head>
 <body>
 
-
 <div class="page-wrap">
 
-<!-- ═══ HEADER: Logo + Empfänger + Rechnungsinfo ═══ -->
+<!-- ═══ HEADER ═══ -->
 <table style="margin-bottom:28px;">
   <tr>
-    <!-- Empfänger links -->
     <td style="vertical-align:top;width:55%;">
       <span class="sender-line">${COMPANY.name} &nbsp;${COMPANY.street} &ndash; ${COMPANY.city}</span>
       <p style="line-height:1.6;font-size:10pt;">
@@ -170,9 +164,8 @@ export async function generateInvoiceHTML(
       </p>
     </td>
 
-    <!-- Logo + Rechnungsinfo rechts -->
     <td style="vertical-align:top;text-align:right;width:45%;">
-      <div style="margin-bottom:3cm;">${logoHtml}</div>
+      <div style="margin-bottom:${gap3cm};">${logoHtml}</div>
       <table style="margin-left:auto;min-width:160px;">
         <tr>
           <td colspan="2" style="padding-bottom:6px;">
@@ -189,7 +182,7 @@ export async function generateInvoiceHTML(
         </tr>
         <tr>
           <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0 3cm;font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 0;padding-bottom:${gap3cm};font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
         </tr>
       </table>
     </td>
@@ -238,8 +231,8 @@ export async function generateInvoiceHTML(
     <td style="text-align:right;color:#555;padding-top:6px;">€&nbsp;${formatCurrency(invoice.paid_amount)}</td>
   </tr>
   <tr style="border-top:2px solid #2c3e50;">
-    <td style="font-weight:700;font-size:11pt;padding:8px 10px 3cm;">Zu zahlender Betrag EUR</td>
-    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px 3cm;">€&nbsp;${formatCurrency(remaining)}</td>
+    <td style="font-weight:700;font-size:11pt;padding:8px 10px;padding-bottom:${gap3cm};">Zu zahlender Betrag EUR</td>
+    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px;padding-bottom:${gap3cm};">€&nbsp;${formatCurrency(remaining)}</td>
   </tr>
 </table>
 
@@ -322,28 +315,31 @@ export async function printInvoice(
   const logoDataUrl = await getLogoDataUrl();
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  // Use hidden iframe — no popup required
   const existing = document.getElementById('invoice-print-frame');
   if (existing) existing.remove();
 
   const iframe = document.createElement('iframe');
   iframe.id = 'invoice-print-frame';
   iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;visibility:hidden;';
-  document.body.appendChild(iframe);
 
-  const doc = iframe.contentDocument || iframe.contentWindow?.document;
-  if (!doc) return;
-  doc.open();
-  doc.write(html);
-  doc.close();
+  return new Promise<void>((resolve) => {
+    // Set onload BEFORE appending to DOM
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        resolve();
+      }, 400);
+    };
 
-  // Wait for resources (logo image) to load, then print
-  iframe.onload = () => {
-    setTimeout(() => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-    }, 300);
-  };
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) { resolve(); return; }
+    doc.open();
+    doc.write(html);
+    doc.close();
+  });
 }
 
 export async function downloadInvoice(
@@ -352,59 +348,69 @@ export async function downloadInvoice(
   const logoDataUrl = await getLogoDataUrl();
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  // Create a wrapper div for html2pdf
-  const container = document.createElement('div');
-  container.innerHTML = html;
-  const body = container.querySelector('body') || container;
+  // Dynamically import html2pdf to avoid SSR issues
+  const html2pdf = (await import('html2pdf.js')).default;
 
-  const opt = {
-    margin: 0,
-    filename: `Rechnung_${invoice.invoice_number}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      width: 794, // A4 at 96dpi
-    },
-    jsPDF: {
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait',
-    },
-    pagebreak: { mode: 'avoid-all' },
-  };
-
-  // Extract the body content for rendering
-  const pageWrap = container.querySelector('.page-wrap');
-  const renderTarget = document.createElement('div');
-  renderTarget.style.cssText = 'width:794px;padding:68px 76px 83px 95px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:10pt;color:#1a1a1a;background:#fff;line-height:1.4;box-sizing:border-box;';
-  renderTarget.innerHTML = pageWrap ? pageWrap.innerHTML : (container.querySelector('body')?.innerHTML || html);
-
-  // Copy the full styles
-  const styleEl = document.createElement('style');
-  styleEl.textContent = `
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    table { border-collapse: collapse; width: 100%; }
-    .items-table th { background: #2c3e50; color: #ffffff; padding: 8px; text-align: left; font-size: 8.5pt; font-weight: 600; letter-spacing: 0.3px; }
-    .items-table td { vertical-align: top; }
-    .totals-table td { padding: 4px 10px; font-size: 9.5pt; }
-    .total-final td { background: #2c3e50; color: #ffffff; font-weight: 700; font-size: 11pt; padding: 8px 10px; }
-    .sender-line { font-size: 7pt; color: #555; text-decoration: underline; margin-bottom: 18px; display: block; }
-    .footer { font-size: 7.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 8px; margin-top: 20px; }
-    .payment-box { margin-top: 18px; padding: 12px 14px; background: #f0f4f8; border-left: 3px solid #2c3e50; font-size: 8.5pt; }
-  `;
-
+  // Build a full self-contained DOM node (must stay in document while rendering)
   const wrapper = document.createElement('div');
+  wrapper.style.cssText = [
+    'position:fixed',
+    'top:-99999px',
+    'left:-99999px',
+    'width:794px',           // A4 at 96dpi
+    'background:#fff',
+    'font-family:Helvetica Neue,Helvetica,Arial,sans-serif',
+    'font-size:10pt',
+    'color:#1a1a1a',
+    'line-height:1.4',
+    'box-sizing:border-box',
+    'padding:68px 76px 83px 95px', // 18mm 20mm 22mm 25mm in px
+  ].join(';');
+
+  // Parse the HTML and extract only the page-wrap content + styles
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(html, 'text/html');
+
+  // Inject styles
+  const styleEl = document.createElement('style');
+  styleEl.textContent = Array.from(parsed.querySelectorAll('style'))
+    .map(s => s.textContent)
+    .join('\n');
   wrapper.appendChild(styleEl);
-  wrapper.appendChild(renderTarget);
+
+  // Inject content
+  const pageWrap = parsed.querySelector('.page-wrap');
+  if (pageWrap) {
+    wrapper.appendChild(pageWrap.cloneNode(true));
+  } else {
+    wrapper.innerHTML += parsed.body.innerHTML;
+  }
 
   document.body.appendChild(wrapper);
-  wrapper.style.cssText = 'position:fixed;top:-99999px;left:-99999px;';
 
   try {
-    await html2pdf().set(opt).from(wrapper).save();
+    await html2pdf().set({
+      margin: 0,
+      filename: `Rechnung_${invoice.invoice_number}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        windowWidth: 794,
+        width: 794,
+        backgroundColor: '#ffffff',
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+      },
+    }).from(wrapper).save();
   } finally {
-    document.body.removeChild(wrapper);
+    if (document.body.contains(wrapper)) {
+      document.body.removeChild(wrapper);
+    }
   }
 }

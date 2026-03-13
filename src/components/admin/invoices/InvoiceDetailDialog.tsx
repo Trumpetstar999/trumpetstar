@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Printer, CheckCircle, Loader2, Pencil, Download, X, Building2, Calendar, Hash, CreditCard } from 'lucide-react';
@@ -62,6 +63,9 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   return (
     <Dialog open={!!invoiceId} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto bg-white border-0 shadow-2xl p-0 rounded-2xl [&>button:last-child]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Rechnung {invoice?.invoice_number ?? ''}</DialogTitle>
+        </VisuallyHidden>
 
         {/* ── Header ── */}
         <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-t-2xl px-6 py-5">
