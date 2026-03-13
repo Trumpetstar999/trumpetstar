@@ -1,6 +1,7 @@
 import type { Invoice, Customer, InvoiceItem } from '@/types/invoice';
 import { formatCurrency, formatDate, getVatNote } from './vat';
 import QRCode from 'qrcode';
+import html2pdf from 'html2pdf.js';
 
 const COMPANY = {
   name: 'Trumpetstar GmbH',
