@@ -1,0 +1,181 @@
+{
+  "site": {
+    "name": "XGG – Gernot Griesbacher",
+    "tagline": "IT- & KI-Beratung für effiziente Prozesse",
+    "description": "Sichern Sie Ihr Unternehmenswissen in einem intelligenten KI-System und sparen Sie bis zu 15.000€ pro Mitarbeiter an Einarbeitungskosten.",
+    "url": "https://www.xgg.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "XGG – IT- & KI-Beratung | Gernot Griesbacher",
+    "description": "17 Jahre Digitalisierungserfahrung. Unternehmenswissen durch KI erfassbar machen – schnelleres Onboarding, weniger Abhängigkeiten, nachhaltiges Wachstum.",
+    "ogImage": "/images/og-image.jpg",
+    "canonical": "https://www.xgg.at"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Ihr Expertenwissen.\nEndlich skalierbar.",
+    "subheadline": "KI-Systeme, die das implizite Wissen Ihrer besten Mitarbeiter für alle zugänglich machen – und bis zu 15.000€/Mitarbeiter Einarbeitungskosten sparen.",
+    "cta": {
+      "primary": {
+        "text": "Kostenloses Erstgespräch",
+        "href": "#kontakt"
+      },
+      "secondary": {
+        "text": "Mehr erfahren",
+        "href": "#leistungen"
+      }
+    },
+    "ctaSecondary": {
+      "text": "Mehr erfahren",
+      "href": "#leistungen"
+    },
+    "slides": [
+      {
+        "image": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1600&q=80",
+        "alt": "KI-Beratung für Unternehmen"
+      }
+    ],
+    "badge": "4,9 von 5 – 11 Bewertungen"
+  },
+  "leistungen": {
+    "headline": "Was ich für Sie tue",
+    "subheadline": "Von der Strategie bis zur fertigen Lösung – alles aus einer Hand.",
+    "items": [
+      {
+        "title": "KI-Wissenssystem",
+        "description": "Ihr implizites Expertenwissen wird durch KI erfassbar und lehrbar gemacht. Kein \"man sieht's halt\" mehr – strukturiertes Wissen für alle Mitarbeiter, rund um die Uhr.",
+        "image": "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80",
+        "icon": "🧠"
+      },
+      {
+        "title": "Mitarbeiter-Onboarding",
+        "description": "Quereinsteiger performen in Wochen statt Monaten. Neue Mitarbeiter arbeiten nach 3 statt 9 Monaten eigenständig – belegt durch Kundenergebnisse.",
+        "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
+        "icon": "🚀"
+      },
+      {
+        "title": "Prozessoptimierung",
+        "description": "Excel-Chaos, E-Mail-Friedhöfe und Expertenwissen im Urlaub – das war gestern. Klare, dokumentierte Prozesse mit KI-Unterstützung.",
+        "image": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80",
+        "icon": "⚙️"
+      },
+      {
+        "title": "KI-Strategie & Beratung",
+        "description": "Von der ersten Idee bis zur produktiven Lösung. 17 Jahre Digitalisierungserfahrung mit Schwerpunkt Daten & KI stehen Ihnen zur Verfügung.",
+        "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80",
+        "icon": "💡"
+      }
+    ]
+  },
+  "about": {
+    "headline": "Gernot Griesbacher",
+    "subheadline": "17 Jahre Digitalisierungserfahrung",
+    "text": "Als Unternehmer wissen Sie: Das wertvollste Kapital Ihres Betriebs ist das Wissen Ihrer Schlüsselmitarbeiter. Doch wenn der erfahrene Meister krank wird, in Pension geht oder das Unternehmen verlässt – steht oft die halbe Firma still.\n\nIch helfe Ihnen, dieses implizite Wissen durch moderne KI-Systeme zu sichern, zu strukturieren und für alle zugänglich zu machen. Nicht als theoretisches Konzept, sondern als praktisches System, das nach 4–8 Wochen produktiv läuft.",
+    "highlights": [
+      "17 Jahre Digitalisierungserfahrung",
+      "Schwerpunkt Daten & KI",
+      "Für KMUs ab 5 Mitarbeitern",
+      "Branchen: Handwerk, Handel, Produktion"
+    ],
+    "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80"
+  },
+  "testimonials": {
+    "headline": "Was Kunden sagen",
+    "items": [
+      {
+        "text": "Gernot hat unser Onboarding so optimiert, dass neue Mitarbeiter nach 3 statt 9 Monaten eigenständig arbeiten können. Wir haben Prozesse mit KI-Unterstützung etabliert, die sich schon nach wenigen Monaten amortisiert haben.",
+        "name": "Markus"
+      },
+      {
+        "text": "Endlich können wir wachsen, ohne dass die Qualität leidet. Das Wissen unserer besten Mitarbeiter ist jetzt für alle Standorte verfügbar. Zuerst hatten wir Vorbehalte, aber es hat sich für uns mehr als gelohnt.",
+        "name": "Robert"
+      },
+      {
+        "text": "Die Pensionierung unseres langjährigen Werkstättenmeisters hat mir Kopfschmerzen bereitet. Jetzt haben wir eine Schulungsplattform, die neue Mitarbeiter in Rekordzeit produktiver macht und unsere Wachstumspläne ermöglicht.",
+        "name": "Inhaber"
+      }
+    ]
+  },
+  "gallery": {
+    "headline": "Ergebnisse, die zählen",
+    "images": [
+      {
+        "src": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80",
+        "alt": "Team-Zusammenarbeit"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+        "alt": "Datenanalyse"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80",
+        "alt": "Beratungsgespräch"
+      }
+    ]
+  },
+  "faq": {
+    "headline": "Häufige Fragen",
+    "items": [
+      {
+        "question": "Was kostet eine KI-Beratung?",
+        "answer": "Das erste Gespräch ist kostenlos und unverbindlich. Die Projektkosten hängen vom Umfang ab und werden nach dem Erstgespräch transparent kalkuliert."
+      },
+      {
+        "question": "Wie lange dauert eine Implementierung?",
+        "answer": "Typischerweise 4–8 Wochen bis zum ersten produktiven KI-System. Sie sehen also rasch konkrete Ergebnisse."
+      },
+      {
+        "question": "Brauche ich technisches Vorwissen?",
+        "answer": "Nein. Ich übersetze die Technik in Geschäftsergebnisse. Sie müssen keine IT-Experten werden – das ist mein Job."
+      },
+      {
+        "question": "Für welche Unternehmensgrößen ist das sinnvoll?",
+        "answer": "Optimal für Unternehmen mit 5 bis 200 Mitarbeitern, besonders in Handwerk, Handel und Produktion – überall dort, wo viel Erfahrungswissen in Köpfen steckt."
+      },
+      {
+        "question": "Was passiert nach dem Erstgespräch?",
+        "answer": "Sie erhalten eine ehrliche Einschätzung, ob und wie ich helfen kann – ohne Verkaufsdruck. Wenn es passt, erstelle ich ein konkretes Angebot."
+      }
+    ]
+  },
+  "contact": {
+    "headline": "Kostenloses Erstgespräch",
+    "subheadline": "Erzählen Sie mir von Ihrem Unternehmen. In 30 Minuten sehen Sie, ob KI bei Ihnen funktioniert.",
+    "cta": "Gespräch anfragen",
+    "email": "office@xgg.at",
+    "phone": "",
+    "address": "",
+    "hours": "",
+    "formPlaceholder": {
+      "name": "Ihr Name",
+      "email": "Ihre E-Mail",
+      "message": "Ihre Nachricht",
+      "submit": "Nachricht senden"
+    }
+  },
+  "footer": {
+    "tagline": "IT- & KI-Beratung für den Mittelstand.",
+    "links": [
+      {
+        "text": "Impressum",
+        "href": "#impressum"
+      },
+      {
+        "text": "Datenschutz",
+        "href": "#datenschutz"
+      }
+    ]
+  },
+  "impressum": {
+    "headline": "Impressum",
+    "lines": [
+      "XGG – Gernot Griesbacher",
+      "www.xgg.at",
+      "E-Mail: office@xgg.at",
+      "",
+      "Angaben gemäß § 5 ECG"
+    ]
+  }
+}
