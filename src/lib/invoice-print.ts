@@ -352,23 +352,59 @@ export async function downloadInvoice(
   const logoDataUrl = await getLogoDataUrl();
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
+  // Create a wrapper div for html2pdf
+  const container = document.createElement('div');
+  container.innerHTML = html;
+  const body = container.querySelector('body') || container;
 
-  const existing = document.getElementById('invoice-download-frame');
-  if (existing) existing.remove();
-
-  const iframe = document.createElement('iframe');
-  iframe.id = 'invoice-download-frame';
-  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;visibility:hidden;';
-  iframe.src = url;
-  document.body.appendChild(iframe);
-
-  iframe.onload = () => {
-    setTimeout(() => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
-    }, 400);
+  const opt = {
+    margin: 0,
+    filename: `Rechnung_${invoice.invoice_number}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      width: 794, // A4 at 96dpi
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait',
+    },
+    pagebreak: { mode: 'avoid-all' },
   };
+
+  // Extract the body content for rendering
+  const pageWrap = container.querySelector('.page-wrap');
+  const renderTarget = document.createElement('div');
+  renderTarget.style.cssText = 'width:794px;padding:68px 76px 83px 95px;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:10pt;color:#1a1a1a;background:#fff;line-height:1.4;box-sizing:border-box;';
+  renderTarget.innerHTML = pageWrap ? pageWrap.innerHTML : (container.querySelector('body')?.innerHTML || html);
+
+  // Copy the full styles
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    table { border-collapse: collapse; width: 100%; }
+    .items-table th { background: #2c3e50; color: #ffffff; padding: 8px; text-align: left; font-size: 8.5pt; font-weight: 600; letter-spacing: 0.3px; }
+    .items-table td { vertical-align: top; }
+    .totals-table td { padding: 4px 10px; font-size: 9.5pt; }
+    .total-final td { background: #2c3e50; color: #ffffff; font-weight: 700; font-size: 11pt; padding: 8px 10px; }
+    .sender-line { font-size: 7pt; color: #555; text-decoration: underline; margin-bottom: 18px; display: block; }
+    .footer { font-size: 7.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 8px; margin-top: 20px; }
+    .payment-box { margin-top: 18px; padding: 12px 14px; background: #f0f4f8; border-left: 3px solid #2c3e50; font-size: 8.5pt; }
+  `;
+
+  const wrapper = document.createElement('div');
+  wrapper.appendChild(styleEl);
+  wrapper.appendChild(renderTarget);
+
+  document.body.appendChild(wrapper);
+  wrapper.style.cssText = 'position:fixed;top:-99999px;left:-99999px;';
+
+  try {
+    await html2pdf().set(opt).from(wrapper).save();
+  } finally {
+    document.body.removeChild(wrapper);
+  }
 }
