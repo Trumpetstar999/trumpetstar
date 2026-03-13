@@ -1,11 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const EMAIL_PROXY_URL = "http://72.60.17.112/email-proxy/send";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,9 +16,9 @@ Deno.serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+    const EMAIL_PROXY_SECRET = Deno.env.get("EMAIL_PROXY_SECRET");
 
-    if (!SMTP_PASSWORD) throw new Error("SMTP_PASSWORD is not configured");
+    if (!EMAIL_PROXY_SECRET) throw new Error("EMAIL_PROXY_SECRET is not configured");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
@@ -49,18 +50,6 @@ Deno.serve(async (req) => {
 
     console.log(`[process-queue] Processing ${queueItems.length} emails`);
 
-    // Set up SMTP transporter
-    const transporter = nodemailer.createTransport({
-      host: "smtp.world4you.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "Valentin@trumpetstar.com",
-        pass: SMTP_PASSWORD,
-      },
-      tls: { rejectUnauthorized: false },
-    });
-
     let sent = 0;
     let failed = 0;
 
@@ -89,7 +78,6 @@ Deno.serve(async (req) => {
         // Get template
         let subject = "Nachricht von Trumpetstar";
         let htmlBody = "<p>Hallo!</p>";
-        let templateKey = "unknown";
 
         if (item.template_id) {
           const { data: template } = await supabase
@@ -99,10 +87,8 @@ Deno.serve(async (req) => {
             .single();
 
           if (template) {
-            templateKey = template.template_key;
             const lang = lead.language || "de";
 
-            // Get localized subject and body
             if (lang === "en" && template.subject_en) {
               subject = template.subject_en;
               htmlBody = template.body_html_en || template.body_html_de;
@@ -114,7 +100,6 @@ Deno.serve(async (req) => {
               htmlBody = template.body_html_de;
             }
 
-            // Replace placeholders
             const firstName = lead.first_name || lead.name || "";
             htmlBody = htmlBody
               .replace(/\{\{Vorname\}\}/g, firstName)
@@ -127,17 +112,30 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Send email
-        const mailOptions = {
-          from: '"Valentin von Trumpetstar" <Valentin@trumpetstar.com>',
-          to: lead.email,
-          subject,
-          html: htmlBody,
-          replyTo: "Valentin@trumpetstar.com",
-        };
+        // Send via HTTP proxy
+        const proxyRes = await fetch(EMAIL_PROXY_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-proxy-secret": EMAIL_PROXY_SECRET,
+          },
+          body: JSON.stringify({
+            from: '"Valentin von Trumpetstar" <Valentin@trumpetstar.com>',
+            to: lead.email,
+            subject,
+            html: htmlBody,
+            replyTo: "Valentin@trumpetstar.com",
+          }),
+        });
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`[process-queue] Sent to ${lead.email}: ${subject} (${info.messageId})`);
+        if (!proxyRes.ok) {
+          const errText = await proxyRes.text();
+          throw new Error(`Proxy error ${proxyRes.status}: ${errText}`);
+        }
+
+        const proxyData = await proxyRes.json().catch(() => ({}));
+        const messageId = proxyData.messageId || proxyData.message_id || "proxy-sent";
+        console.log(`[process-queue] Sent to ${lead.email}: ${subject} (${messageId})`);
 
         // Mark as sent
         await supabase
@@ -163,7 +161,6 @@ Deno.serve(async (req) => {
           .update({ status: "failed" } as any)
           .eq("id", item.id);
 
-        // Log failure
         await supabase.from("email_log").insert({
           recipient_email: "unknown",
           subject: "Failed to send",
