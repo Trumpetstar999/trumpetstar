@@ -406,7 +406,6 @@ export async function downloadInvoice(
         unit: 'mm',
         format: 'a4',
         orientation: 'portrait',
-        compress: true,
       },
     }).from(wrapper).save();
   } finally {
