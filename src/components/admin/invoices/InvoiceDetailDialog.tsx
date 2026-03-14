@@ -56,8 +56,12 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   async function handleDownload() {
     if (!invoice) return;
     setDownloading(true);
-    await downloadInvoice(invoice as any);
-    setDownloading(false);
+    try {
+      await downloadInvoice(invoice as any);
+    } finally {
+      // Short delay so spinner is visible before new window opens
+      setTimeout(() => setDownloading(false), 800);
+    }
   }
 
   return (

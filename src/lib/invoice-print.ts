@@ -348,69 +348,34 @@ export async function downloadInvoice(
   const logoDataUrl = await getLogoDataUrl();
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
 
-  // Dynamically import html2pdf to avoid SSR issues
-  const html2pdf = (await import('html2pdf.js')).default;
-
-  // Build a full self-contained DOM node (must stay in document while rendering)
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText = [
-    'position:fixed',
-    'top:-99999px',
-    'left:-99999px',
-    'width:794px',           // A4 at 96dpi
-    'background:#fff',
-    'font-family:Helvetica Neue,Helvetica,Arial,sans-serif',
-    'font-size:10pt',
-    'color:#1a1a1a',
-    'line-height:1.4',
-    'box-sizing:border-box',
-    'padding:68px 76px 83px 95px', // 18mm 20mm 22mm 25mm in px
-  ].join(';');
-
-  // Parse the HTML and extract only the page-wrap content + styles
-  const parser = new DOMParser();
-  const parsed = parser.parseFromString(html, 'text/html');
-
-  // Inject styles
-  const styleEl = document.createElement('style');
-  styleEl.textContent = Array.from(parsed.querySelectorAll('style'))
-    .map(s => s.textContent)
-    .join('\n');
-  wrapper.appendChild(styleEl);
-
-  // Inject content
-  const pageWrap = parsed.querySelector('.page-wrap');
-  if (pageWrap) {
-    wrapper.appendChild(pageWrap.cloneNode(true));
-  } else {
-    wrapper.innerHTML += parsed.body.innerHTML;
+  // Open in a new window/tab and trigger print dialog (PDF save)
+  // This is the most reliable cross-browser approach (Chrome, Safari, Firefox)
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    // Fallback: blob download of the HTML file if popup blocked
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Rechnung_${invoice.invoice_number}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return;
   }
 
-  document.body.appendChild(wrapper);
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
 
-  try {
-    await html2pdf().set({
-      margin: 0,
-      filename: `Rechnung_${invoice.invoice_number}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        windowWidth: 794,
-        width: 794,
-        backgroundColor: '#ffffff',
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait',
-      },
-    }).from(wrapper).save();
-  } finally {
-    if (document.body.contains(wrapper)) {
-      document.body.removeChild(wrapper);
-    }
-  }
+  // Wait for all resources (images/QR) to load, then print
+  printWindow.onload = () => {
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      // Close the window after print dialog closes
+      printWindow.onafterprint = () => printWindow.close();
+    }, 500);
+  };
 }
