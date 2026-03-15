@@ -59,7 +59,7 @@ export default function TrompeteLernenKinder() {
             {[
               ["1. Körperliche Voraussetzungen", "Die Trompete erfordert Lippenspannung (Ansatz) und Lungenvolumen. Kinder unter 6 Jahren haben in der Regel noch nicht die physische Reife, um einen stabilen Ton zu erzeugen – das führt zu Frust. Ab 7–8 Jahren sind die meisten Kinder körperlich bereit."],
               ["2. Konzentrationsfähigkeit", "Trompetenlernen braucht Fokus. Ein Kind, das 10–15 Minuten konzentriert üben kann, ist bereit. Das ist bei den meisten Kindern ab 7–8 Jahren der Fall."],
-              ["3. Eigene Motivation", "Das wichtigste Kriterium. Ein Kind, das selbst möchte, macht in 3 Monaten mehr Fortschritte als ein Kind, das 1 Jahr lang gedrückt wird. Fragen Sie Ihr Kind ehrlich: „Willst du das wirklich, oder findest du es nur gerade cool?""],
+              ["3. Eigene Motivation", "Das wichtigste Kriterium. Ein Kind, das selbst möchte, macht in 3 Monaten mehr Fortschritte als ein Kind, das 1 Jahr lang gedrückt wird. Fragen Sie Ihr Kind ehrlich: \u201eWillst du das wirklich, oder findest du es nur gerade cool?\u201c"],
             ].map(([title, text], i) => (
               <AnimatedSection key={i} direction="left" delay={i * 80}>
                 <Card>
