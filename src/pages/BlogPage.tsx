@@ -34,6 +34,42 @@ const posts = [
     emoji: "⏱️",
     tag: "Übe-Tipps",
   },
+  {
+    slug: "trompete-lernen-kinder",
+    title: "Trompete lernen für Kinder – Elternguide 2026",
+    excerpt: "Kann mein Kind Trompete lernen? Alter, Instrumente, Kosten, Übungsplan – alles was Eltern wissen müssen.",
+    date: "15. März 2026",
+    readTime: "10 Min",
+    emoji: "👨‍👧",
+    tag: "Elternguide",
+  },
+  {
+    slug: "trompete-fluegelhorn-kind",
+    title: "Trompete oder Flügelhorn fürs Kind – der Vergleich",
+    excerpt: "Trompete oder Flügelhorn für Ihr Kind? Wir vergleichen Klang, Technik, Kosten und zeigen, welches Instrument besser zum Einstieg passt.",
+    date: "15. März 2026",
+    readTime: "7 Min",
+    emoji: "🎵",
+    tag: "Instrument-Vergleich",
+  },
+  {
+    slug: "trompete-kinder-kaufen",
+    title: "Erste Trompete für Kinder kaufen – Ratgeber",
+    excerpt: "Welche Trompete für Kinder kaufen? Budget, Marken, Leihen vs. Kaufen – unser ehrlicher Ratgeber für Eltern. Inkl. Checkliste.",
+    date: "15. März 2026",
+    readTime: "8 Min",
+    emoji: "🛍️",
+    tag: "Kauf-Ratgeber",
+  },
+  {
+    slug: "blaeserklasse-trompete",
+    title: "Bläserklasse Trompete – Was Eltern wissen müssen",
+    excerpt: "Ihr Kind kommt in die Bläserklasse? Wir erklären Ablauf, Kosten, Instrument und wie Sie Ihr Kind optimal unterstützen können.",
+    date: "15. März 2026",
+    readTime: "7 Min",
+    emoji: "🏫",
+    tag: "Eltern-Info",
+  },
 ];
 
 export default function BlogPage() {

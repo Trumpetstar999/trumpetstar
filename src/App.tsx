@@ -17,6 +17,10 @@ import BlogPage from "./pages/BlogPage";
 import TrompeteLernenErwachsene from "./pages/blog/TrompeteLernenErwachsene";
 import ErsterTonTrompete from "./pages/blog/ErsterTonTrompete";
 import TrompeteUebenRoutine from "./pages/blog/TrompeteUebenRoutine";
+import TrompeteLernenKinder from "./pages/blog/TrompeteLernenKinder";
+import TrompeteFluegelhorn from "./pages/blog/TrompeteFluegelhorn";
+import TrompeteKinderKaufen from "./pages/blog/TrompeteKinderKaufen";
+import BlaeserklasseEltern from "./pages/blog/BlaeserklasseEltern";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
 import { ChatsPage } from "./pages/ChatsPage";
@@ -75,6 +79,10 @@ const App = () => {
                         <Route path="/blog/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsene />} />
                         <Route path="/blog/erster-ton-trompete" element={<ErsterTonTrompete />} />
                         <Route path="/blog/trompete-ueben-routine" element={<TrompeteUebenRoutine />} />
+                        <Route path="/blog/trompete-lernen-kinder" element={<TrompeteLernenKinder />} />
+                        <Route path="/blog/trompete-fluegelhorn-kind" element={<TrompeteFluegelhorn />} />
+                        <Route path="/blog/trompete-kinder-kaufen" element={<TrompeteKinderKaufen />} />
+                        <Route path="/blog/blaeserklasse-trompete" element={<BlaeserklasseEltern />} />
                         
                         {/* Auth Routes */}
                         <Route path="/auth" element={<AuthPage />} />
