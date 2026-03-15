@@ -486,6 +486,102 @@ async function processIpnEvent(
       // Don't fail the main flow
     }
 
+    // 9. Upsert lead into CRM for PURCHASE events
+    if (['PURCHASE', 'RENEWAL'].includes(normalized.event_type)) {
+      try {
+        const leadName = [normalized.first_name, normalized.last_name].filter(Boolean).join(' ').trim() || null;
+        const { data: existingLead } = await supabase
+          .from('leads')
+          .select('id, total_purchases')
+          .eq('email', normalized.email)
+          .maybeSingle();
+
+        if (existingLead) {
+          await supabase
+            .from('leads')
+            .update({
+              name: leadName || undefined,
+              first_name: normalized.first_name || undefined,
+              stage: 'customer',
+              last_contact_at: new Date().toISOString(),
+              converted_at: existingLead?.converted_at || new Date().toISOString(),
+              product_interest: product.name,
+              source: 'digistore24',
+              lifetime_value: (existingLead as any).lifetime_value
+                ? ((existingLead as any).lifetime_value + (normalized.amount || 0))
+                : (normalized.amount || 0),
+            })
+            .eq('id', existingLead.id);
+        } else {
+          await supabase
+            .from('leads')
+            .insert({
+              email: normalized.email,
+              name: leadName,
+              first_name: normalized.first_name || null,
+              stage: 'customer',
+              source: 'digistore24',
+              language: normalized.language || 'de',
+              product_interest: product.name,
+              converted_at: new Date().toISOString(),
+              last_contact_at: new Date().toISOString(),
+              lifetime_value: normalized.amount || 0,
+            });
+        }
+        console.log(`[leads] Upserted lead for ${normalized.email}`);
+      } catch (leadErr) {
+        console.error('Error writing to leads table:', leadErr);
+      }
+    }
+
+    // 10. Create shipment entry for PURCHASE events with address data
+    if (normalized.event_type === 'PURCHASE') {
+      try {
+        // Extract address fields from raw payload
+        const street = rawPayload.shipping_street || rawPayload.billing_street || rawPayload.street || rawPayload.address || null;
+        const zip = rawPayload.shipping_zip || rawPayload.billing_zip || rawPayload.zip || rawPayload.postal_code || null;
+        const city = rawPayload.shipping_city || rawPayload.billing_city || rawPayload.city || null;
+        const country = rawPayload.shipping_country || rawPayload.billing_country || rawPayload.country || 'AT';
+        const addressFull = rawPayload.shipping_address || rawPayload.billing_address || null;
+        const phone = rawPayload.phone || rawPayload.buyer_phone || null;
+
+        const customerName = [normalized.first_name, normalized.last_name].filter(Boolean).join(' ').trim()
+          || normalized.email.split('@')[0];
+
+        // Check if shipment already exists for this transaction
+        const { data: existingShipment } = await supabase
+          .from('digistore24_shipments')
+          .select('id')
+          .eq('transaction_id', normalized.order_id)
+          .maybeSingle();
+
+        if (!existingShipment) {
+          await supabase
+            .from('digistore24_shipments')
+            .insert({
+              transaction_id: normalized.order_id,
+              order_id: normalized.order_id,
+              customer_name: customerName,
+              customer_email: normalized.email,
+              product_name: product.name,
+              product_id: normalized.product_id,
+              quantity: 1,
+              address_street: street,
+              address_zip: zip,
+              address_city: city,
+              address_country: country,
+              address_full: addressFull,
+              status: 'pending',
+              notes: phone ? `Tel: ${phone}` : null,
+              raw_data: rawPayload,
+            });
+          console.log(`[shipments] Created shipment for order ${normalized.order_id}`);
+        }
+      } catch (shipErr) {
+        console.error('Error writing to shipments table:', shipErr);
+      }
+    }
+
     // Mark as processed
     await supabase
       .from('digistore24_ipn_events')

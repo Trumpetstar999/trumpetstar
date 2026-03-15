@@ -1,5 +1,4 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,14 +6,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const EMAIL_PROXY_URL = "http://72.60.17.112/email-proxy/send";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-    if (!SMTP_PASSWORD) throw new Error("SMTP_PASSWORD is not configured");
+    const EMAIL_PROXY_SECRET = Deno.env.get("EMAIL_PROXY_SECRET");
+    if (!EMAIL_PROXY_SECRET) throw new Error("EMAIL_PROXY_SECRET is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -100,28 +101,33 @@ Deno.serve(async (req) => {
       htmlBody = fallback[lang].body;
     }
 
-    // Send via SMTP (world4you.com)
-    const transporter = nodemailer.createTransport({
-      host: "smtp.world4you.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: "Valentin@trumpetstar.com",
-        pass: SMTP_PASSWORD,
+    // Send via HTTP proxy
+    const proxyRes = await fetch(EMAIL_PROXY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-proxy-secret": EMAIL_PROXY_SECRET,
       },
+      body: JSON.stringify({
+        from: '"Trumpetstar" <Valentin@trumpetstar.com>',
+        to: email.trim().toLowerCase(),
+        subject,
+        html: htmlBody,
+        replyTo: "Valentin@trumpetstar.com",
+      }),
     });
 
-    const info = await transporter.sendMail({
-      from: '"Trumpetstar" <Valentin@trumpetstar.com>',
-      to: email.trim().toLowerCase(),
-      subject,
-      html: htmlBody,
-    });
+    if (!proxyRes.ok) {
+      const errText = await proxyRes.text();
+      throw new Error(`Proxy error ${proxyRes.status}: ${errText}`);
+    }
 
-    console.log("[send-magic-link] Email sent:", info.messageId);
+    const proxyData = await proxyRes.json().catch(() => ({}));
+    const messageId = proxyData.messageId || proxyData.message_id || "proxy-sent";
+    console.log("[send-magic-link] Sent via proxy:", messageId);
 
     return new Response(
-      JSON.stringify({ success: true, messageId: info.messageId }),
+      JSON.stringify({ success: true, messageId }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

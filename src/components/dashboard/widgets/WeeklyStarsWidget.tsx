@@ -162,7 +162,7 @@ export function WeeklyStarsWidget() {
               </div>
 
               {/* Bar chart — expands to fill space */}
-              <div className="flex-1 min-h-0 flex items-end justify-between gap-2 pb-1">
+              <div className="flex-1 min-h-0 flex items-end justify-between gap-2 pb-1 pt-7">
                 {weekData.map((day, index) => {
                   const heightPercent = day.stars > 0 ? (day.stars / maxStars) * 100 : 0;
                   const actualHeight = Math.max(heightPercent, day.stars > 0 ? 20 : 6);

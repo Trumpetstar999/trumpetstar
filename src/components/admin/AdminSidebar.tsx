@@ -21,7 +21,8 @@ import {
   Search,
   Inbox,
   BookOpen,
-  Truck
+  Truck,
+  Receipt
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,6 +42,7 @@ const menuItems = [
   { id: 'mailbox', label: 'Postfach', icon: Inbox },
   { id: 'knowledge', label: 'Wissensdatenbank', icon: BookOpen },
   { id: 'shipping', label: 'Versand', icon: Truck },
+  { id: 'invoices', label: 'Rechnungen', icon: Receipt },
   { id: 'levels', label: 'Levels', icon: Layers },
   { id: 'pdfs', label: 'PDFs / Noten', icon: FileText },
   { id: 'musicxml', label: 'MusicXML', icon: Music },

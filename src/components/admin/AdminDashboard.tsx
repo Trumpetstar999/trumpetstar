@@ -5,6 +5,7 @@ import { RecentActivityList } from './RecentActivityList';
 import { ActivityCharts } from './ActivityCharts';
 import { VimeoErrorsList } from './VimeoErrorsList';
 import { PlanStatsCards } from './PlanStatsCards';
+import { LandingPageViewsCard } from './LandingPageViewsCard';
 
 const fadeUp = (delay: number) => ({
   hidden: { opacity: 0, y: 22 },
@@ -35,6 +36,11 @@ export function AdminDashboard() {
       <motion.section variants={fadeUp(0.12)} initial="hidden" animate="show">
         <SectionLabel>Übersicht</SectionLabel>
         <DashboardStats />
+      </motion.section>
+
+      <motion.section variants={fadeUp(0.20)} initial="hidden" animate="show">
+        <SectionLabel>Landingpage-Aufrufe</SectionLabel>
+        <LandingPageViewsCard />
       </motion.section>
 
       <motion.section variants={fadeUp(0.24)} initial="hidden" animate="show">
