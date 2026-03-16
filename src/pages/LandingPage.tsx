@@ -190,7 +190,7 @@ export default function LandingPage() {
                 <img
                   src={appPreview}
                   alt="Trumpetstar App – Screenshot"
-                  className="w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
                 />
               </button>
             </div>
