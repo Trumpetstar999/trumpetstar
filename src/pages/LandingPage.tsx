@@ -169,7 +169,7 @@ export default function LandingPage() {
           >
             {audience ? activeContent.cta : 'Jetzt kostenlos starten'} <ArrowRight className="w-6 h-6" />
           </Button>
-          <p className="text-white/50 text-xs mb-3">Keine Kreditkarte · Jederzeit kündbar</p>
+          <p className="text-white/50 text-xs mb-3">Keine Kreditkarte · 30 Tage Geld-zurück-Garantie</p>
           <button
             onClick={() => navigate('/login')}
             className="text-white/60 hover:text-white/90 text-sm underline underline-offset-2 transition-colors"
