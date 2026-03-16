@@ -168,8 +168,7 @@ export default function LandingPage() {
 
           {/* Trust bar – centred */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {[
-              { icon: Users, label: '500+ aktive Schüler', color: 'text-[hsl(var(--reward-gold))]' },
+          {[
               { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
               { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
               { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
