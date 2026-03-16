@@ -344,7 +344,7 @@ export default function LandingPage() {
               Starte noch heute
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Die ersten 30 Lieder — gratis
+              Alle Lieder — kostenlos spielbar
             </h2>
             <p className="text-white/60 mb-8 text-sm">
               Kein Abo, keine Kreditkarte. Einfach registrieren und loslegen.
