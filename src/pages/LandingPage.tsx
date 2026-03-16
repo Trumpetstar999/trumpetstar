@@ -83,7 +83,7 @@ export default function LandingPage() {
 
   const adultContent = {
     headline: 'Trompete lernen als Erwachsener – es ist nie zu spät',
-    sub: 'Tausende Erwachsene haben mit Trumpetstar von Null angefangen. Ohne Blamage. In deinem eigenen Tempo.',
+    sub: 'Viele Erwachsene haben mit Trumpetstar von Null angefangen – ohne Vorkenntnisse, ohne Blamage, in ihrem eigenen Tempo.',
     cta: 'Jetzt kostenlos starten',
   };
 
