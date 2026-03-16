@@ -80,7 +80,7 @@ export async function generateInvoiceHTML(
     .join('');
 
   const logoHtml = logoDataUrl
-    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:52px;object-fit:contain;">`
+    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:60px;object-fit:contain;">`
     : `<div style="font-size:18pt;font-weight:800;letter-spacing:-0.5px;line-height:1;color:#1a1a1a;">TRUMPET<br><span style="color:#c0392b;">STAR</span></div>`;
 
   return `<!DOCTYPE html>
@@ -95,7 +95,7 @@ export async function generateInvoiceHTML(
     margin: 0mm;
   }
   @media print {
-    body { margin: 0 !important; padding: 12mm 18mm 14mm 22mm !important; }
+    body { margin: 0 !important; padding: 18mm 20mm 20mm 25mm !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
   }
@@ -104,7 +104,7 @@ export async function generateInvoiceHTML(
     font-size: 9.5pt;
     color: #1a1a1a;
     background: #fff;
-    line-height: 1.35;
+    line-height: 1.4;
   }
   .page-wrap {
     width: 100%;
@@ -115,7 +115,7 @@ export async function generateInvoiceHTML(
   .items-table th {
     background: #2c3e50;
     color: #ffffff;
-    padding: 5px 7px;
+    padding: 6px 8px;
     text-align: left;
     font-size: 8pt;
     font-weight: 600;
@@ -134,19 +134,19 @@ export async function generateInvoiceHTML(
     font-size: 7pt;
     color: #555;
     text-decoration: underline;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: block;
   }
   .footer {
     font-size: 7pt;
     color: #555;
     border-top: 1px solid #ccc;
-    padding-top: 5px;
-    margin-top: 10px;
+    padding-top: 6px;
+    margin-top: 12px;
   }
   .payment-box {
-    margin-top: 10px;
-    padding: 8px 12px;
+    margin-top: 14px;
+    padding: 10px 14px;
     background: #f0f4f8;
     border-left: 3px solid #2c3e50;
     font-size: 8pt;
@@ -158,11 +158,11 @@ export async function generateInvoiceHTML(
 <div class="page-wrap">
 
 <!-- ═══ HEADER ═══ -->
-<table style="margin-bottom:14px;">
+<table style="margin-bottom:20mm;">
   <tr>
     <td style="vertical-align:top;width:55%;">
       <span class="sender-line">${COMPANY.name} &nbsp;${COMPANY.street} &ndash; ${COMPANY.city}</span>
-      <p style="line-height:1.5;font-size:9.5pt;">
+      <p style="line-height:1.6;font-size:9.5pt;">
         <strong style="font-size:10.5pt;">${customer.company_name || customer.name}</strong><br>
         ${customer.company_name ? customer.name + '<br>' : ''}
         ${customer.street}<br>
@@ -173,24 +173,24 @@ export async function generateInvoiceHTML(
     </td>
 
     <td style="vertical-align:top;text-align:right;width:45%;">
-      <div style="margin-bottom:20px;">${logoHtml}</div>
+      <div style="margin-bottom:24px;">${logoHtml}</div>
       <table style="margin-left:auto;min-width:150px;">
         <tr>
-          <td colspan="2" style="padding-bottom:4px;">
+          <td colspan="2" style="padding-bottom:6px;">
             <span style="font-size:16pt;font-weight:700;letter-spacing:-0.5px;color:#1a1a1a;">Rechnung</span>
           </td>
         </tr>
         <tr>
-          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;white-space:nowrap;">Rechnungsnummer</td>
-          <td style="padding:2px 0;font-size:8.5pt;font-weight:700;">${invoice.invoice_number}</td>
+          <td style="padding:3px 12px 3px 0;color:#666;font-size:8pt;white-space:nowrap;">Rechnungsnummer</td>
+          <td style="padding:3px 0;font-size:8.5pt;font-weight:700;">${invoice.invoice_number}</td>
         </tr>
         <tr>
-          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;">Rechnungsdatum</td>
-          <td style="padding:2px 0;font-size:8.5pt;">${formatDate(invoice.invoice_date)}</td>
+          <td style="padding:3px 12px 3px 0;color:#666;font-size:8pt;">Rechnungsdatum</td>
+          <td style="padding:3px 0;font-size:8.5pt;">${formatDate(invoice.invoice_date)}</td>
         </tr>
         <tr>
-          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;vertical-align:middle;">Fälligkeitsdatum</td>
-          <td style="padding:2px 0;font-size:8.5pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 12px 3px 0;color:#666;font-size:8pt;vertical-align:middle;">Fälligkeitsdatum</td>
+          <td style="padding:3px 0;font-size:8.5pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
         </tr>
       </table>
     </td>
