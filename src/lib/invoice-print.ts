@@ -84,14 +84,13 @@ export async function generateInvoiceHTML(
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
     size: A4 portrait;
-    margin: 18mm 20mm 22mm 25mm;
+    /* margin: 0 removes browser-injected header/footer (URL, title, page numbers) */
+    margin: 0mm;
   }
   @media print {
-    body { margin: 0 !important; }
+    body { margin: 0 !important; padding: 18mm 20mm 22mm 25mm !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
-    /* Suppress browser-added header/footer (URL, title, page number) */
-    @page { margin-top: 18mm; margin-bottom: 22mm; }
   }
   html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -183,9 +182,10 @@ export async function generateInvoiceHTML(
           <td style="padding:3px 0;font-size:9pt;">${formatDate(invoice.invoice_date)}</td>
         </tr>
         <tr>
-          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0;padding-bottom:${gap3cm};font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;vertical-align:middle;">Fälligkeitsdatum</td>
+          <td style="padding:3px 0;font-size:9pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
         </tr>
+        <tr><td colspan="2" style="padding-bottom:${gap3cm};"></td></tr>
       </table>
     </td>
   </tr>
