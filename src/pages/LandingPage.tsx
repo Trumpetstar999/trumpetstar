@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
-  Loader2, Music, CheckCircle, Star, ArrowRight,
-  Users, Tv2, Trophy, Mic2, Zap, BookOpen
+  Loader2, CheckCircle, Star, ArrowRight,
+  Users, Trophy, Mic2, BookOpen, Music2,
+  ChevronDown, Play, Shield, Zap
 } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
@@ -12,10 +13,89 @@ import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import appPreview from '@/assets/app-preview.png';
 import { useLanguage } from '@/hooks/useLanguage';
 
+/* ─── Korrekte Daten aus der Wissensdatenbank ─── */
+const CHECKOUT_URL = 'https://www.digistore24.com/product/345378';
+
+const TESTIMONIALS = [
+  {
+    quote: 'Ich hatte mein ganzes Leben lang das Trompetespielen „irgendwie" gelernt. Mit Trumpetstar habe ich endlich verstanden, wie Ansatz und Atmung wirklich funktionieren.',
+    name: 'Michael R.',
+    role: 'Erwachsener Anfänger, 47 Jahre',
+    stars: 5,
+  },
+  {
+    quote: 'Ein fantastisch gelungenes pädagogisches Konzept – meine Tochter übt jetzt freiwillig jeden Tag. Das hätte ich nie erwartet.',
+    name: 'Sandra K.',
+    role: 'Mutter, Kind 9 Jahre',
+    stars: 5,
+  },
+  {
+    quote: 'Die Mitspieltracks sind genial. Ich übe zu echter Begleitung und merke, wie ich von Woche zu Woche besser werde.',
+    name: 'Jonas T.',
+    role: 'Schüler, 14 Jahre',
+    stars: 5,
+  },
+];
+
+const FREE_FEATURES = [
+  'Ausgewählte Lernvideos',
+  'PDF-Noten (Auswahl)',
+  'Stimmgerät & Basistools',
+];
+
+const PRO_FEATURES = [
+  '300+ Lern- & Mitspielvideos',
+  'Komplette Anfängerschule',
+  '55 Kinderlieder + Playbacks',
+  'KI-Assistent (DE/EN/ES)',
+  'Persönliches Feedback vom Lehrer',
+  'Fortschritt, Kalender & Erfolge',
+  '30 Tage Geld-zurück-Garantie',
+  'Jederzeit kündbar – kein Vertrag',
+];
+
+const STEPS = [
+  {
+    icon: Play,
+    title: 'Video anschauen',
+    desc: 'Professionelle Lehrvideos – klar, kurz und praxisnah. Von Mario Schulter persönlich erklärt.',
+  },
+  {
+    icon: Music2,
+    title: 'Mitspielen',
+    desc: 'Echte Playbacks für jede Übung. Du spielst, die Band spielt mit – sofort motivierend.',
+  },
+  {
+    icon: Trophy,
+    title: 'Fortschritt spüren',
+    desc: 'Lernjournal, Sterne-System und strukturierter Aufbau – von Null bis Bronze.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'Brauche ich Vorkenntnisse?',
+    a: 'Nein. Trumpetstar wurde speziell für absolute Anfänger entwickelt – Kinder ab 5–6 Jahren und Erwachsene ohne Vorkenntnisse.',
+  },
+  {
+    q: 'Kann ich jederzeit kündigen?',
+    a: 'Ja. Das Abo ist monatlich kündbar – per E-Mail bis 48h vor dem Folgemonat. Kein Vertrag, keine versteckten Kosten.',
+  },
+  {
+    q: 'Gibt es eine Geld-zurück-Garantie?',
+    a: 'Ja, 30 Tage Geld-zurück-Garantie. Wenn du nicht überzeugt bist, erhältst du dein Geld zurück – ohne Wenn und Aber.',
+  },
+  {
+    q: 'Eignet sich Trumpetstar auch für Kinder?',
+    a: 'Absolut. Die Starmethode mit Sticker-Sternen motiviert Kinder besonders gut. Für die Kleinsten empfehlen wir ein Kornett (leichter zu halten).',
+  },
+];
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [audience, setAudience] = useState<'child' | 'adult' | null>(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -47,149 +127,131 @@ export default function LandingPage() {
     );
   }
 
-  const handleCtaClick = () => {
+  const handleCta = () => {
     const params = new URLSearchParams(window.location.search);
     const utmString = params.toString();
     navigate(`/signup${utmString ? `?${utmString}` : ''}`);
   };
 
-  const landingFaqs = [
-    { question: t('landing.faq.q1'), answer: t('landing.faq.a1') },
-    { question: t('landing.faq.q2'), answer: t('landing.faq.a2') },
-    { question: t('landing.faq.q3'), answer: t('landing.faq.a3') },
-    { question: t('landing.faq.q4'), answer: t('landing.faq.a4') },
-  ];
+  const heroHeadline = audience === 'child'
+    ? 'Trompete für Kinder – spielerisch & fundiert'
+    : audience === 'adult'
+    ? 'Trompete lernen als Erwachsener – es ist nie zu spät'
+    : 'Trompete lernen – mit System & Spaß';
 
-  const testimonials = [
-    {
-      quote: 'Ich hatte mein ganzes Leben lang das Tenorhornspiel „irgendwie" gelernt. Mit Trumpetstar habe ich endlich verstanden, wie Ansatz und Atmung wirklich funktionieren.',
-      name: 'Michael R.',
-      role: 'Erwachsener Anfänger, 47',
-      stars: 5,
-    },
-    {
-      quote: 'Ein fantastisch gelungenes pädagogisches Konzept – meine Tochter übt jetzt freiwillig jeden Tag. Das hätte ich nie erwartet.',
-      name: 'Sandra K.',
-      role: 'Mutter, Kind 9 Jahre',
-      stars: 5,
-    },
-    {
-      quote: 'Die Mitspieltracks sind genial. Ich übe zu echter Begleitung und merke, wie ich von Woche zu Woche besser werde.',
-      name: 'Jonas T.',
-      role: 'Schüler, 14 Jahre',
-      stars: 5,
-    },
-  ];
+  const heroSub = audience === 'child'
+    ? 'Strukturierter Unterricht, den Kinder lieben. Die Starmethode motiviert ab dem ersten Tag – ab 5–6 Jahren.'
+    : audience === 'adult'
+    ? 'Keine Vorkenntnisse nötig. In deinem eigenen Tempo, mit professionellem Aufbau und persönlicher Begleitung.'
+    : 'Von Null bis zu deinen ersten Stücken – mit 300+ Videos, Playbacks und persönlichem Feedback.';
 
-  const adultContent = {
-    headline: 'Trompete lernen als Erwachsener – es ist nie zu spät',
-    sub: 'Viele Erwachsene haben mit Trumpetstar von Null angefangen – ohne Vorkenntnisse, ohne Blamage, in ihrem eigenen Tempo.',
-    cta: 'Jetzt kostenlos starten',
-  };
-
-  const childContent = {
-    headline: 'Trompete für Kinder – spielerisch & pädagogisch fundiert',
-    sub: 'Professioneller Unterricht, den Kinder lieben – ab 7 Jahren, strukturiert und motivierend.',
-    cta: 'Kostenlos ausprobieren',
-  };
-
-  const activeContent = audience === 'child' ? childContent : adultContent;
+  const landingFaqs = FAQS.map(f => ({ question: f.q, answer: f.a }));
 
   return (
     <SEOPageLayout
-      title={t('landing.seo.title')}
-      description={t('landing.seo.description')}
+      title="Trompete lernen | Trumpetstar – Online Trompetenunterricht"
+      description="Trompete lernen für Anfänger & Kinder. 300+ Videos, Playbacks, KI-Assistent & persönliches Feedback. Bekannt aus 2 Minuten 2 Millionen. Jetzt kostenlos starten."
     >
       <FAQSchema faqs={landingFaqs} />
 
-      <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)]">
+      <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)] min-h-screen">
 
-        {/* ── HERO ── */}
-        <section className="relative max-w-6xl mx-auto px-5 pt-14 pb-10">
-          <div className="flex flex-col lg:flex-row items-center gap-10">
+        {/* ══════════════════════════════════════
+            SECTION 1 — HERO
+        ══════════════════════════════════════ */}
+        <section className="relative max-w-6xl mx-auto px-5 pt-12 pb-16">
 
-            {/* LEFT: text content */}
-            <div className="flex-1 text-center">
-              {/* Logo */}
-              <div className="flex justify-center mb-6">
-                <img src={trumpetstarLogo} alt="Trumpetstar" className="h-16 w-auto drop-shadow-lg" />
-              </div>
+          {/* Logo – centred */}
+          <div className="flex justify-center mb-8">
+            <img src={trumpetstarLogo} alt="Trumpetstar" className="h-14 w-auto drop-shadow-lg" />
+          </div>
 
-              {/* Trust bar – above fold */}
-              <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-                  <Users className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> 500+ aktive Schüler
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-                  <Trophy className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> Bekannt aus „2 Minuten 2 Millionen"
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-                  <Star className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" /> 4,9 / 5 Bewertung
-                </span>
-                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Aktualisiert März 2026
-                </span>
-              </div>
+          {/* Trust bar – centred */}
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {[
+              { icon: Users, label: '500+ aktive Schüler', color: 'text-[hsl(var(--reward-gold))]' },
+              { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
+              { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
+              { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
+            ].map(({ icon: Icon, label, color }) => (
+              <span
+                key={label}
+                className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
+                {label}
+              </span>
+            ))}
+          </div>
 
-              {/* Audience switch */}
-              <div className="flex justify-center gap-3 mb-8">
+          {/* Two-column hero */}
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+
+            {/* LEFT */}
+            <div className="flex-1 text-center lg:text-left max-w-xl mx-auto lg:mx-0">
+
+              {/* Audience toggle */}
+              <div className="flex justify-center lg:justify-start gap-2 mb-7">
                 <button
                   onClick={() => setAudience('child')}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'child' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                    audience === 'child'
+                      ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-md'
+                      : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
+                  }`}
                 >
                   👨‍👧 Für mein Kind
                 </button>
                 <button
                   onClick={() => setAudience('adult')}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'adult' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
+                    audience === 'adult'
+                      ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-md'
+                      : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
+                  }`}
                 >
                   🎺 Für mich selbst
                 </button>
               </div>
 
-              {/* Dynamic headline */}
-              <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-tight mb-4">
-                {audience
-                  ? activeContent.headline
-                  : <>{t('landing.hero.title').split('\n').map((line, i, arr) => (
-                      i < arr.length - 1 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>
-                    ))}{' '}
-                    <span className="text-[hsl(var(--reward-gold))]">{t('landing.hero.titleHighlight')}</span>
-                  </>
-                }
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
+                {heroHeadline}
               </h1>
 
-              <p className="text-lg md:text-xl text-white/80 mb-6">
-                {audience ? activeContent.sub : t('landing.hero.subtitle')}
+              <p className="text-lg text-white/75 leading-relaxed mb-8">
+                {heroSub}
               </p>
 
-              {/* Single dominant CTA */}
               <Button
                 size="lg"
-                onClick={handleCtaClick}
-                className="h-16 px-10 text-xl font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 mb-3"
+                onClick={handleCta}
+                className="h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 w-full sm:w-auto"
               >
-                {audience ? activeContent.cta : 'Jetzt kostenlos starten'} <ArrowRight className="w-6 h-6" />
+                Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
               </Button>
-              <p className="text-white/50 text-xs mb-3">Keine Kreditkarte · 30 Tage Geld-zurück-Garantie</p>
+
+              <p className="text-white/45 text-xs mt-3">
+                Keine Kreditkarte · Jederzeit kündbar · 30 Tage Garantie
+              </p>
+
               <button
                 onClick={() => navigate('/login')}
-                className="text-white/60 hover:text-white/90 text-sm underline underline-offset-2 transition-colors"
+                className="mt-4 block text-white/55 hover:text-white/90 text-sm underline underline-offset-2 transition-colors mx-auto lg:mx-0"
               >
                 Bereits registriert? Einloggen →
               </button>
             </div>
 
-            {/* RIGHT: App preview image */}
-            <div className="flex-1 w-full max-w-lg lg:max-w-none">
+            {/* RIGHT – App preview */}
+            <div className="flex-1 w-full max-w-md lg:max-w-none">
               <button
-                onClick={handleCtaClick}
-                className="block w-full group cursor-pointer"
+                onClick={handleCta}
+                className="block w-full cursor-pointer group"
                 aria-label="App starten"
               >
                 <img
                   src={appPreview}
-                  alt="Trumpetstar App – Screenshot"
+                  alt="Trumpetstar App – Vorschau"
                   className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
                 />
               </button>
@@ -198,165 +260,229 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── GRATIS FRAMING + PREISTABELLE ── */}
-        <section className="max-w-4xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">Kostenlos anfangen. Bezahlen wenn du wächst.</h2>
-          <p className="text-center text-white/60 mb-10 text-sm">Kein Risiko, kein Vertrag, 30 Tage Geld-zurück-Garantie</p>
+        {/* ══════════════════════════════════════
+            SECTION 2 — SO FUNKTIONIERT'S
+        ══════════════════════════════════════ */}
+        <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
+          <h2 className="text-3xl font-bold text-white text-center mb-2">So funktioniert Trumpetstar</h2>
+          <p className="text-center text-white/55 text-sm mb-12">Drei Schritte – vom ersten Ton zum ersten Stück</p>
 
-          <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto">
-            {/* FREE */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col">
-              <p className="text-white/60 text-xs uppercase tracking-widest font-semibold mb-2">Gratis</p>
-              <p className="text-4xl font-bold text-white mb-1">0 €</p>
-              <p className="text-white/50 text-xs mb-5">für immer kostenlos</p>
-              <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Ausgewählte Lernvideos</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> PDF-Noten (Auswahl)</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Notenleser & Stimmgerät</li>
-              </ul>
-              <Button onClick={handleCtaClick} variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
-                Gratis starten
-              </Button>
-            </div>
-
-            {/* PRO — highlighted */}
-            <div className="bg-[hsl(var(--reward-gold))]/15 backdrop-blur-sm border-2 border-[hsl(var(--reward-gold))]/60 rounded-2xl p-6 flex flex-col relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[hsl(var(--reward-gold))] text-slate-900 text-xs font-bold px-3 py-1 rounded-full shadow">
-                🏆 Empfohlen
-              </span>
-              <p className="text-[hsl(var(--reward-gold))] text-xs uppercase tracking-widest font-semibold mb-2">PRO</p>
-              <p className="text-4xl font-bold text-white mb-1">15 €<span className="text-lg font-normal text-white/60">/Monat</span></p>
-              <p className="text-white/50 text-xs mb-5">erster Monat nur 1 €</p>
-              <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle 200+ Lernvideos</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle Noten & Materialien</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> KI-Assistent & Mitspieltracks</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Persönliches Feedback vom Lehrer</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Prioritäts-Support</li>
-              </ul>
-              <Button onClick={handleCtaClick} className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 font-bold">
-                1 € – Jetzt testen
-              </Button>
-            </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {STEPS.map(({ icon: Icon, title, desc }, i) => (
+              <div key={title} className="bg-white/[0.08] border border-white/[0.12] rounded-2xl p-7 text-center">
+                <div className="w-12 h-12 rounded-xl bg-[hsl(var(--reward-gold))]/20 border border-[hsl(var(--reward-gold))]/30 flex items-center justify-center mx-auto mb-5">
+                  <Icon className="w-6 h-6 text-[hsl(var(--reward-gold))]" />
+                </div>
+                <p className="text-[hsl(var(--reward-gold))] text-xs font-bold uppercase tracking-widest mb-2">Schritt {i + 1}</p>
+                <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* ── SOCIAL PROOF – TESTIMONIALS ── */}
-        <section className="max-w-5xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">Was unsere Schüler sagen</h2>
-          <div className="flex justify-center gap-1 mb-8">
-            {[1,2,3,4,5].map(i => (
-              <Star key={i} className="w-5 h-5 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
-            ))}
-            <span className="text-white/60 text-sm ml-2">4,9 von 5 · 500+ Schüler</span>
+        {/* ══════════════════════════════════════
+            SECTION 3 — PREISE
+        ══════════════════════════════════════ */}
+        <section className="max-w-3xl mx-auto px-5 py-16 border-t border-white/10">
+          <h2 className="text-3xl font-bold text-white text-center mb-2">Einfache, faire Preise</h2>
+          <p className="text-center text-white/55 text-sm mb-12">Starte kostenlos – upgrade wenn du bereit bist</p>
+
+          <div className="grid md:grid-cols-2 gap-5">
+
+            {/* FREE */}
+            <div className="bg-white/[0.08] border border-white/[0.14] rounded-2xl p-7 flex flex-col">
+              <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-3">Gratis</p>
+              <div className="mb-1">
+                <span className="text-4xl font-extrabold text-white">0 €</span>
+              </div>
+              <p className="text-white/40 text-xs mb-7">für immer kostenlos</p>
+              <ul className="space-y-3 flex-1 mb-8">
+                {FREE_FEATURES.map(f => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/75">
+                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={handleCta}
+                variant="outline"
+                className="w-full border-white/25 text-white hover:bg-white/10 font-semibold"
+              >
+                Gratis registrieren
+              </Button>
+            </div>
+
+            {/* ABO — highlighted */}
+            <div className="bg-[hsl(var(--reward-gold))]/10 border-2 border-[hsl(var(--reward-gold))]/50 rounded-2xl p-7 flex flex-col relative">
+              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[hsl(var(--reward-gold))] text-slate-900 text-xs font-extrabold px-4 py-1 rounded-full shadow-lg">
+                ✦ Empfohlen
+              </span>
+              <p className="text-[hsl(var(--reward-gold))] text-xs font-bold uppercase tracking-widest mb-3">Onlinezugang</p>
+              <div className="mb-1 flex items-end gap-2">
+                <span className="text-4xl font-extrabold text-white">19 €</span>
+                <span className="text-white/50 text-sm mb-1">/Monat</span>
+              </div>
+              <p className="text-white/40 text-xs mb-7">Kein Vertrag · jederzeit kündbar</p>
+              <ul className="space-y-3 flex-1 mb-8">
+                {PRO_FEATURES.map(f => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/85">
+                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={() => window.open(CHECKOUT_URL, '_blank')}
+                className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 font-extrabold shadow-lg"
+              >
+                Jetzt starten – 19 €/Monat
+              </Button>
+            </div>
+
           </div>
+
+          <p className="text-center text-white/35 text-xs mt-6">
+            Abo-Kunden erhalten Rabatt auf alle Bücher · Kündigung per E-Mail bis 48h vor Folgemonat
+          </p>
+        </section>
+
+        {/* ══════════════════════════════════════
+            SECTION 4 — WARUM TRUMPETSTAR (USPs)
+        ══════════════════════════════════════ */}
+        <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Warum Trumpetstar?</h2>
+
           <div className="grid md:grid-cols-3 gap-5">
-            {testimonials.map((t) => (
-              <div key={t.name} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col gap-4">
+            {[
+              {
+                icon: BookOpen,
+                title: 'Kompletter Lehrplan',
+                desc: 'Strukturierter Aufbau vom ersten Ton bis zur Übertrittsprüfung. Anfänger, Level 1 bis Bronze – alles abgedeckt.',
+              },
+              {
+                icon: Mic2,
+                title: 'Persönliches Feedback',
+                desc: 'Kein anonymes System – Mario Schulter und sein Team helfen dir persönlich weiter. Direkt und menschlich.',
+              },
+              {
+                icon: Zap,
+                title: 'Für Jung & Alt',
+                desc: 'Kinder ab 5–6 Jahren mit Starmethode. Erwachsene ohne Vorkenntnisse. Beide Wege vollständig abgedeckt.',
+              },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="bg-white/[0.08] border border-white/[0.12] rounded-2xl p-6 text-center">
+                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mx-auto mb-4">
+                  <Icon className="w-6 h-6 text-[hsl(var(--reward-gold))]" />
+                </div>
+                <h3 className="text-white font-bold text-base mb-2">{title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════
+            SECTION 5 — TESTIMONIALS
+        ══════════════════════════════════════ */}
+        <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
+          <h2 className="text-3xl font-bold text-white text-center mb-3">Was unsere Schüler sagen</h2>
+          <div className="flex items-center justify-center gap-1 mb-10">
+            {[1,2,3,4,5].map(i => (
+              <Star key={i} className="w-4 h-4 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
+            ))}
+            <span className="text-white/50 text-sm ml-2">4,9 von 5 · 500+ Schüler</span>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map(({ quote, name, role, stars }) => (
+              <div key={name} className="bg-white/[0.08] border border-white/[0.12] rounded-2xl p-6 flex flex-col gap-4">
                 <div className="flex gap-0.5">
-                  {[1,2,3,4,5].map(i => (
+                  {Array.from({ length: stars }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
                   ))}
                 </div>
-                <p className="text-white/85 text-sm leading-relaxed flex-1">„{t.quote}"</p>
-                <div>
-                  <p className="text-white font-semibold text-sm">{t.name}</p>
-                  <p className="text-white/50 text-xs">{t.role}</p>
+                <p className="text-white/80 text-sm leading-relaxed flex-1">„{quote}"</p>
+                <div className="border-t border-white/10 pt-3">
+                  <p className="text-white font-semibold text-sm">{name}</p>
+                  <p className="text-white/45 text-xs">{role}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── 2 MIN 2 MIO BADGE ── */}
-        <section className="max-w-3xl mx-auto px-5 pb-16">
-          <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-8 text-center flex flex-col md:flex-row items-center gap-6">
+        {/* ══════════════════════════════════════
+            SECTION 6 — TV BADGE
+        ══════════════════════════════════════ */}
+        <section className="max-w-3xl mx-auto px-5 py-10">
+          <div className="bg-white/[0.07] border border-white/[0.12] rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
             <div className="text-5xl shrink-0">📺</div>
-            <div className="text-left">
-              <p className="text-[hsl(var(--reward-gold))] font-bold text-sm uppercase tracking-widest mb-1">Bekannt aus dem TV</p>
-              <p className="text-white text-xl font-bold mb-2">„2 Minuten 2 Millionen"</p>
-              <p className="text-white/65 text-sm">Trumpetstar wurde in der österreichischen Startup-Show vorgestellt und überzeugte mit innovativem, digitalem Trompetenunterricht.</p>
+            <div>
+              <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-1">Bekannt aus dem TV</p>
+              <p className="text-white text-lg font-bold mb-1">„2 Minuten 2 Millionen"</p>
+              <p className="text-white/55 text-sm">
+                Trumpetstar wurde in der österreichischen Startup-Show vorgestellt und überzeugte mit seinem innovativen Ansatz für digitalen Trompetenunterricht.
+              </p>
             </div>
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ── */}
-        <section className="max-w-4xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">{t('landing.howItWorks.title')}</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: '1', icon: Tv2, title: 'Video anschauen', desc: 'Professionelle Lehrvideos – klar, kurz und praxisnah.' },
-              { step: '2', icon: Mic2, title: 'Mitspielen', desc: 'Echte Begleitmusik für jede Übung. Du spielst, die Band spielt mit.' },
-              { step: '3', icon: Music, title: 'Fortschritt spüren', desc: 'Woche für Woche neue Stücke – sichtbarer Fortschritt von Anfang an.' },
-            ].map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="text-center">
-                <div className="w-14 h-14 rounded-full bg-[hsl(var(--reward-gold))] text-slate-900 font-bold text-xl flex items-center justify-center mx-auto mb-4">
-                  <Icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-                <p className="text-sm text-white/70">{desc}</p>
+        {/* ══════════════════════════════════════
+            SECTION 7 — FAQ
+        ══════════════════════════════════════ */}
+        <section className="max-w-2xl mx-auto px-5 py-16 border-t border-white/10">
+          <h2 className="text-3xl font-bold text-white text-center mb-10">Häufige Fragen</h2>
+          <div className="space-y-3">
+            {FAQS.map(({ q, a }, i) => (
+              <div
+                key={q}
+                className="bg-white/[0.08] border border-white/[0.12] rounded-xl overflow-hidden"
+              >
+                <button
+                  className="w-full flex items-center justify-between px-6 py-4 text-left"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                >
+                  <span className="text-white font-semibold text-sm pr-4">{q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-white/50 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-white/65 text-sm leading-relaxed">
+                    {a}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </section>
 
-        {/* ── USPs ── */}
-        <section className="max-w-5xl mx-auto px-5 pb-20">
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              { icon: BookOpen, title: 'Kompletter Lehrplan', desc: 'Vom ersten Ton bis zum fortgeschrittenen Repertoire – strukturiert und pädagogisch aufgebaut.' },
-              { icon: Mic2, title: 'Persönliches Feedback', desc: 'Wir helfen dir persönlich weiter – mit individuellem Feedback direkt vom Lehrer.' },
-              { icon: CheckCircle, title: '30 Tage Garantie', desc: 'Nicht überzeugt? Volle Rückerstattung. Kein Wenn und Aber.' },
-            ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center">
-                <div className="w-14 h-14 rounded-xl bg-white/15 flex items-center justify-center mx-auto mb-4">
-                  <Icon className="w-7 h-7 text-[hsl(var(--reward-gold))]" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-                <p className="text-sm text-white/70">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── FAQ ── */}
-        <section className="max-w-3xl mx-auto px-5 pb-20">
-          <h2 className="text-3xl font-bold text-white text-center mb-8">{t('landing.faq.title')}</h2>
-          <div className="space-y-4">
-            {landingFaqs.map(({ question, answer }) => (
-              <details key={question} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl overflow-hidden group">
-                <summary className="cursor-pointer px-6 py-4 text-white font-semibold flex items-center justify-between">
-                  {question}
-                  <ArrowRight className="w-4 h-4 text-white/50 transition-transform group-open:rotate-90" />
-                </summary>
-                <div className="px-6 pb-4 text-white/70 text-sm">
-                  {answer}
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        {/* ── FINAL CTA ── */}
-        <section className="max-w-2xl mx-auto px-5 pb-24 text-center">
-          <div className="bg-white/[0.07] backdrop-blur-xl border border-white/[0.12] rounded-3xl p-8 md:p-12 shadow-2xl">
-            <p className="text-[hsl(var(--reward-gold))] font-bold text-sm uppercase tracking-widest mb-3">
+        {/* ══════════════════════════════════════
+            SECTION 8 — FINAL CTA
+        ══════════════════════════════════════ */}
+        <section className="max-w-2xl mx-auto px-5 pb-24">
+          <div className="bg-white/[0.07] border border-white/[0.12] rounded-3xl p-10 md:p-14 text-center">
+            <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-4">
               Starte noch heute
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Alle Lieder — kostenlos spielbar
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+              Dein erstes Stück wartet auf dich
             </h2>
-            <p className="text-white/60 mb-8 text-sm">
-              Kein Abo, keine Kreditkarte. Einfach registrieren und loslegen.
+            <p className="text-white/55 text-sm mb-8 max-w-md mx-auto">
+              Registriere dich kostenlos und leg sofort los. Kein Abo nötig – upgrade wann du willst.
             </p>
             <Button
               size="lg"
-              onClick={handleCtaClick}
-              className="h-14 px-10 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/30 gap-2 w-full md:w-auto"
+              onClick={handleCta}
+              className="h-14 px-10 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/30 gap-2 w-full sm:w-auto"
             >
               Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
             </Button>
-            <p className="text-white/40 text-xs mt-4">423 Schüler lernen gerade mit Trumpetstar</p>
+            <p className="text-white/35 text-xs mt-4">
+              Keine Kreditkarte · 30 Tage Geld-zurück-Garantie · Jederzeit kündbar
+            </p>
           </div>
         </section>
 
