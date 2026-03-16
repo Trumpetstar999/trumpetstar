@@ -38,15 +38,26 @@ async function generateEpcQrCode(invoice: Invoice): Promise<string> {
   });
 }
 
+/** Build a safe filename: e.g. "2026-001_Jennifer_Ederer" */
+function buildInvoiceFilename(invoice: Invoice & { customer: Customer }): string {
+  const customerLabel = (invoice.customer.company_name || invoice.customer.name)
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß\-_. ]/g, '')
+    .replace(/\s+/g, '_')
+    .slice(0, 50);
+  return `${invoice.invoice_number}_${customerLabel}`;
+}
+
 export async function generateInvoiceHTML(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] },
-  logoDataUrl?: string
+  logoDataUrl?: string,
+  titleOverride?: string
 ): Promise<string> {
   const customer = invoice.customer;
   const hasUid = !!customer.uid_number;
   const vatNote = getVatNote(invoice.country as 'AT' | 'DE', hasUid);
   const vatLabel = invoice.vat_rate === 0 ? 'Reverse Charge' : `USt. ${invoice.vat_rate}%`;
   const remaining = invoice.total_gross - invoice.paid_amount;
+  const docTitle = titleOverride ?? buildInvoiceFilename(invoice);
 
   const qrDataUrl = await generateEpcQrCode(invoice);
 
