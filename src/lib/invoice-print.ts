@@ -80,11 +80,8 @@ export async function generateInvoiceHTML(
     .join('');
 
   const logoHtml = logoDataUrl
-    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:70px;object-fit:contain;">`
-    : `<div style="font-size:22pt;font-weight:800;letter-spacing:-0.5px;line-height:1;color:#1a1a1a;">TRUMPET<br><span style="color:#c0392b;">STAR</span></div>`;
-
-  // Use px-based spacing for html2canvas compatibility (113px ≈ 3cm at 96dpi)
-  const gap3cm = '113px';
+    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:52px;object-fit:contain;">`
+    : `<div style="font-size:18pt;font-weight:800;letter-spacing:-0.5px;line-height:1;color:#1a1a1a;">TRUMPET<br><span style="color:#c0392b;">STAR</span></div>`;
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -95,20 +92,19 @@ export async function generateInvoiceHTML(
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
     size: A4 portrait;
-    /* margin: 0 removes browser-injected header/footer (URL, title, page numbers) */
     margin: 0mm;
   }
   @media print {
-    body { margin: 0 !important; padding: 18mm 20mm 22mm 25mm !important; }
+    body { margin: 0 !important; padding: 12mm 18mm 14mm 22mm !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
   }
   html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 10pt;
+    font-size: 9.5pt;
     color: #1a1a1a;
     background: #fff;
-    line-height: 1.4;
+    line-height: 1.35;
   }
   .page-wrap {
     width: 100%;
@@ -119,41 +115,41 @@ export async function generateInvoiceHTML(
   .items-table th {
     background: #2c3e50;
     color: #ffffff;
-    padding: 8px 8px;
+    padding: 5px 7px;
     text-align: left;
-    font-size: 8.5pt;
+    font-size: 8pt;
     font-weight: 600;
     letter-spacing: 0.3px;
   }
   .items-table td { vertical-align: top; }
-  .totals-table td { padding: 4px 10px; font-size: 9.5pt; }
+  .totals-table td { padding: 3px 8px; font-size: 9pt; }
   .total-final td { 
     background: #2c3e50; 
     color: #ffffff; 
     font-weight: 700; 
-    font-size: 11pt; 
-    padding: 8px 10px;
+    font-size: 10pt; 
+    padding: 6px 8px;
   }
   .sender-line {
     font-size: 7pt;
     color: #555;
     text-decoration: underline;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
     display: block;
   }
   .footer {
-    font-size: 7.5pt;
+    font-size: 7pt;
     color: #555;
     border-top: 1px solid #ccc;
-    padding-top: 8px;
-    margin-top: 20px;
+    padding-top: 5px;
+    margin-top: 10px;
   }
   .payment-box {
-    margin-top: 18px;
-    padding: 12px 14px;
+    margin-top: 10px;
+    padding: 8px 12px;
     background: #f0f4f8;
     border-left: 3px solid #2c3e50;
-    font-size: 8.5pt;
+    font-size: 8pt;
   }
 </style>
 </head>
@@ -162,12 +158,12 @@ export async function generateInvoiceHTML(
 <div class="page-wrap">
 
 <!-- ═══ HEADER ═══ -->
-<table style="margin-bottom:28px;">
+<table style="margin-bottom:14px;">
   <tr>
     <td style="vertical-align:top;width:55%;">
       <span class="sender-line">${COMPANY.name} &nbsp;${COMPANY.street} &ndash; ${COMPANY.city}</span>
-      <p style="line-height:1.6;font-size:10pt;">
-        <strong style="font-size:11pt;">${customer.company_name || customer.name}</strong><br>
+      <p style="line-height:1.5;font-size:9.5pt;">
+        <strong style="font-size:10.5pt;">${customer.company_name || customer.name}</strong><br>
         ${customer.company_name ? customer.name + '<br>' : ''}
         ${customer.street}<br>
         ${customer.postal_code} ${customer.city}<br>
@@ -177,33 +173,32 @@ export async function generateInvoiceHTML(
     </td>
 
     <td style="vertical-align:top;text-align:right;width:45%;">
-      <div style="margin-bottom:${gap3cm};">${logoHtml}</div>
-      <table style="margin-left:auto;min-width:160px;">
+      <div style="margin-bottom:20px;">${logoHtml}</div>
+      <table style="margin-left:auto;min-width:150px;">
         <tr>
-          <td colspan="2" style="padding-bottom:6px;">
-            <span style="font-size:18pt;font-weight:700;letter-spacing:-0.5px;color:#1a1a1a;">Rechnung</span>
+          <td colspan="2" style="padding-bottom:4px;">
+            <span style="font-size:16pt;font-weight:700;letter-spacing:-0.5px;color:#1a1a1a;">Rechnung</span>
           </td>
         </tr>
         <tr>
-          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;white-space:nowrap;">Rechnungsnummer</td>
-          <td style="padding:3px 0;font-size:9pt;font-weight:700;">${invoice.invoice_number}</td>
+          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;white-space:nowrap;">Rechnungsnummer</td>
+          <td style="padding:2px 0;font-size:8.5pt;font-weight:700;">${invoice.invoice_number}</td>
         </tr>
         <tr>
-          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Rechnungsdatum</td>
-          <td style="padding:3px 0;font-size:9pt;">${formatDate(invoice.invoice_date)}</td>
+          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;">Rechnungsdatum</td>
+          <td style="padding:2px 0;font-size:8.5pt;">${formatDate(invoice.invoice_date)}</td>
         </tr>
         <tr>
-          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;vertical-align:middle;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0;font-size:9pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:2px 12px 2px 0;color:#666;font-size:8pt;vertical-align:middle;">Fälligkeitsdatum</td>
+          <td style="padding:2px 0;font-size:8.5pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
         </tr>
-        <tr><td colspan="2" style="padding-bottom:${gap3cm};"></td></tr>
       </table>
     </td>
   </tr>
 </table>
 
 <!-- ═══ ARTIKELTABELLE ═══ -->
-<table class="items-table" style="margin-bottom:12px;">
+<table class="items-table" style="margin-bottom:8px;">
   <thead>
     <tr>
       <th style="width:38%;">Beschreibung</th>
@@ -216,12 +211,12 @@ export async function generateInvoiceHTML(
     </tr>
   </thead>
   <tbody>
-    ${itemRows || `<tr><td colspan="7" style="padding:12px 8px;text-align:center;color:#999;font-size:9pt;font-style:italic;">Keine Positionen</td></tr>`}
+    ${itemRows || `<tr><td colspan="7" style="padding:8px;text-align:center;color:#999;font-size:8.5pt;font-style:italic;">Keine Positionen</td></tr>`}
   </tbody>
 </table>
 
 <!-- ═══ SUMMEN ═══ -->
-<table class="totals-table" style="width:240px;margin-left:auto;margin-bottom:4px;">
+<table class="totals-table" style="width:230px;margin-left:auto;margin-bottom:4px;">
   ${invoice.vat_rate > 0 ? `
   <tr>
     <td style="color:#555;">Zwischensumme ohne USt.</td>
@@ -240,47 +235,47 @@ export async function generateInvoiceHTML(
     <td style="text-align:right;">€&nbsp;${formatCurrency(invoice.total_gross)}</td>
   </tr>
   <tr>
-    <td style="color:#555;padding-top:6px;">Bezahlter Betrag</td>
-    <td style="text-align:right;color:#555;padding-top:6px;">€&nbsp;${formatCurrency(invoice.paid_amount)}</td>
+    <td style="color:#555;padding-top:4px;">Bezahlter Betrag</td>
+    <td style="text-align:right;color:#555;padding-top:4px;">€&nbsp;${formatCurrency(invoice.paid_amount)}</td>
   </tr>
   <tr style="border-top:2px solid #2c3e50;">
-    <td style="font-weight:700;font-size:11pt;padding:8px 10px;padding-bottom:${gap3cm};">Zu zahlender Betrag EUR</td>
-    <td style="text-align:right;font-weight:700;font-size:11pt;padding:8px 10px;padding-bottom:${gap3cm};">€&nbsp;${formatCurrency(remaining)}</td>
+    <td style="font-weight:700;font-size:10pt;padding:5px 8px;">Zu zahlender Betrag EUR</td>
+    <td style="text-align:right;font-weight:700;font-size:10pt;padding:5px 8px;">€&nbsp;${formatCurrency(remaining)}</td>
   </tr>
 </table>
 
-${vatNote ? `<p style="margin-top:14px;font-size:8pt;color:#555;font-style:italic;">${vatNote}</p>` : ''}
-${invoice.notes ? `<p style="margin-top:10px;font-size:9pt;"><strong>Anmerkung:</strong> ${invoice.notes}</p>` : ''}
+${vatNote ? `<p style="margin-top:8px;font-size:7.5pt;color:#555;font-style:italic;">${vatNote}</p>` : ''}
+${invoice.notes ? `<p style="margin-top:6px;font-size:8.5pt;"><strong>Anmerkung:</strong> ${invoice.notes}</p>` : ''}
 
 <!-- ═══ ZAHLUNGSINFO ═══ -->
 <div class="payment-box">
   <table style="width:100%;">
     <tr>
-      <td style="vertical-align:top;padding-right:16px;">
-        <strong style="font-size:9pt;display:block;margin-bottom:8px;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong>
+      <td style="vertical-align:top;padding-right:12px;">
+        <strong style="font-size:8.5pt;display:block;margin-bottom:5px;">Zahlung bitte unter Angabe der Rechnungsnummer ${invoice.invoice_number}:</strong>
         <table style="width:auto;">
           <tr>
-            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Kontoinhaber</td>
-            <td style="font-weight:600;font-size:8.5pt;">${COMPANY.kontoinhaber}</td>
+            <td style="padding:2px 12px 2px 0;color:#555;font-size:8pt;">Kontoinhaber</td>
+            <td style="font-weight:600;font-size:8pt;">${COMPANY.kontoinhaber}</td>
           </tr>
           <tr>
-            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">IBAN</td>
-            <td style="font-family:monospace;font-size:8.5pt;font-weight:600;">${COMPANY.iban}</td>
+            <td style="padding:2px 12px 2px 0;color:#555;font-size:8pt;">IBAN</td>
+            <td style="font-family:monospace;font-size:8pt;font-weight:600;">${COMPANY.iban}</td>
           </tr>
           <tr>
-            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">BIC</td>
-            <td style="font-size:8.5pt;">${COMPANY.bic}</td>
+            <td style="padding:2px 12px 2px 0;color:#555;font-size:8pt;">BIC</td>
+            <td style="font-size:8pt;">${COMPANY.bic}</td>
           </tr>
           <tr>
-            <td style="padding:2px 16px 2px 0;color:#555;font-size:8.5pt;">Bank</td>
-            <td style="font-size:8.5pt;">${COMPANY.bank}</td>
+            <td style="padding:2px 12px 2px 0;color:#555;font-size:8pt;">Bank</td>
+            <td style="font-size:8pt;">${COMPANY.bank}</td>
           </tr>
         </table>
       </td>
-      <td style="vertical-align:top;text-align:center;padding-left:8px;border-left:1px solid #d1d5db;">
-        <img src="${qrDataUrl}" alt="EPC QR Code" style="width:100px;height:100px;display:block;margin:0 auto 4px;">
-        <span style="font-size:6.5pt;color:#777;display:block;">GiroCode / EPC QR</span>
-        <span style="font-size:6.5pt;color:#777;display:block;">Scannen zum Bezahlen</span>
+      <td style="vertical-align:top;text-align:center;padding-left:8px;border-left:1px solid #d1d5db;width:110px;">
+        <img src="${qrDataUrl}" alt="EPC QR Code" style="width:85px;height:85px;display:block;margin:0 auto 3px;">
+        <span style="font-size:6pt;color:#777;display:block;">GiroCode / EPC QR</span>
+        <span style="font-size:6pt;color:#777;display:block;">Scannen zum Bezahlen</span>
       </td>
     </tr>
   </table>
@@ -290,12 +285,12 @@ ${invoice.notes ? `<p style="margin-top:10px;font-size:9pt;"><strong>Anmerkung:<
 <div class="footer">
   <table>
     <tr>
-      <td style="font-size:7.5pt;">${COMPANY.name} &bull; ${COMPANY.street} &bull; ${COMPANY.city}</td>
-      <td style="text-align:right;font-size:7.5pt;">Seite 1 von 1 &nbsp;|&nbsp; Rechnung ${invoice.invoice_number}</td>
+      <td style="font-size:7pt;">${COMPANY.name} &bull; ${COMPANY.street} &bull; ${COMPANY.city}</td>
+      <td style="text-align:right;font-size:7pt;">Seite 1 von 1 &nbsp;|&nbsp; Rechnung ${invoice.invoice_number}</td>
     </tr>
     <tr>
-      <td style="font-size:7.5pt;">E-Mail: ${COMPANY.email} &bull; Tel: ${COMPANY.phone} &bull; ${COMPANY.web}</td>
-      <td style="text-align:right;font-size:7.5pt;">UID: ${COMPANY.uid}</td>
+      <td style="font-size:7pt;">E-Mail: ${COMPANY.email} &bull; Tel: ${COMPANY.phone} &bull; ${COMPANY.web}</td>
+      <td style="text-align:right;font-size:7pt;">UID: ${COMPANY.uid}</td>
     </tr>
   </table>
 </div>
