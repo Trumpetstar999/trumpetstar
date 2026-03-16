@@ -84,14 +84,13 @@ export async function generateInvoiceHTML(
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
     size: A4 portrait;
-    margin: 18mm 20mm 22mm 25mm;
+    /* margin: 0 removes browser-injected header/footer (URL, title, page numbers) */
+    margin: 0mm;
   }
   @media print {
-    body { margin: 0 !important; }
+    body { margin: 0 !important; padding: 18mm 20mm 22mm 25mm !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
-    /* Suppress browser-added header/footer (URL, title, page number) */
-    @page { margin-top: 18mm; margin-bottom: 22mm; }
   }
   html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
