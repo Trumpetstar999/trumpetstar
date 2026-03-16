@@ -132,7 +132,7 @@ export default function LandingPage() {
               </div>
 
               {/* Audience switch */}
-              <div className="flex justify-center lg:justify-start gap-3 mb-8">
+              <div className="flex justify-center gap-3 mb-8">
                 <button
                   onClick={() => setAudience('child')}
                   className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'child' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
