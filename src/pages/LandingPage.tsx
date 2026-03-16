@@ -215,10 +215,11 @@ export default function LandingPage() {
 
               {/* Trust bar – below CTA, centred on mobile / left on desktop */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-5">
-                {[
+              {[
                   { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
                   { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
                   { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
+                  { icon: CheckCircle, label: '500+ Schüler:innen', color: 'text-emerald-400' },
                 ].map(({ icon: Icon, label, color }) => (
                   <span
                     key={label}
