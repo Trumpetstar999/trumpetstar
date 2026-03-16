@@ -79,7 +79,7 @@ export async function generateInvoiceHTML(
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Rechnung ${invoice.invoice_number}</title>
+<title> </title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
@@ -90,6 +90,8 @@ export async function generateInvoiceHTML(
     body { margin: 0 !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
+    /* Suppress browser-added header/footer (URL, title, page number) */
+    @page { margin-top: 18mm; margin-bottom: 22mm; }
   }
   html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
