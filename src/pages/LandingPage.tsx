@@ -4,12 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   Loader2, Music, CheckCircle, Star, ArrowRight,
-  Users, Tv2, Trophy, Mic2, Zap
+  Users, Tv2, Trophy, Mic2, Zap, BookOpen
 } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import appPreview from '@/assets/app-preview.png';
+import { useLanguage } from '@/hooks/useLanguage';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function LandingPage() {
