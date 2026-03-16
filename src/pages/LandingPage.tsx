@@ -7,6 +7,7 @@ import {
   Trophy, Mic2, BookOpen, Music2,
   ChevronDown, Play, Shield, Zap
 } from 'lucide-react';
+
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
