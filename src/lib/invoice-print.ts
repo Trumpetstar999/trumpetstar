@@ -38,15 +38,26 @@ async function generateEpcQrCode(invoice: Invoice): Promise<string> {
   });
 }
 
+/** Build a safe filename: e.g. "2026-001_Jennifer_Ederer" */
+function buildInvoiceFilename(invoice: Invoice & { customer: Customer }): string {
+  const customerLabel = (invoice.customer.company_name || invoice.customer.name)
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß\-_. ]/g, '')
+    .replace(/\s+/g, '_')
+    .slice(0, 50);
+  return `${invoice.invoice_number}_${customerLabel}`;
+}
+
 export async function generateInvoiceHTML(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] },
-  logoDataUrl?: string
+  logoDataUrl?: string,
+  titleOverride?: string
 ): Promise<string> {
   const customer = invoice.customer;
   const hasUid = !!customer.uid_number;
   const vatNote = getVatNote(invoice.country as 'AT' | 'DE', hasUid);
   const vatLabel = invoice.vat_rate === 0 ? 'Reverse Charge' : `USt. ${invoice.vat_rate}%`;
   const remaining = invoice.total_gross - invoice.paid_amount;
+  const docTitle = titleOverride ?? buildInvoiceFilename(invoice);
 
   const qrDataUrl = await generateEpcQrCode(invoice);
 
@@ -79,7 +90,7 @@ export async function generateInvoiceHTML(
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title> </title>
+<title>${docTitle}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
@@ -347,37 +358,42 @@ export async function printInvoice(
 export async function downloadInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {
+  const filename = buildInvoiceFilename(invoice);
   const logoDataUrl = await getLogoDataUrl();
-  const html = await generateInvoiceHTML(invoice, logoDataUrl);
+  // Pass filename as title so the browser uses it as the suggested PDF save name
+  const html = await generateInvoiceHTML(invoice, logoDataUrl, filename);
 
-  // Open in a new window/tab and trigger print dialog (PDF save)
-  // This is the most reliable cross-browser approach (Chrome, Safari, Firefox)
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    // Fallback: blob download of the HTML file if popup blocked
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Rechnung_${invoice.invoice_number}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    return;
-  }
+  // Use a hidden iframe so popup-blockers don't interfere and
+  // the title (= filename) is set correctly for the PDF save dialog.
+  const existing = document.getElementById('invoice-download-frame');
+  if (existing) existing.remove();
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  const iframe = document.createElement('iframe');
+  iframe.id = 'invoice-download-frame';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;visibility:hidden;';
 
-  // Wait for all resources (images/QR) to load, then print
-  printWindow.onload = () => {
-    setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-      // Close the window after print dialog closes
-      printWindow.onafterprint = () => printWindow.close();
-    }, 500);
-  };
+  return new Promise<void>((resolve) => {
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+        // onafterprint fires when the user closes the print/save dialog
+        if (iframe.contentWindow) {
+          iframe.contentWindow.onafterprint = () => {
+            iframe.remove();
+            resolve();
+          };
+        } else {
+          setTimeout(() => { iframe.remove(); resolve(); }, 2000);
+        }
+      }, 500);
+    };
+
+    document.body.appendChild(iframe);
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) { resolve(); return; }
+    doc.open();
+    doc.write(html);
+    doc.close();
+  });
 }
