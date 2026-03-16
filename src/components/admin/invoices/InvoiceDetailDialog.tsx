@@ -138,7 +138,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                   <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
                     <Calendar className="w-3.5 h-3.5 text-slate-600" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
                     <p className="text-xs text-slate-400">Rechnungsdatum</p>
                     <p className="text-sm font-medium text-slate-800">{formatDate(invoice.invoice_date)}</p>
                   </div>
@@ -147,7 +147,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                   <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
                     <Calendar className="w-3.5 h-3.5 text-amber-600" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
                     <p className="text-xs text-slate-400">Fälligkeitsdatum</p>
                     <p className="text-sm font-semibold text-slate-800">{formatDate(invoice.due_date)}</p>
                   </div>

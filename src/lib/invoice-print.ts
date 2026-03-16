@@ -90,6 +90,8 @@ export async function generateInvoiceHTML(
     body { margin: 0 !important; }
     .no-print { display: none !important; }
     html, body { width: 210mm; }
+    /* Suppress browser-added header/footer (URL, title, page number) */
+    @page { margin-top: 18mm; margin-bottom: 22mm; }
   }
   html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
