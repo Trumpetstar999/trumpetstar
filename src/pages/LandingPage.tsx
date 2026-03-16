@@ -203,34 +203,19 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold text-white text-center mb-3">Kostenlos anfangen. Bezahlen wenn du wächst.</h2>
           <p className="text-center text-white/60 mb-10 text-sm">Kein Risiko, kein Vertrag, 30 Tage Geld-zurück-Garantie</p>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto">
             {/* FREE */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col">
               <p className="text-white/60 text-xs uppercase tracking-widest font-semibold mb-2">Gratis</p>
               <p className="text-4xl font-bold text-white mb-1">0 €</p>
               <p className="text-white/50 text-xs mb-5">für immer kostenlos</p>
               <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> 30 kostenlose Lieder</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Anfänger-Kurs komplett</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Notenleser & Metronom</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Ausgewählte Lernvideos</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> PDF-Noten (Auswahl)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Notenleser & Stimmgerät</li>
               </ul>
               <Button onClick={handleCtaClick} variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
                 Gratis starten
-              </Button>
-            </div>
-
-            {/* BASIC */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col">
-              <p className="text-white/60 text-xs uppercase tracking-widest font-semibold mb-2">Buch</p>
-              <p className="text-4xl font-bold text-white mb-1">39 €</p>
-              <p className="text-white/50 text-xs mb-5">einmalig · Notenhefte</p>
-              <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Gedrucktes Notenheft</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Ohne App-Zugang</li>
-                <li className="flex items-center gap-2 opacity-40"><CheckCircle className="w-4 h-4 shrink-0" /> Keine Videos inklusive</li>
-              </ul>
-              <Button onClick={() => navigate('/preise')} variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
-                Zum Shop
               </Button>
             </div>
 
@@ -244,9 +229,9 @@ export default function LandingPage() {
               <p className="text-white/50 text-xs mb-5">erster Monat nur 1 €</p>
               <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
                 <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle 200+ Lernvideos</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle Mitspieltracks</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> KI-Assistent & Noten-Tool</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Direktes Lehrer-Feedback</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle Noten & Materialien</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> KI-Assistent & Mitspieltracks</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Persönliches Feedback vom Lehrer</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Prioritäts-Support</li>
               </ul>
               <Button onClick={handleCtaClick} className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 font-bold">
