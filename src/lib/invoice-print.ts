@@ -182,9 +182,10 @@ export async function generateInvoiceHTML(
           <td style="padding:3px 0;font-size:9pt;">${formatDate(invoice.invoice_date)}</td>
         </tr>
         <tr>
-          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;">Fälligkeitsdatum</td>
-          <td style="padding:3px 0;padding-bottom:${gap3cm};font-size:9pt;font-weight:700;color:#c0392b;">${formatDate(invoice.due_date)}</td>
+          <td style="padding:3px 14px 3px 0;color:#666;font-size:8.5pt;vertical-align:middle;">Fälligkeitsdatum</td>
+          <td style="padding:3px 0;font-size:9pt;font-weight:700;color:#c0392b;vertical-align:middle;">${formatDate(invoice.due_date)}</td>
         </tr>
+        <tr><td colspan="2" style="padding-bottom:${gap3cm};"></td></tr>
       </table>
     </td>
   </tr>
