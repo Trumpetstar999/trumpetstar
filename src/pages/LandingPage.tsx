@@ -7,6 +7,7 @@ import {
   Trophy, Mic2, BookOpen, Music2,
   ChevronDown, Play, Shield, Zap
 } from 'lucide-react';
+
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -166,23 +167,6 @@ export default function LandingPage() {
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-14 w-auto drop-shadow-lg" />
           </div>
 
-          {/* Trust bar – centred */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {[
-              { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
-              { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
-              { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
-            ].map(({ icon: Icon, label, color }) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
-              >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
-                {label}
-              </span>
-            ))}
-          </div>
-
           {/* Two-column hero */}
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
@@ -229,25 +213,48 @@ export default function LandingPage() {
                 Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
               </Button>
 
-              <p className="text-white/45 text-xs mt-3">
-                Keine Kreditkarte · Jederzeit kündbar · 30 Tage Garantie
-              </p>
+              {/* Trust bar – below CTA, centred on mobile / left on desktop */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-5">
+                {[
+                  { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
+                  { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
+                  { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
+                ].map(({ icon: Icon, label, color }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
+                  >
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
+                    {label}
+                  </span>
+                ))}
+              </div>
 
             </div>
 
             {/* RIGHT – App preview */}
             <div className="flex-1 w-full max-w-md lg:max-w-none">
-              <button
+              <div
                 onClick={handleCta}
-                className="block w-full cursor-pointer group"
+                className="relative cursor-pointer group"
                 aria-label="App starten"
               >
                 <img
                   src={appPreview}
                   alt="Trumpetstar App – Vorschau"
-                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
+                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl mix-blend-normal"
+                  style={{ background: 'transparent' }}
                 />
-              </button>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm gap-3">
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 pointer-events-none"
+                  >
+                    Jetzt anmelden <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -274,72 +281,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ══════════════════════════════════════
-            SECTION 3 — PREISE
-        ══════════════════════════════════════ */}
-        <section className="max-w-3xl mx-auto px-5 py-16 border-t border-white/10">
-          <h2 className="text-3xl font-bold text-white text-center mb-2">Einfache, faire Preise</h2>
-          <p className="text-center text-white/55 text-sm mb-12">Starte kostenlos – upgrade wenn du bereit bist</p>
-
-          <div className="grid md:grid-cols-2 gap-5">
-
-            {/* FREE */}
-            <div className="bg-white/[0.08] border border-white/[0.14] rounded-2xl p-7 flex flex-col">
-              <p className="text-white/50 text-xs font-bold uppercase tracking-widest mb-3">Gratis</p>
-              <div className="mb-1">
-                <span className="text-4xl font-extrabold text-white">0 €</span>
-              </div>
-              <p className="text-white/40 text-xs mb-7">für immer kostenlos</p>
-              <ul className="space-y-3 flex-1 mb-8">
-                {FREE_FEATURES.map(f => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/75">
-                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={handleCta}
-                variant="outline"
-                className="w-full border-white/25 text-white hover:bg-white/10 font-semibold"
-              >
-                Gratis registrieren
-              </Button>
-            </div>
-
-            {/* ABO — highlighted */}
-            <div className="bg-[hsl(var(--reward-gold))]/10 border-2 border-[hsl(var(--reward-gold))]/50 rounded-2xl p-7 flex flex-col relative">
-              <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[hsl(var(--reward-gold))] text-slate-900 text-xs font-extrabold px-4 py-1 rounded-full shadow-lg">
-                ✦ Empfohlen
-              </span>
-              <p className="text-[hsl(var(--reward-gold))] text-xs font-bold uppercase tracking-widest mb-3">Onlinezugang</p>
-              <div className="mb-1 flex items-end gap-2">
-                <span className="text-4xl font-extrabold text-white">19 €</span>
-                <span className="text-white/50 text-sm mb-1">/Monat</span>
-              </div>
-              <p className="text-white/40 text-xs mb-7">Kein Vertrag · jederzeit kündbar</p>
-              <ul className="space-y-3 flex-1 mb-8">
-                {PRO_FEATURES.map(f => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/85">
-                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={() => window.open(CHECKOUT_URL, '_blank')}
-                className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 font-extrabold shadow-lg"
-              >
-                Jetzt starten – 19 €/Monat
-              </Button>
-            </div>
-
-          </div>
-
-          <p className="text-center text-white/35 text-xs mt-6">
-            Abo-Kunden erhalten Rabatt auf alle Bücher · Kündigung per E-Mail bis 48h vor Folgemonat
-          </p>
-        </section>
 
         {/* ══════════════════════════════════════
             SECTION 4 — WARUM TRUMPETSTAR (USPs)
