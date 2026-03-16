@@ -243,7 +243,7 @@ export default function LandingPage() {
                 <img
                   src={appPreview}
                   alt="Trumpetstar App – Vorschau"
-                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl mix-blend-normal"
+                  className="w-full rounded-2xl transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl mix-blend-normal"
                   style={{ background: 'transparent' }}
                 />
                 {/* Hover overlay */}
