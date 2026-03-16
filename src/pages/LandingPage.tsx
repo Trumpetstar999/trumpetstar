@@ -160,10 +160,6 @@ export default function LandingPage() {
             {audience ? activeContent.sub : t('landing.hero.subtitle')}
           </p>
 
-          {/* Gratis-Framing */}
-          <p className="text-base font-semibold text-[hsl(var(--reward-gold))] mb-8">
-            🎁 Die ersten 30 Lieder sind komplett kostenlos — kein Abo nötig
-          </p>
 
           {/* Single dominant CTA */}
           <Button
