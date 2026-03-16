@@ -166,23 +166,6 @@ export default function LandingPage() {
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-14 w-auto drop-shadow-lg" />
           </div>
 
-          {/* Trust bar – centred */}
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {[
-              { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
-              { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
-              { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
-            ].map(({ icon: Icon, label, color }) => (
-              <span
-                key={label}
-                className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
-              >
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
-                {label}
-              </span>
-            ))}
-          </div>
-
           {/* Two-column hero */}
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
@@ -229,25 +212,48 @@ export default function LandingPage() {
                 Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
               </Button>
 
-              <p className="text-white/45 text-xs mt-3">
-                Keine Kreditkarte · Jederzeit kündbar · 30 Tage Garantie
-              </p>
+              {/* Trust bar – below CTA, centred on mobile / left on desktop */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-5">
+                {[
+                  { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
+                  { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
+                  { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
+                ].map(({ icon: Icon, label, color }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
+                  >
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
+                    {label}
+                  </span>
+                ))}
+              </div>
 
             </div>
 
             {/* RIGHT – App preview */}
             <div className="flex-1 w-full max-w-md lg:max-w-none">
-              <button
+              <div
                 onClick={handleCta}
-                className="block w-full cursor-pointer group"
+                className="relative cursor-pointer group"
                 aria-label="App starten"
               >
                 <img
                   src={appPreview}
                   alt="Trumpetstar App – Vorschau"
-                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
+                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl mix-blend-normal"
+                  style={{ background: 'transparent' }}
                 />
-              </button>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm gap-3">
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 pointer-events-none"
+                  >
+                    Jetzt anmelden <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
             </div>
 
           </div>
