@@ -305,7 +305,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {[
               { icon: BookOpen, title: 'Kompletter Lehrplan', desc: 'Vom ersten Ton bis zum fortgeschrittenen Repertoire – strukturiert und pädagogisch aufgebaut.' },
-              { icon: Mic2, title: 'Echtzeit-Feedback', desc: 'Das Mikrofon-Game erkennt deine Töne live. Üben wird zum Spiel.' },
+              { icon: Mic2, title: 'Persönliches Feedback', desc: 'Wir helfen dir persönlich weiter – mit individuellem Feedback direkt vom Lehrer.' },
               { icon: CheckCircle, title: '30 Tage Garantie', desc: 'Nicht überzeugt? Volle Rückerstattung. Kein Wenn und Aber.' },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center">
