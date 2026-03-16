@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   Loader2, CheckCircle, Star, ArrowRight,
-  Users, Trophy, Mic2, BookOpen, Music2,
+  Trophy, Mic2, BookOpen, Music2,
   ChevronDown, Play, Shield, Zap
 } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
