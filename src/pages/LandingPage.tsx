@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
-  Loader2, Play, Music, CheckCircle, Star, ArrowRight,
-  Users, Tv2, BookOpen, Trophy, Mic2, Zap
+  Loader2, Music, CheckCircle, Star, ArrowRight,
+  Users, Tv2, Trophy, Mic2, Zap, BookOpen
 } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
-import appScreenshot from '@/assets/trumpetstar-app-screenshot.png';
+import appPreview from '@/assets/app-preview.png';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export default function LandingPage() {
@@ -105,111 +105,96 @@ export default function LandingPage() {
       <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)]">
 
         {/* ── HERO ── */}
-        <section className="relative max-w-5xl mx-auto px-5 pt-14 pb-10 text-center">
+        <section className="relative max-w-6xl mx-auto px-5 pt-14 pb-10">
+          <div className="flex flex-col lg:flex-row items-center gap-10">
 
-          {/* Logo */}
-          <div className="flex justify-center mb-6">
-            <img src={trumpetstarLogo} alt="Trumpetstar" className="h-16 w-auto drop-shadow-lg" />
-          </div>
+            {/* LEFT: text content */}
+            <div className="flex-1 text-center lg:text-left">
+              {/* Logo */}
+              <div className="flex justify-center lg:justify-start mb-6">
+                <img src={trumpetstarLogo} alt="Trumpetstar" className="h-16 w-auto drop-shadow-lg" />
+              </div>
 
-          {/* Trust bar – above fold */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-              <Users className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> 500+ aktive Schüler
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-              <Trophy className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> Bekannt aus „2 Minuten 2 Millionen"
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-              <Star className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" /> 4,9 / 5 Bewertung
-            </span>
-            <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
-              <Zap className="w-3.5 h-3.5 text-emerald-400" /> Aktualisiert März 2026
-            </span>
-          </div>
-
-          {/* Audience switch */}
-          <div className="flex justify-center gap-3 mb-8">
-            <button
-              onClick={() => setAudience('child')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'child' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
-            >
-              👨‍👧 Für mein Kind
-            </button>
-            <button
-              onClick={() => setAudience('adult')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'adult' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
-            >
-              🎺 Für mich selbst
-            </button>
-          </div>
-
-          {/* Dynamic headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
-            {audience
-              ? activeContent.headline
-              : <>{t('landing.hero.title').split('\n').map((line, i, arr) => (
-                  i < arr.length - 1 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>
-                ))}{' '}
-                <span className="text-[hsl(var(--reward-gold))]">{t('landing.hero.titleHighlight')}</span>
-              </>
-            }
-          </h1>
-
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-4">
-            {audience ? activeContent.sub : t('landing.hero.subtitle')}
-          </p>
-
-
-          {/* Single dominant CTA */}
-          <Button
-            size="lg"
-            onClick={handleCtaClick}
-            className="h-16 px-10 text-xl font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 mb-3"
-          >
-            {audience ? activeContent.cta : 'Jetzt kostenlos starten'} <ArrowRight className="w-6 h-6" />
-          </Button>
-          <p className="text-white/50 text-xs mb-3">Keine Kreditkarte · 30 Tage Geld-zurück-Garantie</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="text-white/60 hover:text-white/90 text-sm underline underline-offset-2 transition-colors"
-          >
-            Bereits registriert? Einloggen →
-          </button>
-        </section>
-
-        {/* ── DEMO VIDEO ── */}
-        <section className="max-w-3xl mx-auto px-5 pb-14">
-          <p className="text-center text-white/50 text-xs uppercase tracking-widest mb-4 font-medium">Sieh wie es funktioniert</p>
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-            <iframe
-              src="https://player.vimeo.com/video/955857757?title=0&byline=0&portrait=0&dnt=1"
-              className="w-full aspect-video"
-              frameBorder="0"
-              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-              allowFullScreen
-              title="Trumpetstar Demo – So funktioniert das Lernen"
-            />
-          </div>
-          <p className="text-center text-white/50 text-xs mt-3">90 Sekunden · Kein Ton nötig</p>
-        </section>
-
-        {/* ── APP SCREENSHOT ── */}
-        <section className="max-w-4xl mx-auto px-5 pb-14">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[hsl(var(--reward-gold))]/10 blur-3xl rounded-full scale-75 pointer-events-none" />
-            <button onClick={handleCtaClick} className="block w-full max-w-2xl mx-auto group cursor-pointer relative">
-              <img
-                src={appScreenshot}
-                alt={t('landing.hero.imageAlt')}
-                className="relative w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
-              />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="bg-[hsl(var(--reward-gold))] text-slate-900 font-bold px-6 py-3 rounded-xl shadow-lg text-lg flex items-center gap-2">
-                  <Play className="w-5 h-5 fill-current" /> Jetzt starten
+              {/* Trust bar – above fold */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <Users className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> 500+ aktive Schüler
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <Trophy className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> Bekannt aus „2 Minuten 2 Millionen"
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <Star className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" /> 4,9 / 5 Bewertung
+                </span>
+                <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Aktualisiert März 2026
                 </span>
               </div>
-            </button>
+
+              {/* Audience switch */}
+              <div className="flex justify-center lg:justify-start gap-3 mb-8">
+                <button
+                  onClick={() => setAudience('child')}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'child' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
+                >
+                  👨‍👧 Für mein Kind
+                </button>
+                <button
+                  onClick={() => setAudience('adult')}
+                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'adult' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
+                >
+                  🎺 Für mich selbst
+                </button>
+              </div>
+
+              {/* Dynamic headline */}
+              <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-tight mb-4">
+                {audience
+                  ? activeContent.headline
+                  : <>{t('landing.hero.title').split('\n').map((line, i, arr) => (
+                      i < arr.length - 1 ? <span key={i}>{line}<br /></span> : <span key={i}>{line}</span>
+                    ))}{' '}
+                    <span className="text-[hsl(var(--reward-gold))]">{t('landing.hero.titleHighlight')}</span>
+                  </>
+                }
+              </h1>
+
+              <p className="text-lg md:text-xl text-white/80 mb-6">
+                {audience ? activeContent.sub : t('landing.hero.subtitle')}
+              </p>
+
+              {/* Single dominant CTA */}
+              <Button
+                size="lg"
+                onClick={handleCtaClick}
+                className="h-16 px-10 text-xl font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2 mb-3"
+              >
+                {audience ? activeContent.cta : 'Jetzt kostenlos starten'} <ArrowRight className="w-6 h-6" />
+              </Button>
+              <p className="text-white/50 text-xs mb-3">Keine Kreditkarte · 30 Tage Geld-zurück-Garantie</p>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-white/60 hover:text-white/90 text-sm underline underline-offset-2 transition-colors"
+              >
+                Bereits registriert? Einloggen →
+              </button>
+            </div>
+
+            {/* RIGHT: App preview image */}
+            <div className="flex-1 w-full max-w-lg lg:max-w-none">
+              <button
+                onClick={handleCtaClick}
+                className="block w-full group cursor-pointer"
+                aria-label="App starten"
+              >
+                <img
+                  src={appPreview}
+                  alt="Trumpetstar App – Screenshot"
+                  className="w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
+                />
+              </button>
+            </div>
+
           </div>
         </section>
 
