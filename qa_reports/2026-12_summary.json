@@ -1,0 +1,50 @@
+{
+  "date": "2026-03-16",
+  "env": "prod",
+  "go_no_go": "GO",
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 2,
+  "p3_count": 2,
+  "top_risks": [
+    "TS-QA-PERF-001: trompete-lernen-erwachsene-infografik.png = 2.2 MB — LCP > 4s auf Mobile, SEO-Malus",
+    "TS-QA-PERF-002: game-background.png = 2.1 MB — Game Screen BG unkomprimiert",
+    "TS-QA-SEC-001: capture-lead ohne Rate Limiting — Spam-Risiko für Lead-DB + E-Mail-Sequenzen"
+  ],
+  "next_steps": [
+    "1. WebP-Konvertierung aller großen PNG-Assets (cwebp -q 85), JSX <picture> Tags einbauen — Ziel: < 200 KB",
+    "2. Rate Limiting für capture-lead Edge Function (IP-Cooldown oder DB-seitiger Unique-Check)",
+    "3. xlsx → exceljs Migration mittelfristig evaluieren (Q2 Backlog)"
+  ],
+  "commit": "c74e11e",
+  "fixesApplied": [],
+  "bugs_closed": [
+    "TS-QA-EMAIL-001",
+    "TS-QA-EMAIL-002",
+    "TS-QA-EMAIL-003",
+    "TS-QA-DB-001"
+  ],
+  "bugs_new": [
+    "TS-QA-PERF-001",
+    "TS-QA-PERF-002",
+    "TS-QA-SEC-001"
+  ],
+  "bugs_still_open": [
+    "TS-QA-DEP-001"
+  ],
+  "build_incidents": [
+    "Blog-Commit 5763f05 brach Production Build (unterminated string + fehlende qrcode Dep) — bereits gepatcht in c74e11e/a3c846a"
+  ],
+  "modules_checked": [
+    "Email-Tracking (A)",
+    "RLS/Security (B)",
+    "Build/TypeScript (C)",
+    "Performance/Assets (D)",
+    "Edge Functions (E)",
+    "Dependencies (F)",
+    "Blog/SEO Pages (G)"
+  ],
+  "ts_errors": 0,
+  "npm_audit_high": 16,
+  "npm_audit_critical": 0
+}
