@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import {
   Loader2, CheckCircle, Star, ArrowRight,
-  Users, Trophy, Mic2, BookOpen, Music2,
+  Trophy, Mic2, BookOpen, Music2,
   ChevronDown, Play, Shield, Zap
 } from 'lucide-react';
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
@@ -168,8 +168,7 @@ export default function LandingPage() {
 
           {/* Trust bar – centred */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {[
-              { icon: Users, label: '500+ aktive Schüler', color: 'text-[hsl(var(--reward-gold))]' },
+          {[
               { icon: Trophy, label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
               { icon: Star,  label: '4,9 / 5 Bewertung', color: 'text-[hsl(var(--reward-gold))]' },
               { icon: Shield, label: '30 Tage Geld-zurück', color: 'text-emerald-400' },
@@ -234,12 +233,6 @@ export default function LandingPage() {
                 Keine Kreditkarte · Jederzeit kündbar · 30 Tage Garantie
               </p>
 
-              <button
-                onClick={() => navigate('/login')}
-                className="mt-4 block text-white/55 hover:text-white/90 text-sm underline underline-offset-2 transition-colors mx-auto lg:mx-0"
-              >
-                Bereits registriert? Einloggen →
-              </button>
             </div>
 
             {/* RIGHT – App preview */}
