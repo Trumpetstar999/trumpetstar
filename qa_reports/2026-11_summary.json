@@ -1,47 +1,101 @@
 {
-  "date": "2026-03-09",
+  "date": "2026-03-16",
+  "kw": "KW11",
   "env": "prod",
+  "app_url": "https://www.trumpetstar.app",
   "go_no_go": "GO",
   "p0_count": 0,
-  "p1_count": 1,
-  "p2_count": 2,
-  "p3_count": 3,
+  "p1_count": 0,
+  "p2_count": 1,
+  "p3_count": 2,
+  "ts_errors": 0,
+  "npm_audit_high": 17,
+  "npm_audit_critical": 0,
+  "build_status": "PASS",
+  "commit": "c74e11e",
   "top_risks": [
-    "TS-QA-EMAIL-001: Cross-Project Tracking — Log in main project, pixel calls separate project rhnhhjidsnrlwxtbarvf. Tracking may be silently broken if secondary project SUPABASE_URL is misconfigured.",
-    "TS-QA-EMAIL-002: email_log RLS TO public — anon users can read ALL email_log rows (recipient emails, subjects). Fix: restrict SELECT to authenticated/admin.",
-    "TS-QA-DEP-001: xlsx Prototype Pollution + ReDoS (no fix available) — no immediate exploit vector found in current usage"
+    "TS-QA-PERF-001: Unoptimierte PNG-Assets (bis 2.2 MB) — Mobile Performance kritisch",
+    "TS-QA-DEP-001: xlsx Prototype Pollution + ReDoS — kein Upstream-Fix verfügbar",
+    "TS-QA-SEC-001: capture-lead Edge Function ohne Auth/Rate-Limit — Spam-Risiko"
   ],
   "next_steps": [
-    "1. Verify rhnhhjidsnrlwxtbarvf project secrets: SUPABASE_URL must point to main project osgrjouxwpnokfvzztji",
-    "2. Apply email_log RLS fix: restrict SELECT TO authenticated WHERE role IN (admin, teacher)",
-    "3. Harden SMTP: tls.rejectUnauthorized = true in send-email/index.ts",
-    "4. Clarify agent_log table existence and RLS status in Supabase dashboard"
+    "1. Image-Optimierung: WebP-Konvertierung aller PNG-Assets, Prio: trompete-lernen-erwachsene-infografik.png (2.2 MB)",
+    "2. capture-lead Rate Limiting ergänzen (CAPTCHA oder Supabase Rate Limit)",
+    "3. xlsx durch exceljs ersetzen (evaluieren, Breaking Change)",
+    "4. Bundle Splitting: OSMD + PDF.js als lazy async chunks trennen"
   ],
-  "commit": "04256d7",
-  "fixesApplied": [],
+  "fixesApplied": [
+    {
+      "id": "TS-QA-BUILD-001",
+      "title": "Unterminated string literal in TrompeteLernenKinder.tsx",
+      "file": "src/pages/blog/TrompeteLernenKinder.tsx",
+      "description": "Deutsches schließendes Anführungszeichen U+201C brach JS String-Literal. Fix: Unicode-Escape \\u201E...\\u201C",
+      "commit": "c74e11e",
+      "severity": "P1"
+    },
+    {
+      "id": "TS-QA-BUILD-002",
+      "title": "Missing npm dependency qrcode",
+      "file": "package.json",
+      "description": "src/lib/invoice-print.ts importiert QRCode von 'qrcode', war nicht in package.json. Fix: npm install qrcode @types/qrcode --save",
+      "commit": "c74e11e",
+      "severity": "P1"
+    }
+  ],
   "bugs_closed": [
-    "TS-QA-PDF-001",
-    "TS-QA-PDF-002",
-    "TS-QA-PDF-003"
+    "TS-QA-EMAIL-001: Cross-Project Tracking (rhnhhjidsnrlwxtbarvf) — nicht mehr im Code vorhanden",
+    "TS-QA-EMAIL-002: email_log RLS TO public — Admin-only Policies in 767ba9e/6a5318e verifiziert",
+    "TS-QA-DB-001: agent_log anon INSERT — Feature komplett entfernt",
+    "TS-QA-EMAIL-003: SMTP tls.rejectUnauthorized=false — send-email auf HTTP Proxy migriert (dcb9bdb)",
+    "TS-QA-BUILD-001: Unterminated string literal — FIXED in c74e11e",
+    "TS-QA-BUILD-002: Missing qrcode dependency — FIXED in c74e11e"
   ],
   "bugs_new": [
-    "TS-QA-EMAIL-001",
-    "TS-QA-EMAIL-002",
-    "TS-QA-EMAIL-003"
+    "TS-QA-BUILD-001 (P1, FIXED): Unterminated string literal — TrompeteLernenKinder.tsx",
+    "TS-QA-BUILD-002 (P1, FIXED): Missing qrcode npm dependency",
+    "TS-QA-PERF-001 (P2, OPEN): Unoptimierte PNG-Assets bis 2.2 MB",
+    "TS-QA-SEC-001 (P3, OPEN): capture-lead ohne Auth/Rate-Limit"
   ],
   "bugs_still_open": [
-    "TS-QA-DB-001"
+    "TS-QA-DEP-001 (P3): xlsx Prototype Pollution + ReDoS — kein Upstream-Fix",
+    "TS-QA-PERF-001 (P2): Unoptimierte PNG-Assets (neu)",
+    "TS-QA-SEC-001 (P3): capture-lead keine Auth (neu)"
   ],
   "modules_checked": [
-    "PDF (A)",
-    "Email-Tracking (B)",
-    "RLS/Security (C)",
-    "Edge Functions (D)",
-    "Frontend Secrets (E)",
-    "TypeScript (F)",
-    "Dependencies (G)"
+    "A: Auth/RLS",
+    "B: Dashboard/Routing",
+    "C: Content/PDF-Safari-Fix",
+    "D: Stars/Gamification",
+    "E: Payments/DS24",
+    "F: Teacher",
+    "G: Admin/Invoice/Lager"
   ],
-  "ts_errors": 0,
-  "npm_audit_high": 16,
-  "npm_audit_critical": 0
+  "new_commits_reviewed": [
+    "5763f05: Blog KW11 — enthielt Build-Breaking Bug (FIXED)",
+    "195dea4: SEO KW11 — OK",
+    "08cf056: Loading Spinner fix — OK",
+    "647d537-d06411d: Safari PDF fix — OK (window.open approach)",
+    "9b4c4f6: XGG Website — OK",
+    "Invoice PDF e2e commits — OK (nach qrcode fix)",
+    "dcb9bdb+a7b2019: SMTP→HTTP Proxy — TS-QA-EMAIL-003 RESOLVED",
+    "767ba9e+6a5318e: email_log RLS fix — TS-QA-EMAIL-002 RESOLVED",
+    "221ae87: email tracking fix — OK"
+  ],
+  "security_summary": {
+    "service_role_in_frontend": false,
+    "jwt_keys_in_frontend": false,
+    "cross_project_tracking": false,
+    "email_log_rls_admin_only": true,
+    "smtp_reject_unauthorized_false": false,
+    "edge_functions_with_no_auth": ["capture-lead"]
+  },
+  "performance_summary": {
+    "main_js_bundle_kb": 2905,
+    "main_js_bundle_gzip_kb": 814,
+    "largest_image_kb": 2253,
+    "hook_count_useEffect_useMemo_useCallback": 530,
+    "build_time_seconds": 30.47
+  },
+  "generated_by": "Seppl-Checker",
+  "generated_at": "2026-03-16T04:30:00Z"
 }
