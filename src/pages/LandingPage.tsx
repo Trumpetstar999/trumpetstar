@@ -109,14 +109,14 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center gap-10">
 
             {/* LEFT: text content */}
-            <div className="flex-1 text-center lg:text-left">
+            <div className="flex-1 text-center">
               {/* Logo */}
-              <div className="flex justify-center lg:justify-start mb-6">
+              <div className="flex justify-center mb-6">
                 <img src={trumpetstarLogo} alt="Trumpetstar" className="h-16 w-auto drop-shadow-lg" />
               </div>
 
               {/* Trust bar – above fold */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
                 <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
                   <Users className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> 500+ aktive Schüler
                 </span>
