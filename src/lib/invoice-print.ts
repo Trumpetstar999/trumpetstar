@@ -79,7 +79,7 @@ export async function generateInvoiceHTML(
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title> </title>
+<title>{{INVOICE_TITLE}}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   @page {
