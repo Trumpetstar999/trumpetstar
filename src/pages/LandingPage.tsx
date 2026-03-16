@@ -11,7 +11,6 @@ import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import appPreview from '@/assets/app-preview.png';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useLanguage } from '@/hooks/useLanguage';
 
 export default function LandingPage() {
   const navigate = useNavigate();
