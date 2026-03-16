@@ -109,14 +109,14 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center gap-10">
 
             {/* LEFT: text content */}
-            <div className="flex-1 text-center lg:text-left">
+            <div className="flex-1 text-center">
               {/* Logo */}
-              <div className="flex justify-center lg:justify-start mb-6">
+              <div className="flex justify-center mb-6">
                 <img src={trumpetstarLogo} alt="Trumpetstar" className="h-16 w-auto drop-shadow-lg" />
               </div>
 
               {/* Trust bar – above fold */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
                 <span className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full">
                   <Users className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" /> 500+ aktive Schüler
                 </span>
@@ -132,7 +132,7 @@ export default function LandingPage() {
               </div>
 
               {/* Audience switch */}
-              <div className="flex justify-center lg:justify-start gap-3 mb-8">
+              <div className="flex justify-center gap-3 mb-8">
                 <button
                   onClick={() => setAudience('child')}
                   className={`px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all ${audience === 'child' ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-lg' : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'}`}
@@ -190,7 +190,7 @@ export default function LandingPage() {
                 <img
                   src={appPreview}
                   alt="Trumpetstar App – Screenshot"
-                  className="w-full rounded-2xl shadow-2xl shadow-black/40 border border-white/10 transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="w-full transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
                 />
               </button>
             </div>
@@ -203,34 +203,19 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold text-white text-center mb-3">Kostenlos anfangen. Bezahlen wenn du wächst.</h2>
           <p className="text-center text-white/60 mb-10 text-sm">Kein Risiko, kein Vertrag, 30 Tage Geld-zurück-Garantie</p>
 
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 gap-5 max-w-2xl mx-auto">
             {/* FREE */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col">
               <p className="text-white/60 text-xs uppercase tracking-widest font-semibold mb-2">Gratis</p>
               <p className="text-4xl font-bold text-white mb-1">0 €</p>
               <p className="text-white/50 text-xs mb-5">für immer kostenlos</p>
               <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> 30 kostenlose Lieder</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Anfänger-Kurs komplett</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Notenleser & Metronom</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Ausgewählte Lernvideos</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> PDF-Noten (Auswahl)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Notenleser & Stimmgerät</li>
               </ul>
               <Button onClick={handleCtaClick} variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
                 Gratis starten
-              </Button>
-            </div>
-
-            {/* BASIC */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 flex flex-col">
-              <p className="text-white/60 text-xs uppercase tracking-widest font-semibold mb-2">Buch</p>
-              <p className="text-4xl font-bold text-white mb-1">39 €</p>
-              <p className="text-white/50 text-xs mb-5">einmalig · Notenhefte</p>
-              <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Gedrucktes Notenheft</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Ohne App-Zugang</li>
-                <li className="flex items-center gap-2 opacity-40"><CheckCircle className="w-4 h-4 shrink-0" /> Keine Videos inklusive</li>
-              </ul>
-              <Button onClick={() => navigate('/preise')} variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
-                Zum Shop
               </Button>
             </div>
 
@@ -244,9 +229,9 @@ export default function LandingPage() {
               <p className="text-white/50 text-xs mb-5">erster Monat nur 1 €</p>
               <ul className="space-y-2 text-sm text-white/80 flex-1 mb-6">
                 <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle 200+ Lernvideos</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle Mitspieltracks</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> KI-Assistent & Noten-Tool</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Direktes Lehrer-Feedback</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Alle Noten & Materialien</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> KI-Assistent & Mitspieltracks</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Persönliches Feedback vom Lehrer</li>
                 <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" /> Prioritäts-Support</li>
               </ul>
               <Button onClick={handleCtaClick} className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,45%)] text-slate-900 font-bold">
@@ -320,7 +305,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {[
               { icon: BookOpen, title: 'Kompletter Lehrplan', desc: 'Vom ersten Ton bis zum fortgeschrittenen Repertoire – strukturiert und pädagogisch aufgebaut.' },
-              { icon: Mic2, title: 'Echtzeit-Feedback', desc: 'Das Mikrofon-Game erkennt deine Töne live. Üben wird zum Spiel.' },
+              { icon: Mic2, title: 'Persönliches Feedback', desc: 'Wir helfen dir persönlich weiter – mit individuellem Feedback direkt vom Lehrer.' },
               { icon: CheckCircle, title: '30 Tage Garantie', desc: 'Nicht überzeugt? Volle Rückerstattung. Kein Wenn und Aber.' },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 text-center">
@@ -359,7 +344,7 @@ export default function LandingPage() {
               Starte noch heute
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Die ersten 30 Lieder — gratis
+              Alle Lieder — kostenlos spielbar
             </h2>
             <p className="text-white/60 mb-8 text-sm">
               Kein Abo, keine Kreditkarte. Einfach registrieren und loslegen.
