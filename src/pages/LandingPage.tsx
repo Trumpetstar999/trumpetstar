@@ -233,12 +233,6 @@ export default function LandingPage() {
                 Keine Kreditkarte · Jederzeit kündbar · 30 Tage Garantie
               </p>
 
-              <button
-                onClick={() => navigate('/login')}
-                className="mt-4 block text-white/55 hover:text-white/90 text-sm underline underline-offset-2 transition-colors mx-auto lg:mx-0"
-              >
-                Bereits registriert? Einloggen →
-              </button>
             </div>
 
             {/* RIGHT – App preview */}
