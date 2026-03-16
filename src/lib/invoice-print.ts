@@ -145,7 +145,7 @@ export async function generateInvoiceHTML(
     margin-top: 12px;
   }
   .payment-box {
-    margin-top: 14px;
+    margin-top: 25mm;
     padding: 10px 14px;
     background: #f0f4f8;
     border-left: 3px solid #2c3e50;
