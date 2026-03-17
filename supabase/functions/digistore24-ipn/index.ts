@@ -796,10 +796,7 @@ Deno.serve(async (req) => {
   } catch (parseError) {
     console.error("Failed to parse payload:", parseError);
     // Still return 200 to prevent Digistore24 from retrying
-    return new Response(JSON.stringify({ status: "ok", message: "parse_error" }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
   
   try {
@@ -833,10 +830,7 @@ Deno.serve(async (req) => {
         });
       
       // Still return 200
-      return new Response(JSON.stringify({ status: "ok" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
     // Check idempotency
@@ -848,10 +842,7 @@ Deno.serve(async (req) => {
     
     if (existingEvent) {
       console.log(`Duplicate event detected: ${idempotencyKey}, status: ${existingEvent.status}`);
-      return new Response(JSON.stringify({ status: "ok", message: "duplicate" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
     // Store event
@@ -874,10 +865,7 @@ Deno.serve(async (req) => {
     if (insertError) {
       // Might be duplicate due to race condition
       if (insertError.code === '23505') {
-        return new Response(JSON.stringify({ status: "ok", message: "duplicate" }), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
       }
       throw insertError;
     }
@@ -894,18 +882,12 @@ Deno.serve(async (req) => {
     }
     
     // Return
-    return new Response(JSON.stringify({ status: "ok", event_id: ipnEvent.id }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     
   } catch (error: any) {
     console.error("IPN handler error:", error);
     
     // Always return 200 to prevent retries that might cause duplicates
-    return new Response(JSON.stringify({ status: "ok", error: "internal_error" }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
 });
