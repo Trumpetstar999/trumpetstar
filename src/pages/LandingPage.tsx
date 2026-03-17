@@ -212,7 +212,7 @@ export default function LandingPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)] flex items-center justify-center">
+      <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
