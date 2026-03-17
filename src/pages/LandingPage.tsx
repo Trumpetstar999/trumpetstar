@@ -376,21 +376,6 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* App Store Badges */}
-              <div className="flex items-center justify-center gap-3 mt-4">
-                <div className="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-lg px-3 py-2">
-                  <Smartphone className="w-4 h-4 text-white/70" />
-                  <span className="text-white/70 text-xs font-medium">iOS App</span>
-                </div>
-                <div className="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-lg px-3 py-2">
-                  <Smartphone className="w-4 h-4 text-white/70" />
-                  <span className="text-white/70 text-xs font-medium">Android App</span>
-                </div>
-                <div className="flex items-center gap-1.5 bg-white/10 border border-white/20 rounded-lg px-3 py-2">
-                  <Play className="w-4 h-4 text-white/70" />
-                  <span className="text-white/70 text-xs font-medium">Browser</span>
-                </div>
-              </div>
             </div>
 
           </div>
