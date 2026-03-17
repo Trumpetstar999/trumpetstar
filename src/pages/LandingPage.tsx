@@ -249,7 +249,7 @@ export default function LandingPage() {
     >
       <FAQSchema faqs={landingFaqs} />
 
-      <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)] min-h-screen">
+      <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen">
 
         {/* ══════════════════════════════════════
             SECTION 1 — HERO
