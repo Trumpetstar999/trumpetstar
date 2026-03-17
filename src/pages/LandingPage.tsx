@@ -212,7 +212,7 @@ export default function LandingPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)] flex items-center justify-center">
+      <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-white" />
       </div>
     );
@@ -249,7 +249,7 @@ export default function LandingPage() {
     >
       <FAQSchema faqs={landingFaqs} />
 
-      <div className="bg-gradient-to-b from-[hsl(212,100%,56%)] via-[hsl(218,88%,46%)] to-[hsl(222,86%,29%)] min-h-screen">
+      <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen">
 
         {/* ══════════════════════════════════════
             SECTION 1 — HERO
@@ -573,6 +573,7 @@ export default function LandingPage() {
                 className="bg-white/[0.08] border border-white/[0.12] rounded-xl overflow-hidden"
               >
                 <button
+                  type="button"
                   className="w-full flex items-center justify-between px-6 py-4 text-left"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
@@ -581,11 +582,17 @@ export default function LandingPage() {
                     className={`w-4 h-4 text-white/50 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
                   />
                 </button>
-                {openFaq === i && (
+                <div
+                  style={{
+                    maxHeight: openFaq === i ? '300px' : '0px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.25s ease',
+                  }}
+                >
                   <div className="px-6 pb-5 text-white/65 text-sm leading-relaxed">
                     {a}
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>

@@ -125,6 +125,7 @@
     @apply text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     /* Full-screen gradient background */
+    /* NOTE: background-attachment: fixed is intentionally removed — it breaks on iOS Safari */
     background: linear-gradient(
       180deg, 
       hsl(212 100% 56%) 0%, 
@@ -132,26 +133,25 @@
       hsl(222 86% 29%) 100%
     );
     min-height: 100vh;
-    background-attachment: fixed;
   }
   
-  /* iPad optimized touch targets */
-  button, a, [role="button"] {
-    @apply min-h-[44px] min-w-[44px];
+  /* iPad optimized touch targets — only for interactive elements that are too small */
+  button:not([data-no-min-size]), [role="button"]:not([data-no-min-size]) {
+    min-height: 44px;
   }
 }
 
 @layer components {
   /* Glass effect for panels */
   .glass {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(11, 46, 138, 0.55); /* fallback for no backdrop-filter */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
   
   .glass-strong {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(11, 46, 138, 0.60); /* fallback */
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.22);

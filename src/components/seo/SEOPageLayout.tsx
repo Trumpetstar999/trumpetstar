@@ -83,7 +83,8 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value as Language)}
-              className="bg-white/10 border border-white/20 text-white rounded-lg px-2 py-1 text-xs cursor-pointer backdrop-blur-sm hover:bg-white/20 transition-colors"
+              className="bg-white/10 border border-white/20 text-white rounded-lg px-2 py-1 text-xs cursor-pointer hover:bg-white/20 transition-colors"
+              style={{ WebkitAppearance: 'none', appearance: 'none' }}
               title="Select language"
             >
               <option value="de">🇩🇪 DE</option>
