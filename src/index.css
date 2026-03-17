@@ -125,6 +125,7 @@
     @apply text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     /* Full-screen gradient background */
+    /* NOTE: background-attachment: fixed is intentionally removed — it breaks on iOS Safari */
     background: linear-gradient(
       180deg, 
       hsl(212 100% 56%) 0%, 
@@ -132,7 +133,6 @@
       hsl(222 86% 29%) 100%
     );
     min-height: 100vh;
-    background-attachment: fixed;
   }
   
   /* iPad optimized touch targets */
