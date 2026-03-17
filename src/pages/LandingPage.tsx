@@ -573,6 +573,7 @@ export default function LandingPage() {
                 className="bg-white/[0.08] border border-white/[0.12] rounded-xl overflow-hidden"
               >
                 <button
+                  type="button"
                   className="w-full flex items-center justify-between px-6 py-4 text-left"
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 >
@@ -581,11 +582,17 @@ export default function LandingPage() {
                     className={`w-4 h-4 text-white/50 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
                   />
                 </button>
-                {openFaq === i && (
+                <div
+                  style={{
+                    maxHeight: openFaq === i ? '300px' : '0px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.25s ease',
+                  }}
+                >
                   <div className="px-6 pb-5 text-white/65 text-sm leading-relaxed">
                     {a}
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
