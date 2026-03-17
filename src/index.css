@@ -144,14 +144,14 @@
 @layer components {
   /* Glass effect for panels */
   .glass {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(11, 46, 138, 0.55); /* fallback for no backdrop-filter */
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.18);
   }
   
   .glass-strong {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(11, 46, 138, 0.60); /* fallback */
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.22);
