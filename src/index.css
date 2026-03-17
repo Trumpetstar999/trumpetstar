@@ -135,9 +135,9 @@
     min-height: 100vh;
   }
   
-  /* iPad optimized touch targets */
-  button, a, [role="button"] {
-    @apply min-h-[44px] min-w-[44px];
+  /* iPad optimized touch targets — only for interactive elements that are too small */
+  button:not([data-no-min-size]), [role="button"]:not([data-no-min-size]) {
+    min-height: 44px;
   }
 }
 
