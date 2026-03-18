@@ -874,14 +874,20 @@ Deno.serve(async (req) => {
     // In production, this would ideally be a background job
     // For now, we process inline but return quickly to Digistore
     
-    // Process inline before returning
+    // Sofort 200 zurückgeben — DS24 hat kurzen Timeout
+    // Verarbeitung läuft im Hintergrund via EdgeRuntime.waitUntil
+    const processingPromise = processIpnEvent(
+      supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
+    ).catch(err => console.error('IPN processing failed (bg):', err));
+
     try {
-      await processIpnEvent(supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload);
-    } catch (err) {
-      console.error('IPN processing failed:', err);
-    }
-    
-    // Return
+      // @ts-ignore – EdgeRuntime ist in Supabase Edge Functions verfügbar
+      if (typeof EdgeRuntime !== 'undefined') {
+        // @ts-ignore
+        EdgeRuntime.waitUntil(processingPromise);
+      }
+    } catch (_) { /* ignorieren wenn nicht verfügbar */ }
+
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     
   } catch (error: any) {
