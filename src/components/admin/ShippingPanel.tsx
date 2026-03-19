@@ -28,6 +28,16 @@ interface Shipment {
   created_at: string;
 }
 
+// Physische Produkte (Bücher) die versandt werden müssen
+// Alle anderen (PRO-Kurse, BASIC-Zugänge, PDFs, X-Mas-Sheets) sind digital → kein Versand
+const PHYSICAL_PRODUCT_IDS = [
+  '345999',  // Trumpetstar - Band 1
+  '405913',  // Trumpetstar - Band 2
+  '546953',  // Einfache Duette für Anfänger
+  '384651',  // Klavierbegleitungen - Trumpetstar Band 1
+  '550425',  // Techno Tunes Vol. 1 - Buch - Instrumente in Bb
+];
+
 const EMPTY_FORM = {
   transaction_id: '',
   order_id: '',
@@ -58,6 +68,7 @@ export function ShippingPanel() {
     const { data, error } = await (supabase as any)
       .from('digistore24_shipments')
       .select('*')
+      .in('product_id', PHYSICAL_PRODUCT_IDS)
       .order('created_at', { ascending: false });
 
     if (error) {
