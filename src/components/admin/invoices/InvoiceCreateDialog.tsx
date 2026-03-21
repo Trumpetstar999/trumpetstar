@@ -71,12 +71,21 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
   const watchCountry = watch('country');
+  const watchNewCustomerCountry = watch('new_customer_country');
   const watchItems = watch('items');
   const watchCustomerId = watch('customer_id');
 
   const selectedCustomer = customers.find((c) => c.id === watchCustomerId);
   const hasUid = isNewCustomer ? !!watch('new_customer_uid') : !!selectedCustomer?.uid_number;
-  const vatRate = getVatRate(watchCountry, hasUid);
+  // When creating new customer, derive VAT country from new customer's country
+  const effectiveCountry = isNewCustomer ? watchNewCustomerCountry : watchCountry;
+  const vatRate = getVatRate(effectiveCountry, hasUid);
+
+  // Sync invoice country when new customer country changes
+  const handleNewCustomerCountryChange = (v: 'AT' | 'DE') => {
+    setValue('new_customer_country', v);
+    setValue('country', v); // keep invoice country in sync
+  };
 
   const computedItems: InvoiceItem[] = watchItems.map((item, i) => ({
     ...item,
@@ -108,6 +117,14 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
     }
 
     if (isNewCustomer) {
+      if (!values.new_customer_name.trim()) {
+        toast.error('Bitte einen Namen eingeben.');
+        return;
+      }
+      if (!values.new_customer_street.trim() || !values.new_customer_postal.trim() || !values.new_customer_city.trim()) {
+        toast.error('Bitte Adresse vollständig ausfüllen.');
+        return;
+      }
       const newCust = await createCustomer.mutateAsync({
         name: values.new_customer_name,
         company_name: values.new_customer_company || undefined,
@@ -119,25 +136,41 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
         email: values.new_customer_email || undefined,
       });
       customerId = newCust.id;
+      // Auto-sync invoice country from new customer country
+      if (!values.country || values.country === 'AT') {
+        values.country = values.new_customer_country;
+      }
     }
 
+    // Recalculate with final country (may have changed when new customer was set)
+    const finalCountry = values.country;
+    const finalHasUid = isNewCustomer ? !!values.new_customer_uid : !!selectedCustomer?.uid_number;
+    const finalVatRate = getVatRate(finalCountry, finalHasUid);
+    const finalTotals = calculateInvoiceTotals(computedItems, finalVatRate);
+
     const dueDate = addDays(values.invoice_date, 14);
+
+    // Sanitize items: empty product_id → null/undefined
+    const sanitizedItems = computedItems.map((item) => ({
+      ...item,
+      product_id: item.product_id || undefined,
+    }));
 
     await createInvoice.mutateAsync({
       invoice: {
         customer_id: customerId,
         invoice_date: values.invoice_date,
         due_date: dueDate,
-        country: values.country,
-        vat_rate: vatRate,
-        subtotal_net: totals.subtotalNet,
-        vat_amount: totals.vatAmount,
-        total_gross: totals.totalGross,
+        country: finalCountry,
+        vat_rate: finalVatRate,
+        subtotal_net: finalTotals.subtotalNet,
+        vat_amount: finalTotals.vatAmount,
+        total_gross: finalTotals.totalGross,
         paid_amount: 0,
         status: 'draft',
         notes: values.notes || undefined,
       },
-      items: computedItems,
+      items: sanitizedItems,
     });
 
     reset();
@@ -230,7 +263,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
                 </div>
                 <div>
                   <Label className="text-xs font-medium text-gray-600">Land</Label>
-                  <Select value={watch('new_customer_country')} onValueChange={(v) => setValue('new_customer_country', v as 'AT' | 'DE')}>
+                  <Select value={watch('new_customer_country')} onValueChange={(v) => handleNewCustomerCountryChange(v as 'AT' | 'DE')}>
                     <SelectTrigger className="mt-1 h-9 border-gray-200 bg-white text-gray-900 text-sm">
                       <SelectValue />
                     </SelectTrigger>

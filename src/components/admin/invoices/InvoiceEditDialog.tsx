@@ -150,6 +150,7 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
       }
 
       qc.invalidateQueries({ queryKey: ['invoices'] });
+      qc.invalidateQueries({ queryKey: ['invoices', invoiceId] });
       toast.success('Rechnung gespeichert');
       onClose();
     } catch (e: any) {
