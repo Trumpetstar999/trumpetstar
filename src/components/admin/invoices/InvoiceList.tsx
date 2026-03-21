@@ -114,7 +114,9 @@ export function InvoiceList({ onView, onCreate }: Props) {
             <tbody>
               {filtered.map((inv) => (
                 <tr key={inv.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs font-medium">{inv.invoice_number}</td>
+                  <td className="px-4 py-3 font-mono text-xs font-medium">
+                    {inv.invoice_number ?? <span className="text-muted-foreground italic">Entwurf</span>}
+                  </td>
                   <td className="px-4 py-3">
                     <p className="font-medium">{inv.customer?.company_name || inv.customer?.name}</p>
                     {inv.customer?.company_name && (
@@ -151,7 +153,8 @@ export function InvoiceList({ onView, onCreate }: Props) {
                       {inv.status === 'draft' && (
                         <button
                           onClick={() => {
-                            if (confirm(`Rechnung ${inv.invoice_number} wirklich löschen?`)) {
+                           const label = inv.invoice_number ?? 'diesen Entwurf';
+                            if (confirm(`Rechnung ${label} wirklich löschen?`)) {
                               deleteInvoice.mutate(inv.id!);
                             }
                           }}
