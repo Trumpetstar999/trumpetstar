@@ -2,13 +2,19 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Printer, CheckCircle, Loader2, Pencil, Download, X, Building2, Calendar, Hash, CreditCard } from 'lucide-react';
+import {
+  Printer, CheckCircle, Loader2, Pencil, Download, X,
+  Building2, Calendar, Hash, CreditCard, Mail, Send
+} from 'lucide-react';
 import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
-import { printInvoice, downloadInvoice } from '@/lib/invoice-print';
+import { printInvoice, downloadInvoice, generateInvoiceHTML } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice } from '@/types/invoice';
 import { InvoiceEditDialog } from './InvoiceEditDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const STATUS_LABELS: Record<Invoice['status'], string> = {
   draft: 'Entwurf',
@@ -41,6 +47,10 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   const [downloading, setDownloading] = useState(false);
   const [printing, setPrinting] = useState(false);
 
+  // Finalize + email flow
+  const [finalizeStep, setFinalizeStep] = useState<'idle' | 'prompt-email' | 'sending'>('idle');
+  const [emailInput, setEmailInput] = useState('');
+
   if (!invoiceId) return null;
 
   const statusStyle = invoice ? STATUS_COLORS[invoice.status] : STATUS_COLORS.draft;
@@ -59,10 +69,82 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
     try {
       await downloadInvoice(invoice as any);
     } finally {
-      // Short delay so spinner is visible before new window opens
       setTimeout(() => setDownloading(false), 800);
     }
   }
+
+  async function sendInvoiceEmail(recipientEmail: string) {
+    if (!invoice) return;
+    setFinalizeStep('sending');
+    try {
+      // 1. Finalize (assigns number + books inventory)
+      await new Promise<void>((resolve, reject) =>
+        finalizeInvoice.mutate(invoice.id!, { onSuccess: resolve, onError: reject })
+      );
+
+      // 2. Generate invoice HTML (without logo for email — base64 is too large)
+      const html = await generateInvoiceHTML(invoice as any, undefined);
+
+      // 3. Send email via edge function
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/send-invoice-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            invoice_id: invoice.id,
+            recipient_email: recipientEmail,
+            invoice_html: html,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      toast.success(`Rechnung finalisiert & E-Mail an ${recipientEmail} gesendet`);
+    } catch (err: any) {
+      toast.error('Fehler: ' + err.message);
+    } finally {
+      setFinalizeStep('idle');
+    }
+  }
+
+  async function handleFinalizeClick() {
+    if (!invoice) return;
+    const email = invoice.customer?.email?.trim();
+    if (email) {
+      // Email exists — finalize & send directly
+      await sendInvoiceEmail(email);
+    } else {
+      // No email — show prompt
+      setEmailInput('');
+      setFinalizeStep('prompt-email');
+    }
+  }
+
+  async function handleFinalizeWithoutEmail() {
+    if (!invoice) return;
+    setFinalizeStep('sending');
+    try {
+      await new Promise<void>((resolve, reject) =>
+        finalizeInvoice.mutate(invoice.id!, { onSuccess: resolve, onError: reject })
+      );
+      toast.success('Rechnung finalisiert (ohne E-Mail-Versand)');
+    } catch (err: any) {
+      toast.error('Fehler: ' + err.message);
+    } finally {
+      setFinalizeStep('idle');
+    }
+  }
+
+  const isFinalizing = finalizeStep === 'sending' || finalizeInvoice.isPending;
 
   return (
     <Dialog open={!!invoiceId} onOpenChange={(v) => !v && onClose()}>
@@ -77,7 +159,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
             <div>
               <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-1">Rechnung</p>
               <h2 className="text-2xl font-bold tracking-tight">
-                {isLoading ? '...' : invoice?.invoice_number}
+                {isLoading ? '...' : (invoice?.invoice_number ?? 'Entwurf')}
               </h2>
             </div>
             <div className="flex items-center gap-3">
@@ -108,7 +190,6 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
 
             {/* ── Kunde + Metadaten ── */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Kunde */}
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center">
@@ -130,9 +211,14 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                 {invoice.customer?.uid_number && (
                   <p className="text-xs text-slate-400 mt-1.5 font-mono">UID: {invoice.customer.uid_number}</p>
                 )}
+                {invoice.customer?.email && (
+                  <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {invoice.customer.email}
+                  </p>
+                )}
               </div>
 
-              {/* Metadaten */}
               <div className="space-y-2">
                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100 flex items-center gap-3">
                   <div className="w-7 h-7 rounded-lg bg-slate-200 flex items-center justify-center shrink-0">
@@ -233,9 +319,56 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
               </p>
             )}
 
+            {/* ── E-Mail-Eingabe wenn keine E-Mail vorhanden ── */}
+            {finalizeStep === 'prompt-email' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-blue-600" />
+                  <p className="text-sm font-medium text-blue-900">Keine E-Mailadresse hinterlegt</p>
+                </div>
+                <p className="text-xs text-blue-700">Bitte E-Mailadresse eingeben um die Rechnung zu verschicken, oder ohne Versand fortfahren.</p>
+                <Input
+                  type="email"
+                  placeholder="kunde@example.com"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  className="bg-white border-blue-200 text-sm"
+                  onKeyDown={(e) => e.key === 'Enter' && emailInput.trim() && sendInvoiceEmail(emailInput.trim())}
+                  autoFocus
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => sendInvoiceEmail(emailInput.trim())}
+                    disabled={!emailInput.trim() || isFinalizing}
+                    className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {isFinalizing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Finalisieren & Senden
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleFinalizeWithoutEmail}
+                    disabled={isFinalizing}
+                    className="gap-1.5 border-blue-200 text-blue-700"
+                  >
+                    Ohne Versand finalisieren
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setFinalizeStep('idle')}
+                    className="text-slate-500"
+                  >
+                    Abbrechen
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* ── Aktionen ── */}
             <div className="space-y-3 pt-1">
-              {/* Primäre Buttons */}
               <div className="grid grid-cols-3 gap-2">
                 <button
                   onClick={() => setEditOpen(true)}
@@ -262,16 +395,15 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                 </button>
               </div>
 
-              {/* Sekundäre Aktionen */}
               <div className="flex items-center gap-3">
-                {invoice.status === 'draft' && (
+                {invoice.status === 'draft' && finalizeStep === 'idle' && (
                   <Button
                     size="sm"
-                    onClick={() => finalizeInvoice.mutate(invoice.id!)}
-                    disabled={finalizeInvoice.isPending}
+                    onClick={handleFinalizeClick}
+                    disabled={isFinalizing}
                     className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
                   >
-                    {finalizeInvoice.isPending
+                    {isFinalizing
                       ? <Loader2 className="w-4 h-4 animate-spin" />
                       : <CheckCircle className="w-4 h-4" />}
                     Finalisieren & Lager buchen
