@@ -2,11 +2,77 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Eye, Printer, Trash2, Search, Plus, FileText } from 'lucide-react';
+import { Eye, Printer, Trash2, Search, Plus, FileText, Download } from 'lucide-react';
 import { useInvoices, useDeleteInvoice } from '@/hooks/useInvoices';
 import { printInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
-import type { Invoice } from '@/types/invoice';
+import type { Invoice, Customer } from '@/types/invoice';
+
+function exportSteuerberaterCSV(invoices: (Invoice & { customer: Customer })[]) {
+  const SEP = ';';
+  const headers = [
+    'Rechnungsnummer',
+    'Rechnungsdatum',
+    'Fälligkeitsdatum',
+    'Status',
+    'Kundenname',
+    'Firmenname',
+    'Straße',
+    'PLZ',
+    'Ort',
+    'Land',
+    'UID-Nummer',
+    'Steuersatz (%)',
+    'Nettobetrag (EUR)',
+    'MwSt-Betrag (EUR)',
+    'Bruttobetrag (EUR)',
+    'Bezahlt (EUR)',
+    'Offen (EUR)',
+  ];
+
+  const STATUS_DE: Record<string, string> = {
+    draft: 'Entwurf',
+    sent: 'Gesendet',
+    viewed: 'Gesehen',
+    paid: 'Bezahlt',
+    overdue: 'Überfällig',
+    cancelled: 'Storniert',
+  };
+
+  const rows = invoices
+    .filter((inv) => inv.invoice_number) // only finalized invoices
+    .map((inv) => {
+      const offen = Math.max(0, Number(inv.total_gross) - Number(inv.paid_amount));
+      return [
+        inv.invoice_number ?? '',
+        inv.invoice_date ?? '',
+        inv.due_date ?? '',
+        STATUS_DE[inv.status] ?? inv.status,
+        inv.customer?.name ?? '',
+        inv.customer?.company_name ?? '',
+        inv.customer?.street ?? '',
+        inv.customer?.postal_code ?? '',
+        inv.customer?.city ?? '',
+        inv.customer?.country ?? '',
+        inv.customer?.uid_number ?? '',
+        Number(inv.vat_rate).toFixed(2).replace('.', ','),
+        Number(inv.subtotal_net).toFixed(2).replace('.', ','),
+        Number(inv.vat_amount).toFixed(2).replace('.', ','),
+        Number(inv.total_gross).toFixed(2).replace('.', ','),
+        Number(inv.paid_amount).toFixed(2).replace('.', ','),
+        offen.toFixed(2).replace('.', ','),
+      ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(SEP);
+    });
+
+  const csv = '\uFEFF' + [headers.join(SEP), ...rows].join('\r\n'); // BOM for Excel
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Rechnungen_Steuerberater_${new Date().getFullYear()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const STATUS_LABELS: Record<Invoice['status'], string> = {
   draft: 'Entwurf',
