@@ -266,7 +266,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
                 </div>
                 <div>
                   <Label className="text-xs font-medium text-gray-600">Land</Label>
-                  <Select value={watch('new_customer_country')} onValueChange={(v) => setValue('new_customer_country', v as 'AT' | 'DE')}>
+                  <Select value={watch('new_customer_country')} onValueChange={(v) => handleNewCustomerCountryChange(v as 'AT' | 'DE')}>
                     <SelectTrigger className="mt-1 h-9 border-gray-200 bg-white text-gray-900 text-sm">
                       <SelectValue />
                     </SelectTrigger>
