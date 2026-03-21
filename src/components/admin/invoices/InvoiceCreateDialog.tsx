@@ -108,6 +108,14 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
     }
 
     if (isNewCustomer) {
+      if (!values.new_customer_name.trim()) {
+        toast.error('Bitte einen Namen eingeben.');
+        return;
+      }
+      if (!values.new_customer_street.trim() || !values.new_customer_postal.trim() || !values.new_customer_city.trim()) {
+        toast.error('Bitte Adresse vollständig ausfüllen.');
+        return;
+      }
       const newCust = await createCustomer.mutateAsync({
         name: values.new_customer_name,
         company_name: values.new_customer_company || undefined,
@@ -119,9 +127,28 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
         email: values.new_customer_email || undefined,
       });
       customerId = newCust.id;
+      // Auto-sync invoice country from new customer country
+      if (!values.country || values.country === 'AT') {
+        values.country = values.new_customer_country;
+      }
     }
 
+    // Recalculate vatRate with final values (country may have changed)
+    const finalHasUid = isNewCustomer
+      ? !!values.new_customer_uid
+      : !!selectedCustomer?.uid_number;
+    const { getVatRate: getVat } = await import('@/lib/vat');
+    const finalVatRate = getVat(values.country, finalHasUid);
+    const { calculateInvoiceTotals: calcTotals } = await import('@/lib/invoice-calc');
+    const finalTotals = calcTotals(computedItems, finalVatRate);
+
     const dueDate = addDays(values.invoice_date, 14);
+
+    // Sanitize items: empty product_id → null
+    const sanitizedItems = computedItems.map((item) => ({
+      ...item,
+      product_id: item.product_id || undefined,
+    }));
 
     await createInvoice.mutateAsync({
       invoice: {
@@ -129,15 +156,15 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
         invoice_date: values.invoice_date,
         due_date: dueDate,
         country: values.country,
-        vat_rate: vatRate,
-        subtotal_net: totals.subtotalNet,
-        vat_amount: totals.vatAmount,
-        total_gross: totals.totalGross,
+        vat_rate: finalVatRate,
+        subtotal_net: finalTotals.subtotalNet,
+        vat_amount: finalTotals.vatAmount,
+        total_gross: finalTotals.totalGross,
         paid_amount: 0,
         status: 'draft',
         notes: values.notes || undefined,
       },
-      items: computedItems,
+      items: sanitizedItems,
     });
 
     reset();
