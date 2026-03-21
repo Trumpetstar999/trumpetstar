@@ -101,8 +101,15 @@ const Index = () => {
     setTotalStars(prev => prev + 1);
   };
 
-  // Show loading state
-  if (loading) {
+  // Show loading state — cap at 4s to avoid Safari ITP infinite spinner
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+  useEffect(() => {
+    if (!loading) { setLoadingTimedOut(false); return; }
+    const t = setTimeout(() => setLoadingTimedOut(true), 4000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  if (loading && !loadingTimedOut) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
