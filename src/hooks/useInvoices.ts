@@ -125,16 +125,10 @@ export function useCreateInvoice() {
       invoice: Omit<Invoice, 'id' | 'created_at' | 'updated_at' | 'items' | 'customer'>;
       items: Omit<InvoiceItem, 'id' | 'invoice_id'>[];
     }) => {
-      // Get next invoice number
-      const year = new Date().getFullYear();
-      const { data: numData, error: numError } = await supabase.rpc('next_invoice_number', {
-        p_year: year,
-      });
-      if (numError) throw numError;
-
+      // Invoice number is assigned on finalization — drafts get no number yet
       const { data: inv, error: invError } = await supabase
         .from('invoices')
-        .insert({ ...invoice, invoice_number: numData })
+        .insert({ ...invoice, invoice_number: null })
         .select()
         .single();
       if (invError) throw invError;
