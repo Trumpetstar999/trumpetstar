@@ -35,12 +35,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let initialised = false;
+
+    // Safari ITP fix: set a timeout fallback so loading never hangs forever
+    const safariTimeout = setTimeout(() => {
+      if (!initialised) {
+        console.warn('[Auth] Safari timeout: forcing loading=false');
+        setLoading(false);
+        initialised = true;
+      }
+    }, 3000);
+
+    // Set up auth state listener FIRST — this is the single source of truth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+
+        if (!initialised) {
+          initialised = true;
+          clearTimeout(safariTimeout);
+          setLoading(false);
+        }
 
         // Log login activity and award daily login star (prevent duplicate logs for same session)
         if (event === 'SIGNED_IN' && session?.user) {
@@ -123,14 +139,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // THEN check for existing session
+    // THEN check for existing session — resolves Safari ITP by explicitly reading stored session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      // Only apply if onAuthStateChange hasn't fired yet
+      if (!initialised) {
+        initialised = true;
+        clearTimeout(safariTimeout);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    }).catch(() => {
+      // On error (e.g. Safari private mode), still unblock loading
+      if (!initialised) {
+        initialised = true;
+        clearTimeout(safariTimeout);
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(safariTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
