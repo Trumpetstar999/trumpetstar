@@ -138,6 +138,7 @@ export function InvoiceList({ onView, onCreate }: Props) {
         </div>
       </div>
 
+
       {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
@@ -149,11 +150,22 @@ export function InvoiceList({ onView, onCreate }: Props) {
             className="pl-9"
           />
         </div>
+        <Button
+          onClick={() => exportSteuerberaterCSV(invoices)}
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          title="CSV-Export für Steuerberater (Österreich)"
+        >
+          <Download className="w-4 h-4" />
+          Steuerberater Export
+        </Button>
         <Button onClick={onCreate} size="sm" className="gap-1.5">
           <Plus className="w-4 h-4" />
           Neue Rechnung
         </Button>
       </div>
+
 
       {/* Table */}
       <div className="bg-white border border-border rounded-lg overflow-hidden">
