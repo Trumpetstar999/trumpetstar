@@ -9,7 +9,7 @@ import {
   Building2, Calendar, Hash, CreditCard, Mail, Send
 } from 'lucide-react';
 import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
-import { printInvoice, downloadInvoice, generateInvoiceHTML } from '@/lib/invoice-print';
+import { printInvoice, downloadInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice } from '@/types/invoice';
 import { InvoiceEditDialog } from './InvoiceEditDialog';
