@@ -71,12 +71,21 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
   const watchCountry = watch('country');
+  const watchNewCustomerCountry = watch('new_customer_country');
   const watchItems = watch('items');
   const watchCustomerId = watch('customer_id');
 
   const selectedCustomer = customers.find((c) => c.id === watchCustomerId);
   const hasUid = isNewCustomer ? !!watch('new_customer_uid') : !!selectedCustomer?.uid_number;
-  const vatRate = getVatRate(watchCountry, hasUid);
+  // When creating new customer, derive VAT country from new customer's country
+  const effectiveCountry = isNewCustomer ? watchNewCustomerCountry : watchCountry;
+  const vatRate = getVatRate(effectiveCountry, hasUid);
+
+  // Sync invoice country when new customer country changes
+  const handleNewCustomerCountryChange = (v: 'AT' | 'DE') => {
+    setValue('new_customer_country', v);
+    setValue('country', v); // keep invoice country in sync
+  };
 
   const computedItems: InvoiceItem[] = watchItems.map((item, i) => ({
     ...item,
