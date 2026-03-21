@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Eye, Printer, Trash2, Search, Plus, FileText, Download } from 'lucide-react';
 import { useInvoices, useDeleteInvoice } from '@/hooks/useInvoices';
-import { printInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice, Customer } from '@/types/invoice';
 
@@ -40,7 +38,7 @@ function exportSteuerberaterCSV(invoices: (Invoice & { customer: Customer })[]) 
   };
 
   const rows = invoices
-    .filter((inv) => inv.invoice_number) // only finalized invoices
+    .filter((inv) => inv.invoice_number)
     .map((inv) => {
       const offen = Math.max(0, Number(inv.total_gross) - Number(inv.paid_amount));
       return [
@@ -64,13 +62,15 @@ function exportSteuerberaterCSV(invoices: (Invoice & { customer: Customer })[]) 
       ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(SEP);
     });
 
-  const csv = '\uFEFF' + [headers.join(SEP), ...rows].join('\r\n'); // BOM for Excel
+  const csv = '\uFEFF' + [headers.join(SEP), ...rows].join('\r\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = `Rechnungen_Steuerberater_${new Date().getFullYear()}.csv`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
@@ -84,12 +84,12 @@ const STATUS_LABELS: Record<Invoice['status'], string> = {
 };
 
 const STATUS_COLORS: Record<Invoice['status'], string> = {
-  draft: 'bg-slate-100 text-slate-600',
+  draft: 'bg-muted text-muted-foreground',
   sent: 'bg-blue-100 text-blue-700',
   viewed: 'bg-purple-100 text-purple-700',
   paid: 'bg-green-100 text-green-700',
   overdue: 'bg-red-100 text-red-700',
-  cancelled: 'bg-gray-100 text-gray-500',
+  cancelled: 'bg-muted text-muted-foreground',
 };
 
 interface Props {
@@ -138,7 +138,6 @@ export function InvoiceList({ onView, onCreate }: Props) {
         </div>
       </div>
 
-
       {/* Toolbar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
@@ -165,7 +164,6 @@ export function InvoiceList({ onView, onCreate }: Props) {
           Neue Rechnung
         </Button>
       </div>
-
 
       {/* Table */}
       <div className="bg-white border border-border rounded-lg overflow-hidden">
@@ -219,10 +217,7 @@ export function InvoiceList({ onView, onCreate }: Props) {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={async () => {
-                          // Need full invoice with items — open detail dialog
-                          onView(inv.id!);
-                        }}
+                        onClick={() => onView(inv.id!)}
                         className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
                         title="Drucken"
                       >
@@ -231,7 +226,7 @@ export function InvoiceList({ onView, onCreate }: Props) {
                       {inv.status === 'draft' && (
                         <button
                           onClick={() => {
-                           const label = inv.invoice_number ?? 'diesen Entwurf';
+                            const label = inv.invoice_number ?? 'diesen Entwurf';
                             if (confirm(`Rechnung ${label} wirklich löschen?`)) {
                               deleteInvoice.mutate(inv.id!);
                             }
