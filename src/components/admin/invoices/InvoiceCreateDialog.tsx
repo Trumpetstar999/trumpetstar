@@ -142,18 +142,15 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
       }
     }
 
-    // Recalculate vatRate with final values (country may have changed)
-    const finalHasUid = isNewCustomer
-      ? !!values.new_customer_uid
-      : !!selectedCustomer?.uid_number;
-    const { getVatRate: getVat } = await import('@/lib/vat');
-    const finalVatRate = getVat(values.country, finalHasUid);
-    const { calculateInvoiceTotals: calcTotals } = await import('@/lib/invoice-calc');
-    const finalTotals = calcTotals(computedItems, finalVatRate);
+    // Recalculate with final country (may have changed when new customer was set)
+    const finalCountry = values.country;
+    const finalHasUid = isNewCustomer ? !!values.new_customer_uid : !!selectedCustomer?.uid_number;
+    const finalVatRate = getVatRate(finalCountry, finalHasUid);
+    const finalTotals = calculateInvoiceTotals(computedItems, finalVatRate);
 
     const dueDate = addDays(values.invoice_date, 14);
 
-    // Sanitize items: empty product_id → null
+    // Sanitize items: empty product_id → null/undefined
     const sanitizedItems = computedItems.map((item) => ({
       ...item,
       product_id: item.product_id || undefined,
@@ -164,7 +161,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
         customer_id: customerId,
         invoice_date: values.invoice_date,
         due_date: dueDate,
-        country: values.country,
+        country: finalCountry,
         vat_rate: finalVatRate,
         subtotal_net: finalTotals.subtotalNet,
         vat_amount: finalTotals.vatAmount,
