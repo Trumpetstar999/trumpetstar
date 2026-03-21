@@ -80,7 +80,7 @@ export async function generateInvoiceHTML(
     .join('');
 
   const logoHtml = logoDataUrl
-    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:60px;object-fit:contain;">`
+    ? `<img src="${logoDataUrl}" alt="Trumpetstar" style="height:80px;object-fit:contain;">`
     : `<div style="font-size:18pt;font-weight:800;letter-spacing:-0.5px;line-height:1;color:#1a1a1a;">TRUMPET<br><span style="color:#c0392b;">STAR</span></div>`;
 
   return `<!DOCTYPE html>
