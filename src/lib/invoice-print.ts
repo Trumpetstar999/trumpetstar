@@ -317,6 +317,14 @@ async function getLogoDataUrl(): Promise<string | undefined> {
   }
 }
 
+/** Generate invoice HTML with logo embedded as base64 (for email sending) */
+export async function generateInvoiceHTMLWithLogo(
+  invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
+): Promise<string> {
+  const logoDataUrl = await getLogoDataUrl();
+  return generateInvoiceHTML(invoice, logoDataUrl);
+}
+
 export async function printInvoice(
   invoice: Invoice & { customer: Customer; items: InvoiceItem[] }
 ) {

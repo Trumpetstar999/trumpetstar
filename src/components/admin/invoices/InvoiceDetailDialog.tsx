@@ -9,7 +9,7 @@ import {
   Building2, Calendar, Hash, CreditCard, Mail, Send
 } from 'lucide-react';
 import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
-import { printInvoice, downloadInvoice, generateInvoiceHTML } from '@/lib/invoice-print';
+import { printInvoice, downloadInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice } from '@/types/invoice';
 import { InvoiceEditDialog } from './InvoiceEditDialog';
@@ -77,15 +77,24 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
     if (!invoice) return;
     setFinalizeStep('sending');
     try {
-      // 1. Finalize (assigns number + books inventory)
+      // 1. Finalize (assigns invoice number + books inventory)
       await new Promise<void>((resolve, reject) =>
         finalizeInvoice.mutate(invoice.id!, { onSuccess: resolve, onError: reject })
       );
 
-      // 2. Generate invoice HTML (without logo for email — base64 is too large)
-      const html = await generateInvoiceHTML(invoice as any, undefined);
+      // 2. Fetch the freshly finalized invoice (now has invoice_number)
+      const { data: freshInvoice, error: fetchErr } = await supabase
+        .from('invoices')
+        .select('*, customer:customers(*), items:invoice_items(*, product:products(*))')
+        .eq('id', invoice.id!)
+        .single();
+      if (fetchErr || !freshInvoice) throw new Error('Rechnung konnte nicht geladen werden');
 
-      // 3. Send email via edge function
+      // 3. Generate HTML with logo embedded as base64
+      const { generateInvoiceHTMLWithLogo } = await import('@/lib/invoice-print');
+      const html = await generateInvoiceHTMLWithLogo(freshInvoice as any);
+
+      // 4. Send email via edge function
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch(
         `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/send-invoice-email`,
@@ -96,7 +105,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
             Authorization: `Bearer ${session?.access_token}`,
           },
           body: JSON.stringify({
-            invoice_id: invoice.id,
+            invoice_id: freshInvoice.id,
             recipient_email: recipientEmail,
             invoice_html: html,
           }),
