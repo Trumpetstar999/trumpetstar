@@ -153,7 +153,8 @@ export function InvoiceList({ onView, onCreate }: Props) {
                       {inv.status === 'draft' && (
                         <button
                           onClick={() => {
-                            if (confirm(`Rechnung ${inv.invoice_number} wirklich löschen?`)) {
+                           const label = inv.invoice_number ?? 'diesen Entwurf';
+                            if (confirm(`Rechnung ${label} wirklich löschen?`)) {
                               deleteInvoice.mutate(inv.id!);
                             }
                           }}
