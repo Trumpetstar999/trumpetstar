@@ -41,6 +41,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Admin-only: verify caller has admin role
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleData) {
+      return new Response(JSON.stringify({ error: "Forbidden: admin only" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { invoice_id, recipient_email, invoice_html } = await req.json();
     if (!invoice_id || !recipient_email || !invoice_html) {
       return new Response(JSON.stringify({ error: "invoice_id, recipient_email, invoice_html required" }), {
