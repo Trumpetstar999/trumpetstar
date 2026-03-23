@@ -113,6 +113,14 @@
     "release": "Seppl-Checker: Run Release Check\nContext: ENVIRONMENT=staging APP_URL={appUrl} Build={version_or_commit} Devices=iPhone,iPad,Desktop"
   },
 
+  "lastWeeklyCheck": {
+    "kw": 13,
+    "date": "2026-03-23",
+    "commit": "37dd59a",
+    "go_no_go": "GO",
+    "p0": 0, "p1": 0, "p2": 1, "p3": 3
+  },
+
   "knownOpenIssues": [
     {
       "id": "TS-QA-PDF-001",
@@ -179,6 +187,62 @@
       "priority": "P3",
       "status": "open",
       "openedAt": "2026-03-09"
+    },
+    {
+      "id": "TS-QA-PERF-001",
+      "title": "trompete-lernen-erwachsene-infografik.png = 2.2 MB in src/assets/",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "closed",
+      "closedAt": "2026-03-23",
+      "closedBy": "seppl-checker-weekly-2026-03-23",
+      "fix": "PNG→JPEG (-92%), refs updated in TrompeteLernenErwachsenePage.tsx"
+    },
+    {
+      "id": "TS-QA-PERF-002",
+      "title": "game-background.png = 2.1 MB in public/images/",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "closed",
+      "closedAt": "2026-03-23",
+      "closedBy": "seppl-checker-weekly-2026-03-23",
+      "fix": "PNG→JPEG (-96%), refs updated in NoteRenderer.ts"
+    },
+    {
+      "id": "TS-QA-KW13-SEC-001",
+      "title": "send-invoice-email Edge Function ohne Admin-Role-Check",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "closed",
+      "closedAt": "2026-03-23",
+      "closedBy": "seppl-checker-weekly-2026-03-23",
+      "fix": "Admin role check via user_roles table, 403 für non-admin"
+    },
+    {
+      "id": "TS-QA-KW13-SEC-002",
+      "title": "finalize_invoice SECURITY DEFINER ohne Admin-Guard",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "closed",
+      "closedAt": "2026-03-23",
+      "closedBy": "seppl-checker-weekly-2026-03-23",
+      "fix": "has_role(auth.uid(),'admin') guard in Migration 20260323040000"
+    },
+    {
+      "id": "TS-QA-KW13-SEC-003",
+      "title": "send-invoice-email Edge Function ohne Rate Limiting",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-23"
+    },
+    {
+      "id": "TS-QA-KW13-PERF-003",
+      "title": "toni-coach.png (873KB) + trumpetstar-logo.png (555KB) + app-screenshot.png (567KB) optimierbar",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-23"
     }
   ]
 }

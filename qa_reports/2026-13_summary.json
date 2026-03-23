@@ -1,0 +1,27 @@
+{
+  "date": "2026-03-23",
+  "env": "prod",
+  "go_no_go": "GO",
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 1,
+  "p3_count": 3,
+  "top_risks": [
+    "TS-QA-EMAIL-002: email_log RLS TO public – anon kann alle Empfänger/Betreff lesen (P2, open)",
+    "TS-QA-EMAIL-001: Cross-Project Email Tracking ggf. broken (P1, open – needs live verify)",
+    "TS-QA-KW13-SEC-003: send-invoice-email ohne Rate Limiting (P3, low risk post admin-fix)"
+  ],
+  "next_steps": [
+    "Fix TS-QA-EMAIL-002: email_log RLS TO public → TO authenticated (triviale Migration)",
+    "Verify TS-QA-EMAIL-001: Cross-Project Email Tracking live testen",
+    "Asset-Optimierung: toni-coach.png (873KB) + trumpetstar-logo.png (555KB) komprimieren",
+    "Rate Limiting für Edge Functions: capture-lead + send-invoice-email"
+  ],
+  "commit": "37dd59a",
+  "fixesApplied": [
+    "TS-QA-PERF-001: trompete-lernen-erwachsene-infografik.png (2.2MB) → JPEG 175KB (-92%)",
+    "TS-QA-PERF-002: game-background.png (2.1MB) → JPEG 92KB (-96%)",
+    "TS-QA-KW13-SEC-001: send-invoice-email – Admin-Role-Check hinzugefügt (403 für non-admin)",
+    "TS-QA-KW13-SEC-002: finalize_invoice SECURITY DEFINER – has_role('admin') Guard via Migration"
+  ]
+}
