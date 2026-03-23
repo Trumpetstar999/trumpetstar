@@ -238,23 +238,27 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
   return (
     <Dialog open={open} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-md border-0 bg-gradient-to-b from-slate-900 to-slate-800"
+        className="sm:max-w-md border-0 bg-gradient-to-b from-slate-900 to-slate-800 max-h-[90dvh] flex flex-col p-0 overflow-hidden"
         onInteractOutside={(e) => e.preventDefault()}
       >
-        <div className="flex justify-center mb-2">
-          <img src={trumpetstarLogo} alt="TrumpetStar" className="h-12 w-auto" />
+        {/* Fixed header */}
+        <div className="px-6 pt-6 pb-0 shrink-0">
+          <div className="flex justify-center mb-2">
+            <img src={trumpetstarLogo} alt="TrumpetStar" className="h-12 w-auto" />
+          </div>
+          {renderStepIndicator()}
         </div>
 
-        {renderStepIndicator()}
-
-        <div className="min-h-[320px]">
+        {/* Scrollable step content */}
+        <div className="flex-1 overflow-y-auto px-6 py-2">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
           {step === 4 && renderStep4()}
         </div>
 
-        <div className="flex gap-3 mt-4">
+        {/* Fixed footer */}
+        <div className="px-6 pb-6 pt-4 shrink-0 flex gap-3">
           {step > 1 && (
             <Button variant="outline" onClick={handleBack} className="flex-1 h-12 border-white/20 text-white hover:bg-white/10">
               {t('common.back')}
