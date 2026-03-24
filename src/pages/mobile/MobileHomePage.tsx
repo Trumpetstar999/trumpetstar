@@ -102,6 +102,7 @@ export default function MobileHomePage() {
   const [isSending, setIsSending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showIpadCard, setShowIpadCard] = useState(false);
+  const [tunerOpen, setTunerOpen] = useState(false);
 
   const t = TEXTS[language as keyof typeof TEXTS] || TEXTS.de;
   const appUrl = window.location.origin;
