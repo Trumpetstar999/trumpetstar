@@ -38,7 +38,7 @@ import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
