@@ -187,6 +187,101 @@ export type Database = {
         }
         Relationships: []
       }
+      audio_files: {
+        Row: {
+          created_at: string | null
+          display_name: string
+          duration_seconds: number | null
+          id: string
+          level_id: string | null
+          original_filename: string
+          storage_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_name: string
+          duration_seconds?: number | null
+          id?: string
+          level_id?: string | null
+          original_filename?: string
+          storage_url: string
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string
+          duration_seconds?: number | null
+          id?: string
+          level_id?: string | null
+          original_filename?: string
+          storage_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_files_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "audio_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audio_level_items: {
+        Row: {
+          audio_id: string
+          created_at: string | null
+          id: string
+          level_id: string
+          position: number
+        }
+        Insert: {
+          audio_id: string
+          created_at?: string | null
+          id?: string
+          level_id: string
+          position?: number
+        }
+        Update: {
+          audio_id?: string
+          created_at?: string | null
+          id?: string
+          level_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audio_level_items_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: true
+            referencedRelation: "audio_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_level_items_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "audio_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audio_levels: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       classroom_participants: {
         Row: {
           classroom_id: string

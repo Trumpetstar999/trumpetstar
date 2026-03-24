@@ -11,6 +11,7 @@ import { ClassroomPage } from './ClassroomPage';
 import { ProfilePage } from './ProfilePage';
 import { GamePage } from './GamePage';
 import { MetronomePage } from './MetronomePage';
+import { AudiosPage } from './AudiosPage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -23,7 +24,7 @@ import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
 
 // Define tab order for determining slide direction
-const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'metronome', 'chats', 'classroom', 'profile'];
+const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'metronome', 'audios', 'chats', 'classroom', 'profile'];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('levels');
@@ -138,6 +139,8 @@ const Index = () => {
         return <GamePage />;
       case 'metronome':
         return <MetronomePage />;
+      case 'audios':
+        return <AudiosPage />;
       case 'chats':
         return <ChatsPage />;
       case 'classroom':
