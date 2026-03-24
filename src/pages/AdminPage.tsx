@@ -158,6 +158,7 @@ export default function AdminPage() {
       case 'products': return 'Produkte & Pläne';
       case 'digistore24': return 'Digistore24';
       case 'beats': return 'Drum Beats';
+      case 'audioplayer': return 'Audio Player';
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
