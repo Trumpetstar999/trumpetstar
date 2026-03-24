@@ -352,6 +352,27 @@
   .space-grid-sm { @apply gap-3; } /* 12px */
   .space-grid-md { @apply gap-4; } /* 16px */
   .space-grid-lg { @apply gap-6; } /* 24px */
+
+  /* Thin scrollbar for audio track list */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+  }
+
+  /* Text color on muted secondary whites */
+  .text-secondary-white {
+    color: rgba(255, 255, 255, 0.75);
+  }
 }
 
 /* Custom Cursor Overlay Styling */
