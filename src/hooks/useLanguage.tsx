@@ -133,13 +133,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           .upsert({ 
             user_id: user.id, 
             language: lang,
-            skill_level: skill 
+            skill_level: skill,
+            has_seen_welcome: false
           }, { onConflict: 'user_id' });
-        // Mark setup as complete after saving
+        // Mark onboarding complete but keep welcome slideshow pending
         setHasCompletedLanguageSetup(true);
+        // hasSeenWelcome stays false → WelcomeSlideshow will show next
       } catch (error) {
         console.error('[useLanguage] Error completing onboarding:', error);
+        // Even on error, unblock the UI
+        setHasCompletedLanguageSetup(true);
       }
+    } else {
+      setHasCompletedLanguageSetup(true);
     }
   }, [user]);
 

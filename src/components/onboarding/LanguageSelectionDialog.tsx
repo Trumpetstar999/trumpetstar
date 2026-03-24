@@ -52,29 +52,33 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
   };
 
   const handleComplete = async () => {
-    if (!user || isSubmitting) return;
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
-      if (name.trim()) {
-        await supabase
-          .from('profiles')
-          .update({ display_name: name.trim() })
-          .eq('id', user.id);
-      }
+      if (user) {
+        if (name.trim()) {
+          await supabase
+            .from('profiles')
+            .update({ display_name: name.trim() })
+            .eq('id', user.id);
+        }
 
-      // Save segment to leads table (upsert by user email)
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser?.email) {
-        await supabase.from('leads').upsert(
-          { email: authUser.email, segment, auth_user_id: user.id },
-          { onConflict: 'email' }
-        );
+        // Save segment to leads table (upsert by user email)
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser?.email) {
+          await supabase.from('leads').upsert(
+            { email: authUser.email, segment, auth_user_id: user.id },
+            { onConflict: 'email' }
+          );
+        }
       }
 
       await completeOnboarding(selectedLang, skillLevel);
     } catch (error) {
       console.error('[Onboarding] Error completing setup:', error);
+      // Unblock even on error
+      await completeOnboarding(selectedLang, skillLevel);
     } finally {
       setIsSubmitting(false);
     }
