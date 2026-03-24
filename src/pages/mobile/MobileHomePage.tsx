@@ -7,12 +7,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Star, Timer, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
+import { TunerPopup } from '@/components/tuner/TunerPopup';
+import { MetronomeSheet } from '@/components/mobile/MetronomeSheet';
 
 const TEXTS = {
   de: {
@@ -100,6 +102,7 @@ export default function MobileHomePage() {
   const [isSending, setIsSending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showIpadCard, setShowIpadCard] = useState(false);
+  const [tunerOpen, setTunerOpen] = useState(false);
 
   const t = TEXTS[language as keyof typeof TEXTS] || TEXTS.de;
   const appUrl = window.location.origin;
@@ -288,6 +291,49 @@ export default function MobileHomePage() {
             </div>
           </div>
 
+          {/* ── Tools: Metronom & Stimmgerät ── */}
+          <div className="mx-4 mb-4 space-y-3">
+            {/* Section header */}
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, hsl(260 80% 52%), hsl(270 70% 42%))' }}>
+                <Timer className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-white font-bold text-base leading-tight">Übe-Tools</h2>
+                <p className="text-white/50 text-xs">Metronom &amp; Stimmgerät</p>
+              </div>
+            </div>
+
+            {/* Metronom card */}
+            <MetronomeSheet />
+
+            {/* Tuner card */}
+            <button
+              onClick={() => setTunerOpen(true)}
+              className="w-full rounded-2xl px-5 py-4 flex items-center gap-4 transition-all active:scale-[0.98]"
+              style={{
+                background: 'rgba(8,18,45,0.88)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+              }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, hsl(40 80% 48%), hsl(30 70% 38%))' }}
+              >
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-left">
+                <div className="text-white font-bold text-base">Stimmgerät</div>
+                <div className="text-white/50 text-xs">Bb Trompete • A=440 Hz</div>
+              </div>
+              <div className="ml-auto text-white/30 text-xs">Öffnen →</div>
+            </button>
+          </div>
+
           {/* ── Star row ── */}
           <div className="px-5 pb-6 pt-2 flex items-center justify-center gap-1">
             {[...Array(5)].map((_, i) => (
@@ -299,6 +345,7 @@ export default function MobileHomePage() {
         </div>
       </MobileLayout>
 
+      <TunerPopup isOpen={tunerOpen} onClose={() => setTunerOpen(false)} />
       <LanguageSelectionDialog open={!languageLoading && !hasCompletedLanguageSetup} />
       <WelcomeSlideshow
         open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
