@@ -469,6 +469,8 @@ export default function AdminPage() {
 
           {activeTab === 'beats' && <DrumBeatManager />}
 
+          {activeTab === 'audioplayer' && <AudioPlayerManager />}
+
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'emails' && <EmailTemplateManager />}
           {activeTab === 'reviews' && <ReviewSettingsManager />}
