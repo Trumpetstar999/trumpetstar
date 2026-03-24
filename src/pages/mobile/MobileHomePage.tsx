@@ -89,7 +89,7 @@ const TEXTS = {
 export default function MobileHomePage() {
   const { user } = useAuth();
   const { planKey } = useMembership();
-  const { language } = useLanguage();
+  const { language, isLoading: languageLoading, hasCompletedLanguageSetup, hasSeenWelcome, completeWelcome } = useLanguage();
   const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
   const [sendEmail, setSendEmail] = useState('');
   const [showSendField, setShowSendField] = useState(false);
