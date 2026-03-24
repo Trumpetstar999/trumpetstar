@@ -103,12 +103,12 @@ export function AudioPlayer() {
 
   return (
     <div
-      className="flex h-full"
+      className="flex h-full overflow-hidden"
       style={{ background: 'rgba(8,16,42,0.97)' }}
     >
       {/* ── LEFT COLUMN: Level list ── */}
       <div
-        className="w-56 flex-shrink-0 flex flex-col border-r"
+        className="w-56 flex-shrink-0 flex flex-col border-r overflow-hidden"
         style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(6,12,35,0.6)' }}
       >
         {/* Left header */}
@@ -119,8 +119,8 @@ export function AudioPlayer() {
           </div>
         </div>
 
-        {/* Level list */}
-        <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin">
+        {/* Level list — scrollable, stops before the player footer */}
+        <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-thin min-h-0">
           {isLoadingLevels ? (
             <div className="space-y-1 px-2">
               {[1, 2, 3, 4, 5].map(i => (
@@ -150,8 +150,8 @@ export function AudioPlayer() {
         </div>
       </div>
 
-      {/* ── RIGHT COLUMN: Tracks + Player ── */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* ── RIGHT COLUMN: Tracks (scroll) + Player (fixed bottom) ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* ── Top bar ── */}
         <div className="flex items-center gap-2 px-4 pt-4 pb-2 flex-shrink-0">
