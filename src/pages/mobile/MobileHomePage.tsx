@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Monitor, Copy, Send, Info, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
+import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
+import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 
 const TEXTS = {
   de: {
@@ -87,7 +89,7 @@ const TEXTS = {
 export default function MobileHomePage() {
   const { user } = useAuth();
   const { planKey } = useMembership();
-  const { language } = useLanguage();
+  const { language, isLoading: languageLoading, hasCompletedLanguageSetup, hasSeenWelcome, completeWelcome } = useLanguage();
   const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
   const [sendEmail, setSendEmail] = useState('');
   const [showSendField, setShowSendField] = useState(false);
@@ -139,8 +141,9 @@ export default function MobileHomePage() {
   const displayName = profile?.display_name || user?.email?.split('@')[0] || '';
 
   return (
-    <MobileLayout>
-      <div className="px-5 py-6 space-y-6">
+    <>
+      <MobileLayout>
+        <div className="px-5 py-6 space-y-6">
         {/* Greeting */}
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -248,6 +251,18 @@ export default function MobileHomePage() {
           </Card>
         )}
       </div>
-    </MobileLayout>
+      </MobileLayout>
+
+      {/* Onboarding: language/name/skill selection for new users */}
+      <LanguageSelectionDialog
+        open={!languageLoading && !hasCompletedLanguageSetup}
+      />
+
+      {/* Welcome slideshow after onboarding */}
+      <WelcomeSlideshow
+        open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
+        onComplete={completeWelcome}
+      />
+    </>
   );
 }
