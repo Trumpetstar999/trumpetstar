@@ -265,6 +265,55 @@
       0 0 0 4px hsl(48 100% 50%),
       0 0 30px rgba(255, 204, 0, 0.5);
   }
+
+  /* Audio Player Surface */
+  .bg-player-surface {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: var(--radius);
+  }
+
+  /* Track item styles */
+  .track-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors;
+    background: transparent;
+  }
+
+  .track-item:hover {
+    background: rgba(30, 134, 255, 0.08);
+  }
+
+  .track-item-active {
+    background: rgba(30, 134, 255, 0.15) !important;
+  }
+
+  /* Loop marker on progress bar */
+  .loop-marker {
+    @apply absolute top-0 bottom-0 w-0.5 opacity-70;
+    background: hsl(48 100% 50%);
+  }
+
+  /* Player control buttons */
+  .player-control {
+    @apply h-10 w-10 rounded-full flex items-center justify-center transition-colors;
+    background: rgba(255, 255, 255, 0.15);
+    color: hsl(222 86% 29%);
+  }
+
+  .player-control:hover {
+    background: rgba(30, 134, 255, 0.15);
+  }
+
+  .player-control-main {
+    @apply h-12 w-12 rounded-full flex items-center justify-center transition-all;
+    background: hsl(212 100% 56%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(30, 134, 255, 0.4);
+  }
+
+  .player-control-main:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(30, 134, 255, 0.5);
+  }
 }
 
 @layer utilities {
