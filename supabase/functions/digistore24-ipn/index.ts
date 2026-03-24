@@ -184,7 +184,16 @@ async function processIpnEvent(
       .maybeSingle();
     
     if (!product) {
-      throw new Error(`unknown_product: ${normalized.product_id}`);
+      console.warn(`[IPN] Unknown product ID: ${normalized.product_id} — marking event as processed without plan assignment`);
+      await supabase
+        .from('digistore24_ipn_events')
+        .update({ 
+          status: 'processed',
+          processed_at: new Date().toISOString(),
+          error_message: `unknown_product: ${normalized.product_id}`,
+        })
+        .eq('id', eventId);
+      return; // Don't throw — return gracefully so DS24 stays happy
     }
     
     // 2. Find or create user by email
