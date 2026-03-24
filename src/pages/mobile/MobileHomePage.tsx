@@ -265,14 +265,10 @@ export default function MobileHomePage() {
 
             {/* Player card */}
             <div
-              className="flex-1 rounded-2xl overflow-hidden flex flex-col"
-              style={{
-                background: 'rgba(255,255,255,0.97)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                minHeight: 420,
-              }}
+              className="flex-1 overflow-hidden flex flex-col"
+              style={{ minHeight: 420 }}
             >
-              <AudioPlayer />
+              <MobileAudioPlayer />
             </div>
           </div>
 
