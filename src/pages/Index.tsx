@@ -24,7 +24,7 @@ import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
 
 // Define tab order for determining slide direction
-const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'metronome', 'chats', 'classroom', 'profile'];
+const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'metronome', 'audios', 'chats', 'classroom', 'profile'];
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('levels');
