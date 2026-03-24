@@ -7,12 +7,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Star, Timer, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
+import { TunerPopup } from '@/components/tuner/TunerPopup';
+import { MetronomeSheet } from '@/components/mobile/MetronomeSheet';
 
 const TEXTS = {
   de: {
