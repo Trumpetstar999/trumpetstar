@@ -27,7 +27,10 @@ export function MobileAudioPlayer() {
   const [showSettings, setShowSettings] = useState(false);
   const [showLoop, setShowLoop] = useState(false);
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
+  const [showAllTracks, setShowAllTracks] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const TRACKS_PREVIEW = 5;
 
   const player = useAudioPlayer();
   const displayTracks = searchQuery.trim() ? searchResults : tracks;
