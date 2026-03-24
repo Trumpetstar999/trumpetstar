@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, Settings2, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, Settings2, ChevronDown, ChevronUp, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatTime } from '@/lib/formatTime';
@@ -26,6 +26,8 @@ export function MobileAudioPlayer() {
   const [showSearch, setShowSearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showLoop, setShowLoop] = useState(false);
+  const [showLevelDropdown, setShowLevelDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const player = useAudioPlayer();
   const displayTracks = searchQuery.trim() ? searchResults : tracks;
@@ -95,77 +97,110 @@ export function MobileAudioPlayer() {
   const loopStartPercent = player.duration > 0 ? (player.loop.start / player.duration) * 100 : 0;
   const loopEndPercent = player.duration > 0 ? (player.loop.end / player.duration) * 100 : 100;
 
-  const selectedTransposition = TRANSPOSITION_OPTIONS.find(o => o.id === player.transpositionId);
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowLevelDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selectedLevel = levels.find(l => l.id === selectedLevelId);
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'rgba(10,20,50,0.92)', borderRadius: '1rem' }}>
 
       {/* ── Top bar ── */}
-      <div className="flex items-center gap-2 px-4 pt-4 pb-3 flex-shrink-0">
+      <div className="flex items-center gap-2 px-3 pt-3 pb-2 flex-shrink-0">
+
+        {/* Level dropdown */}
+        <div className="relative flex-1" ref={dropdownRef}>
+          <button
+            onClick={() => { setShowLevelDropdown(!showLevelDropdown); setShowSearch(false); setShowSettings(false); }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: showLevelDropdown ? 'rgba(30,134,255,0.3)' : 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid rgba(255,255,255,0.12)' }}
+          >
+            {isLoadingLevels
+              ? <div className="h-4 w-20 rounded bg-white/20 animate-pulse" />
+              : <span className="flex-1 text-left truncate">{selectedLevel?.name ?? 'Level wählen'}</span>
+            }
+            <ChevronDown className="w-4 h-4 flex-shrink-0 opacity-60" style={{ transform: showLevelDropdown ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+          </button>
+
+          {/* Dropdown list */}
+          {showLevelDropdown && (
+            <div
+              className="absolute top-full left-0 right-0 mt-1 rounded-xl overflow-hidden z-50"
+              style={{ background: 'rgba(15,25,60,0.98)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 16px 40px rgba(0,0,0,0.6)', maxHeight: 240, overflowY: 'auto' }}
+            >
+              {levels.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => { setSelectedLevelId(l.id); player.stop(); setShowLevelDropdown(false); }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm transition-all"
+                  style={selectedLevelId === l.id
+                    ? { background: 'rgba(30,134,255,0.25)', color: 'white', fontWeight: 600 }
+                    : { background: 'transparent', color: 'rgba(255,255,255,0.65)' }}
+                >
+                  {selectedLevelId === l.id && <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'hsl(212 100% 70%)' }} />}
+                  <span className={selectedLevelId === l.id ? '' : 'ml-5'}>{l.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Search button */}
         <button
-          onClick={() => { setShowSearch(!showSearch); if (!showSearch) setShowSettings(false); }}
-          className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
-          style={{ background: showSearch ? 'rgba(30,134,255,0.4)' : 'rgba(255,255,255,0.1)' }}
+          onClick={() => { setShowSearch(!showSearch); setShowLevelDropdown(false); setShowSettings(false); }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+          style={{ background: showSearch ? 'rgba(30,134,255,0.4)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
           <Search className="w-4 h-4 text-white" />
         </button>
 
-        {showSearch ? (
+        {/* Settings button — icon only */}
+        <button
+          onClick={() => { setShowSettings(!showSettings); setShowLevelDropdown(false); setShowSearch(false); }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
+          style={{ background: showSettings ? 'rgba(30,134,255,0.4)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <Settings2 className="w-4 h-4 text-white" />
+        </button>
+      </div>
+
+      {/* ── Search input ── */}
+      {showSearch && (
+        <div className="px-3 pb-2 flex-shrink-0">
           <input
             autoFocus
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Titel suchen..."
-            className="flex-1 bg-white/10 text-white placeholder-white/40 text-sm rounded-full px-3 py-1.5 outline-none border border-white/20 focus:border-white/40"
+            className="w-full bg-white/10 text-white placeholder-white/40 text-sm rounded-xl px-3 py-2 outline-none border border-white/20 focus:border-white/40"
           />
-        ) : (
-          /* Level pills */
-          <div className="flex-1 flex gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
-            {isLoadingLevels
-              ? <div className="h-6 w-24 rounded-full bg-white/10 animate-pulse" />
-              : levels.map(l => (
-                <button
-                  key={l.id}
-                  onClick={() => { setSelectedLevelId(l.id); player.stop(); }}
-                  className="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-all whitespace-nowrap"
-                  style={selectedLevelId === l.id
-                    ? { background: 'hsl(212 100% 56%)', color: 'white' }
-                    : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}
-                >
-                  {l.name}
-                </button>
-              ))
-            }
-          </div>
-        )}
-
-        <button
-          onClick={() => { setShowSettings(!showSettings); if (!showSettings) setShowSearch(false); }}
-          className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
-          style={showSettings
-            ? { background: 'rgba(30,134,255,0.4)', color: 'white' }
-            : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
-        >
-          <Settings2 className="w-3.5 h-3.5" />
-          <span className="text-yellow-400 font-bold text-xs">{selectedTransposition?.label.split(' ').slice(-1)[0].replace('(', '').replace(')', '') || 'Bb'}</span>
-        </button>
-      </div>
+        </div>
+      )}
 
       {/* ── Settings panel ── */}
       {showSettings && (
-        <div className="mx-4 mb-3 rounded-xl p-3 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-          <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-2">Transposition</p>
+        <div className="mx-3 mb-2 rounded-xl p-3 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <p className="text-white/40 text-xs font-semibold uppercase tracking-wider mb-2">Transposition</p>
           <div className="flex flex-wrap gap-1.5">
             {TRANSPOSITION_OPTIONS.map(opt => (
               <button
                 key={opt.id}
-                onClick={() => player.setTranspositionId(opt.id)}
-                className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
+                onClick={() => { player.setTranspositionId(opt.id); setShowSettings(false); }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={player.transpositionId === opt.id
                   ? { background: 'hsl(48 100% 50%)', color: '#000' }
                   : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)' }}
               >
-                {opt.label.replace('Trompete in ', '').replace('Horn in ', 'Horn ').replace('(STANDARD)', '★')}
+                {player.transpositionId === opt.id && <Check className="w-3 h-3" />}
+                {opt.label.replace('Trompete in ', '').replace('Horn in ', 'Horn ').replace(' (STANDARD)', '')}
               </button>
             ))}
           </div>
