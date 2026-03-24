@@ -251,6 +251,18 @@ export default function MobileHomePage() {
           </Card>
         )}
       </div>
-    </MobileLayout>
+      </MobileLayout>
+
+      {/* Onboarding: language/name/skill selection for new users */}
+      <LanguageSelectionDialog
+        open={!languageLoading && !hasCompletedLanguageSetup}
+      />
+
+      {/* Welcome slideshow after onboarding */}
+      <WelcomeSlideshow
+        open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
+        onComplete={completeWelcome}
+      />
+    </>
   );
 }
