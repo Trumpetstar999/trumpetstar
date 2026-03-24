@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, Settings2, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, Settings2, ChevronDown, ChevronUp, RotateCcw, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatTime } from '@/lib/formatTime';
