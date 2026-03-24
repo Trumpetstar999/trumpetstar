@@ -160,7 +160,8 @@
     "classroom": "Aula",
     "profile": "Perfil",
     "game": "Juego",
-    "metronome": "Metrónomo"
+    "metronome": "Metrónomo",
+    "audios": "Audios"
   },
   "levels": {
     "title": "Niveles",

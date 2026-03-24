@@ -160,7 +160,8 @@
     "classroom": "Classroom",
     "profile": "Profile",
     "game": "Game",
-    "metronome": "Metronome"
+    "metronome": "Metronome",
+    "audios": "Audios"
   },
   "levels": {
     "title": "Levels",

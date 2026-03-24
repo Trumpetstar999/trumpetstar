@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
+import { AudioPlayer } from '@/components/audio/AudioPlayer';
 
 const TEXTS = {
   de: {
@@ -143,114 +144,122 @@ export default function MobileHomePage() {
   return (
     <>
       <MobileLayout>
-        <div className="px-5 py-6 space-y-6">
-        {/* Greeting */}
-        <div>
-          <h1 className="text-2xl font-bold text-white">
-            {t.greeting}, {displayName} 👋
-          </h1>
-        </div>
-
-        {/* Plan Badge */}
-        <div className="flex items-center gap-2">
-          <span className="text-white/60 text-sm">{t.yourPlan}:</span>
-          <Badge className="bg-white/15 text-white border-white/20 font-semibold">
-            {PLAN_DISPLAY_NAMES[planKey]}
-          </Badge>
-        </div>
-
-        {/* Main Card */}
-        <Card className="border-0 shadow-xl">
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Monitor className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="font-bold text-slate-900 text-lg">{t.cardTitle}</h2>
-                <p className="text-slate-600 text-sm mt-1 leading-relaxed">{t.cardText}</p>
-              </div>
+        <div className="space-y-0">
+          {/* Top section: greeting + iPad redirect card */}
+          <div className="px-5 py-6 space-y-6">
+            {/* Greeting */}
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                {t.greeting}, {displayName} 👋
+              </h1>
             </div>
 
-            <div className="space-y-2 pt-2">
-              {/* Copy Link */}
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
-                onClick={handleCopyLink}
-              >
-                {linkCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
-                {linkCopied ? t.linkCopied : t.copyLink}
-              </Button>
+            {/* Plan Badge */}
+            <div className="flex items-center gap-2">
+              <span className="text-white/60 text-sm">{t.yourPlan}:</span>
+              <Badge className="bg-white/15 text-white border-white/20 font-semibold">
+                {PLAN_DISPLAY_NAMES[planKey]}
+              </Badge>
+            </div>
 
-              {/* Send Link */}
-              {!showSendField ? (
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
-                  onClick={() => { setShowSendField(true); setSendEmail(user?.email || ''); }}
-                >
-                  <Send className="w-4 h-4" />
-                  {t.sendLink}
-                </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Input
-                    type="email"
-                    value={sendEmail}
-                    onChange={(e) => setSendEmail(e.target.value)}
-                    placeholder={t.emailPlaceholder}
-                    className="h-12 border-slate-200 text-slate-900"
-                  />
+            {/* Main Card */}
+            <Card className="border-0 shadow-xl">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Monitor className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-slate-900 text-lg">{t.cardTitle}</h2>
+                    <p className="text-slate-600 text-sm mt-1 leading-relaxed">{t.cardText}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2">
+                  {/* Copy Link */}
                   <Button
-                    onClick={handleSendLink}
-                    disabled={isSending}
-                    className="h-12 px-4"
+                    variant="outline"
+                    className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
+                    onClick={handleCopyLink}
                   >
-                    {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendButton}
+                    {linkCopied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                    {linkCopied ? t.linkCopied : t.copyLink}
+                  </Button>
+
+                  {/* Send Link */}
+                  {!showSendField ? (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
+                      onClick={() => { setShowSendField(true); setSendEmail(user?.email || ''); }}
+                    >
+                      <Send className="w-4 h-4" />
+                      {t.sendLink}
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        type="email"
+                        value={sendEmail}
+                        onChange={(e) => setSendEmail(e.target.value)}
+                        placeholder={t.emailPlaceholder}
+                        className="h-12 border-slate-200 text-slate-900"
+                      />
+                      <Button
+                        onClick={handleSendLink}
+                        disabled={isSending}
+                        className="h-12 px-4"
+                      >
+                        {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : t.sendButton}
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* How To */}
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
+                    onClick={() => setShowHowTo(!showHowTo)}
+                  >
+                    <Info className="w-4 h-4" />
+                    {t.howTo}
                   </Button>
                 </div>
-              )}
+              </CardContent>
+            </Card>
 
-              {/* How To */}
-              <Button
-                variant="outline"
-                className="w-full justify-start gap-3 h-12 border-slate-200 text-slate-700"
-                onClick={() => setShowHowTo(!showHowTo)}
-              >
-                <Info className="w-4 h-4" />
-                {t.howTo}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            {/* How-To Overlay */}
+            {showHowTo && (
+              <Card className="border-0 shadow-xl">
+                <CardContent className="p-6 space-y-4">
+                  <h3 className="font-bold text-slate-900 text-lg">{t.howToTitle}</h3>
+                  <ol className="space-y-3">
+                    {t.howToSteps.map((step, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <span className="text-slate-700 text-sm leading-relaxed">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  <Button
+                    variant="outline"
+                    className="w-full h-11 border-slate-200 text-slate-700"
+                    onClick={() => setShowHowTo(false)}
+                  >
+                    {t.close}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
-        {/* How-To Overlay */}
-        {showHowTo && (
-          <Card className="border-0 shadow-xl">
-            <CardContent className="p-6 space-y-4">
-              <h3 className="font-bold text-slate-900 text-lg">{t.howToTitle}</h3>
-              <ol className="space-y-3">
-                {t.howToSteps.map((step, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
-                      {i + 1}
-                    </span>
-                    <span className="text-slate-700 text-sm leading-relaxed">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <Button
-                variant="outline"
-                className="w-full h-11 border-slate-200 text-slate-700"
-                onClick={() => setShowHowTo(false)}
-              >
-                {t.close}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          {/* Audio Player section */}
+          <div className="rounded-t-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)' }}>
+            <AudioPlayer />
+          </div>
+        </div>
       </MobileLayout>
 
       {/* Onboarding: language/name/skill selection for new users */}

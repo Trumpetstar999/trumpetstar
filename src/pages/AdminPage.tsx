@@ -33,12 +33,13 @@ import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { ShippingPanel } from '@/components/admin/ShippingPanel';
 import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones } from 'lucide-react';
+import { AudioPlayerManager } from '@/components/admin/AudioPlayerManager';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -157,6 +158,7 @@ export default function AdminPage() {
       case 'products': return 'Produkte & Pläne';
       case 'digistore24': return 'Digistore24';
       case 'beats': return 'Drum Beats';
+      case 'audioplayer': return 'Audio Player';
       case 'assistant': return 'KI-Assistent';
       case 'classrooms': return 'Klassenzimmer';
       case 'feedback': return 'Feedback & Chats';
@@ -186,6 +188,7 @@ export default function AdminPage() {
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
       case 'digistore24': return 'IPN-Webhooks, Produkt-Mapping und Event-Logs';
       case 'beats': return 'Drum Beat Loops hochladen und verwalten';
+      case 'audioplayer': return 'Audio-Tracks und Levels verwalten';
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
@@ -465,6 +468,8 @@ export default function AdminPage() {
           {activeTab === 'digistore24' && <Digistore24Manager />}
 
           {activeTab === 'beats' && <DrumBeatManager />}
+
+          {activeTab === 'audioplayer' && <AudioPlayerManager />}
 
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'emails' && <EmailTemplateManager />}
