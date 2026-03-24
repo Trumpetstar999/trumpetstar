@@ -139,6 +139,8 @@ const Index = () => {
         return <GamePage />;
       case 'metronome':
         return <MetronomePage />;
+      case 'audios':
+        return <AudiosPage />;
       case 'chats':
         return <ChatsPage />;
       case 'classroom':
