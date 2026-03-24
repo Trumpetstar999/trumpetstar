@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Monitor, Copy, Send, Info, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
+import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
+import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 
 const TEXTS = {
   de: {
