@@ -141,8 +141,9 @@ export default function MobileHomePage() {
   const displayName = profile?.display_name || user?.email?.split('@')[0] || '';
 
   return (
-    <MobileLayout>
-      <div className="px-5 py-6 space-y-6">
+    <>
+      <MobileLayout>
+        <div className="px-5 py-6 space-y-6">
         {/* Greeting */}
         <div>
           <h1 className="text-2xl font-bold text-white">
