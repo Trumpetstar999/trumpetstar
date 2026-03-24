@@ -254,38 +254,55 @@ export function AudioPlayer() {
           <div className="flex flex-col items-center justify-center h-24 gap-2">
             <p className="text-white/30 text-sm">{isSearchMode ? 'Keine Ergebnisse' : 'Keine Tracks in diesem Level'}</p>
           </div>
-        ) : (
-          displayTracks.map((track, i) => {
-            const isActive = player.currentTrack?.id === track.id;
-            return (
-              <button
-                key={track.id}
-                onClick={() => player.loadTrack(track)}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-1 text-left transition-all hover:bg-white/5"
-                style={isActive
-                  ? { background: 'rgba(30,134,255,0.22)', border: '1px solid rgba(30,134,255,0.35)' }
-                  : { background: 'rgba(255,255,255,0.03)', border: '1px solid transparent' }}
-              >
-                <span
-                  className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
-                  style={isActive
-                    ? { background: 'hsl(212 100% 56%)', color: 'white' }
-                    : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+        ) : (() => {
+          const visibleTracks = isSearchMode || showAllTracks ? displayTracks : displayTracks.slice(0, TRACKS_PREVIEW);
+          const hasMore = !isSearchMode && displayTracks.length > TRACKS_PREVIEW;
+          return (
+            <>
+              {visibleTracks.map((track, i) => {
+                const isActive = player.currentTrack?.id === track.id;
+                return (
+                  <button
+                    key={track.id}
+                    onClick={() => player.loadTrack(track)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-1 text-left transition-all hover:bg-white/5"
+                    style={isActive
+                      ? { background: 'rgba(30,134,255,0.22)', border: '1px solid rgba(30,134,255,0.35)' }
+                      : { background: 'rgba(255,255,255,0.03)', border: '1px solid transparent' }}
+                  >
+                    <span
+                      className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
+                      style={isActive
+                        ? { background: 'hsl(212 100% 56%)', color: 'white' }
+                        : { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+                    >
+                      {isActive && player.isPlaying ? '▶' : i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium truncate" style={{ color: isActive ? 'white' : 'rgba(255,255,255,0.75)' }}>
+                      {track.display_name}
+                    </span>
+                    {track.duration_seconds && (
+                      <span className="text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                        {formatTime(track.duration_seconds)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+              {hasMore && (
+                <button
+                  onClick={() => setShowAllTracks(v => !v)}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl mb-1 text-sm font-semibold transition-all hover:bg-white/5"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
                 >
-                  {isActive && player.isPlaying ? '▶' : i + 1}
-                </span>
-                <span className="flex-1 text-sm font-medium truncate" style={{ color: isActive ? 'white' : 'rgba(255,255,255,0.75)' }}>
-                  {track.display_name}
-                </span>
-                {track.duration_seconds && (
-                  <span className="text-xs flex-shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                    {formatTime(track.duration_seconds)}
-                  </span>
-                )}
-              </button>
-            );
-          })
-        )}
+                  {showAllTracks
+                    ? <><ChevronUp className="w-4 h-4" /> Weniger anzeigen</>
+                    : <><ChevronDown className="w-4 h-4" /> {displayTracks.length - TRACKS_PREVIEW} weitere Tracks</>}
+                </button>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       {/* ── Player — fixed bottom panel ── */}
