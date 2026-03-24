@@ -86,6 +86,7 @@ export function AudioPlayer() {
           position: i.position,
         }));
       setTracks(mapped);
+      setShowAllTracks(false);
       setIsLoadingTracks(false);
     };
     fetchTracks();
