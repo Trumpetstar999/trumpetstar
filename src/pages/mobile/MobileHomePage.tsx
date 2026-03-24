@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
-import { AudioPlayer } from '@/components/audio/AudioPlayer';
+import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
 
 const TEXTS = {
   de: {
@@ -255,24 +255,36 @@ export default function MobileHomePage() {
                 <h2 className="text-white font-bold text-base leading-tight">{t.audioTitle}</h2>
                 <p className="text-white/50 text-xs">{t.audioSubtitle}</p>
               </div>
-              {/* live EQ animation dots */}
+              {/* live EQ bars */}
               <div className="ml-auto flex items-end gap-0.5 h-4">
-                <div className="w-1 rounded-full bg-primary/60 animate-pulse" style={{ height: '60%', animationDelay: '0ms' }} />
-                <div className="w-1 rounded-full bg-primary/80 animate-pulse" style={{ height: '100%', animationDelay: '150ms' }} />
-                <div className="w-1 rounded-full bg-primary/60 animate-pulse" style={{ height: '40%', animationDelay: '75ms' }} />
+                {[60, 100, 40, 80, 55].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-1 rounded-full animate-pulse"
+                    style={{
+                      height: `${h}%`,
+                      animationDelay: `${i * 80}ms`,
+                      background: 'hsl(212 100% 70%)',
+                      opacity: 0.7,
+                    }}
+                  />
+                ))}
               </div>
             </div>
 
-            {/* Player card */}
+            {/* Player card — dark glassmorphism */}
             <div
-              className="flex-1 rounded-2xl overflow-hidden flex flex-col"
+              className="flex-1 overflow-hidden flex flex-col rounded-2xl"
               style={{
-                background: 'rgba(255,255,255,0.97)',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                minHeight: 420,
+                background: 'rgba(8,18,45,0.88)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                minHeight: 440,
               }}
             >
-              <AudioPlayer />
+              <MobileAudioPlayer />
             </div>
           </div>
 
