@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { TabId } from '@/types';
-import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic, Gamepad2, Timer } from 'lucide-react';
+import { Layers, Music, Video, Users, User, MessageSquare, FileText, FileMusic, Gamepad2, Timer, Headphones } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
