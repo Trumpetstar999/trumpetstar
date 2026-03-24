@@ -188,6 +188,7 @@ export default function AdminPage() {
       case 'products': return 'DigiMember Produkte und Plan-Zuordnungen';
       case 'digistore24': return 'IPN-Webhooks, Produkt-Mapping und Event-Logs';
       case 'beats': return 'Drum Beat Loops hochladen und verwalten';
+      case 'audioplayer': return 'Audio-Tracks und Levels verwalten';
       case 'assistant': return 'Wissensbasis, Repertoire und Feedback';
       case 'classrooms': return 'Live-Unterricht verwalten';
       case 'feedback': return 'Schüler-Feedback und Nachrichten';
