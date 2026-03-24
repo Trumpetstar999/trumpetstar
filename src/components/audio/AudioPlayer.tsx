@@ -233,7 +233,7 @@ export function AudioPlayer() {
           </div>
         )}
 
-        {/* ── Track list — scrollable ── */}
+        {/* ── Track list — scrollable, player footer stays fixed below ── */}
         <div className="flex-1 overflow-y-auto px-4 min-h-0 py-1 scrollbar-thin">
           {(isSearchMode ? isSearching : isLoadingTracks) ? (
             <div className="flex items-center justify-center h-24">
