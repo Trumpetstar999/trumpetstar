@@ -184,7 +184,16 @@ async function processIpnEvent(
       .maybeSingle();
     
     if (!product) {
-      throw new Error(`unknown_product: ${normalized.product_id}`);
+      console.warn(`[IPN] Unknown product ID: ${normalized.product_id} — marking event as processed without plan assignment`);
+      await supabase
+        .from('digistore24_ipn_events')
+        .update({ 
+          status: 'processed',
+          processed_at: new Date().toISOString(),
+          error_message: `unknown_product: ${normalized.product_id}`,
+        })
+        .eq('id', eventId);
+      return; // Don't throw — return gracefully so DS24 stays happy
     }
     
     // 2. Find or create user by email
@@ -768,12 +777,17 @@ async function sendWelcomeEmail(
 
 // Main handler
 Deno.serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Digistore24 sends GET requests as health checks — respond with 200
+  if (req.method === "GET") {
+    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+  }
   
-  // Only accept POST
+  // Only accept POST for actual IPN events
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -795,7 +809,6 @@ Deno.serve(async (req) => {
     console.log("Received IPN payload:", JSON.stringify(rawPayload).substring(0, 500));
   } catch (parseError) {
     console.error("Failed to parse payload:", parseError);
-    // Still return 200 to prevent Digistore24 from retrying
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
   
@@ -809,11 +822,10 @@ Deno.serve(async (req) => {
     const appBaseUrl = await getSetting(supabase, 'app_base_url', 'APP_BASE_URL') || 'https://trumpetstar.lovable.app';
     const defaultLocale = await getSetting(supabase, 'default_locale') || 'de';
     
-    // Validate secret
+    // Validate secret — only block if a secret IS configured AND it doesn't match
     if (ipnSecret && !validateSecret(rawPayload, ipnSecret)) {
-      console.warn("Invalid IPN secret provided");
+      console.warn("Invalid IPN secret provided, payload keys:", Object.keys(rawPayload));
       
-      // Log as rejected
       await supabase
         .from('digistore24_ipn_events')
         .insert({
@@ -829,7 +841,6 @@ Deno.serve(async (req) => {
           error_message: 'Invalid IPN secret',
         });
       
-      // Still return 200
       return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
@@ -863,37 +874,30 @@ Deno.serve(async (req) => {
       .single();
     
     if (insertError) {
-      // Might be duplicate due to race condition
       if (insertError.code === '23505') {
+        // Race condition duplicate — still OK
         return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
       }
       throw insertError;
     }
     
-    // Process asynchronously (but within edge function timeout)
-    // In production, this would ideally be a background job
-    // For now, we process inline but return quickly to Digistore
-    
-    // Sofort 200 zurückgeben — DS24 hat kurzen Timeout
-    // Verarbeitung läuft im Hintergrund via EdgeRuntime.waitUntil
-    const processingPromise = processIpnEvent(
-      supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
-    ).catch(err => console.error('IPN processing failed (bg):', err));
-
+    // Process SYNCHRONOUSLY — return 200 only after processing is complete
+    // This is required because EdgeRuntime.waitUntil is unreliable in Supabase
     try {
-      // @ts-ignore – EdgeRuntime ist in Supabase Edge Functions verfügbar
-      if (typeof EdgeRuntime !== 'undefined') {
-        // @ts-ignore
-        EdgeRuntime.waitUntil(processingPromise);
-      }
-    } catch (_) { /* ignorieren wenn nicht verfügbar */ }
+      await processIpnEvent(
+        supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
+      );
+      console.log(`IPN event ${ipnEvent.id} processed successfully`);
+    } catch (processingError: any) {
+      // Log the error but still return 200 to prevent infinite Digistore24 retries
+      console.error('IPN processing error (non-fatal for DS24):', processingError?.message || processingError);
+    }
 
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     
   } catch (error: any) {
     console.error("IPN handler error:", error);
-    
-    // Always return 200 to prevent retries that might cause duplicates
+    // Always 200 — never let DS24 see a 5xx which triggers deactivation
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
 });
