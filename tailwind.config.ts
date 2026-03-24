@@ -51,6 +51,10 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           foreground: "hsl(var(--gold-foreground))",
         },
+        // Audio Player tokens
+        "progress-bg": "rgba(0,0,0,0.12)",
+        "progress-fill": "hsl(var(--primary))",
+        "player-surface": "rgba(255,255,255,0.97)",
         // Trumpetstar Brand Colors
         brand: {
           "blue-start": "hsl(var(--brand-blue-start))",
