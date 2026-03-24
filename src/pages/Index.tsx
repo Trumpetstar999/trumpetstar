@@ -11,6 +11,7 @@ import { ClassroomPage } from './ClassroomPage';
 import { ProfilePage } from './ProfilePage';
 import { GamePage } from './GamePage';
 import { MetronomePage } from './MetronomePage';
+import { AudiosPage } from './AudiosPage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
