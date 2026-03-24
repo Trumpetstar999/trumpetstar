@@ -97,7 +97,18 @@ export function MobileAudioPlayer() {
   const loopStartPercent = player.duration > 0 ? (player.loop.start / player.duration) * 100 : 0;
   const loopEndPercent = player.duration > 0 ? (player.loop.end / player.duration) * 100 : 100;
 
-  const selectedTransposition = TRANSPOSITION_OPTIONS.find(o => o.id === player.transpositionId);
+  const selectedLevel = levels.find(l => l.id === selectedLevelId);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowLevelDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const selectedLevel = levels.find(l => l.id === selectedLevelId);
 
