@@ -4,17 +4,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage, Language } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
-import { LogOut, Edit2, Lock, Scale, UserPlus, Star } from 'lucide-react';
+import { LogOut, Edit2, Lock, Scale, UserPlus, Star, Crown, Sparkles, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { PLAN_DISPLAY_NAMES } from '@/types/plans';
+import { PLAN_DISPLAY_NAMES, PlanKey } from '@/types/plans';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -34,6 +31,9 @@ const TEXTS = {
     plan: 'Dein Plan',
     logout: 'Abmelden',
     loggedOut: 'Erfolgreich abgemeldet',
+    invite: 'Freunde einladen',
+    inviteDesc: 'Erhalte 5 Sterne pro Einladung!',
+    account: 'Account',
   },
   en: {
     title: 'Profile',
@@ -43,6 +43,9 @@ const TEXTS = {
     plan: 'Your plan',
     logout: 'Sign out',
     loggedOut: 'Signed out successfully',
+    invite: 'Invite friends',
+    inviteDesc: 'Earn 5 stars per invitation!',
+    account: 'Account',
   },
   es: {
     title: 'Perfil',
@@ -52,6 +55,9 @@ const TEXTS = {
     plan: 'Tu plan',
     logout: 'Cerrar sesión',
     loggedOut: 'Sesión cerrada',
+    invite: 'Invitar amigos',
+    inviteDesc: '¡Gana 5 estrellas por invitación!',
+    account: 'Cuenta',
   },
 };
 
@@ -61,9 +67,16 @@ const LANG_OPTIONS: { code: Language; flag: string; label: string }[] = [
   { code: 'es', flag: '🇪🇸', label: 'Español' },
 ];
 
+const planConfig: Record<PlanKey, { label: string; icon: typeof Crown; gradient: string; textColor: string }> = {
+  FREE:  { label: 'Free',  icon: Sparkles, gradient: 'from-slate-500 to-slate-600',  textColor: 'text-slate-200' },
+  BASIC: { label: 'Basic', icon: Sparkles, gradient: 'from-blue-500 to-blue-700',   textColor: 'text-blue-100'  },
+  PRO:   { label: 'Pro',   icon: Crown,    gradient: 'from-amber-400 to-orange-500', textColor: 'text-amber-100' },
+};
+
 export default function MobileProfilePage() {
   const { user, signOut } = useAuth();
-  const { planKey } = useMembership();
+  const { planKey: rawPlanKey } = useMembership();
+  const planKey: PlanKey = (rawPlanKey === 'PREMIUM' as any) ? 'PRO' : rawPlanKey;
   const { language, setLanguage, t: tGlobal } = useLanguage();
   const texts = TEXTS[language as keyof typeof TEXTS] || TEXTS.de;
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -89,170 +102,248 @@ export default function MobileProfilePage() {
     toast.success(texts.loggedOut);
   };
 
+  const plan = planConfig[planKey] || planConfig.FREE;
+  const PlanIcon = plan.icon;
+
   return (
     <MobileLayout>
-      <div className="px-5 py-6 space-y-6">
-        <h1 className="text-2xl font-bold text-white">{texts.title}</h1>
+      <div className="min-h-full pb-8">
+        {/* Hero header */}
+        <div
+          className="relative px-6 pt-10 pb-24 flex flex-col items-center text-center"
+          style={{
+            background: 'linear-gradient(160deg, rgba(11,28,80,0.95) 0%, rgba(18,50,140,0.9) 60%, rgba(30,80,180,0.85) 100%)',
+          }}
+        >
+          {/* Glow behind avatar */}
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 w-32 h-32 rounded-full bg-blue-500/20 blur-2xl pointer-events-none" />
 
-        {/* Profile Card */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-            <Avatar className="w-20 h-20 ring-4 ring-primary/20">
+          <div className="relative">
+            <Avatar className="w-24 h-24 ring-4 ring-white/20 shadow-2xl">
               <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="text-xl bg-primary text-primary-foreground font-bold">
+              <AvatarFallback
+                className="text-2xl font-bold"
+                style={{ background: 'linear-gradient(135deg, #1e4fc2, #3b82f6)', color: '#fff' }}
+              >
                 {getInitials(profile?.display_name)}
               </AvatarFallback>
             </Avatar>
-
-            <div>
-              <h2 className="text-lg font-bold text-foreground">
-                {profile?.display_name || user?.email?.split('@')[0]}
-              </h2>
-              <p className="text-muted-foreground text-sm">{user?.email}</p>
+            {/* plan badge on avatar */}
+            <div className={cn(
+              'absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center shadow-lg',
+              `bg-gradient-to-br ${plan.gradient}`
+            )}>
+              <PlanIcon className="w-3.5 h-3.5 text-white" />
             </div>
+          </div>
 
-            <Badge className="bg-primary/10 text-primary border-primary/20 font-semibold">
-              {texts.plan}: {PLAN_DISPLAY_NAMES[planKey]}
-            </Badge>
+          <h1 className="mt-4 text-2xl font-bold text-white tracking-tight">
+            {profile?.display_name || user?.email?.split('@')[0]}
+          </h1>
+          <p className="mt-1 text-sm text-white/50">{user?.email}</p>
 
-            <Button
-              variant="outline"
-              className="w-full h-11 gap-2"
-              onClick={() => setEditDialogOpen(true)}
-            >
-              <Edit2 className="w-4 h-4" />
-              {texts.editProfile}
-            </Button>
+          <div className={cn(
+            'mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold',
+            `bg-gradient-to-r ${plan.gradient}`, plan.textColor
+          )}>
+            <PlanIcon className="w-3 h-3" />
+            {PLAN_DISPLAY_NAMES[planKey]}
+          </div>
+        </div>
 
-            <Button
-              variant="outline"
-              className="w-full h-11 gap-2"
-              onClick={() => setPasswordDialogOpen(true)}
-            >
-              <Lock className="w-4 h-4" />
-              {texts.changePassword}
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Cards section floats over header */}
+        <div className="px-4 -mt-14 space-y-3 relative z-10">
 
-        {/* Invite Friends */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-5">
-            <Button
-              variant="outline"
-              className="w-full h-12 border-primary/20 text-primary hover:bg-primary/5 gap-2 font-semibold"
-              onClick={() => setInviteDialogOpen(true)}
-            >
-              <UserPlus className="w-4 h-4" />
-              {language === 'en' ? 'Invite friends' : language === 'es' ? 'Invitar amigos' : 'Freunde einladen'}
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 ml-1" />
-            </Button>
-            <p className="text-xs text-muted-foreground text-center mt-2">
-              {language === 'en' ? 'Earn 5 stars per invitation!' : language === 'es' ? '¡Gana 5 estrellas por invitación!' : 'Erhalte 5 Sterne pro Einladung!'}
+          {/* Account actions */}
+          <div
+            className="rounded-2xl overflow-hidden shadow-xl"
+            style={{ background: 'rgba(15, 30, 80, 0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest px-5 pt-4 pb-2">
+              {texts.account}
             </p>
-          </CardContent>
-        </Card>
+            <ActionRow
+              icon={<Edit2 className="w-4 h-4 text-blue-400" />}
+              label={texts.editProfile}
+              iconBg="rgba(59,130,246,0.15)"
+              onClick={() => setEditDialogOpen(true)}
+            />
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '0 16px' }} />
+            <ActionRow
+              icon={<Lock className="w-4 h-4 text-indigo-400" />}
+              label={texts.changePassword}
+              iconBg="rgba(99,102,241,0.15)"
+              onClick={() => setPasswordDialogOpen(true)}
+              last
+            />
+          </div>
 
-        {/* Language Selector */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-5 space-y-3">
-            <h3 className="font-bold text-foreground text-sm">{texts.language}</h3>
-            <div className="flex gap-2">
+          {/* Invite friends */}
+          <button
+            onClick={() => setInviteDialogOpen(true)}
+            className="w-full rounded-2xl p-4 flex items-center gap-4 shadow-xl transition-all active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(245,158,11,0.1) 100%)',
+              border: '1px solid rgba(234,179,8,0.25)',
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)' }}>
+              <UserPlus className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-white font-semibold text-sm">{texts.invite}</p>
+              <p className="text-amber-300/70 text-xs mt-0.5">{texts.inviteDesc}</p>
+            </div>
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <Star className="w-3.5 h-3.5 text-amber-400/60 fill-amber-400/60" />
+            </div>
+          </button>
+
+          {/* Language */}
+          <div
+            className="rounded-2xl shadow-xl overflow-hidden"
+            style={{ background: 'rgba(15, 30, 80, 0.92)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            <p className="text-[11px] font-semibold text-white/40 uppercase tracking-widest px-5 pt-4 pb-3">
+              {texts.language}
+            </p>
+            <div className="px-4 pb-4 flex gap-2">
               {LANG_OPTIONS.map((opt) => (
                 <button
                   key={opt.code}
                   onClick={() => setLanguage(opt.code)}
                   className={cn(
-                    'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium transition-all min-h-[44px]',
+                    'flex-1 flex flex-col items-center gap-1.5 py-3 rounded-xl text-xs font-semibold transition-all min-h-[56px]',
                     language === opt.code
-                      ? 'bg-primary/10 border-2 border-primary text-primary'
-                      : 'bg-muted border-2 border-transparent text-muted-foreground hover:bg-muted/80'
+                      ? 'text-white scale-105'
+                      : 'text-white/40 hover:text-white/70'
                   )}
+                  style={language === opt.code ? {
+                    background: 'linear-gradient(135deg, rgba(59,130,246,0.35), rgba(99,102,241,0.25))',
+                    border: '1.5px solid rgba(99,102,241,0.5)',
+                    boxShadow: '0 0 16px rgba(99,102,241,0.2)',
+                  } : {
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1.5px solid rgba(255,255,255,0.07)',
+                  }}
                 >
-                  <span>{opt.flag}</span>
-                  <span className="hidden sm:inline">{opt.label}</span>
+                  <span className="text-xl">{opt.flag}</span>
+                  <span>{opt.label}</span>
                 </button>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Logout */}
-        <Button
-          variant="outline"
-          className="w-full h-12 border-destructive/30 text-destructive hover:bg-destructive/10 gap-2"
-          onClick={handleSignOut}
-        >
-          <LogOut className="w-4 h-4" />
-          {texts.logout}
-        </Button>
+          {/* Sign out */}
+          <button
+            onClick={handleSignOut}
+            className="w-full rounded-2xl p-4 flex items-center gap-4 shadow-xl transition-all active:scale-[0.98]"
+            style={{
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.2)',
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: 'rgba(239,68,68,0.15)' }}>
+              <LogOut className="w-5 h-5 text-red-400" />
+            </div>
+            <span className="text-red-400 font-semibold text-sm">{texts.logout}</span>
+          </button>
 
-        {/* Impressum */}
-        <div className="flex justify-center">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-white/30 hover:text-white/60 text-xs gap-1.5">
-                <Scale className="w-3 h-3" />
-                {tGlobal('profile.impressumTitle')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle>{tGlobal('profile.impressumTitle')}</DialogTitle>
-              </DialogHeader>
-              <ScrollArea className="max-h-[60vh] pr-4">
-                <div className="space-y-4 text-sm text-muted-foreground">
-                  <div>
-                    <p className="font-semibold text-foreground">Trumpetstar GmbH</p>
-                    <p>Verlag für Buch, Kunst und Musikalien</p>
-                    <p>Geschäftsführer: Mario Schulter, MA</p>
-                    <p>Mogersdorf 253, 8382 Mogersdorf, Österreich</p>
+          {/* Impressum */}
+          <div className="flex justify-center pt-2 pb-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-1.5 text-white/25 hover:text-white/50 text-xs transition-colors">
+                  <Scale className="w-3 h-3" />
+                  {tGlobal('profile.impressumTitle')}
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg max-h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle>{tGlobal('profile.impressumTitle')}</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[60vh] pr-4">
+                  <div className="space-y-4 text-sm text-muted-foreground">
+                    <div>
+                      <p className="font-semibold text-foreground">Trumpetstar GmbH</p>
+                      <p>Verlag für Buch, Kunst und Musikalien</p>
+                      <p>Geschäftsführer: Mario Schulter, MA</p>
+                      <p>Mogersdorf 253, 8382 Mogersdorf, Österreich</p>
+                    </div>
+                    <div>
+                      <p>UID-Nr. (AT): ATU81038878</p>
+                      <p>UID-Nr. (DE): DE442429470</p>
+                      <p>Firmenbuch: FN 633951g</p>
+                    </div>
+                    <div>
+                      <p>Tel.: +43 677 / 628 053 57</p>
+                      <p>E-Mail: info@trumpetstar.com</p>
+                      <p>Web: www.trumpetstar.com</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{tGlobal('profile.disputeResolution')}</p>
+                      <p>
+                        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
+                        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                          ec.europa.eu/consumers/odr
+                        </a>. Beschwerden können auch direkt per E-Mail an uns gerichtet werden.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{tGlobal('profile.liabilityNote')}</p>
+                      <p>Trotz sorgfältiger Prüfung übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte.</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground/60 pt-2">Angaben gemäß §5 ECG, §14 UGB, §63 GewO, §25 MedienG</p>
                   </div>
-                  <div>
-                    <p>UID-Nr. (AT): ATU81038878</p>
-                    <p>UID-Nr. (DE): DE442429470</p>
-                    <p>Firmenbuch: FN 633951g</p>
-                  </div>
-                  <div>
-                    <p>Tel.: +43 677 / 628 053 57</p>
-                    <p>E-Mail: info@trumpetstar.com</p>
-                    <p>Web: www.trumpetstar.com</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{tGlobal('profile.disputeResolution')}</p>
-                    <p>
-                      Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
-                      <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                        ec.europa.eu/consumers/odr
-                      </a>. Beschwerden können auch direkt per E-Mail an uns gerichtet werden.
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{tGlobal('profile.liabilityNote')}</p>
-                    <p>Trotz sorgfältiger Prüfung übernehmen wir keine Gewähr für die Richtigkeit, Vollständigkeit oder Aktualität der bereitgestellten Inhalte.</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground/60 pt-2">Angaben gemäß §5 ECG, §14 UGB, §63 GewO, §25 MedienG</p>
-                </div>
-              </ScrollArea>
-            </DialogContent>
-          </Dialog>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-
-        <EditProfileDialog
-          open={editDialogOpen}
-          onOpenChange={setEditDialogOpen}
-          profile={profile || { id: user?.id || '', display_name: null, avatar_url: null, created_at: '' }}
-          onUpdate={fetchProfile}
-        />
-        <ChangePasswordDialog
-          open={passwordDialogOpen}
-          onOpenChange={setPasswordDialogOpen}
-        />
-        <InviteFriendDialog
-          open={inviteDialogOpen}
-          onOpenChange={setInviteDialogOpen}
-        />
       </div>
+
+      <EditProfileDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        profile={profile || { id: user?.id || '', display_name: null, avatar_url: null, created_at: '' }}
+        onUpdate={fetchProfile}
+      />
+      <ChangePasswordDialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen} />
+      <InviteFriendDialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} />
     </MobileLayout>
+  );
+}
+
+function ActionRow({
+  icon, label, iconBg, onClick, last = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  iconBg: string;
+  onClick: () => void;
+  last?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        'w-full flex items-center gap-4 px-5 py-3.5 transition-all active:bg-white/5',
+        !last && ''
+      )}
+    >
+      <div
+        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ background: iconBg }}
+      >
+        {icon}
+      </div>
+      <span className="flex-1 text-left text-sm font-medium text-white/90">{label}</span>
+      <ChevronRight className="w-4 h-4 text-white/25" />
+    </button>
   );
 }
