@@ -334,13 +334,6 @@ export default function MobileHomePage() {
             </button>
           </div>
 
-          {/* ── Star row ── */}
-          <div className="px-5 pb-6 pt-2 flex items-center justify-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold opacity-70" />
-            ))}
-            <span className="text-white/40 text-xs ml-2">TrumpetStar</span>
-          </div>
 
         </div>
       </MobileLayout>
