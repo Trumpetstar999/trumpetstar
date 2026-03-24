@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Star, Timer, Activity } from 'lucide-react';
+import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, ChevronUp, Timer, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
@@ -334,13 +334,6 @@ export default function MobileHomePage() {
             </button>
           </div>
 
-          {/* ── Star row ── */}
-          <div className="px-5 pb-6 pt-2 flex items-center justify-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3.5 h-3.5 fill-gold text-gold opacity-70" />
-            ))}
-            <span className="text-white/40 text-xs ml-2">TrumpetStar</span>
-          </div>
 
         </div>
       </MobileLayout>
