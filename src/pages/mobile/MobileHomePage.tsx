@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
+import { AudioPlayer } from '@/components/audio/AudioPlayer';
 
 const TEXTS = {
   de: {

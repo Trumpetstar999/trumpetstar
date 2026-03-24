@@ -33,7 +33,8 @@ import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { ShippingPanel } from '@/components/admin/ShippingPanel';
 import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones } from 'lucide-react';
+import { AudioPlayerManager } from '@/components/admin/AudioPlayerManager';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
