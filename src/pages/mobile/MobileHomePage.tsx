@@ -102,6 +102,8 @@ export default function MobileHomePage() {
   const [isSending, setIsSending] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [showIpadCard, setShowIpadCard] = useState(false);
+  const [showAudioSection, setShowAudioSection] = useState(true);
+  const [showToolsSection, setShowToolsSection] = useState(true);
   const [tunerOpen, setTunerOpen] = useState(false);
 
   const t = TEXTS[language as keyof typeof TEXTS] || TEXTS.de;
@@ -246,92 +248,103 @@ export default function MobileHomePage() {
             )}
           </div>
 
-          {/* ── Audio Player Section ── */}
-          <div className="mx-4 mb-4 flex-1 flex flex-col min-h-0">
-            {/* Section header */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+          {/* ── Audio Player Section (collapsible) ── */}
+          <div className="mx-4 mb-4">
+            {/* Clickable header */}
+            <button
+              onClick={() => setShowAudioSection(v => !v)}
+              className="w-full flex items-center gap-3 mb-3 group"
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg, hsl(212 100% 56%), hsl(218 88% 46%))' }}>
                 <Headphones className="w-4 h-4 text-white" />
               </div>
-              <div>
+              <div className="text-left flex-1">
                 <h2 className="text-white font-bold text-base leading-tight">{t.audioTitle}</h2>
                 <p className="text-white/50 text-xs">{t.audioSubtitle}</p>
               </div>
-              {/* live EQ bars */}
-              <div className="ml-auto flex items-end gap-0.5 h-4">
-                {[60, 100, 40, 80, 55].map((h, i) => (
-                  <div
-                    key={i}
-                    className="w-1 rounded-full animate-pulse"
-                    style={{
-                      height: `${h}%`,
-                      animationDelay: `${i * 80}ms`,
-                      background: 'hsl(212 100% 70%)',
-                      opacity: 0.7,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
+              {/* live EQ bars — only when open */}
+              {showAudioSection && (
+                <div className="flex items-end gap-0.5 h-4 mr-2">
+                  {[60, 100, 40, 80, 55].map((h, i) => (
+                    <div key={i} className="w-1 rounded-full animate-pulse"
+                      style={{ height: `${h}%`, animationDelay: `${i * 80}ms`, background: 'hsl(212 100% 70%)', opacity: 0.7 }}
+                    />
+                  ))}
+                </div>
+              )}
+              {showAudioSection
+                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+            </button>
 
-            {/* Player card — dark glassmorphism */}
-            <div
-              className="flex-1 overflow-hidden flex flex-col rounded-2xl"
-              style={{
-                background: 'rgba(8,18,45,0.88)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
-                minHeight: 440,
-              }}
-            >
-              <MobileAudioPlayer />
-            </div>
+            {/* Player card */}
+            {showAudioSection && (
+              <div
+                className="overflow-hidden flex flex-col rounded-2xl"
+                style={{
+                  background: 'rgba(8,18,45,0.88)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                  minHeight: 440,
+                }}
+              >
+                <MobileAudioPlayer />
+              </div>
+            )}
           </div>
 
-          {/* ── Tools: Metronom & Stimmgerät ── */}
-          <div className="mx-4 mb-4 space-y-3">
-            {/* Section header */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+          {/* ── Tools: Metronom & Stimmgerät (collapsible) ── */}
+          <div className="mx-4 mb-4">
+            {/* Clickable header */}
+            <button
+              onClick={() => setShowToolsSection(v => !v)}
+              className="w-full flex items-center gap-3 mb-3 group"
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg, hsl(260 80% 52%), hsl(270 70% 42%))' }}>
                 <Timer className="w-4 h-4 text-white" />
               </div>
-              <div>
+              <div className="text-left flex-1">
                 <h2 className="text-white font-bold text-base leading-tight">Übe-Tools</h2>
                 <p className="text-white/50 text-xs">Metronom &amp; Stimmgerät</p>
               </div>
-            </div>
-
-            {/* Metronom card */}
-            <MetronomeSheet />
-
-            {/* Tuner card */}
-            <button
-              onClick={() => setTunerOpen(true)}
-              className="w-full rounded-2xl px-5 py-4 flex items-center gap-4 transition-all active:scale-[0.98]"
-              style={{
-                background: 'rgba(8,18,45,0.88)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
-              }}
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, hsl(40 80% 48%), hsl(30 70% 38%))' }}
-              >
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-left">
-                <div className="text-white font-bold text-base">Stimmgerät</div>
-                <div className="text-white/50 text-xs">Bb Trompete • A=440 Hz</div>
-              </div>
-              <div className="ml-auto text-white/30 text-xs">Öffnen →</div>
+              {showToolsSection
+                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
             </button>
+
+            {showToolsSection && (
+              <div className="space-y-3">
+                {/* Metronom card */}
+                <MetronomeSheet />
+
+                {/* Tuner card */}
+                <button
+                  onClick={() => setTunerOpen(true)}
+                  className="w-full rounded-2xl px-5 py-4 flex items-center gap-4 transition-all active:scale-[0.98]"
+                  style={{
+                    background: 'rgba(8,18,45,0.88)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                  }}
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, hsl(40 80% 48%), hsl(30 70% 38%))' }}>
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-white font-bold text-base">Stimmgerät</div>
+                    <div className="text-white/50 text-xs">Bb Trompete • A=440 Hz</div>
+                  </div>
+                  <div className="ml-auto text-white/30 text-xs">Öffnen →</div>
+                </button>
+              </div>
+            )}
           </div>
 
 
