@@ -201,11 +201,15 @@ async function processIpnEvent(
     let isNewUser = false;
     let userLocale = normalized.language;
     
-    // Check if user exists via auth.users (use admin API)
-    const { data: existingUsers } = await supabase.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(
-      (u: any) => u.email?.toLowerCase() === normalized.email
+    // Check if user exists via GoTrue REST API with email filter — O(1) statt O(n)
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const userSearchRes = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users?email=${encodeURIComponent(normalized.email)}`,
+      { headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}` } }
     );
+    const { users: foundUsers } = await userSearchRes.json();
+    const existingUser = foundUsers?.[0];
     
     if (existingUser) {
       userId = existingUser.id;
@@ -881,19 +885,19 @@ Deno.serve(async (req) => {
       throw insertError;
     }
     
-    // Process SYNCHRONOUSLY — return 200 only after processing is complete
-    // This is required because EdgeRuntime.waitUntil is unreliable in Supabase
-    try {
-      await processIpnEvent(
-        supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
-      );
-      console.log(`IPN event ${ipnEvent.id} processed successfully`);
-    } catch (processingError: any) {
-      // Log the error but still return 200 to prevent infinite Digistore24 retries
-      console.error('IPN processing error (non-fatal for DS24):', processingError?.message || processingError);
-    }
+    // Sofort 200 zurückgeben — Digistore24 bekommt Antwort vor Timeout
+    const ipnResponse = new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
 
-    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    // Verarbeitung im Hintergrund (fire-and-forget) — Deno hält die Funktion am Leben
+    processIpnEvent(
+      supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
+    ).then(() => {
+      console.log(`IPN event ${ipnEvent.id} processed successfully`);
+    }).catch((processingError: any) => {
+      console.error('IPN processing error (non-fatal for DS24):', processingError?.message || processingError);
+    });
+
+    return ipnResponse;
     
   } catch (error: any) {
     console.error("IPN handler error:", error);
