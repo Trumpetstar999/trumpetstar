@@ -201,11 +201,15 @@ async function processIpnEvent(
     let isNewUser = false;
     let userLocale = normalized.language;
     
-    // Check if user exists via auth.users (use admin API)
-    const { data: existingUsers } = await supabase.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(
-      (u: any) => u.email?.toLowerCase() === normalized.email
+    // Check if user exists via GoTrue REST API with email filter — O(1) statt O(n)
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const userSearchRes = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users?email=${encodeURIComponent(normalized.email)}`,
+      { headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}` } }
     );
+    const { users: foundUsers } = await userSearchRes.json();
+    const existingUser = foundUsers?.[0];
     
     if (existingUser) {
       userId = existingUser.id;
