@@ -433,6 +433,11 @@ export default function AuthPage() {
             {/* Login Tab */}
             <TabsContent value="login" className="mt-6">
               <form onSubmit={handleSignIn} className="space-y-4">
+                {loginError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                    {loginError}
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="text-slate-700 font-medium">
                     {t('auth.emailLabel')}
@@ -444,7 +449,7 @@ export default function AuthPage() {
                       type="email"
                       placeholder={t('auth.emailPlaceholder')}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => { setEmail(e.target.value); setLoginError(null); }}
                       className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
                       disabled={isLoading}
                     />
@@ -458,24 +463,41 @@ export default function AuthPage() {
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <Input
                       id="login-password"
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       placeholder={t('auth.passwordPlaceholder')}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
+                      onChange={(e) => { setPassword(e.target.value); setLoginError(null); }}
+                      className="pl-11 pr-11 h-12 text-base border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500"
                       disabled={isLoading}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 py-1">
-                  <Checkbox 
-                    id="rememberMe-login" 
-                    checked={rememberMe} 
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
-                  />
-                  <Label htmlFor="rememberMe-login" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
-                    {t('auth.rememberMe')}
-                  </Label>
+                <div className="flex items-center justify-between py-1">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="rememberMe-login" 
+                      checked={rememberMe} 
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)} 
+                    />
+                    <Label htmlFor="rememberMe-login" className="text-sm font-medium text-slate-600 leading-none cursor-pointer">
+                      {t('auth.rememberMe')}
+                    </Label>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+                  >
+                    {t('auth.forgotPassword')}
+                  </button>
                 </div>
                 <Button 
                   type="submit" 
