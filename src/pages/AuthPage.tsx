@@ -139,8 +139,9 @@ export default function AuthPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError(null);
     if (!email || !password) {
-      toast({ title: t('auth.missingFields'), description: t('auth.missingFieldsDesc'), variant: 'destructive' });
+      setLoginError(t('auth.missingFieldsDesc'));
       return;
     }
     setIsLoading(true);
@@ -148,9 +149,9 @@ export default function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          toast({ title: t('auth.invalidCredentials'), description: t('auth.invalidCredentialsDesc'), variant: 'destructive' });
+          setLoginError(t('auth.invalidCredentialsDesc'));
         } else {
-          throw error;
+          setLoginError(error.message);
         }
       } else {
         toast({ title: t('auth.welcomeBack'), description: t('auth.nowLoggedIn') });
@@ -158,7 +159,28 @@ export default function AuthPage() {
       }
     } catch (error) {
       console.error('Signin error:', error);
-      toast({ title: t('auth.loginFailed'), description: error instanceof Error ? error.message : t('auth.unknownError'), variant: 'destructive' });
+      setLoginError(error instanceof Error ? error.message : t('auth.unknownError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setLoginError(t('auth.emailRequiredDesc'));
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotPasswordSent(true);
+      toast({ title: t('auth.forgotPassword'), description: t('auth.magicLinkSentToastDesc') });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast({ title: t('auth.error'), description: error instanceof Error ? error.message : t('auth.unknownError'), variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
