@@ -250,6 +250,13 @@ Deno.serve(async (req) => {
       // Fetch videos from showcase
       const result = await syncVideosForLevel(supabase, VIMEO_TOKEN, level.id, showcaseId);
 
+      // If the level thumbnail is a Vimeo default, use the first video's thumbnail
+      if (isDefaultThumb(level.thumbnail_url) && result.firstVideoThumbnail && !isDefaultThumb(result.firstVideoThumbnail)) {
+        await supabase.from('levels').update({ thumbnail_url: result.firstVideoThumbnail }).eq('id', level.id);
+        level.thumbnail_url = result.firstVideoThumbnail;
+        console.log(`Updated level ${level.id} thumbnail from first video`);
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
