@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const VIMEO_DEFAULT_THUMB_PATTERN = /default-\d+_/;
+
+function isDefaultThumb(url: string | null): boolean {
+  return !url || VIMEO_DEFAULT_THUMB_PATTERN.test(url);
+}
+
 interface VimeoVideo {
   uri: string;
   name: string;
@@ -14,7 +20,7 @@ interface VimeoVideo {
     sizes: Array<{ link: string; width: number }>;
   };
   player_embed_url: string;
-const VIMEO_DEFAULT_THUMB_PATTERN = /default-\d+_/;
+}
 
 interface VimeoShowcase {
   uri: string;
