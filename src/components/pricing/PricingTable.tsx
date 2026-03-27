@@ -124,7 +124,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               {isHighlighted && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white shadow-lg">
                   <Crown className="w-3 h-3 mr-1" />
-                  Empfohlen
+                  {t('pricing_table.recommended')}
                 </Badge>
               )}
               
