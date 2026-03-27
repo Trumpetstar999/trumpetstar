@@ -622,7 +622,25 @@
     "hero": {
       "title": "Blog & Trompeten-Tipps",
       "subtitle": "Tipps, Guides und Tutorials für Trompetenlernende."
-    }
+    },
+    "readMore": "Lesen"
+  },
+  "pricing_table": {
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "saveUpTo": "Spare bis zu 35%",
+    "recommended": "Empfohlen",
+    "currentPlan": "Dein Plan",
+    "currentPlanBtn": "Aktueller Plan",
+    "free": "Kostenlos",
+    "forever": "Für immer",
+    "perMonth": "pro Monat",
+    "perYear": "/Jahr",
+    "save": "spare",
+    "promoFirstMonth": "🎉 Erster Monat nur 1€",
+    "compareTitle": "Funktionen im Vergleich",
+    "compareFeature": "Funktion",
+    "guarantee": "30 Tage Geld-zurück-Garantie"
   },
   "layout": {
     "nav": {
