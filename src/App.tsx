@@ -43,6 +43,7 @@ import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 // Mobile Mini-Mode pages
 import MobileHomePage from "./pages/mobile/MobileHomePage";
