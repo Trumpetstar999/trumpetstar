@@ -186,7 +186,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
       <div className="flex justify-center">
         <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium">
           <span>✓</span>
-          30 Tage Geld-zurück-Garantie
+          {t('pricing_table.guarantee')}
         </div>
       </div>
 
