@@ -99,9 +99,9 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
-          Jährlich
+          {t('pricing_table.yearly')}
           <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-            Spare bis zu 35%
+            {t('pricing_table.saveUpTo')}
           </Badge>
         </Label>
       </div>
