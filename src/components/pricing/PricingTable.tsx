@@ -153,7 +153,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   {/* Pro promo */}
                   {plan.key === 'PRO' && (
                     <div className="mt-2 inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
-                      🎉 Erster Monat nur 1€
+                      {t('pricing_table.promoFirstMonth')}
                     </div>
                   )}
                 </div>
