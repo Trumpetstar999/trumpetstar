@@ -599,7 +599,10 @@ export default function AuthPage() {
 
         {/* Footer */}
         <p className="text-center text-white/60 text-sm mt-6">
-          {t('auth.footer')}
+          {t('auth.footer').replace(t('auth.footerTosText') || 'Nutzungsbedingungen', '')}
+          <a href="/hilfe" className="underline hover:text-white/80 transition-colors">
+            {t('auth.footerTosText') || 'Nutzungsbedingungen'}
+          </a>
         </p>
       </div>
     </div>
