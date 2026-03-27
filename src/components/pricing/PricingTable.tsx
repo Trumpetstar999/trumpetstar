@@ -85,7 +85,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             !isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
-          Monatlich
+          {t('pricing_table.monthly')}
         </Label>
         <Switch
           id="billing-toggle"
