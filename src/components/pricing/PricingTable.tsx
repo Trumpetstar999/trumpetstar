@@ -198,7 +198,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b bg-slate-100">
-                <th className="text-left p-4 w-1/3 font-semibold text-slate-900">Funktion</th>
+                <th className="text-left p-4 w-1/3 font-semibold text-slate-900">{t('pricing_table.compareFeature')}</th>
                 {plans.map(plan => (
                   <th key={plan.key} className="text-center p-4">
                     <span className={cn(
