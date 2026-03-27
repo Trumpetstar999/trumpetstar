@@ -299,19 +299,35 @@ Deno.serve(async (req) => {
       console.log(`Syncing ${levelsToSync.length} levels`);
 
       const results = [];
-      for (const level of levelsToSync) {
+      for (const lvl of levelsToSync) {
         try {
           const result = await syncVideosForLevel(
             supabase,
             VIMEO_TOKEN,
-            level.id,
-            level.vimeo_showcase_id
+            lvl.id,
+            lvl.vimeo_showcase_id
           );
-          results.push({ levelId: level.id, ...result });
+
+          // Update level thumbnail if it's a Vimeo default
+          if (result.firstVideoThumbnail && !isDefaultThumb(result.firstVideoThumbnail)) {
+            // Check current level thumbnail
+            const { data: currentLevel } = await supabase
+              .from('levels')
+              .select('thumbnail_url')
+              .eq('id', lvl.id)
+              .single();
+            
+            if (isDefaultThumb(currentLevel?.thumbnail_url)) {
+              await supabase.from('levels').update({ thumbnail_url: result.firstVideoThumbnail }).eq('id', lvl.id);
+              console.log(`Updated level ${lvl.id} thumbnail from first video`);
+            }
+          }
+
+          results.push({ levelId: lvl.id, ...result });
         } catch (error) {
-          console.error(`Error syncing level ${level.id}:`, error);
+          console.error(`Error syncing level ${lvl.id}:`, error);
           results.push({
-            levelId: level.id,
+            levelId: lvl.id,
             error: error instanceof Error ? error.message : 'Unknown error',
           });
         }
