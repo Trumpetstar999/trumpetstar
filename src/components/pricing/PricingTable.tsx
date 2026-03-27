@@ -174,7 +174,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   disabled={isLoading || isCurrentPlan}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {isCurrentPlan ? 'Aktueller Plan' : plan.cta}
+                  {isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.cta}
                 </Button>
               </CardContent>
             </Card>
