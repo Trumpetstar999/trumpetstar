@@ -31,6 +31,7 @@ const categoryColors = {
 export function PricingTable({ onSelectPlan }: PricingTableProps) {
   const [isYearly, setIsYearly] = useState(true);
   const { planKey: currentPlan, getUpgradeLink, isLoading } = useMembership();
+  const { t } = useLanguage();
 
   const plans = [PLAN_INFO.FREE, PLAN_INFO.BASIC, PLAN_INFO.PRO];
 
