@@ -28,6 +28,9 @@ export default function AuthPage() {
   const { t, language, setLanguage } = useLanguage();
   const { toast } = useToast();
   const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   const getRedirectPath = () => {
     const returnTo = sessionStorage.getItem('returnTo');
