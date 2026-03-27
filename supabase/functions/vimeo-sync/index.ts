@@ -484,9 +484,14 @@ async function syncVideosForLevel(
 
   console.log(`Sync complete: +${videosAdded}, ~${videosUpdated}, -${videosDeactivated}`);
 
+  // Determine the best thumbnail from first video for level fallback
+  const firstVideoThumb = allVideos[0]?.pictures?.sizes
+    ?.sort((a, b) => b.width - a.width)[0]?.link || null;
+
   return {
     videosAdded,
     videosUpdated,
     videosDeactivated,
+    firstVideoThumbnail: firstVideoThumb,
   };
 }
