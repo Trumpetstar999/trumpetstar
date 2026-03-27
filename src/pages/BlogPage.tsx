@@ -111,7 +111,7 @@ export default function BlogPage() {
                       <p className="text-muted-foreground text-sm leading-relaxed">{post.excerpt}</p>
                       <div className="flex items-center justify-between mt-3">
                         <span className="text-xs text-muted-foreground">{post.date}</span>
-                        <span className="text-primary text-sm font-medium flex items-center gap-1">Lesen <ArrowRight className="w-3 h-3" /></span>
+                        <span className="text-primary text-sm font-medium flex items-center gap-1">{t('seo_blog.readMore')} <ArrowRight className="w-3 h-3" /></span>
                       </div>
                     </div>
                   </div>

@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { PLAN_INFO, PlanKey, FEATURE_CATEGORIES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useMembership } from '@/hooks/useMembership';
 
 interface PricingTableProps {
   onSelectPlan?: (planKey: PlanKey) => void;
