@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { PLAN_INFO, PlanKey, FEATURE_CATEGORIES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface PricingTableProps {
   onSelectPlan?: (planKey: PlanKey) => void;
@@ -30,6 +31,7 @@ const categoryColors = {
 export function PricingTable({ onSelectPlan }: PricingTableProps) {
   const [isYearly, setIsYearly] = useState(true);
   const { planKey: currentPlan, getUpgradeLink, isLoading } = useMembership();
+  const { t } = useLanguage();
 
   const plans = [PLAN_INFO.FREE, PLAN_INFO.BASIC, PLAN_INFO.PRO];
 
@@ -52,17 +54,17 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
   };
 
   const getPrice = (plan: typeof PLAN_INFO.FREE) => {
-    if (!plan.monthlyPrice) return 'Kostenlos';
+    if (!plan.monthlyPrice) return t('pricing_table.free');
     const price = isYearly ? Math.round(plan.yearlyPrice! / 12) : plan.monthlyPrice;
     return `${price}€`;
   };
 
   const getPriceSubtext = (plan: typeof PLAN_INFO.FREE) => {
-    if (!plan.monthlyPrice) return 'Für immer';
+    if (!plan.monthlyPrice) return t('pricing_table.forever');
     if (isYearly) {
-      return `${plan.yearlyPrice}€/Jahr (spare ${plan.yearlyDiscount}%)`;
+      return `${plan.yearlyPrice}€${t('pricing_table.perYear')} (${t('pricing_table.save')} ${plan.yearlyDiscount}%)`;
     }
-    return 'pro Monat';
+    return t('pricing_table.perMonth');
   };
 
   // Group features by category
@@ -83,7 +85,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             !isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
-          Monatlich
+          {t('pricing_table.monthly')}
         </Label>
         <Switch
           id="billing-toggle"
@@ -97,9 +99,9 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
             isYearly ? 'text-slate-900' : 'text-slate-500'
           )}
         >
-          Jährlich
+          {t('pricing_table.yearly')}
           <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-            Spare bis zu 35%
+            {t('pricing_table.saveUpTo')}
           </Badge>
         </Label>
       </div>
@@ -122,13 +124,13 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               {isHighlighted && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white shadow-lg">
                   <Crown className="w-3 h-3 mr-1" />
-                  Empfohlen
+                  {t('pricing_table.recommended')}
                 </Badge>
               )}
               
               {isCurrentPlan && (
                 <Badge className="absolute -top-3 right-4 bg-emerald-500 text-white shadow-lg">
-                  Dein Plan
+                  {t('pricing_table.currentPlan')}
                 </Badge>
               )}
 
@@ -151,7 +153,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   {/* Pro promo */}
                   {plan.key === 'PRO' && (
                     <div className="mt-2 inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
-                      🎉 Erstes Monat nur 1€
+                      {t('pricing_table.promoFirstMonth')}
                     </div>
                   )}
                 </div>
@@ -172,7 +174,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   disabled={isLoading || isCurrentPlan}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {isCurrentPlan ? 'Aktueller Plan' : plan.cta}
+                  {isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.cta}
                 </Button>
               </CardContent>
             </Card>
@@ -184,19 +186,19 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
       <div className="flex justify-center">
         <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full text-sm font-medium">
           <span>✓</span>
-          30 Tage Geld-zurück-Garantie
+          {t('pricing_table.guarantee')}
         </div>
       </div>
 
       {/* Feature Comparison Table */}
       <div className="mt-16">
-        <h3 className="text-2xl font-bold text-center mb-8 text-white">Funktionen im Vergleich</h3>
+        <h3 className="text-2xl font-bold text-center mb-8 text-white">{t('pricing_table.compareTitle')}</h3>
         
         <div className="overflow-x-auto rounded-xl border bg-white/95 shadow-lg">
           <table className="w-full">
             <thead>
               <tr className="border-b bg-slate-100">
-                <th className="text-left p-4 w-1/3 font-semibold text-slate-900">Funktion</th>
+                <th className="text-left p-4 w-1/3 font-semibold text-slate-900">{t('pricing_table.compareFeature')}</th>
                 {plans.map(plan => (
                   <th key={plan.key} className="text-center p-4">
                     <span className={cn(

@@ -46,7 +46,7 @@ const AUDIENCE_CONTENT = {
       { value: '300+', label: 'Videos' },
       { value: '0', label: 'Vorkenntnisse nötig' },
       { value: '100%', label: 'Online & flexibel' },
-      { value: '30 T.', label: 'Geld-zurück' },
+      { value: '30 Tage', label: 'Geld-zurück-Garantie' },
     ],
   },
   default: {
@@ -59,7 +59,7 @@ const AUDIENCE_CONTENT = {
       { value: '300+', label: 'Lernvideos' },
       { value: '500+', label: 'Schüler:innen' },
       { value: '4,9★', label: 'Bewertung' },
-      { value: '30 T.', label: 'Geld-zurück' },
+      { value: '30 Tage', label: 'Geld-zurück-Garantie' },
     ],
   },
 };

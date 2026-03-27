@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
@@ -43,6 +43,7 @@ import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 // Mobile Mini-Mode pages
 import MobileHomePage from "./pages/mobile/MobileHomePage";
@@ -88,6 +89,7 @@ const App = () => {
                         <Route path="/auth" element={<AuthPage />} />
                         <Route path="/login" element={<AuthPage />} />
                         <Route path="/signup" element={<AuthPage />} />
+                        <Route path="/reset-password" element={<ResetPasswordPage />} />
                         
                         {/* Mobile Mini-Mode Routes */}
                         <Route path="/mobile/home" element={<MobileHomePage />} />
@@ -123,6 +125,12 @@ const App = () => {
                         <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
                         <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
+                        
+                        {/* Common URL redirects */}
+                        <Route path="/shop" element={<Navigate to="/pricing" replace />} />
+                        <Route path="/levels" element={<Navigate to="/app" replace />} />
+                        <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+                        <Route path="/register" element={<Navigate to="/signup" replace />} />
                         
                         {/* Legacy redirect: old /musicxml/:id links */}
                         <Route path="/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />

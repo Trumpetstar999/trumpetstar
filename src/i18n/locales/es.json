@@ -22,7 +22,8 @@
     "signingIn": "Iniciando sesión...",
     "createAccount": "Crear cuenta",
     "registering": "Registrando...",
-    "footer": "Al registrarte, aceptas nuestros términos de servicio",
+    "footer": "Al registrarte, aceptas nuestros ",
+    "footerTosText": "términos de servicio",
     "magicLinkSentTitle": "¡Correo enviado!",
     "magicLinkSentDesc": "Enviamos un Magic Link a {{email}}. Haz clic en el enlace del correo para iniciar sesión.",
     "backToLogin": "Volver al inicio de sesión",
@@ -621,7 +622,25 @@
     "hero": {
       "title": "Blog y Consejos de Trompeta",
       "subtitle": "Consejos, guías y tutoriales para quienes aprenden trompeta."
-    }
+    },
+    "readMore": "Leer"
+  },
+  "pricing_table": {
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "saveUpTo": "Ahorra hasta un 35%",
+    "recommended": "Recomendado",
+    "currentPlan": "Tu Plan",
+    "currentPlanBtn": "Plan actual",
+    "free": "Gratis",
+    "forever": "Para siempre",
+    "perMonth": "por mes",
+    "perYear": "/año",
+    "save": "ahorra",
+    "promoFirstMonth": "🎉 Primer mes solo 1€",
+    "compareTitle": "Comparación de funciones",
+    "compareFeature": "Función",
+    "guarantee": "Garantía de devolución de 30 días"
   },
   "layout": {
     "nav": {

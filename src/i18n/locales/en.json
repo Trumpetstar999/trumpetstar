@@ -22,7 +22,8 @@
     "signingIn": "Signing in...",
     "createAccount": "Create account",
     "registering": "Registering...",
-    "footer": "By signing in, you accept our terms of service",
+    "footer": "By signing in, you accept our ",
+    "footerTosText": "terms of service",
     "magicLinkSentTitle": "Email sent!",
     "magicLinkSentDesc": "We sent a Magic Link to {{email}}. Click the link in the email to log in.",
     "backToLogin": "Back to sign in",
@@ -621,7 +622,25 @@
     "hero": {
       "title": "Blog & Trumpet Tips",
       "subtitle": "Tips, guides and tutorials for trumpet learners."
-    }
+    },
+    "readMore": "Read"
+  },
+  "pricing_table": {
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "saveUpTo": "Save up to 35%",
+    "recommended": "Recommended",
+    "currentPlan": "Your Plan",
+    "currentPlanBtn": "Current Plan",
+    "free": "Free",
+    "forever": "Forever",
+    "perMonth": "per month",
+    "perYear": "/year",
+    "save": "save",
+    "promoFirstMonth": "🎉 First month only €1",
+    "compareTitle": "Feature Comparison",
+    "compareFeature": "Feature",
+    "guarantee": "30-day money-back guarantee"
   },
   "layout": {
     "nav": {
