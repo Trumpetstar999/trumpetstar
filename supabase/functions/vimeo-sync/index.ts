@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const VIMEO_DEFAULT_THUMB_PATTERN = /default-\d+_/;
+
+function isDefaultThumb(url: string | null): boolean {
+  return !url || VIMEO_DEFAULT_THUMB_PATTERN.test(url);
+}
+
 interface VimeoVideo {
   uri: string;
   name: string;
@@ -244,6 +250,13 @@ Deno.serve(async (req) => {
       // Fetch videos from showcase
       const result = await syncVideosForLevel(supabase, VIMEO_TOKEN, level.id, showcaseId);
 
+      // If the level thumbnail is a Vimeo default, use the first video's thumbnail
+      if (isDefaultThumb(level.thumbnail_url) && result.firstVideoThumbnail && !isDefaultThumb(result.firstVideoThumbnail)) {
+        await supabase.from('levels').update({ thumbnail_url: result.firstVideoThumbnail }).eq('id', level.id);
+        level.thumbnail_url = result.firstVideoThumbnail;
+        console.log(`Updated level ${level.id} thumbnail from first video`);
+      }
+
       return new Response(
         JSON.stringify({
           success: true,
@@ -286,19 +299,35 @@ Deno.serve(async (req) => {
       console.log(`Syncing ${levelsToSync.length} levels`);
 
       const results = [];
-      for (const level of levelsToSync) {
+      for (const lvl of levelsToSync) {
         try {
           const result = await syncVideosForLevel(
             supabase,
             VIMEO_TOKEN,
-            level.id,
-            level.vimeo_showcase_id
+            lvl.id,
+            lvl.vimeo_showcase_id
           );
-          results.push({ levelId: level.id, ...result });
+
+          // Update level thumbnail if it's a Vimeo default
+          if (result.firstVideoThumbnail && !isDefaultThumb(result.firstVideoThumbnail)) {
+            // Check current level thumbnail
+            const { data: currentLevel } = await supabase
+              .from('levels')
+              .select('thumbnail_url')
+              .eq('id', lvl.id)
+              .single();
+            
+            if (isDefaultThumb(currentLevel?.thumbnail_url)) {
+              await supabase.from('levels').update({ thumbnail_url: result.firstVideoThumbnail }).eq('id', lvl.id);
+              console.log(`Updated level ${lvl.id} thumbnail from first video`);
+            }
+          }
+
+          results.push({ levelId: lvl.id, ...result });
         } catch (error) {
-          console.error(`Error syncing level ${level.id}:`, error);
+          console.error(`Error syncing level ${lvl.id}:`, error);
           results.push({
-            levelId: level.id,
+            levelId: lvl.id,
             error: error instanceof Error ? error.message : 'Unknown error',
           });
         }
@@ -478,9 +507,14 @@ async function syncVideosForLevel(
 
   console.log(`Sync complete: +${videosAdded}, ~${videosUpdated}, -${videosDeactivated}`);
 
+  // Determine the best thumbnail from first video for level fallback
+  const firstVideoThumb = allVideos[0]?.pictures?.sizes
+    ?.sort((a, b) => b.width - a.width)[0]?.link || null;
+
   return {
     videosAdded,
     videosUpdated,
     videosDeactivated,
+    firstVideoThumbnail: firstVideoThumb,
   };
 }
