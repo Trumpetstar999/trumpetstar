@@ -124,6 +124,12 @@ const App = () => {
                         <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         
+                        {/* Common URL redirects */}
+                        <Route path="/shop" element={<Navigate to="/pricing" replace />} />
+                        <Route path="/levels" element={<Navigate to="/app" replace />} />
+                        <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+                        <Route path="/register" element={<Navigate to="/signup" replace />} />
+                        
                         {/* Legacy redirect: old /musicxml/:id links */}
                         <Route path="/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
