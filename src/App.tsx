@@ -89,6 +89,7 @@ const App = () => {
                         <Route path="/auth" element={<AuthPage />} />
                         <Route path="/login" element={<AuthPage />} />
                         <Route path="/signup" element={<AuthPage />} />
+                        <Route path="/reset-password" element={<ResetPasswordPage />} />
                         
                         {/* Mobile Mini-Mode Routes */}
                         <Route path="/mobile/home" element={<MobileHomePage />} />
