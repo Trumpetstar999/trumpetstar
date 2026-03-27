@@ -54,17 +54,17 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
   };
 
   const getPrice = (plan: typeof PLAN_INFO.FREE) => {
-    if (!plan.monthlyPrice) return 'Kostenlos';
+    if (!plan.monthlyPrice) return t('pricing_table.free');
     const price = isYearly ? Math.round(plan.yearlyPrice! / 12) : plan.monthlyPrice;
     return `${price}€`;
   };
 
   const getPriceSubtext = (plan: typeof PLAN_INFO.FREE) => {
-    if (!plan.monthlyPrice) return 'Für immer';
+    if (!plan.monthlyPrice) return t('pricing_table.forever');
     if (isYearly) {
-      return `${plan.yearlyPrice}€/Jahr (spare ${plan.yearlyDiscount}%)`;
+      return `${plan.yearlyPrice}€${t('pricing_table.perYear')} (${t('pricing_table.save')} ${plan.yearlyDiscount}%)`;
     }
-    return 'pro Monat';
+    return t('pricing_table.perMonth');
   };
 
   // Group features by category
