@@ -130,7 +130,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               
               {isCurrentPlan && (
                 <Badge className="absolute -top-3 right-4 bg-emerald-500 text-white shadow-lg">
-                  Dein Plan
+                  {t('pricing_table.currentPlan')}
                 </Badge>
               )}
 
