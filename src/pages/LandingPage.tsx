@@ -339,7 +339,7 @@ export default function LandingPage() {
                 {[
                   { icon: Trophy,      label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
                   { icon: Star,        label: '4,9 / 5 Bewertung',                   color: 'text-[hsl(var(--reward-gold))]' },
-                  { icon: Shield,      label: '30 Tage Geld-zurück',                 color: 'text-emerald-400' },
+                  { icon: Shield,      label: '30 Tage Garantie',                     color: 'text-emerald-400' },
                   { icon: CheckCircle, label: '500+ Schüler:innen',                  color: 'text-emerald-400' },
                 ].map(({ icon: Icon, label, color }) => (
                   <span
@@ -354,8 +354,8 @@ export default function LandingPage() {
 
             </div>
 
-            {/* RIGHT – App preview */}
-            <div className="flex-1 w-full max-w-md lg:max-w-none">
+            {/* RIGHT – App preview (visible on all screens) */}
+            <div className="w-full max-w-xs mx-auto md:max-w-md lg:flex-1 lg:max-w-none">
               <div
                 onClick={() => handleCta(null)}
                 className="relative cursor-pointer group"
@@ -366,7 +366,7 @@ export default function LandingPage() {
                   alt="Trumpetstar App – Vorschau"
                   className="w-full rounded-2xl transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm gap-3">
+                <div className="absolute inset-0 flex-col items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm gap-3 hidden md:flex">
                   <Button
                     size="lg"
                     className="h-12 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl gap-2 pointer-events-none"
@@ -375,7 +375,6 @@ export default function LandingPage() {
                   </Button>
                 </div>
               </div>
-
             </div>
 
           </div>
