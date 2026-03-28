@@ -599,10 +599,14 @@ export default function AuthPage() {
 
         {/* Footer */}
         <p className="text-center text-white/60 text-sm mt-6">
-          {t('auth.footer').replace(t('auth.footerTosText') || 'Nutzungsbedingungen', '')}
-          <a href="/hilfe" className="underline hover:text-white/80 transition-colors">
-            {t('auth.footerTosText') || 'Nutzungsbedingungen'}
+          {language === 'de' ? 'Mit der Anmeldung akzeptierst du unsere ' : 'By signing up you agree to our '}
+          <a href="/impressum" className="underline hover:text-white/80 transition-colors">
+            {language === 'de' ? 'Nutzungsbedingungen' : 'Terms of Service'}
           </a>
+          {language === 'de' ? ' und ' : ' and '}
+          <a href="/datenschutz" className="underline hover:text-white/80 transition-colors">
+            {language === 'de' ? 'Datenschutzerklärung' : 'Privacy Policy'}
+          </a>.
         </p>
       </div>
     </div>

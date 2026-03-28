@@ -44,6 +44,8 @@ import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ImpressumPage from "./pages/ImpressumPage";
+import DatenschutzPage from "./pages/DatenschutzPage";
 
 // Mobile Mini-Mode pages
 import MobileHomePage from "./pages/mobile/MobileHomePage";
@@ -125,6 +127,8 @@ const App = () => {
                         <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
                         <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
+                        <Route path="/impressum" element={<ImpressumPage />} />
+                        <Route path="/datenschutz" element={<DatenschutzPage />} />
                         
                         {/* Common URL redirects */}
                         <Route path="/shop" element={<Navigate to="/pricing" replace />} />
