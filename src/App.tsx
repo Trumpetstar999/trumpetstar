@@ -127,6 +127,8 @@ const App = () => {
                         <Route path="/trompete-tonumfang" element={<TrompeteTonumfangPage />} />
                         <Route path="/hilfe" element={<HelpCenterPage />} />
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
+                        <Route path="/impressum" element={<ImpressumPage />} />
+                        <Route path="/datenschutz" element={<DatenschutzPage />} />
                         
                         {/* Common URL redirects */}
                         <Route path="/shop" element={<Navigate to="/pricing" replace />} />

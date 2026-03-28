@@ -141,8 +141,8 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
           <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/40">
             <span>© {new Date().getFullYear()} Trumpetstar. {t('auth.footerCopyright')}</span>
             <div className="flex items-center gap-4">
-              <a href="https://trumpetstar.com/impressum/" target="_blank" rel="noopener noreferrer" className="hover:text-white/60 transition-colors">Impressum</a>
-              <a href="https://trumpetstar.com/datenschutzerklaerung/" target="_blank" rel="noopener noreferrer" className="hover:text-white/60 transition-colors">Datenschutz</a>
+              <Link to="/impressum" className="hover:text-white/60 transition-colors">Impressum</Link>
+              <Link to="/datenschutz" className="hover:text-white/60 transition-colors">Datenschutz</Link>
             </div>
           </div>
         </div>
