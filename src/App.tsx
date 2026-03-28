@@ -44,6 +44,8 @@ import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ImpressumPage from "./pages/ImpressumPage";
+import DatenschutzPage from "./pages/DatenschutzPage";
 
 // Mobile Mini-Mode pages
 import MobileHomePage from "./pages/mobile/MobileHomePage";
