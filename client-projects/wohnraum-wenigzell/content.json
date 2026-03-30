@@ -1,0 +1,157 @@
+{
+  "site": {
+    "name": "Wohnraum Wenigzell",
+    "tagline": "Wunderbar – Wertvoll – Willkommen",
+    "description": "Moderne Mietwohnungen im idyllischen Wenigzell (Steiermark). Vermietet von Thomas Holzer – persönlich, fair und familiennah.",
+    "url": "https://wohnraum-wenigzell.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "Wohnraum Wenigzell | Mietwohnungen in der Steiermark",
+    "description": "Moderne Mietwohnungen im idyllischen Wenigzell. Jetzt verfügbar: 2 Wohnungen ab 697 € inkl. Betriebskosten. Persönliche Betreuung durch Thomas Holzer.",
+    "ogImage": "/images/haus.jpg",
+    "canonical": "https://wohnraum-wenigzell.at"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Dein neues Zuhause\nin Wenigzell.",
+    "subheadline": "Wunderbar – Wertvoll – Willkommen. Entdecke das idyllische Wenigzell als Ort der Entspannung und echten Nachbarschaft.",
+    "cta": {
+      "primary": { "text": "Wohnungen ansehen", "href": "#leistungen" },
+      "secondary": { "text": "Kontakt aufnehmen", "href": "#kontakt" }
+    },
+    "slides": [
+      { "src": "/images/haus.jpg", "alt": "Wohnhaus in Wenigzell" },
+      { "src": "/images/gruen.jpg", "alt": "Grünanlage rund ums Haus" },
+      { "src": "/images/balkon.jpg", "alt": "Balkon mit Ausblick" }
+    ]
+  },
+  "leistungen": {
+    "headline": "Verfügbare Wohnungen",
+    "subheadline": "Alle Wohnungen im Dachgeschoss, bezugsfertig – inklusive Heizung, Wasser und Parkplatz.",
+    "items": [
+      {
+        "image": "/images/wohnung.jpg",
+        "title": "Wohnung 4 – 7 Räume",
+        "text": "61,12 m² | Langer Balkon auf 2 Seiten | 2 Badezimmer | Neuwertige Küche mit Einbaugeräten | 7 Räume. Miete: 697,- € inkl. Betriebskosten."
+      },
+      {
+        "image": "/images/innen.jpg",
+        "title": "Wohnung EG – Wohnen & Arbeiten",
+        "text": "121 m² | 5 Zimmer | 2 Balkone | Küche mit Einbaugeräten + Holzherd | Bad/WC getrennt. Miete: 971,- € inkl. Betriebskosten."
+      },
+      {
+        "image": "/images/balkon.jpg",
+        "title": "Wohnung 6 – Garçonnière",
+        "text": "Gemütliche Garçonnière mit Balkon | 3 Räume (Wohn/Schlafraum, Bad, WC) | Bad/WC getrennt. Derzeit in Fertigstellung – bald verfügbar."
+      },
+      {
+        "image": "/images/aussen.jpg",
+        "title": "Was ist inklusive?",
+        "text": "Heizung, Wasser, Abwasser & Müllabfuhr inklusive. 36,5 m³ Warmwasser/Jahr, 1 Stellplatz, Waschmaschine im Keller, Kabelfernsehen, Kellerplatz."
+      }
+    ]
+  },
+  "about": {
+    "headline": "Dein Vermieter: Thomas Holzer",
+    "text": "Mein Vater Franz Holzer hatte schon vor Jahren die Idee, Wohnraum für neue Wenigzeller zu schaffen. Seit seinem Ableben 2020 führe ich seine Vision weiter. Als Kind habe ich viel Zeit in Wenigzell verbracht – ich schätze die Ruhe und vor allem die echte Nachbarschaft hier. Ich helfe dir persönlich dabei, den passenden Wohnraum zu finden.",
+    "image": "/images/thomas.jpg",
+    "highlights": [
+      "Persönliche Betreuung durch den Vermieter",
+      "Familiäre Geschichte seit über 20 Jahren",
+      "Alle Betriebskosten inklusive",
+      "Idyllische Lage in Wenigzell, Steiermark"
+    ]
+  },
+  "testimonials": {
+    "headline": "Was Mieter sagen",
+    "items": [
+      {
+        "name": "Mieterin, Wohnung 2",
+        "text": "Die Wohnung ist wunderbar hell, der Balkon ein Traum. Thomas ist immer erreichbar und hilft sofort, wenn etwas ist. Ich fühle mich hier wirklich zu Hause."
+      },
+      {
+        "name": "Familie aus Birkfeld",
+        "text": "Endlich ein Zuhause mit echter Ruhe – und trotzdem alles inklusive. Heizung, Wasser, Parkplatz – man braucht sich um nichts zu kümmern."
+      },
+      {
+        "name": "Mieter, Wohnung 1",
+        "text": "Der Wechselblick vom Dachgeschoss ist unglaublich. Man kommt nach Hause und schaltet sofort ab. Wenigzell ist ein besonderer Ort."
+      }
+    ]
+  },
+  "gallery": {
+    "headline": "Einblicke ins Haus",
+    "images": [
+      { "src": "/images/haus.jpg",    "alt": "Außenansicht des Hauses",     "caption": "Das Haus in Wenigzell" },
+      { "src": "/images/balkon.jpg",  "alt": "Balkon mit Ausblick",         "caption": "Balkon mit Panoramablick" },
+      { "src": "/images/gruen.jpg",   "alt": "Grünanlage",                  "caption": "Großzügige Grünanlage" },
+      { "src": "/images/innen.jpg",   "alt": "Innenraum einer Wohnung",     "caption": "Helle, moderne Räume" },
+      { "src": "/images/wohnung.jpg", "alt": "Wohnbereich",                 "caption": "Wohnbereich mit Aussicht" },
+      { "src": "/images/aussen.jpg",  "alt": "Außenbereich",                "caption": "Ruhige Umgebung" }
+    ]
+  },
+  "faq": {
+    "headline": "Häufige Fragen",
+    "items": [
+      {
+        "q": "Was ist alles im Mietpreis inklusive?",
+        "a": "Heizung, Wasser, Abwasser, Müllabfuhr und 36,5 m³ Warmwasser pro Jahr sind inkludiert. Zusätzlich gibt es 1 Stellplatz, einen Kellerplatz, Waschmaschine im Keller sowie Kabelfernsehen und Telefonkabel/Internet im Haus."
+      },
+      {
+        "q": "Wie weit ist Wenigzell von der nächsten Stadt?",
+        "a": "Wenigzell liegt in der Steiermark, ca. 15 Minuten von Birkfeld entfernt. Die Umgebung ist ideal für alle, die Natur und Ruhe suchen, aber trotzdem gut angebunden sein möchten."
+      },
+      {
+        "q": "Sind Haustiere erlaubt?",
+        "a": "Bitte nehme direkt mit Thomas Kontakt auf – er bespricht das gerne individuell mit dir."
+      },
+      {
+        "q": "Wie kann ich eine Wohnung besichtigen?",
+        "a": "Schreib Thomas einfach über das Kontaktformular oder ruf ihn an. Er vereinbart gerne einen Besichtigungstermin nach deinen Wünschen."
+      },
+      {
+        "q": "Gibt es Internetzugang in der Wohnung?",
+        "a": "Ja, Telefonkabel und Internet sind ins Haus verlegt. Du kannst deinen eigenen Internetvertrag abschließen."
+      },
+      {
+        "q": "Wann sind die Wohnungen verfügbar?",
+        "a": "Wohnung 4 (61 m²) und die Erdgeschosswohnung (121 m²) sind aktuell sofort verfügbar. Die Garçonnière (Wohnung 6) ist derzeit in Fertigstellung. Melde dich einfach für aktuelle Informationen."
+      }
+    ]
+  },
+  "contact": {
+    "headline": "Jetzt Kontakt aufnehmen",
+    "subheadline": "Der beste Zeitpunkt ist jetzt. Du hast gefunden, was du suchst.",
+    "phone": "",
+    "email": "",
+    "address": "Wenigzell, Steiermark, Österreich",
+    "hours": [
+      { "label": "Erreichbarkeit", "time": "Jederzeit per Formular" },
+      { "label": "Besichtigung",   "time": "Nach Vereinbarung" }
+    ],
+    "formPlaceholder": {
+      "name":    "Dein Name",
+      "email":   "Deine E-Mail-Adresse",
+      "message": "Ich interessiere mich für... (z.B. Wohnung 4, Besichtigungstermin)",
+      "submit":  "Anfrage senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Wohnraum Wenigzell – Thomas Holzer",
+    "links": [
+      { "text": "Impressum",   "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ],
+    "social": []
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "Thomas Holzer",
+      "Wenigzell, Steiermark, Österreich",
+      "Privatvermieter"
+    ]
+  }
+}

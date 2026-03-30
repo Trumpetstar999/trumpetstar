@@ -1,0 +1,497 @@
+---
+import Base from '../layouts/Base.astro';
+import content from '../../content.json';
+
+const { site, hero, leistungen, about, testimonials, gallery, faq, contact, footer, impressum } = content;
+---
+<Base>
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="site-nav" aria-label="Hauptnavigation">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo-link" aria-label="Wohnraum Wenigzell – Startseite">
+        <span class="nav-logo-text">Wohnraum Wenigzell</span>
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="#leistungen">Wohnungen</a></li>
+        <li><a href="#about">Ihr Vermieter</a></li>
+        <li><a href="#galerie">Galerie</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" aria-label="Willkommen bei Tischlerei Fasching OG">
+      <!-- Slides -->
+      {hero.slides.map((slide, i) => (
+        <div
+          class={`hero-slide${i === 0 ? ' active' : ''}`}
+          id={`hero-slide-${i}`}
+          aria-hidden={i !== 0 ? 'true' : 'false'}
+          style={`background-image: url('${slide.src}');`}
+        >
+          {i === 0 && (
+            <img
+              src={slide.src}
+              alt={slide.alt}
+              class="hero-slide-img"
+              fetchpriority="high"
+              width="1400"
+              height="900"
+            />
+          )}
+        </div>
+      ))}
+
+      <!-- Overlay -->
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <!-- Content -->
+      <div class="container">
+        <div class="hero-content">
+          <span class="hero-tagline">{site.tagline}</span>
+          <h1>{hero.headline}</h1>
+          <span class="hero-headline-rule" aria-hidden="true"></span>
+          <p class="hero-subheadline">{hero.subheadline}</p>
+          <div class="hero-cta">
+            <a href={hero.cta.primary.href} class="btn btn-primary">
+              {hero.cta.primary.text}
+            </a>
+            <a href={hero.cta.secondary.href} class="btn btn-secondary">
+              📞 {hero.cta.secondary.text}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slideshow controls -->
+      <button class="hero-nav-btn hero-prev" aria-label="Vorheriges Bild" id="hero-prev">&#8592;</button>
+      <button class="hero-nav-btn hero-next" aria-label="Nächstes Bild" id="hero-next">&#8594;</button>
+
+      <div class="hero-controls" role="group" aria-label="Slideshow Navigation">
+        <div class="hero-dots" role="tablist" aria-label="Slide auswählen">
+          {hero.slides.map((slide, i) => (
+            <button
+              class={`hero-dot${i === 0 ? ' active' : ''}`}
+              role="tab"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              aria-label={`Slide ${i + 1}: ${slide.alt}`}
+              data-slide={i}
+              id={`dot-${i}`}
+            ></button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LEISTUNGEN ===== -->
+    <section class="leistungen" id="leistungen" aria-labelledby="leistungen-title">
+      <div class="container">
+        <div class="section-header anim-ready anim-fade-up">
+          <h2 id="leistungen-title">{leistungen.headline}</h2>
+          <p>{leistungen.subheadline}</p>
+        </div>
+        <div class="leistungen-grid" role="list">
+          {leistungen.items.map((item, i) => (
+            <article class={`leistung-card anim-ready anim-fade-up anim-delay-${i + 1}`} role="listitem">
+              {item.image && <img src={item.image} alt={item.title} class="leistung-img" loading="lazy" width="480" height="220" />}
+              <div class="leistung-text">
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="container">
+        <div class="about-grid">
+          <div class="about-text-col anim-ready anim-slide-left">
+            <h2 id="about-title">{about.headline}</h2>
+            <p class="about-text">{about.text}</p>
+            <span class="about-names">Georg & Jochen Fasching</span>
+          </div>
+          <div class="about-highlights-col anim-ready anim-slide-right">
+            <ul class="highlights-list" role="list">
+              {about.highlights.map(item => (
+                <li>
+                  <span class="highlight-check" aria-hidden="true">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="testimonials" aria-labelledby="testimonials-title">
+      <div class="container">
+        <div class="section-header anim-ready anim-fade-up">
+          <h2 id="testimonials-title">{testimonials.headline}</h2>
+        </div>
+        <div class="testimonials-grid" role="list">
+          {testimonials.items.map((item, i) => (
+            <article class={`testimonial-card anim-ready anim-fade-up anim-delay-${i + 1}`} role="listitem">
+              <div class="testimonial-stars" aria-label="5 Sterne">★★★★★</div>
+              <span class="testimonial-quote" aria-hidden="true">»</span>
+              <blockquote>
+                <p class="testimonial-text">{item.text}«</p>
+              </blockquote>
+              <footer class="testimonial-name">{item.name}</footer>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GALLERY ===== -->
+    <section class="gallery" id="galerie" aria-labelledby="gallery-title">
+      <div class="container">
+        <div class="section-header anim-ready anim-fade-up">
+          <h2 id="gallery-title">{gallery.headline}</h2>
+        </div>
+        <div class="gallery-grid">
+          {gallery.images.map((img, i) => (
+            <figure class={`gallery-item anim-ready anim-scale-in anim-delay-${Math.min(i + 1, 6)}`}>
+              <img
+                src={img.src}
+                alt={img.alt}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                width="800"
+                height="600"
+              />
+              <figcaption class="gallery-caption">{img.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="section-header anim-ready anim-fade-up">
+          <h2 id="faq-title">{faq.headline}</h2>
+        </div>
+        <div class="faq-list" role="list">
+          {faq.items.map((item, i) => (
+            <details class={`faq-item anim-ready anim-fade-up anim-delay-${Math.min(i + 1, 4)}`} role="listitem">
+              <summary id={`faq-q-${i}`}>{item.q}</summary>
+              <div class="faq-answer" role="region" aria-labelledby={`faq-q-${i}`}>
+                <p>{item.a}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="contact" id="kontakt" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="contact-grid">
+          <!-- Contact Info -->
+          <div class="contact-info anim-ready anim-slide-left">
+            <h2 id="contact-title">{contact.headline}</h2>
+            <p class="contact-subheadline">{contact.subheadline}</p>
+            <div class="contact-info-items">
+              <div class="contact-info-item">
+                <div class="contact-info-icon" aria-hidden="true">📞</div>
+                <div class="contact-info-content">
+                  <strong>Telefon</strong>
+                  <a href={`tel:+43${contact.phone.replace(/\//g, '')}`}>{contact.phone}</a>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-info-icon" aria-hidden="true">✉️</div>
+                <div class="contact-info-content">
+                  <strong>E-Mail</strong>
+                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-info-icon" aria-hidden="true">📍</div>
+                <div class="contact-info-content">
+                  <strong>Adresse</strong>
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(contact.address)}`} target="_blank" rel="noopener noreferrer">{contact.address}</a>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-info-icon" aria-hidden="true">🕐</div>
+                <div class="contact-info-content">
+                  <strong>Bürozeiten</strong>
+                  <span>Mo – Fr: 07:00 – 12:00 Uhr</span>
+                  <span>Mo – Fr: 12:40 – 17:00 Uhr</span>
+                  <span>Sa: Geschlossen</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form -->
+          <div class="contact-form anim-ready anim-slide-right" role="form" aria-label="Kontaktformular">
+            <form
+              action={`mailto:${contact.email}`}
+              method="get"
+              enctype="text/plain"
+              novalidate
+            >
+              <!-- Honeypot spam protection -->
+              <div class="honeypot" aria-hidden="true">
+                <label for="website">Website (nicht ausfüllen)</label>
+                <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <div class="form-group">
+                <label for="contact-name">{contact.formPlaceholder.name} *</label>
+                <input
+                  type="text"
+                  id="contact-name"
+                  name="name"
+                  placeholder={contact.formPlaceholder.name}
+                  required
+                  autocomplete="name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="contact-email">{contact.formPlaceholder.email} *</label>
+                <input
+                  type="email"
+                  id="contact-email"
+                  name="email"
+                  placeholder={contact.formPlaceholder.email}
+                  required
+                  autocomplete="email"
+                />
+              </div>
+              <div class="form-group">
+                <label for="contact-message">{contact.formPlaceholder.message} *</label>
+                <textarea
+                  id="contact-message"
+                  name="body"
+                  placeholder={contact.formPlaceholder.message}
+                  required
+                  rows="5"
+                ></textarea>
+              </div>
+              <button type="submit" class="form-submit">
+                {contact.formPlaceholder.submit} →
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== IMPRESSUM & DATENSCHUTZ ===== -->
+    <section class="legal" aria-label="Rechtliche Informationen">
+      <div class="container">
+        <div class="legal-grid">
+
+          <!-- IMPRESSUM -->
+          <div class="legal-section" id="impressum">
+            <h2>{impressum.title}</h2>
+            <address>
+              {impressum.lines.map(line => (
+                <span>{line}<br /></span>
+              ))}
+            </address>
+          </div>
+
+          <!-- DATENSCHUTZ -->
+          <div class="legal-section" id="datenschutz">
+            <h2>Datenschutz</h2>
+            <p>
+              <strong>Datenschutzerklärung gemäß DSGVO</strong><br /><br />
+
+              <strong>Cookies</strong><br />
+              Diese Website verwendet ausschließlich technisch notwendige Cookies. Es werden keine Tracking- oder Marketing-Cookies eingesetzt. Die Speicherung Ihrer Cookie-Einstellung erfolgt lokal in Ihrem Browser (localStorage) und wird nicht an uns übertragen.<br /><br />
+
+              <strong>Verantwortlicher:</strong><br />
+              Tischlerei Fasching OG, Mogersdorf 205, 8382 Mogersdorf<br />
+              E-Mail: office@wohnen-fasching.com<br /><br />
+
+              <strong>Erhebung und Verarbeitung personenbezogener Daten</strong><br />
+              Diese Website erhebt keine personenbezogenen Daten durch Tracking-Tools oder Analyse-Software.
+              Es werden keine Cookies gesetzt, die einer Einwilligung bedürfen.<br /><br />
+
+              <strong>Kontaktformular</strong><br />
+              Wenn Sie uns über das Kontaktformular kontaktieren, werden die von Ihnen eingegebenen Daten
+              (Name, E-Mail-Adresse, Nachricht) ausschließlich zur Bearbeitung Ihrer Anfrage verwendet.
+              Die Daten werden nicht an Dritte weitergegeben.<br /><br />
+
+              <strong>Hosting</strong><br />
+              Diese Website wird auf einem Server in der Europäischen Union gehostet.
+              Die technische Bereitstellung der Website erfordert die Verarbeitung Ihrer IP-Adresse durch den Hosting-Anbieter
+              (Art. 6 Abs. 1 lit. f DSGVO – berechtigtes Interesse).<br /><br />
+
+              <strong>Ihre Rechte</strong><br />
+              Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung
+              sowie das Recht auf Datenübertragbarkeit. Für Anfragen wenden Sie sich an:
+              office@wohnen-fasching.com<br /><br />
+
+              <strong>Beschwerderecht</strong><br />
+              Sie haben das Recht, bei der Datenschutzbehörde (dsb.gv.at) eine Beschwerde einzureichen.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a href="#" aria-label="Tischlerei Fasching OG – nach oben">
+        <span class="nav-logo-text">Wohnraum Wenigzell</span>
+      </a>
+      <span class="footer-copyright">{footer.copyright}</span>
+      <ul class="footer-links" role="list">
+        {footer.links.map(link => (
+          <li><a href={link.href}>{link.text}</a></li>
+        ))}
+      </ul>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/georg.fasching.397" target="_blank" rel="noopener noreferrer" aria-label="Tischlerei Fasching auf Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-credit">
+      <span>Webdesign</span>
+      <a href="https://www.schulter-design.at" target="_blank" rel="noopener noreferrer" aria-label="Schulter Design – Webdesign">
+        <img src="/images/schulter-design-logo.jpg" alt="Mario Schulter Design" class="footer-credit-logo" width="80" height="32" />
+      </a>
+    </div>
+  </footer>
+
+  <!-- ===== HERO SLIDESHOW SCRIPT ===== -->
+  <script>
+    (function() {
+      const slides = document.querySelectorAll('.hero-slide');
+      const dots = document.querySelectorAll('.hero-dot');
+      const prevBtn = document.getElementById('hero-prev');
+      const nextBtn = document.getElementById('hero-next');
+
+      if (!slides.length) return;
+
+      let current = 0;
+      let autoPlay = null;
+      const INTERVAL = 5000;
+
+      // Respect prefers-reduced-motion
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function goTo(index) {
+        slides[current].classList.remove('active');
+        slides[current].setAttribute('aria-hidden', 'true');
+        dots[current].classList.remove('active');
+        dots[current].setAttribute('aria-selected', 'false');
+
+        current = (index + slides.length) % slides.length;
+
+        slides[current].classList.add('active');
+        slides[current].setAttribute('aria-hidden', 'false');
+        dots[current].classList.add('active');
+        dots[current].setAttribute('aria-selected', 'true');
+      }
+
+      function startAutoPlay() {
+        if (prefersReducedMotion) return;
+        stopAutoPlay();
+        autoPlay = setInterval(() => goTo(current + 1), INTERVAL);
+      }
+
+      function stopAutoPlay() {
+        if (autoPlay) { clearInterval(autoPlay); autoPlay = null; }
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', () => { stopAutoPlay(); goTo(current - 1); });
+      }
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => { stopAutoPlay(); goTo(current + 1); });
+      }
+
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => { stopAutoPlay(); goTo(i); });
+      });
+
+      // Keyboard navigation on hero
+      document.querySelector('.hero')?.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') { stopAutoPlay(); goTo(current - 1); }
+        if (e.key === 'ArrowRight') { stopAutoPlay(); goTo(current + 1); }
+      });
+
+      // Start auto-play (only if motion OK)
+      if (!prefersReducedMotion) {
+        startAutoPlay();
+      }
+    })();
+
+    // ── Intersection Observer für Scroll-Animationen ──
+    (function() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(el => {
+          if (el.isIntersecting) {
+            el.target.classList.add('anim-visible');
+            observer.unobserve(el.target); // einmalig, kein Re-trigger
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      document.querySelectorAll('.anim-ready').forEach(el => observer.observe(el));
+    })();
+
+    // ── Cookie Banner ──
+    (function() {
+      const banner  = document.getElementById('cookie-banner');
+      const consent = localStorage.getItem('fasching_cookie_consent');
+      if (!banner) return;
+      if (consent) {
+        banner.classList.add('hidden');
+        return;
+      }
+      // Kurze Verzögerung damit Seite erst lädt
+      setTimeout(() => banner.classList.remove('hidden'), 800);
+
+      function dismiss(choice) {
+        localStorage.setItem('fasching_cookie_consent', choice);
+        banner.classList.add('hidden');
+      }
+      document.getElementById('cookie-accept').addEventListener('click', () => dismiss('accepted'));
+      document.getElementById('cookie-reject').addEventListener('click', () => dismiss('rejected'));
+    })();
+  </script>
+
+  <!-- ===== COOKIE BANNER ===== -->
+  <div id="cookie-banner" class="hidden" role="region" aria-label="Cookie-Hinweis">
+    <div class="cookie-inner">
+      <p class="cookie-text">
+        Diese Website verwendet keine Tracking-Cookies. Wir setzen ausschließlich technisch notwendige Cookies ein, die für den Betrieb der Website erforderlich sind.
+        <a href="#datenschutz">Datenschutzerklärung</a>
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-accept" id="cookie-accept" aria-label="Cookies akzeptieren">Akzeptieren</button>
+        <button class="cookie-reject" id="cookie-reject" aria-label="Cookies ablehnen">Ablehnen</button>
+      </div>
+    </div>
+  </div>
+</Base>

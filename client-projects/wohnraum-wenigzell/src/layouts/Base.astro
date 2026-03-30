@@ -1,0 +1,81 @@
+---
+import content from '../../content.json';
+import '../styles/global.css';
+
+const { title, description } = Astro.props;
+
+const metaTitle = title || content.meta.title;
+const metaDesc = description || content.meta.description;
+
+const schemaOrgJson = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Tischlerei Fasching OG",
+  "telephone": "+433325822800",
+  "email": "office@wohnen-fasching.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Mogersdorf 205",
+    "addressLocality": "Mogersdorf",
+    "postalCode": "8382",
+    "addressCountry": "AT"
+  },
+  "url": "https://www.wohnen-fasching.com",
+  "priceRange": "€€",
+  "image": "https://www.wohnen-fasching.com/images/og-image.jpg",
+  "openingHoursSpecification": []
+});
+---
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#E8611A" />
+  <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
+  <link rel="apple-touch-icon" href="/images/logo.jpg" />
+
+  <title>{metaTitle}</title>
+  <meta name="description" content={metaDesc} />
+  <link rel="canonical" href={content.meta.canonical} />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content={content.site.locale} />
+  <meta property="og:title" content={metaTitle} />
+  <meta property="og:description" content={metaDesc} />
+  <meta property="og:url" content={content.site.url} />
+  <meta property="og:image" content={content.site.url + content.meta.ogImage} />
+  <meta property="og:site_name" content={content.site.name} />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={metaTitle} />
+  <meta name="twitter:description" content={metaDesc} />
+  <meta name="twitter:image" content={content.site.url + content.meta.ogImage} />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json" set:html={schemaOrgJson}></script>
+
+  <!-- Critical CSS inline for above-the-fold -->
+  <style>
+    /* Critical: nav + hero skeleton to prevent FOUC */
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0.75rem 0; }
+    .hero { min-height: 100svh; display: flex; align-items: center; background: #2C2C2C; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-to-main">Zum Inhalt springen</a>
+  <slot />
+  <!-- Nav scroll behavior -->
+  <script>
+    const nav = document.querySelector('.site-nav');
+    if (nav) {
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 50);
+      }, { passive: true });
+    }
+  </script>
+</body>
+</html>
