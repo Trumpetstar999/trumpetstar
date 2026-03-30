@@ -1,0 +1,47 @@
+{
+  "date": "2026-03-30",
+  "kw": 14,
+  "env": "prod",
+  "go_no_go": "CONDITIONAL GO",
+  "commit_before": "1050144",
+  "commit_after": "b4e8f04",
+  "p0_count": 0,
+  "p1_count": 1,
+  "p2_count": 3,
+  "p3_count": 10,
+  "fixes_applied": [
+    "TS-QA-KW14-PERF-001 (P2) CLOSED: All .png refs → .jpg in 11 files (commit b4e8f04)"
+  ],
+  "new_findings": [
+    "TS-QA-KW14-SEC-001 (P2): send-email Edge Function – no caller authentication, spam/abuse risk",
+    "TS-QA-KW14-SEC-002 (P2): elevenlabs-tts + elevenlabs-stt – no auth, API cost abuse risk",
+    "TS-QA-KW14-SEC-003 (P3): vimeo-sync – no caller authentication",
+    "TS-QA-KW14-SEC-004 (P3): WP_OAUTH_CLIENT_ID hardcoded in source code",
+    "TS-QA-KW14-PERF-002 (P2): logo-trumpetstar-game.png 556KB (GameHUD.tsx), no JPG version",
+    "TS-QA-KW14-PERF-003 (P3): Orphan PNGs (toni-coach.png 876KB + trumpetstar-logo.png 556KB) still in repo",
+    "TS-QA-KW14-PERF-004 (P3): app-preview.png 252KB + trumpetstar-lernwelt.jpg 300KB over 200KB threshold"
+  ],
+  "carry_over_open": [
+    "TS-QA-EMAIL-001 (P1): Cross-Project Email Tracking – needs live verify",
+    "TS-QA-DB-001 (P3): agent_log anon INSERT blocked by missing RLS policy",
+    "TS-QA-EMAIL-003 (P3): EMAIL_PROXY_URL via HTTP plain (72.60.17.112)",
+    "TS-QA-DEP-001 (P3): xlsx 0.18.5 Prototype Pollution + ReDoS",
+    "TS-QA-KW13-SEC-003 (P3): send-invoice-email without rate limiting",
+    "TS-QA-KW13-PERF-003 (P3): trumpetstar-app-screenshot.png 567KB"
+  ],
+  "top_risks": [
+    "TS-QA-KW14-SEC-001: send-email unauthenticated – anyone can send emails via Trumpetstar SMTP",
+    "TS-QA-KW14-SEC-002: ElevenLabs TTS/STT unauthenticated – API cost abuse risk",
+    "TS-QA-EMAIL-001: Cross-Project Email Tracking unverified (P1 carry-over)"
+  ],
+  "next_actions": [
+    "Add auth check to send-email, elevenlabs-tts, elevenlabs-stt, vimeo-sync",
+    "Convert logo-trumpetstar-game.png to WebP/JPG (<80KB)",
+    "Live-test TS-QA-EMAIL-001 Cross-Project Tracking",
+    "Delete orphan PNGs from repo",
+    "Move WP_OAUTH_CLIENT_ID to env var",
+    "Update xlsx to >=0.20.x"
+  ],
+  "regression_check": "PASS – no functional regressions in KW13→KW14 changes",
+  "report_file": "2026-14_weekly_full_check.md"
+}
