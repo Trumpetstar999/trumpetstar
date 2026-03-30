@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AssistantPanel } from './AssistantPanel';
 import { cn } from '@/lib/utils';
-import toniAvatar from '@/assets/toni-coach.png';
+import toniAvatar from '@/assets/toni-coach.jpg';
 
 export function AssistantButton() {
   const [isOpen, setIsOpen] = useState(false);

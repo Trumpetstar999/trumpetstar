@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.jpg';
 import { Music, Sparkles, ArrowRight, User, Globe, Target, Users, GraduationCap } from 'lucide-react';
 
 interface LanguageOption {
