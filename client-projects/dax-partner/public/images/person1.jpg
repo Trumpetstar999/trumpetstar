@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="de">
+    
+    <!-- HTML HEADER ATOM -->
+    <head>
+    
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>@charset 'UTF-8';@import url(https://p.typekit.net/p.css?s=1&k=jvb8ues&ht=tk&f=28167&a=82850918&app=typekit&e=css);@font-face{font-family:eloquent-jf-pro;src:url("https://use.typekit.net/af/27914b/00000000000000007735b3f9/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/27914b/00000000000000007735b3f9/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/27914b/00000000000000007735b3f9/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");font-display:auto;font-style:normal;font-weight:400;font-stretch:normal}@font-face{font-display:swap;font-family:Asap;font-style:normal;font-weight:400;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-regular.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-regular.ttf) format('truetype')}@font-face{font-display:swap;font-family:Asap;font-style:italic;font-weight:400;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-italic.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-italic.ttf) format('truetype')}@font-face{font-display:swap;font-family:Asap;font-style:normal;font-weight:500;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-500.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-500.ttf) format('truetype')}@font-face{font-display:swap;font-family:Asap;font-style:normal;font-weight:600;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-600.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-600.ttf) format('truetype')}@font-face{font-display:swap;font-family:Asap;font-style:normal;font-weight:700;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-700.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-700.ttf) format('truetype')}@font-face{font-display:swap;font-family:Asap;font-style:normal;font-weight:800;src:url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-800.woff2) format('woff2'),url(/xstorage/1/template/fonts/asap/asap-v30-latin_latin-ext-800.ttf) format('truetype')}@font-face{font-family:icomoon-shop;font-display:block;src:url(//www.daxundpartner.at/xstorage/1/Components/xs_shop/icons/fonts/icomoon-shop_v3.eot?15pw0p);src:url('//www.daxundpartner.at/xstorage/1/Components/xs_shop/icons/fonts/icomoon-shop_v3.eot?15pw0p#iefix') format('embedded-opentype'),url(//www.daxundpartner.at/xstorage/1/Components/xs_shop/icons/fonts/icomoon-shop_v3.ttf?15pw0p) format('truetype'),url(//www.daxundpartner.at/xstorage/1/Components/xs_shop/icons/fonts/icomoon-shop_v3.woff?15pw0p) format('woff'),url('//www.daxundpartner.at/xstorage/1/Components/xs_shop/icons/fonts/icomoon-shop_v3.svg?15pw0p#icomoon-shop') format('svg');font-weight:400;font-style:normal}@font-face{font-family:icomoon;src:url(//www.edelstoffe.at/xstorage/1/template/fonts/icoMoon/fonts/icomoon.eot?7fdh4i);src:url('//www.edelstoffe.at/xstorage/1/template/fonts/icoMoon/fonts/icomoon.eot?7fdh4i#iefix') format('embedded-opentype'),url(//www.edelstoffe.at/xstorage/1/template/fonts/icoMoon/fonts/icomoon.ttf?7fdh4i) format('truetype'),url(//www.edelstoffe.at/xstorage/1/template/fonts/icoMoon/fonts/icomoon.woff?7fdh4i) format('woff'),url('//www.edelstoffe.at/xstorage/1/template/fonts/icoMoon/fonts/icomoon.svg?7fdh4i#icomoon') format('svg');font-weight:400;font-style:normal;font-display:block}button,input,select{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}.col-12,.col-6,.col-lg-6,.col-md-6,.col-sm-6,.col-xs-12{position:relative;width:100%;padding-right:15px;padding-left:15px}.form-control,.sod_select,input.form-control{border:none;outline:0;box-shadow:none;border-radius:0;display:block;width:100%;height:34px;padding:0 15px;font-size:13px;color:var(--color);background-color:#fff;border-radius:7px;border:1px solid #fff;font-family:Asap;font-style:normal;font-weight:400;filter:none}.form-control:-webkit-autofill,.sod_select:-webkit-autofill,input.form-control:-webkit-autofill{-webkit-text-fill-color:var(--color);-webkit-box-shadow:0 0 0 30px #fff inset}[type=button],button{-webkit-appearance:button}[type=button]::-moz-focus-inner,button::-moz-focus-inner{padding:0;border-style:none}@media (max-width:991px){.col-lg-6,.col-md-6,.col-sm-6,.col-xs-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}}:root{--blue:#007bff;--indigo:#6610f2;--purple:#6f42c1;--pink:#e83e8c;--red:#dc3545;--orange:#fd7e14;--yellow:#ffc107;--green:#28a745;--teal:#20c997;--cyan:#17a2b8;--white:#fff;--gray:#6c757d;--gray-dark:#343a40;--primary:#007bff;--secondary:#6c757d;--success:#28a745;--info:#17a2b8;--warning:#ffc107;--danger:#dc3545;--breakpoint-xs:0;--breakpoint-sm:576px;--breakpoint-md:768px;--breakpoint-lg:992px;--breakpoint-xl:1200px;--font-family-sans-serif:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";--font-family-monospace:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}*,::after,::before{box-sizing:border-box}html{font-family:sans-serif;line-height:1.15;-webkit-text-size-adjust:100%}aside,header,section{display:block}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;text-align:left;background-color:#fff}h1,h2,h3{margin-top:0;margin-bottom:.5rem}p{margin-top:0;margin-bottom:1rem}ul{margin-top:0;margin-bottom:1rem}ul ul{margin-bottom:0}a{color:#007bff;text-decoration:none;background-color:transparent}svg{overflow:hidden;vertical-align:middle}label{display:inline-block;margin-bottom:.5rem}button{border-radius:0}button,input,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,input{overflow:visible}button,select{text-transform:none}[type=button],[type=submit],button{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{padding:0;border-style:none}input[type=checkbox]{box-sizing:border-box;padding:0}textarea{overflow:auto;resize:vertical}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}h1,h2,h3{margin-bottom:.5rem;font-family:inherit;font-weight:500;line-height:1.2;color:inherit}h1{font-size:2.5rem}h2{font-size:2rem}h3{font-size:1.75rem}.container{width:100%;padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto}@media (min-width:768px){.container{max-width:740px}}@media (min-width:992px){.container{max-width:960px}}@media (min-width:1200px){.container{max-width:1140px}}.row{display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;margin-right:-15px;margin-left:-15px}.col-12,.col-6,.col-lg-12,.col-lg-6,.col-md-12,.col-md-6,.col-sm-12,.col-sm-6,.col-xs-12{position:relative;width:100%;padding-right:15px;padding-left:15px}.col-xs-12{-ms-flex-preferred-size:0;flex-basis:0%;-ms-flex-positive:1;flex-grow:1;max-width:100%}.col-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-12,.col-xs-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}@media (min-width:768px){.col-sm-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-sm-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}@media (min-width:992px){.col-md-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-md-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}@media (min-width:1200px){.col-lg-6{-ms-flex:0 0 50%;flex:0 0 50%;max-width:50%}.col-lg-12{-ms-flex:0 0 100%;flex:0 0 100%;max-width:100%}}.form-control{display:block;width:100%;height:calc(2.25rem + 2px);padding:.375rem .75rem;font-size:1rem;font-weight:400;line-height:1.5;color:#495057;background-color:#fff;background-clip:padding-box;border:1px solid #ced4da;border-radius:.25rem}.form-control::-ms-expand{background-color:transparent;border:0}.form-control::-webkit-input-placeholder{color:#6c757d;opacity:1}.form-control::-moz-placeholder{color:#6c757d;opacity:1}.form-control:-ms-input-placeholder{color:#6c757d;opacity:1}.form-control::-ms-input-placeholder{color:#6c757d;opacity:1}textarea.form-control{height:auto}.form-group{margin-bottom:1rem}.btn{display:inline-block;font-weight:400;color:#212529;text-align:center;vertical-align:middle;background-color:transparent;border:1px solid transparent;padding:.375rem .75rem;font-size:1rem;line-height:1.5;border-radius:.25rem}.btn:disabled{opacity:.65}.btn-primary{color:#fff;background-color:#007bff;border-color:#007bff}.btn-secondary{color:#fff;background-color:#6c757d;border-color:#6c757d}.btn-secondary:disabled{color:#fff;background-color:#6c757d;border-color:#6c757d}.btn-link{font-weight:400;color:#007bff}.fade:not(.show){opacity:0}.collapse:not(.show){display:none}.nav{display:-ms-flexbox;display:flex;-ms-flex-wrap:wrap;flex-wrap:wrap;padding-left:0;margin-bottom:0;list-style:none}.nav-link{display:block;padding:.5rem 1rem}.modal{position:fixed;top:0;left:0;z-index:1050;display:none;width:100%;height:100%;overflow:hidden;outline:0}.modal-dialog{position:relative;width:auto;margin:.5rem}.modal.fade .modal-dialog{-webkit-transform:translate(0,-50px);transform:translate(0,-50px)}.modal-content{position:relative;display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column;width:100%;background-color:#fff;background-clip:padding-box;border:1px solid rgba(0,0,0,.2);border-radius:.3rem;outline:0}.modal-body{position:relative;-ms-flex:1 1 auto;flex:1 1 auto;padding:1rem}.modal-footer{display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:end;justify-content:flex-end;padding:1rem;border-top:1px solid #e9ecef;border-bottom-right-radius:.3rem;border-bottom-left-radius:.3rem}@media (min-width:768px){.modal-dialog{max-width:500px;margin:1.75rem auto}}@media (min-width:1200px){.modal-xl{max-width:800px}}@media (min-width:1600px){.modal-xl{max-width:1140px}}.clearfix::after{display:block;clear:both;content:""}.d-none,.hidden{display:none!important}.d-block{display:block!important}.d-flex{display:-ms-flexbox!important;display:flex!important}.justify-content-center{-ms-flex-pack:center!important;justify-content:center!important}.justify-content-between{-ms-flex-pack:justify!important;justify-content:space-between!important}.align-items-end{-ms-flex-align:end!important;align-items:flex-end!important}.align-items-center{-ms-flex-align:center!important;align-items:center!important}.float-left{float:left!important}.float-right{float:right!important}.position-relative{position:relative!important}.h-100{height:100%!important}.p-3{padding:1rem!important}.text-right{text-align:right!important}.text-center{text-align:center!important}.text-white{color:#fff!important}.sod_select,.sod_select *{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;-webkit-touch-callout:none}.sod_select{display:inline-block;position:relative;line-height:1;width:100%;padding:15px 10px;border:1px solid #000;background:#fff;font-size:14px;text-align:left;text-transform:uppercase;outline:0}.sod_select:after,.sod_select:before{content:"\25B2";position:absolute;right:10px;top:12px;font-size:7px}.sod_select:after{content:"\25BC";top:auto;bottom:12px}.sod_select .sod_label{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:15px}.sod_select .sod_list_wrapper{position:absolute;top:100%;left:-1px;right:-1px;display:none;height:auto;background:#fff;border:1px solid #000;border-top:none;z-index:1}.sod_select .sod_list{display:block;overflow-y:auto;padding:0;margin:0}.sod_select .sod_option{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;position:relative;padding:10px;list-style-type:none}.sod_select .sod_option.active{background:#f7f7f7}.sod_select .sod_option.selected{padding-right:25px}.sod_select .sod_option.selected:before{content:"";position:absolute;right:10px;top:50%;-webkit-transform:translateY(-50%);-ms-transform:translateY(-50%);transform:translateY(-50%);display:inline-block;height:9px;width:10px;background:url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMTAgOSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMTAgOSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBmaWxsPSIjRDlEOUQ4IiBkPSJNNCw2LjdDMy42LDYuMywzLjUsNi4xLDMuMSw1LjdDMi42LDUuMiwyLDQuNiwxLjUsNC4xYy0wLjgtMC44LTIsMC40LTEuMiwxLjJjMC45LDAuOSwxLjksMS45LDIuOCwyLjgNCgkJYzAuNywwLjcsMS4zLDEsMiwwQzYuNyw2LDguMywzLjcsOS44LDEuNUMxMC41LDAuNSw5LTAuMyw4LjMsMC42bDAsMEM2LjcsMi45LDUuNyw0LjQsNCw2LjciLz4NCjwvZz4NCjwvc3ZnPg0K)}.sod_select select{display:none!important}.pswp{display:none;position:absolute;width:100%;height:100%;left:0;top:0;overflow:hidden;-ms-touch-action:none;touch-action:none;z-index:1500;-webkit-text-size-adjust:100%;-webkit-backface-visibility:hidden;outline:0}.pswp *{-webkit-box-sizing:border-box;box-sizing:border-box}.pswp__bg{position:absolute;left:0;top:0;width:100%;height:100%;background:#000;opacity:0;-webkit-backface-visibility:hidden;will-change:opacity}.pswp__scroll-wrap{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden}.pswp__container{-ms-touch-action:none;touch-action:none;position:absolute;left:0;right:0;top:0;bottom:0}.pswp__container{-webkit-touch-callout:none}.pswp__bg{will-change:opacity}.pswp__container{-webkit-backface-visibility:hidden}.pswp__item{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden}.pswp__button{width:44px;height:44px;position:relative;background:0 0;overflow:visible;-webkit-appearance:none;display:block;border:0;padding:0;margin:0;float:right;opacity:.75;-webkit-box-shadow:none;box-shadow:none}.pswp__button::-moz-focus-inner{padding:0;border:0}.pswp__button,.pswp__button--arrow--left:before,.pswp__button--arrow--right:before{background:url(/xstorage/1/Components/xs_defaults/Photoswipe/default-skin.svg) no-repeat;background-size:264px 88px;width:44px;height:44px}.pswp__button--close{background-position:0 -44px}.pswp__button--share{background-position:-44px -44px}.pswp__button--fs{display:none}.pswp__button--zoom{display:none;background-position:-88px 0}.pswp__button--arrow--left,.pswp__button--arrow--right{background:0 0;top:50%;margin-top:-50px;width:70px;height:100px;position:absolute}.pswp__button--arrow--left{left:0}.pswp__button--arrow--right{right:0}.pswp__button--arrow--left:before,.pswp__button--arrow--right:before{content:'';top:35px;background-color:rgba(0,0,0,.3);height:30px;width:32px;position:absolute}.pswp__button--arrow--left:before{left:6px;background-position:-138px -44px}.pswp__button--arrow--right:before{right:6px;background-position:-94px -44px}.pswp__share-modal{display:block;background:rgba(0,0,0,.5);width:100%;height:100%;top:0;left:0;padding:10px;position:absolute;z-index:1600;opacity:0;-webkit-backface-visibility:hidden;will-change:opacity}.pswp__share-modal--hidden{display:none}.pswp__share-tooltip{z-index:1620;position:absolute;background:#fff;top:56px;border-radius:2px;display:block;width:auto;right:44px;-webkit-box-shadow:0 2px 5px rgba(0,0,0,.25);box-shadow:0 2px 5px rgba(0,0,0,.25);-webkit-transform:translateY(6px);-ms-transform:translateY(6px);transform:translateY(6px);-webkit-backface-visibility:hidden;will-change:transform}.pswp__counter{position:absolute;left:0;top:0;height:44px;font-size:13px;line-height:44px;color:#fff;opacity:.75;padding:0 10px}.pswp__caption{position:absolute;left:0;bottom:0;width:100%;min-height:44px}.pswp__caption__center{text-align:left;max-width:420px;margin:0 auto;font-size:13px;padding:10px;line-height:20px;color:#ccc}.pswp__preloader{width:44px;height:44px;position:absolute;top:0;left:50%;margin-left:-22px;opacity:0;will-change:opacity;direction:ltr}.pswp__preloader__icn{width:20px;height:20px;margin:12px}@media screen and (max-width:1024px){.pswp__preloader{position:relative;left:auto;top:auto;margin:0;float:right}}.pswp__ui{-webkit-font-smoothing:auto;visibility:visible;opacity:1;z-index:1550}.pswp__top-bar{position:absolute;left:0;top:0;height:44px;width:100%}.pswp__caption,.pswp__top-bar{-webkit-backface-visibility:hidden;will-change:opacity}.pswp__caption,.pswp__top-bar{background-color:rgba(0,0,0,.5)}.pswp__ui--hidden .pswp__button--arrow--left,.pswp__ui--hidden .pswp__button--arrow--right,.pswp__ui--hidden .pswp__caption,.pswp__ui--hidden .pswp__top-bar{opacity:.001}.form-group{position:relative;display:flex;flex-wrap:wrap}.checkbox-full-width,.checkbox-label{display:inline-flex;width:auto;flex-wrap:nowrap;justify-content:flex-start;align-items:flex-start;padding-right:23px;margin-bottom:.5rem}.checkbox-full-width input[type=checkbox],.checkbox-label input[type=checkbox]{display:none}.checkbox-full-width input[type=checkbox]~.fakebox,.checkbox-label input[type=checkbox]~.fakebox{position:relative;display:inline-block;vertical-align:middle;margin-right:10px;width:15px;min-width:15px;height:15px;border:1px solid currentColor;background:0 0}.checkbox-full-width input[type=checkbox]~.fakebox:after,.checkbox-label input[type=checkbox]~.fakebox:after{content:'';position:absolute;color:currentColor;background:var(--primary-color);width:9px;height:9px;top:2px;left:2px;opacity:0;-webkit-transform:scale(0);-moz-transform:scale(0);-ms-transform:scale(0);-o-transform:scale(0);transform:scale(0)}.checkbox-full-width input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-full-width input[type=checkbox]~.fakebox+span,.checkbox-label input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-label input[type=checkbox]~.fakebox+span{display:inline-block;vertical-align:middle;line-height:1.2;margin-top:-.1em;word-break:break-word;font-size:14px}.checkbox-full-width.small-text input[type=checkbox]~.fakebox:after,.checkbox-label.small-text input[type=checkbox]~.fakebox:after{color:currentColor}.checkbox-full-width.small-text input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-full-width.small-text input[type=checkbox]~.fakebox+span,.checkbox-label.small-text input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-label.small-text input[type=checkbox]~.fakebox+span{font-size:13px;line-height:18px;margin-top:0;text-transform:none}.form-control,.sod_select,input.form-control,textarea.form-control{border:none;outline:0;box-shadow:none;border-radius:0;display:block;width:100%;height:34px;padding:0 15px;font-size:13px;color:var(--color);background-color:#fff;border-radius:7px;border:1px solid #fff;font-family:Asap;font-style:normal;font-weight:400;filter:none}.form-control:-webkit-autofill,.sod_select:-webkit-autofill,input.form-control:-webkit-autofill,textarea.form-control:-webkit-autofill{-webkit-text-fill-color:var(--color);-webkit-box-shadow:0 0 0 30px #fff inset}.sod_select .sod_label{text-transform:none;color:var(--color);font-size:13px}@media (min-width:992px){.form-control,.sod_select,input.form-control,textarea.form-control{font-size:16px}.sod_select .sod_label{font-size:16px}}textarea,textarea.form-control{height:105px;resize:none;padding:13px}.xr_error_tooltip{position:absolute;background:0 0;color:#ff174e;top:1px;right:1px;height:36px;width:28px;font-size:1.5em;text-align:center;line-height:36px;font-family:Asap;font-style:normal;font-weight:700}.sod_select{z-index:2}.sod_select:after,.sod_select:before{font-family:icomoon;speak:none;font-style:normal;font-weight:400;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:8px}.sod_select:after{display:block;color:currentColor;content:"\e906"}.sod_select:before{content:"\e905";display:none;color:var(--color)}.sod_select .sod_label{display:block;line-height:35px}.sod_select .sod_list_wrapper{width:100%;border:1px solid var(--color);box-sizing:content-box;background:var(--background-color)}.sod_select .sod_option{padding:8px 15px;font-size:12px;text-transform:none;color:var(--color);font-family:Asap;font-style:normal;font-weight:400}.sod_select .sod_option.active{background:#363636;color:#fff}label{display:block;width:100%}.xr_error{position:absolute;bottom:-17px;left:1px;font-size:.8em;color:red}.underline-form .form-control,.underline-form input.form-control{border-bottom:2px solid currentColor;border-right:0;border-left:0;border-top:0;background:0 0;color:var(--color)}.underline-form .form-control:-webkit-autofill,.underline-form input.form-control:-webkit-autofill{-webkit-text-fill-color:currentColor}.xs-shop-action-page-wrapper{max-width:500px;margin:0 auto;background:#fff;border-radius:5px;padding:25px 15px 15px;text-align:center;-webkit-box-shadow:0 4px 8px rgba(0,0,0,.2);-moz-box-shadow:0 4px 8px rgba(0,0,0,.2);box-shadow:0 4px 8px rgba(0,0,0,.2)}@media (min-width:768px){.checkbox-full-width input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-full-width input[type=checkbox]~.fakebox+span,.checkbox-label input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-label input[type=checkbox]~.fakebox+span{font-size:16px}.checkbox-full-width.small-text input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-full-width.small-text input[type=checkbox]~.fakebox+span,.checkbox-label.small-text input[type=checkbox]~.fakebox+.inner-checkbox,.checkbox-label.small-text input[type=checkbox]~.fakebox+span{font-size:14px;line-height:18px;margin-top:0}.xs-shop-action-page-wrapper{padding:30px 25px}}@media (min-width:992px){.xs-shop-action-page-wrapper{padding:70px 30px}}.xs-shop-warenkorb-feedback-holder .xs-shop-feedback-wrapper-info{background:var(--info);color:#fff}.xs-shop-warenkorb-feedback-holder .xs-shop-feedback-wrapper-success{background:var(--success);color:#fff}.xs-shop-warenkorb-feedback-holder .xs-shop-feedback-wrapper-error{background:var(--danger);color:#fff}[class*=" shopicon-"],[class^=shopicon-]{font-family:icomoon-shop!important;speak:none;font-style:normal;font-weight:400;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shopicon-bdce19a8c48f73e6f40cee79dfe7ff:before{content:"\e92f"}.shopicon-close:before{content:"\e90c"}.xs-shop-add-to-cart-feedback-outer{position:fixed;top:25%;right:0;z-index:15;width:260px;min-height:200px;background:url(//www.edelstoffe.at/xstorage/1/imported/wk_splash.svg) no-repeat #fff;background-size:80px auto;-webkit-transform:translate(105%,0);-moz-transform:translate(105%,0);-ms-transform:translate(105%,0);-o-transform:translate(105%,0);transform:translate(105%,0);-webkit-box-shadow:0 3px 6px rgba(0,0,0,.2);-moz-box-shadow:0 3px 6px rgba(0,0,0,.2);box-shadow:0 3px 6px rgba(0,0,0,.2);overflow:hidden}a{color:inherit;text-decoration:none}:focus{outline:rgba(0,0,0,0) auto 0!important}input::-webkit-inner-spin-button,input::-webkit-outer-spin-button{display:none;margin:0;-webkit-appearance:none}@media (min-width:1400px){.container{max-width:1340px}}@media (min-width:1600px){.container{max-width:1540px}}.ks-element{width:100%;padding-right:15px;padding-left:15px;margin-right:auto;margin-left:auto;margin-top:85px;margin-bottom:85px;max-width:none}@media (min-width:768px){.ks-element{margin-top:100px;margin-bottom:100px;max-width:740px}body{font-size:16px}}@media (min-width:992px){.ks-element{max-width:960px}.col-lg-12,.col-lg-6,.col-md-12,.col-md-6,.col-sm-12,.col-sm-6,.col-xs-12{position:relative;min-height:1px;padding-right:15px;padding-left:15px}}@media (min-width:1200px){.ks-element{margin-top:120px;margin-bottom:120px;max-width:1140px}}@media (min-width:1400px){.ks-element{max-width:1340px}}@media (min-width:1600px){.ks-element{max-width:1540px}}@media (max-width:991px){.col-lg-12,.col-lg-6,.col-md-12,.col-md-6,.col-sm-12,.col-sm-6,.col-xs-12{position:relative;min-height:1px;padding-left:15px;padding-right:15px}}.clearfix:after,.clearfix:before{content:"";display:block;line-height:0}.clearfix:after{clear:both}body,html{width:100%;height:100%}body{overflow-y:scroll;font-size:16px;background-color:var(--background-color);color:var(--color);line-height:1.8;font-family:Asap;font-style:normal;font-weight:400}@media (min-width:992px){body{font-size:16px}}::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#ccc}::-webkit-scrollbar-thumb:hover{background:#bbb}h1,h2,h3{font-family:Asap;font-style:normal;font-weight:700;line-height:1.2;margin:0 0 30px}h3+h1{margin-top:-15px}h1,h2{font-size:26px}@media (min-width:992px){h1,h2{font-size:30px}}@media (min-width:1200px){h1,h2{font-size:35px}.modal .modal-xl{max-width:1100px}}h3{font-family:Asap;font-style:normal;font-weight:500;font-size:18px}@media (min-width:768px){h3{font-size:22px}.btn{font-size:14px}}@media (min-width:1400px){h3{font-size:28px}}p{margin:0 0 15px;line-height:1.7;font-size:14px;font-family:Asap;font-style:normal;font-weight:400}@media (min-width:992px){p{font-size:14px}}:focus{outline:0!important;box-shadow:0 0 0 #fff!important}.btn{border:none;box-shadow:none;outline:0;-webkit-appearance:none;display:inline-block;font-size:14px;padding:0 15px;color:var(--background-color-reverse);background:0 0;border:1px solid var(--background-color-reverse);border-radius:5px;text-transform:uppercase;text-decoration:none!important;letter-spacing:.04em;padding:.3rem 1.2rem;font-family:Asap;font-style:normal;font-weight:500}.btn [class*=shopicon]{margin-right:10px}.btn.btn-primary{background-color:var(--accent-color);border-color:var(--accent-color);color:#fff;font-family:Asap;font-style:normal;font-weight:500}.btn.btn-secondary{background-color:transparent;color:var(--accent-color);border-color:var(--accent-color);font-family:Asap;font-style:normal;font-weight:500}.btn-link{color:var(--accent-color);font-family:Asap;font-style:normal;font-weight:500}.modal-content{background:#f8f8f7;border-radius:0;border:0}.overflow-fix{contain:paint;max-width:100%}.show-on-success{display:none;margin:15px 0}.contact-request{max-width:1000px}.close-modal{position:absolute;top:15px;right:15px;font-size:20px;display:block;padding:10px;line-height:1;background:rgba(255,255,255,.6);border-radius:5px;z-index:5}@media (max-width:1199px){.quickview-modal .modal-dialog{max-width:90%}}.header{position:fixed;top:0;left:0;right:0;height:auto;z-index:20;border:none;color:var(--header-color)}.header-not-transparent .header.header{color:var(--header-sticky-color);box-shadow:10px 10px 16px rgba(0,0,0,.07)}.header-not-transparent .header.header .mainNav{background-color:var(--header-sticky-background-color)}.header-not-transparent .header.header .logo svg{fill:var(--accent-color)}@media (min-width:768px){.header{height:auto}.header-not-transparent .header.header .logo svg{height:auto;width:205px}}.header .logo{padding:0}@media (min-width:1400px){p{font-size:16px}.header .logo{padding-top:10px}.header .logo{padding-right:15px;padding-bottom:10px}}.header .logo svg{height:auto;width:150px;display:block;fill:currentColor}@media (min-width:768px){.header .logo svg{height:auto;width:205px}}.header .mainNav{background:0 0;padding:8px 0}.header .mainNav .toggle-menu{padding:0;z-index:1;display:flex;align-items:center}.header .mainNav .toggle-menu .burger-custom{width:20px;height:20px;font-size:20px;margin:10px 0;position:relative}@media (max-width:767px){.header .mainNav .toggle-menu .burger-custom{font-size:28px;width:24px;height:25px}}.header .mainNav .toggle-menu .burger-custom .dot{position:absolute;left:calc(50% - .1em);top:calc(50% - .1em);width:.15em;height:.15em;border-radius:50%;background:currentColor}.header .mainNav .toggle-menu .burger-custom .dot:after,.header .mainNav .toggle-menu .burger-custom .dot:before{content:'';width:.15em;height:.15em;border-radius:50%;background:currentColor;display:block;position:absolute;left:0;top:0}@media (min-width:768px){.header .mainNav .toggle-menu .burger-custom{width:39px;height:39px;margin:0}.header .mainNav .toggle-menu .burger-custom .dot{width:.3em;height:.3em}.header .mainNav .toggle-menu .burger-custom .dot:after,.header .mainNav .toggle-menu .burger-custom .dot:before{width:.3em;height:.3em}}.header .mainNav .toggle-menu .burger-custom .dot:before{-webkit-transform:translateX(-230%) scale(1);-moz-transform:translateX(-230%) scale(1);-ms-transform:translateX(-230%) scale(1);-o-transform:translateX(-230%) scale(1);transform:translateX(-230%) scale(1)}.header .mainNav .toggle-menu .burger-custom .dot:after{-webkit-transform:translateX(230%) scale(1);-moz-transform:translateX(230%) scale(1);-ms-transform:translateX(230%) scale(1);-o-transform:translateX(230%) scale(1);transform:translateX(230%) scale(1)}.header .mainNav .toggle-menu .burger-custom .dot:nth-child(2){-webkit-transform:translateY(-230%) scale(1);-moz-transform:translateY(-230%) scale(1);-ms-transform:translateY(-230%) scale(1);-o-transform:translateY(-230%) scale(1);transform:translateY(-230%) scale(1)}.header .mainNav .toggle-menu .burger-custom .dot:nth-child(3){-webkit-transform:translateY(230%) scale(1);-moz-transform:translateY(230%) scale(1);-ms-transform:translateY(230%) scale(1);-o-transform:translateY(230%) scale(1);transform:translateY(230%) scale(1)}.header .mainNav .toggle-menu .close-text{font-size:15px;line-height:1;margin-right:12px}.header .mainNav .toggle-menu .close-text:before{content:'MENU'}.menu-mobile{background-image:url(/xstorage/1/imported/mainMenuBg.svg);background-position:center center;background-size:111% auto;background-repeat:no-repeat;padding:60px 25px 100px;overflow:auto;-webkit-overflow-scrolling:touch;display:none;position:absolute;top:0;right:-10px;border-radius:15px;height:calc(100 * var(--vh) - 40px);height:calc(100dvh - 40px);width:calc(100vw - 20px);z-index:0;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);background-color:rgba(255,255,255,.7);color:var(--color)}@media (min-width:768px){.menu-mobile{padding:100px 25px;width:415px;top:-12px;right:-15px}}@media (min-width:992px){.menu-mobile:after{font-family:Asap;font-style:normal;font-weight:700;position:fixed;bottom:100px;left:100px}}.menu-mobile .simplebar-content{height:100%}.menu-mobile .mainMenu{padding:0}.menu-mobile .mainMenu .nav-item{opacity:0;list-style:none;-webkit-transform:scale(.8);-moz-transform:scale(.8);-ms-transform:scale(.8);-o-transform:scale(.8);transform:scale(.8);font-family:Asap;font-style:normal;font-weight:500}.menu-mobile .mainMenu .nav-item>a{display:inline-block;color:var(--color);font-size:20px;line-height:1;padding:.7rem 1rem;white-space:nowrap;position:relative;border:1px solid transparent;border-radius:10px}@media (min-width:1200px){.header-not-transparent .header.header .logo svg{height:auto;width:250px}.header .logo svg{height:auto;width:250px}.menu-mobile .mainMenu .nav-item>a{font-size:30px}}.menu-mobile .mainMenu .submenu{border-left:1px solid var(--accent-color);margin-left:20px;padding-left:15px;color:var(--color);padding-block:7px 0;margin-bottom:20px}.menu-mobile .mainMenu .submenu-item{list-style-type:none;padding:7px 0;line-height:1.3}.menu-mobile .mainMenu .submenu-item>a{font-size:17px}.menu-mobile .menu-footer{position:absolute;bottom:35px;left:40px;right:40px}.xs-shop-search{display:none;position:fixed;right:0;bottom:0;left:0;background:#fff;z-index:9;top:var(--header-height)}.xs-shop-search.must-fade .searchfield-holder{opacity:0;-webkit-transform:translate(0,-100%);-moz-transform:translate(0,-100%);-ms-transform:translate(0,-100%);-o-transform:translate(0,-100%);transform:translate(0,-100%)}.xs-shop-search .inner{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto}.xs-shop-search .xs-shop-search-close{font-size:20px;position:absolute;top:10px;right:0;z-index:2}.xs-shop-search .searchfield-holder{position:relative;background:#f4f4f4;opacity:1;padding:30px 0}.xs-shop-search .searchfield-holder .xs-shop-search-form{max-width:830px;margin:0 auto;position:relative}@media (min-width:992px){.xs-shop-search .searchfield-holder{padding:110px 0 60px}.xs-shop-search .searchfield-holder .xs-shop-search-form{margin:30px auto 0}}.xs-shop-search h3{text-transform:none;letter-spacing:0}.xs-shop-search .xs-shop-search-results{opacity:0;margin-top:15px;height:calc(100vh - 100px);margin-right:-30px;padding-right:30px}.xs-shop-search-form.overlay .xs-shop-search-input{border-bottom:1px solid var(--color);font-size:30px;padding:0 15px;height:45px;color:var(--color)!important}.xs-shop-mini-cart .xs-shop-mini-cart-header{--color:var(--color-reverse);--background-color:var(--background-color-reverse)}.xs-shop-mini-cart{position:fixed;top:0;right:0;bottom:0;width:100%;min-width:280px;max-width:100%;background-color:var(--background-color);color:var(--color);z-index:500;opacity:0;-webkit-transform:translate(100%,0);-moz-transform:translate(100%,0);-ms-transform:translate(100%,0);-o-transform:translate(100%,0);transform:translate(100%,0)}.xs-shop-mini-cart .no-items{margin-bottom:30px}.xs-shop-mini-cart .xs-shop-mini-cart-header{background:var(--background-color);color:var(--color);position:relative;padding:7px 10px;text-align:center;font-size:18px}@media (min-width:768px){.xs-shop-search .xs-shop-search-results{margin-top:30px;height:calc(100vh - 220px)}.xs-shop-mini-cart{max-width:500px}.xs-shop-mini-cart .xs-shop-mini-cart-header{padding:30px 30px 10px}.xs-shop-mini-cart .xs-shop-mini-cart-header{font-size:22px}}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-anzahl{font-family:Montserrat,sans-serif;font-weight:700;font-style:normal;font-size:14px;letter-spacing:.12em}@media (min-width:992px){.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-anzahl{font-size:16px}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline.upper{padding-top:30px}}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-close{text-align:center;width:20px;height:20px;line-height:20px;font-size:20px}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline{line-height:1.1}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline.upper{position:relative}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline.lower{text-align:left}.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline-text{font-family:eloquent-jf-pro,serif;font-weight:400;font-style:normal;font-size:25px}.xs-shop-mini-cart .xs-shop-mini-cart-holder{padding:10px;background:url(//www.edelstoffe.at/xstorage/1/imported/wk_splash.svg) no-repeat;height:calc(100% - 61px);display:flex;flex-direction:column;overflow:hidden}@media (min-width:768px){.xs-shop-mini-cart .xs-shop-mini-cart-holder{padding:30px;height:calc(100% - 92px)}}@media (min-width:992px){.xs-shop-mini-cart .xs-shop-mini-cart-header .xs-shop-mini-cart-headline-text{font-size:34px}.xs-shop-mini-cart .xs-shop-mini-cart-holder{height:calc(100% - 102px)}}.xs-shop-mini-cart .xs-shop-mini-cart-content-holder{position:relative;flex:1 1 100%;overflow-y:auto;margin-right:-30px;padding-right:30px;margin-left:-30px;padding-left:30px}.xs-shop-mini-cart .xs-shop-mini-cart-content-holder .xs-shop-mini-cart-content{height:100%;overflow-y:visible}.xs-shop-mini-cart+.xs-shop-mini-cart-overlay{position:fixed;top:0;left:0;bottom:0;right:0;background:rgba(0,0,0,.85);z-index:499;opacity:0}[data-simplebar]{position:relative;flex-direction:column;flex-wrap:wrap;justify-content:flex-start;align-content:flex-start;align-items:flex-start}.simplebar-wrapper{overflow:hidden;width:inherit;height:inherit;max-width:inherit;max-height:inherit}.simplebar-mask{direction:inherit;position:absolute;overflow:hidden;padding:0;margin:0;left:0;top:0;bottom:0;right:0;width:auto!important;height:auto!important;z-index:0}.simplebar-offset{direction:inherit!important;box-sizing:inherit!important;resize:none!important;position:absolute;top:0;left:0;bottom:0;right:0;padding:0;margin:0;-webkit-overflow-scrolling:touch}.simplebar-content-wrapper{direction:inherit;box-sizing:border-box!important;position:relative;display:block;height:100%;width:auto;max-width:100%;max-height:100%;scrollbar-width:none;-ms-overflow-style:none}.simplebar-content-wrapper::-webkit-scrollbar{width:0;height:0}.simplebar-content:after,.simplebar-content:before{content:' ';display:table}.simplebar-placeholder{max-height:100%;max-width:100%;width:100%}.simplebar-height-auto-observer-wrapper{box-sizing:inherit!important;height:100%;width:100%;max-width:1px;position:relative;float:left;max-height:1px;overflow:hidden;z-index:-1;padding:0;margin:0;flex-grow:inherit;flex-shrink:0;flex-basis:0%}.simplebar-height-auto-observer{box-sizing:inherit;display:block;opacity:0;position:absolute;top:0;left:0;height:1000%;width:1000%;min-height:1px;min-width:1px;overflow:hidden;z-index:-1}.simplebar-track{z-index:1;position:absolute;right:0;bottom:0;overflow:hidden}.simplebar-scrollbar{position:absolute;left:0;right:0;min-height:10px}.simplebar-scrollbar:before{position:absolute;content:'';background:#000;border-radius:7px;left:2px;right:2px;opacity:0}.simplebar-track.simplebar-vertical{top:0;width:11px}.simplebar-track.simplebar-vertical .simplebar-scrollbar:before{top:2px;bottom:2px}.simplebar-track.simplebar-horizontal{left:0;height:11px}.simplebar-track.simplebar-horizontal .simplebar-scrollbar:before{height:100%;left:2px;right:2px}.simplebar-track.simplebar-horizontal .simplebar-scrollbar{right:auto;left:0;top:2px;height:7px;min-height:0;min-width:10px;width:auto}</style>
+            <script src="/xassets/core/js/libs/cookieconsent/cookieconsent.js"></script>
+        
+    <!-- XR-HEAD -->
+	<!--[if lt IE 11]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+
+<link rel="canonical" href="https://www.daxundpartner.at/de/seite-leider-nicht-gefunden-404.html">
+
+
+
+
+<!-- FAVICONS -->
+
+<link rel="icon" type="image/png" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_a761035452ceadc005622a82169a7c8a.jpg" sizes="196x196" />
+
+<link rel="icon" type="image/png" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_7e70489af2b179d1d8761d3340410fb8.jpg" sizes="96x96" />
+
+<link rel="icon" type="image/png" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_3e67daf2f89dbee5e812193faebba55c.jpg" sizes="32x32" />
+
+<link rel="icon" type="image/png" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_1c1a865a8ab3837928644ab89767caf5.jpg" sizes="16x16" />
+
+<link rel="icon" type="image/png" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_67df50ef099978182be0526aca88df70.jpg" sizes="128x128" />
+
+
+<link rel="apple-touch-icon-precomposed" sizes="57x57" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_9aaf6f0cb3ffcfaa8544f468f4e9e7c7.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_4308d922464dd1aa3861d24b06a2cca3.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_5c236ee5be43a7e33b506cd63bc6f835.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_bbe73a67d27112eb9d8416bd4ff95ec6.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="60x60" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_eefbf370d04854ee83e1ffbe0db686a4.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_e4bf53f22ee374e5904205782d569910.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="76x76" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_727e4299dfc94425ee6e4558fca8de23.jpg" />
+
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_f4c41eb59ce54179806c4cd5ea893c8a.jpg" />
+
+<meta name="application-name" content="Seite leider nicht gefunden - 404 - DAX Wutzhofer & Partner"/>
+<meta name="msapplication-TileColor" content="#FFFFFF" />
+
+<meta name="msapplication-TileImage" content="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_bbe73a67d27112eb9d8416bd4ff95ec6.jpg" />
+
+<meta name="msapplication-square70x70logo" content="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_e91cd679dad9fc322d2dce92247b8a3c.jpg" />
+
+<meta name="msapplication-square150x150logo" content="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_3ee8b24e1e4692a4fca9ffe5c123bd8d.jpg" />
+
+<meta name="msapplication-wide310x150logo" content="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_4f9ef04460b7029668ac6b96298d0ab8.jpg" />
+
+<meta name="msapplication-square310x310logo" content="https://www.daxundpartner.at/xstorage/1/_cache/favicon_dax_7480_1_68479cb4931aaf25949b52f54153cb50.jpg" />
+
+<!-- META -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seite leider nicht gefunden - 404 - DAX Wutzhofer & Partner</title>
+<meta name="description" content="Seite leider nicht gefunden - 404">
+<meta name="keywords" content="">
+<meta name="robots" content="index, follow">
+
+<!-- OG -->
+
+<meta property="og:type" content="Website">
+<meta property="og:url" content="https://www.daxundpartner.at/de/seite-leider-nicht-gefunden-404.html">
+<meta property="og:image" content="">
+<meta property="og:image:secure_url" content="">
+<meta property="og:title" content="">
+<meta property="og:description" content="">
+
+<!-- TWITTER -->
+	
+<meta name="twitter:title" content="">
+<meta name="twitter:description" content="">
+
+
+
+<!-- GEO -->
+<meta name="geo.region" content="AT-1">
+<meta name="geo.placename" content="Trausdorf an der Wulka">
+<meta name="geo.position" content="47.814583;16.548648">
+<meta name="ICBM" content="47.814583;16.548648">
+
+
+<script type="text/javascript">
+	top.P_LANG='DE';
+	document.P_LANG='DE';
+	document.P_ID ='46';
+	document.P_TITLE_SUFFIX ='DAX Wutzhofer &amp; Partner';
+	document.P_STATIC ='Y';
+	document.XR_EAS = {"GOOGLE_TAG_MANAGER_KEY":"GTM-WPBW8CZF","GOOGLE_ANALYTICS_KEY":"","GOOGLE_MAPS_KEY":"AIzaSyANnTz8dYfDGERDU3-mwn4OK7oP5aT3ZTs","GOOGLE_EEC":"","GOOGLE_RECAPTCHA_SITE_KEY":"6LeGYY8UAAAAAIAS36hByyBGpN6N1LZHpI3XLiBS","GOOGLE_WEBFONT_KEY":"AIzaSyCuHH49ipxF2PX6NYXb-I8tFLTwNRyQSOw"};
+	document.PROJECT = 1;
+	document.PROJECT_ID = 1;
+	document.O_ID = '0';
+	document.R_ID = '0';
+	document.IS_CMS = '';
+	</script>
+
+
+<!-- CCS VARIALBES -->
+<!-- IE11 POLYFILL -->
+<script>
+	window.MSInputMethodContext && document.documentMode && document.write('<script src="https://cdn.jsdelivr.net/gh/nuxodin/ie11CustomProperties@4.1.0/ie11CustomProperties.min.js"><\/script>');
+</script>
+<style>
+	:root{
+		--primary-color: #3E3E3E;
+		--neutral-color: #F4F4F4;
+		
+		--accent-color: #E64848;
+		--accent-color-reverse: #FFF;
+		
+		--dark: #3E3E3E;
+	    --dark-reverse: #E64848;
+	    --light: #F4F4F4;
+	    --light-reverse: #3E3E3E;
+	    
+	    --color: #3E3E3E;
+	    --color-reverse: #FFFFFF;
+	    --color-init: var(--color);
+	    
+	    --background-color: #F4F4F4;
+	    --background-color-reverse: #2B2B2B;
+	    --background-color-init: var(--background-color);
+	    
+	    --header-background-color: #FFFFFF;
+	    --header-sticky-background-color: #FFFFFF;
+	    --header-color: #FFFFFF;
+	    --header-sticky-color: #3E3E3E;
+	    
+	    --footer-background-color: #2B2B2B;
+	    --footer-color: #FFFFFF;
+	}
+</style>
+
+<!-- OLD BROWSER FALLBACK -->
+<script>
+   (function() {
+        var method;
+        var noop = function () {};
+        var methods = [
+            'assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error',
+            'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log',
+            'markTimeline', 'profile', 'profileEnd', 'table', 'time', 'timeEnd',
+            'timeStamp', 'trace', 'warn'
+        ];
+        var length = methods.length;
+        var console = (window.console = window.console || {});
+    
+        while (length--) {
+            method = methods[length];
+    
+            // Only stub undefined methods.
+            if (!console[method]) {
+                console[method] = noop;
+            }
+        }
+    }());
+</script>
+
+	<!-- /XR-HEAD -->
+	
+	<script>
+        var vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', vh+'px');
+	</script>
+	
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://use.typekit.net/jvb8ues.css">
+
+
+</head>
+
+
+     
+	<body class="lang-DE no-transition page-46 fe-body header-not-transparent">
+	    
+	    	        <script>
+	            document.xs_shop_registermodal_hidden = 1;
+	        </script>
+	    	    
+	    <!-- HEADER -->
+	    
+	    <!-- header_type -->
+	    
+		
+
+
+
+
+
+    
+
+
+
+<header class="header">
+    <div class="mainNav">
+        
+        <div class="container d-flex align-items-center justify-content-between">
+            
+            <a href="https://www.daxundpartner.at/de/rechtsanwaltskanzlei.html" class="logo float-left">
+                
+        		<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                	 viewBox="0 0 276.1 45" style="enable-background:new 0 0 276.1 45;" xml:space="preserve">
+                <g>
+                	<g>
+                		<path id="Pfad_135_00000150812512461456490840000006230255400148163762_" class="st0" d="M15.1,0.1H0.4C0.2,0.1,0,0.3,0,0.4v6.2
+                			l0,0v31.7l0,0v6.2C0,44.9,0.2,45,0.4,45h14.8c10.8,0,19.5-10.1,19.5-22.5S25.9,0.1,15.1,0.1 M6.6,7c0-0.2,0.2-0.4,0.4-0.4h8.2
+                			c7.2,0,13,7.1,13,15.9s-5.8,15.9-13,15.9H6.9c-0.2,0-0.4-0.2-0.4-0.4V7z"/>
+                		<path id="Pfad_136_00000065796970237702104490000010775928642604292276_" class="st0" d="M59,0h-6.5c-0.1,0-0.3,0.1-0.3,0.2
+                			L35.4,44.6c-0.1,0.2,0.1,0.5,0.3,0.5H42c0.1,0,0.3-0.1,0.3-0.2l4.2-11.3c0.1-0.1,0.2-0.2,0.3-0.2h18.4c0.1,0,0.3,0.1,0.3,0.2
+                			l4.6,11.2l0.1,0.2H77c0.3,0,0.4-0.3,0.3-0.5L59.1,0.2L59,0z M49.3,26.3l6.1-16c0.1-0.3,0.5-0.3,0.7,0l6.6,16
+                			c0.1,0.2-0.1,0.5-0.3,0.5H49.7C49.4,26.7,49.2,26.5,49.3,26.3z"/>
+                		<path id="Pfad_137_00000048474012049978139480000011188430744617936306_" class="st0" d="M96.9,22.1l13.6-21.6
+                			c0.1-0.2,0-0.5-0.3-0.5h-7c-0.1,0-0.2,0.1-0.3,0.2l-9.7,15.5c-0.1,0.2-0.5,0.2-0.6,0L82.8,0.2C82.7,0.1,82.6,0,82.5,0h-7
+                			c-0.3,0-0.4,0.3-0.3,0.5l13.6,21.6c0.1,0.1,0.1,0.3,0,0.4L76,42.8c0,0,0,0,0,0L74.4,45h7.8c0.1,0,0.2-0.1,0.3-0.2l10-15.9
+                			c0.1-0.2,0.5-0.2,0.6,0l10,15.9c0.1,0.1,0.2,0.2,0.3,0.2h7c0.3,0,0.4-0.3,0.3-0.5l-13.9-22C96.8,22.4,96.8,22.2,96.9,22.1z"/>
+                	</g>
+                	<g>
+                		<path class="st0" d="M133.1,4.5c-0.1-0.4-0.1-0.6-0.2-0.9c0-0.3-0.1-0.5-0.1-0.7h-0.1c0,0.2,0,0.4-0.1,0.7c0,0.2-0.1,0.5-0.2,0.9
+                			c-0.1,0.4-0.2,0.8-0.3,1.2L129,17.4c-0.1,0-0.3,0.1-0.4,0.1c-0.2,0-0.4,0-0.6,0c-0.2,0-0.4,0-0.6,0c-0.2,0-0.3-0.1-0.4-0.1
+                			l-4.7-16.4l0.2-0.1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.2,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0l0.2,0.1l3.4,11.8
+                			c0.1,0.4,0.2,0.7,0.3,1c0.1,0.3,0.1,0.6,0.2,0.9c0.1,0.3,0.1,0.5,0.2,0.8h0.1c0-0.3,0.1-0.5,0.1-0.8c0.1-0.5,0.2-1.1,0.4-1.8
+                			L132,1.1l0.2-0.1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.2,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0l0.2,0.1l3.3,11.8
+                			c0.1,0.4,0.2,0.7,0.2,1c0.1,0.3,0.1,0.6,0.1,0.9c0,0.3,0.1,0.5,0.1,0.8h0.1c0-0.2,0.1-0.5,0.1-0.8c0-0.2,0.1-0.5,0.2-0.8
+                			c0.1-0.3,0.2-0.7,0.3-1.1l3.4-11.8l0.2-0.1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.3,0l0.2,0.1
+                			l-4.6,16.4c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.4,0.1-0.7,0.1c-0.3,0-0.5,0-0.7-0.1c-0.1,0-0.2,0-0.3-0.1l-3.2-11.7
+                			C133.2,5.3,133.1,4.9,133.1,4.5z"/>
+                		<path class="st0" d="M157.8,14.6c-0.3,0.7-0.7,1.3-1.1,1.8c-0.5,0.5-1.1,0.9-1.8,1.1c-0.7,0.2-1.5,0.4-2.3,0.4
+                			c-0.8,0-1.6-0.1-2.3-0.4c-0.7-0.3-1.3-0.6-1.8-1.1c-0.5-0.5-0.9-1.1-1.1-1.8c-0.3-0.7-0.4-1.5-0.4-2.4V1.1l0.2-0.1
+                			c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.1,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0l0.2,0.1v11.3c0,1.2,0.3,2.2,1,2.9c0.7,0.7,1.7,1,2.9,1
+                			c1.2,0,2.2-0.3,2.9-1c0.7-0.7,1-1.7,1-2.9V1.1l0.2-0.1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.1,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0
+                			c0.1,0,0.2,0.1,0.2,0.1v11.1C158.2,13.1,158,13.9,157.8,14.6z"/>
+                		<path class="st0" d="M173,1.1l0,0.2c0,0.1,0,0.2,0,0.3c0,0.1,0,0.2,0,0.3c0,0.1,0,0.2,0,0.2l-0.1,0.2h-4.5v15
+                			c-0.1,0-0.2,0.1-0.2,0.1c-0.1,0-0.3,0.1-0.6,0.1c-0.3,0-0.5,0-0.6-0.1c-0.1,0-0.1,0-0.2-0.1v-15h-4.6c0-0.1-0.1-0.1-0.1-0.2
+                			c0-0.1-0.1-0.3-0.1-0.6c0-0.2,0-0.4,0.1-0.5c0-0.1,0-0.1,0.1-0.2h10.8C172.9,1,172.9,1.1,173,1.1z"/>
+                		<path class="st0" d="M186.9,1.2c0,0.1,0,0.3,0,0.4c0,0.2,0,0.3,0,0.5c0,0.1-0.1,0.2-0.1,0.3l-9.2,13.6h9.5c0,0.1,0.1,0.2,0.1,0.3
+                			c0,0.1,0,0.3,0,0.4c0,0.3,0,0.6-0.1,0.8h-11.4c0-0.1-0.1-0.2-0.1-0.3s0-0.3,0-0.5c0-0.2,0-0.3,0-0.4c0-0.1,0-0.2,0.1-0.3l9.1-13.6
+                			h-8.5c0-0.1-0.1-0.2-0.1-0.3c0-0.1,0-0.3,0-0.5c0-0.2,0-0.3,0-0.4c0-0.1,0-0.2,0.1-0.3h10.4C186.8,1,186.9,1.1,186.9,1.2z"/>
+                		<path class="st0" d="M191.7,1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.1,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0l0.2,0.1v15h7.2
+                			c0,0.1,0.1,0.2,0.1,0.3s0,0.3,0,0.4c0,0.2,0,0.3,0,0.4c0,0.1,0,0.2-0.1,0.3h-8.9V1.1L191.7,1z"/>
+                		<path class="st0" d="M214,1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0c0.1,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0.1,0.2,0.1v16.4
+                			c-0.1,0-0.1,0.1-0.2,0.1c-0.1,0-0.4,0.1-0.6,0.1c-0.3,0-0.5,0-0.7-0.1c-0.1,0-0.1,0-0.2-0.1V9.8H206v7.6c-0.1,0-0.2,0.1-0.2,0.1
+                			c-0.1,0-0.3,0.1-0.6,0.1c-0.3,0-0.5,0-0.7-0.1c-0.1,0-0.1,0-0.2-0.1V1.1l0.2-0.1c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0,0.4,0
+                			c0.1,0,0.3,0,0.4,0c0.1,0,0.2,0,0.3,0c0.1,0,0.2,0.1,0.2,0.1v7.2h7.8V1.1L214,1z"/>
+                		<path class="st0" d="M220.7,5.4c0.3-1.1,0.7-2,1.3-2.7c0.5-0.7,1.2-1.2,2-1.5c0.8-0.3,1.7-0.5,2.7-0.5s1.9,0.2,2.7,0.5
+                			c0.8,0.3,1.5,0.8,2,1.5c0.5,0.7,1,1.6,1.3,2.7c0.3,1.1,0.4,2.4,0.4,3.9c0,1.5-0.1,2.8-0.4,3.9c-0.3,1.1-0.7,2-1.3,2.7
+                			c-0.5,0.7-1.2,1.2-2,1.5c-0.8,0.3-1.7,0.5-2.7,0.5s-1.9-0.2-2.7-0.5c-0.8-0.3-1.5-0.8-2-1.5c-0.5-0.7-1-1.6-1.3-2.7
+                			c-0.3-1.1-0.4-2.4-0.4-3.9C220.2,7.8,220.4,6.5,220.7,5.4z M230.8,5.9c-0.2-0.9-0.5-1.6-0.9-2.2c-0.4-0.6-0.9-1-1.4-1.2
+                			s-1.2-0.4-1.9-0.4c-0.7,0-1.3,0.1-1.9,0.4s-1,0.6-1.4,1.2c-0.4,0.6-0.7,1.3-0.9,2.2c-0.2,0.9-0.3,2-0.3,3.4s0.1,2.5,0.3,3.4
+                			c0.2,0.9,0.5,1.6,0.9,2.2c0.4,0.6,0.9,1,1.4,1.2c0.6,0.2,1.2,0.4,1.9,0.4c0.7,0,1.3-0.1,1.9-0.4c0.6-0.2,1-0.6,1.4-1.2
+                			c0.4-0.6,0.7-1.3,0.9-2.2c0.2-0.9,0.3-2,0.3-3.4S231,6.8,230.8,5.9z"/>
+                		<path class="st0" d="M239.1,17.5c-0.1,0-0.4,0.1-0.6,0.1c-0.3,0-0.5,0-0.6-0.1c-0.1,0-0.1,0-0.2-0.1V0.9h9.1
+                			c0,0.1,0.1,0.2,0.1,0.3c0,0.1,0,0.3,0,0.4c0,0.2,0,0.3,0,0.4c0,0.1-0.1,0.2-0.1,0.3h-7.4v6.3h6.5c0,0.1,0.1,0.2,0.1,0.3
+                			c0,0.1,0,0.3,0,0.4c0,0.2,0,0.3,0,0.4c0,0.1-0.1,0.2-0.1,0.3h-6.5v7.3C239.3,17.5,239.2,17.5,239.1,17.5z"/>
+                		<path class="st0" d="M260.3,1.6c0,0.3,0,0.5-0.1,0.7h-7.5v6.1h6.3c0.1,0.2,0.1,0.4,0.1,0.7c0,0.3,0,0.5-0.1,0.7h-6.3v6.3h7.7
+                			c0.1,0.2,0.1,0.4,0.1,0.7c0,0.3,0,0.5-0.1,0.7h-9.4V0.9h9.2C260.2,1.2,260.3,1.4,260.3,1.6z"/>
+                		<path class="st0" d="M272.5,1.3c0.6,0.2,1.1,0.5,1.5,1s0.7,0.9,0.9,1.5c0.2,0.6,0.3,1.2,0.3,1.9c0,1.2-0.3,2.2-0.9,3
+                			c-0.6,0.8-1.4,1.3-2.5,1.6l4,7.2c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.4,0.1-0.7,0.1c-0.3,0-0.6,0-0.7-0.1c-0.1,0-0.2,0-0.3-0.1
+                			l-3.9-7h-3.6v7c-0.1,0-0.1,0.1-0.2,0.1c-0.1,0-0.3,0.1-0.6,0.1c-0.3,0-0.5,0-0.7-0.1c-0.1,0-0.1,0-0.2-0.1V0.9h5.7
+                			C271.3,0.9,271.9,1.1,272.5,1.3z M270.4,9c1,0,1.8-0.3,2.3-0.9c0.6-0.6,0.8-1.4,0.8-2.4c0-1-0.3-1.8-0.8-2.4s-1.3-0.9-2.3-0.9
+                			h-3.9V9H270.4z"/>
+                		<path class="st0" d="M135.2,41.6c-0.3,0.8-0.7,1.4-1.2,1.9c-0.5,0.5-1.2,0.9-1.9,1.2c-0.7,0.3-1.6,0.4-2.5,0.4
+                			c-0.9,0-1.7-0.1-2.5-0.4c-0.7-0.3-1.4-0.7-1.9-1.2c-0.5-0.5-0.9-1.2-1.2-1.9c-0.3-0.8-0.4-1.6-0.4-2.6V27.8c0.1,0,0.2,0,0.3-0.1
+                			c0.1,0,0.2-0.1,0.4-0.1c0.1,0,0.3,0,0.5,0c0.2,0,0.4,0,0.5,0c0.1,0,0.3,0,0.4,0.1c0.1,0,0.2,0.1,0.3,0.1v11.6c0,1.1,0.3,2,1,2.7
+                			c0.6,0.6,1.5,1,2.7,1c1.2,0,2-0.3,2.7-1s0.9-1.5,0.9-2.7V27.8l0.3-0.1c0.1,0,0.2-0.1,0.4-0.1s0.3,0,0.5,0c0.2,0,0.4,0,0.5,0
+                			c0.2,0,0.3,0,0.4,0.1c0.1,0,0.2,0.1,0.3,0.1V39C135.7,40,135.5,40.8,135.2,41.6z"/>
+                		<path class="st0" d="M142.8,32.7c-0.2-0.4-0.3-0.7-0.4-1c-0.1-0.3-0.3-0.7-0.4-1h-0.1c0,0.3,0,0.7,0.1,1.1c0,0.3,0.1,0.8,0.1,1.3
+                			c0,0.5,0,1,0,1.6v9.9c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.7,0-0.8-0.1c-0.1,0-0.2-0.1-0.3-0.1V27.8l0.4-0.1
+                			c0.1,0,0.3-0.1,0.5-0.1s0.4,0,0.6,0c0.2,0,0.4,0,0.6,0c0.2,0,0.3,0,0.5,0.1l0.4,0.1l5.9,10.7c0.2,0.4,0.4,0.8,0.6,1.2
+                			c0.2,0.4,0.3,0.7,0.5,1c0.2,0.3,0.3,0.7,0.4,1h0.1c0-0.4-0.1-0.8-0.1-1.2c0-0.7-0.1-1.7-0.1-2.8v-9.9l0.3-0.1
+                			c0.1,0,0.2-0.1,0.3-0.1s0.3,0,0.5,0c0.2,0,0.4,0,0.5,0c0.1,0,0.3,0,0.3,0.1c0.1,0,0.2,0.1,0.3,0.1v16.8c-0.1,0-0.2,0.1-0.4,0.1
+                			c-0.2,0-0.6,0.1-1,0.1c-0.5,0-0.9,0-1.1-0.1c-0.1,0-0.3-0.1-0.4-0.1l-6-10.8C143.1,33.4,142.9,33,142.8,32.7z"/>
+                		<path class="st0" d="M164.7,28.1c0.9,0.3,1.6,0.8,2.2,1.5c0.6,0.7,1.1,1.6,1.4,2.7c0.3,1.1,0.5,2.4,0.5,4c0,1.6-0.2,2.9-0.5,4
+                			s-0.8,2-1.4,2.7c-0.6,0.7-1.3,1.2-2.2,1.5c-0.9,0.3-1.9,0.5-3,0.5h-5.3V27.6h5.3C162.8,27.6,163.8,27.8,164.7,28.1z M163.5,42.5
+                			c0.6-0.2,1-0.5,1.4-1c0.4-0.5,0.7-1.2,0.9-2c0.2-0.8,0.3-1.9,0.3-3.3c0-1.3-0.1-2.4-0.3-3.3s-0.5-1.5-0.9-2
+                			c-0.4-0.5-0.9-0.8-1.4-1c-0.6-0.2-1.2-0.3-1.9-0.3h-2.7v13.1h2.7C162.3,42.8,162.9,42.7,163.5,42.5z"/>
+                		<path class="st0" d="M179.7,44.7c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.8,0-1-0.1c-0.1,0-0.2-0.1-0.3-0.1v-17h6.2
+                			c0.8,0,1.5,0.1,2.1,0.4c0.6,0.3,1.2,0.6,1.6,1.1c0.4,0.5,0.8,1,1,1.7c0.2,0.6,0.4,1.4,0.4,2.1s-0.1,1.5-0.4,2.1
+                			c-0.2,0.6-0.6,1.2-1,1.6c-0.4,0.5-1,0.8-1.6,1.1c-0.6,0.3-1.3,0.4-2.1,0.4h-3.8v6.5C180,44.7,179.9,44.7,179.7,44.7z M185.7,35.2
+                			c0.5-0.6,0.7-1.3,0.7-2.3c0-1-0.2-1.8-0.7-2.4c-0.5-0.6-1.2-0.8-2.2-0.8h-3.5v6.4h3.5C184.5,36.1,185.2,35.8,185.7,35.2z"/>
+                		<path class="st0" d="M195.4,27.7c0.1,0,0.3-0.1,0.4-0.1s0.4,0,0.6,0c0.2,0,0.4,0,0.6,0c0.2,0,0.3,0,0.5,0.1c0.1,0,0.3,0.1,0.4,0.1
+                			l6,16.8c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-1,0.1c-0.4,0-0.7,0-0.9-0.1c-0.1,0-0.2-0.1-0.3-0.1l-1.5-4.2h-7.1l-1.5,4.2
+                			c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.6,0-0.8-0.1c-0.1,0-0.2-0.1-0.3-0.1l6-16.8
+                			C195.1,27.8,195.2,27.8,195.4,27.7z M196.1,30.9c0,0.2-0.1,0.4-0.2,0.7c-0.1,0.3-0.2,0.5-0.3,0.8l-2.2,6h5.7l-2.2-6
+                			c-0.1-0.3-0.2-0.6-0.3-0.9c-0.1-0.3-0.1-0.5-0.2-0.7c-0.1-0.2-0.1-0.4-0.1-0.6h-0.1C196.2,30.5,196.2,30.7,196.1,30.9z"/>
+                		<path class="st0" d="M214.5,28c0.6,0.2,1.2,0.6,1.6,1c0.4,0.4,0.8,1,1,1.6c0.2,0.6,0.4,1.3,0.4,2c0,1.2-0.3,2.2-0.9,3
+                			c-0.6,0.8-1.4,1.4-2.5,1.7l4.1,7.2c-0.1,0-0.2,0.1-0.4,0.1c-0.2,0-0.6,0.1-1.1,0.1c-0.4,0-0.8,0-1-0.1c-0.1,0-0.3-0.1-0.4-0.1
+                			l-4-7h-2.8v7c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.8,0-1-0.1c-0.1,0-0.2-0.1-0.3-0.1v-17h6.1
+                			C213.2,27.6,213.9,27.8,214.5,28z M212.1,35.7c0.9,0,1.7-0.3,2.2-0.8c0.5-0.5,0.8-1.3,0.8-2.2c0-1-0.3-1.7-0.8-2.2
+                			s-1.2-0.8-2.2-0.8h-3.4v6H212.1z"/>
+                		<path class="st0" d="M231.4,27.9c0,0.1,0.1,0.2,0.1,0.3c0,0.1,0,0.3,0,0.4c0,0.2,0,0.3,0,0.4c0,0.1,0,0.2-0.1,0.3
+                			c0,0.1-0.1,0.2-0.1,0.3h-4.4v14.9c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.7,0-0.9-0.1c-0.1,0-0.2-0.1-0.3-0.1
+                			V29.7h-4.5c0-0.1-0.1-0.2-0.1-0.3c0-0.1-0.1-0.2-0.1-0.3c0-0.1,0-0.3,0-0.4c0-0.1,0-0.3,0-0.4c0-0.1,0-0.2,0.1-0.3
+                			c0-0.1,0.1-0.2,0.1-0.3h11.4C231.3,27.7,231.4,27.8,231.4,27.9z"/>
+                		<path class="st0" d="M237.2,32.7c-0.2-0.4-0.3-0.7-0.4-1c-0.1-0.3-0.3-0.7-0.4-1h-0.1c0,0.3,0,0.7,0.1,1.1c0,0.3,0.1,0.8,0.1,1.3
+                			c0,0.5,0,1,0,1.6v9.9c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.7,0-0.8-0.1c-0.1,0-0.2-0.1-0.3-0.1V27.8l0.4-0.1
+                			c0.1,0,0.3-0.1,0.5-0.1s0.4,0,0.6,0c0.2,0,0.4,0,0.6,0c0.2,0,0.3,0,0.5,0.1l0.4,0.1l5.9,10.7c0.2,0.4,0.4,0.8,0.6,1.2
+                			c0.2,0.4,0.3,0.7,0.5,1c0.2,0.3,0.3,0.7,0.4,1h0.1c0-0.4-0.1-0.8-0.1-1.2c0-0.7-0.1-1.7-0.1-2.8v-9.9l0.3-0.1
+                			c0.1,0,0.2-0.1,0.3-0.1s0.3,0,0.5,0c0.2,0,0.4,0,0.5,0c0.1,0,0.3,0,0.3,0.1c0.1,0,0.2,0.1,0.3,0.1v16.8c-0.1,0-0.2,0.1-0.4,0.1
+                			c-0.2,0-0.6,0.1-1,0.1c-0.5,0-0.9,0-1.1-0.1c-0.1,0-0.3-0.1-0.4-0.1l-6-10.8C237.6,33.4,237.4,33,237.2,32.7z"/>
+                		<path class="st0" d="M260.7,28.1c0,0.2,0.1,0.3,0.1,0.5c0,0.4-0.1,0.7-0.2,1h-7.2v5.5h6.1c0,0.1,0.1,0.3,0.1,0.5
+                			c0,0.2,0.1,0.3,0.1,0.5c0,0.3-0.1,0.7-0.2,1h-6.1v5.7h7.5c0,0.2,0.1,0.3,0.1,0.5c0,0.2,0.1,0.3,0.1,0.5c0,0.3-0.1,0.7-0.2,1h-9.9
+                			V27.6h9.7C260.6,27.8,260.7,27.9,260.7,28.1z"/>
+                		<path class="st0" d="M272.4,28c0.6,0.2,1.2,0.6,1.6,1c0.4,0.4,0.8,1,1,1.6c0.2,0.6,0.4,1.3,0.4,2c0,1.2-0.3,2.2-0.9,3
+                			c-0.6,0.8-1.4,1.4-2.5,1.7l4.1,7.2c-0.1,0-0.2,0.1-0.4,0.1c-0.2,0-0.6,0.1-1.1,0.1c-0.4,0-0.8,0-1-0.1c-0.1,0-0.3-0.1-0.4-0.1
+                			l-4-7h-2.8v7c-0.1,0-0.2,0.1-0.3,0.1c-0.2,0-0.5,0.1-0.9,0.1c-0.4,0-0.8,0-1-0.1c-0.1,0-0.2-0.1-0.3-0.1v-17h6.1
+                			C271,27.6,271.7,27.8,272.4,28z M269.9,35.7c0.9,0,1.7-0.3,2.2-0.8c0.5-0.5,0.8-1.3,0.8-2.2c0-1-0.3-1.7-0.8-2.2
+                			c-0.5-0.5-1.2-0.8-2.2-0.8h-3.4v6H269.9z"/>
+                	</g>
+                </g>
+                </svg>
+
+
+            </a>
+            
+            <div class="hamburger-wrapper d-block ">
+                <div class="position-relative">
+                    
+    				
+    				
+    				<span class="toggle-menu js-open-mobile-menu position-relative" title="Menü zeigen">
+					    <span class="close-text"></span>
+					    
+    					<div class="burger-custom" title="Menü zeigen">
+    					    <span class="ring"></span>
+    					    <span class="dot"></span>
+    					    <span class="dot"></span>
+    					    <span class="dot"></span>
+    					</div>
+    				</span>
+    				
+    				<!-- MOBILE MENU -->
+                    
+<div class="menu-mobile js-mobile-menu text-white" id="mainmenu">
+	<div class="d-flex h-100 align-items-center justify-content-center simplebarinit">
+		<ul class="mainMenu">
+		    
+		    		        <li class="nav-item  ">
+		            
+									        <a href="https://www.daxundpartner.at/de/die-kanzlei.html" title="Die Kanzlei" class="nav-link" role="button" aria-expanded="false">Die Kanzlei</a>
+										
+				</li>
+            		        <li class="nav-item  ">
+		            
+										    <a href="#submenu-1174" title="Portfolio" data-toggle="collapse" aria-expanded="false">Portfolio</a>
+					    
+					    <div class="collapse submenu-collapse" id="submenu-1174">
+    					    <ul class="submenu">
+    					        <li class="submenu-item">
+    					            <a href="https://www.daxundpartner.at/de/portfolio.html">UNSERE LEISTUNGEN</a>
+    					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/1/arbeits-und-sozialrecht.html">ARBEITS- UND SOZIALRECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/2/allgemeines-zivilrecht.html">ALLGEMEINES ZIVILRECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/7/bau-immobilien-und-liegenschaftsrecht.html">BAU-, IMMOBILIEN- UND LIEGENSCHAFTSRECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/11/familien-und-erbrecht.html">FAMILIEN- UND ERBRECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/12/gesellschaftsrecht-/mergers-acquisitions.html">GESELLSCHAFTSRECHT / MERGERS & ACQUISITIONS</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/8/insolvenzrecht-und-restrutkurierungen.html">INSOLVENZRECHT UND RESTRUTKURIERUNGEN</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/13/strafrecht.html">STRAFRECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/3/banken-/finanzierungen.html">BANKEN / FINANZIERUNGEN</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/4/oeffentliches-wirtschafts-recht-/regulatory.html">ÖFFENTLICHES (WIRTSCHAFTS-)RECHT / REGULATORY</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/5/unlauterer-wettbewerb-und-geistiges-eigentum-/datenschutz.html">UNLAUTERER WETTBEWERB UND GEISTIGES EIGENTUM / DATENSCHUTZ</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/6/wettbewerbs-und-vergaberecht.html">WETTBEWERBS- UND VERGABERECHT</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/10/prozessfuehrung-/alternative-streitbeilegung.html">PROZESSFÜHRUNG / ALTERNATIVE STREITBEILEGUNG</a>
+        					        </li>
+            					        					        <li class="submenu-item">
+        					            <a href="https://www.daxundpartner.at/de/portfolio/detail/9/vortraege;-seminare-und-schulungen.html">VORTRÄGE; SEMINARE UND SCHULUNGEN</a>
+        					        </li>
+            					
+    					    </ul>
+					    </div>
+				    					
+				</li>
+            		        <li class="nav-item  ">
+		            
+									        <a href="https://www.daxundpartner.at/de/unser-team.html" title="Unser Team" class="nav-link" role="button" aria-expanded="false">Unser Team</a>
+										
+				</li>
+            		        <li class="nav-item  ">
+		            
+									        <a href="https://www.daxundpartner.at/de/standorte.html" title="Standorte" class="nav-link" role="button" aria-expanded="false">Standorte</a>
+										
+				</li>
+            		        <li class="nav-item  ">
+		            
+									        <a href="https://www.daxundpartner.at/de/karriere.html" title="Karriere" class="nav-link" role="button" aria-expanded="false">Karriere</a>
+										
+				</li>
+            
+		    
+		</ul>
+	</div>
+	
+	<div class="menu-footer">
+	    <div class="row align-items-end">
+	        <div class="col-6">
+	            <a class="btn-link" href="#" data-toggle="modal" data-target=".datenschutz-modal-lg">Datenschutz</a>
+	            <a class="btn-link" href="#" data-toggle="modal" data-target=".impressum-modal-lg">Impressum</a>
+	        </div>
+	        <div class="col-6 text-right">
+	            <a href="https://www.daxundpartner.at/de/standorte.html" class="btn btn-primary"><span class="shopicon-bdce19a8c48f73e6f40cee79dfe7ff"></span>Kontakt</a>
+	        </div>
+	    </div>
+	</div>
+	
+</div>
+
+
+    			</div>
+            </div>
+        </div>
+    </div>
+    <xr-mam class="js-xs-mam-placement js-xs-mam-placement-5 xs-mam-placement" style="display: none;"  data-id="5" /></xr-mam>
+</header>
+
+<!-- SITESEARCH -->
+
+<section class="xs-shop-search  js-sitesearch must-fade">
+    <div class="inner">
+        <div class="searchfield-holder">
+            <div class="container">
+                <h2>Suche...</h2>
+                
+                <form class="js-sitesearch-form xs-shop-search-form underline-form overlay">
+                    
+                    <div class="js-close-sitesearch xs-shop-search-close">
+                        <span class="shopicon-close"></span>
+                    </div>
+                    
+                    <div class="d-flex">
+                        <input type="text" class="form-control xs-shop-search-input js-sitesearchinput" />
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="xs-shop-search-results js-sitesearch-results">
+                    <h3>Kategorien</h3>
+    <ul class="nav nav-pills" id="myTab" role="tablist">
+        
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        
+    </div>
+
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+		
+		<!-- CONTACT FLAPPY -->
+	    
+	    
+	    <div class="overflow-fix">
+	        <!-- CONTENT -->
+		     <section class="error-page ks-element">
+    <div class="xs-shop-action-page-wrapper">
+        <h3>Seite leider nicht gefunden</h3>
+        <h1>Error 404</h1>
+        
+        <a href="https://www.daxundpartner.at/de/rechtsanwaltskanzlei.html" class="btn btn-primary">
+            Zurück zur Startseite
+        </a>
+    </div>
+</section>
+		    
+    		<!-- FOOTER -->
+    		
+
+<section class="contact-request ks-element">
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h2>Wir sind der<br/> starke Partner<br/> für Ihre Anliegen.</h2>
+            <p>Wir freuen uns auf Ihre unverbindliche Anfrage!</p>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <form class="xr_form  " data-o_id="384"   data-form-id='203' data-hash='b00a076a9e0fb290c4089a0a97724964' data-pre-action='' data-action="js" data-js="fe_content.handleFormSuccess" data-js-abort="" data-url="" data-method="POST" data-security="default">
+    
+	<div class="row ">
+<div class=" col-12 col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="form-group">
+	    <label for="xr_form_1_field_4404" class="hidden d-none">Anrede</label>
+	    <select id="xr_form_1_field_4404" name="ANREDE" class="" data-onchange="" data-onchange-value="" data-onchange-class="" data-required="">
+	    		        	        <option value="M">Herr</option>
+	        	        <option value="W">Frau</option>
+	        	        <option value="F">Familie</option>
+	        	        <option value="C">Firma</option>
+	        	        <option value="D">Divers</option>
+	        	        <option value="X">Unbekannt</option>
+	        
+	    </select>
+	    <div class="clearfix"></div>
+                	<div class="xr_required_ANREDE required_Y xr_error_tooltip xr_error_tooltip_sod" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+        	
+	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="form-group">
+	    <label for="xr_form_1_field_4407" class="hidden d-none">Vorname*</label>
+	    <input id="xr_form_1_field_4407"  type="text" name="VORNAME" value="" placeholder="Vorname*" class="form-control " data-required="Y">
+	    
+	    	    <div class="xr_required_VORNAME required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+	    <div  class="xr_required_VORNAME required_EMAIL xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte tragen Sie eine E-Mail Adresse ein">!</div>
+	    <div  class="xr_required_VORNAME required_EMAIL_UNIQUE required_USERNAME_UNIQUE xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Diese E-Mail Adresse ist bereits in Verwendung">!</div>
+	    <div  class="xr_required_VORNAME required_VAT xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte gültige UID eingeben">!</div>
+	    <div class="xr_required_VORNAME required_NUMERIC xr_error" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte numerischen Wert eingeben">!</div>
+	    <div class="xr_required_VORNAME required_CUSTOM_MSG xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="">!</div>
+	    	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="form-group">
+	    <label for="xr_form_1_field_4406" class="hidden d-none">Nachname*</label>
+	    <input id="xr_form_1_field_4406"  type="text" name="NACHNAME" value="" placeholder="Nachname*" class="form-control " data-required="Y">
+	    
+	    	    <div class="xr_required_NACHNAME required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+	    <div  class="xr_required_NACHNAME required_EMAIL xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte tragen Sie eine E-Mail Adresse ein">!</div>
+	    <div  class="xr_required_NACHNAME required_EMAIL_UNIQUE required_USERNAME_UNIQUE xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Diese E-Mail Adresse ist bereits in Verwendung">!</div>
+	    <div  class="xr_required_NACHNAME required_VAT xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte gültige UID eingeben">!</div>
+	    <div class="xr_required_NACHNAME required_NUMERIC xr_error" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte numerischen Wert eingeben">!</div>
+	    <div class="xr_required_NACHNAME required_CUSTOM_MSG xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="">!</div>
+	    	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="form-group">
+	    <label for="xr_form_1_field_3325" class="hidden d-none">Email*</label>
+	    <input id="xr_form_1_field_3325"  type="text" name="EMAIL" value="" placeholder="Email*" class="form-control " data-required="EMAIL">
+	    
+	    	    <div class="xr_required_EMAIL required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+	    <div  class="xr_required_EMAIL required_EMAIL xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte tragen Sie eine E-Mail Adresse ein">!</div>
+	    <div  class="xr_required_EMAIL required_EMAIL_UNIQUE required_USERNAME_UNIQUE xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Diese E-Mail Adresse ist bereits in Verwendung">!</div>
+	    <div  class="xr_required_EMAIL required_VAT xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte gültige UID eingeben">!</div>
+	    <div class="xr_required_EMAIL required_NUMERIC xr_error" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte numerischen Wert eingeben">!</div>
+	    <div class="xr_required_EMAIL required_CUSTOM_MSG xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="">!</div>
+	    	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="form-group">
+	    <label for="xr_form_1_field_4415" class="hidden d-none">Telefon</label>
+	    <input id="xr_form_1_field_4415"  type="text" name="TEL" value="" placeholder="Telefon" class="form-control " data-required="">
+	    
+	    	    <div class="xr_required_TEL required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+	    <div  class="xr_required_TEL required_EMAIL xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte tragen Sie eine E-Mail Adresse ein">!</div>
+	    <div  class="xr_required_TEL required_EMAIL_UNIQUE required_USERNAME_UNIQUE xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Diese E-Mail Adresse ist bereits in Verwendung">!</div>
+	    <div  class="xr_required_TEL required_VAT xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte gültige UID eingeben">!</div>
+	    <div class="xr_required_TEL required_NUMERIC xr_error" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte numerischen Wert eingeben">!</div>
+	    <div class="xr_required_TEL required_CUSTOM_MSG xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="">!</div>
+	    	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<div class="form-group">
+	    <label for="xr_form_1_field_4408" class="hidden d-none">Nachricht</label>
+	    <textarea id="xr_form_1_field_4408" name="NACHRICHT" placeholder="Nachricht" class="form-control " data-required=""></textarea>
+	    
+	    	    <div class="xr_required_NACHRICHT required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+	    <div  class="xr_required_NACHRICHT required_EMAIL xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte tragen Sie eine E-Mail Adresse ein">!</div>
+	    <div  class="xr_required_NACHRICHT required_EMAIL_UNIQUE required_USERNAME_UNIQUE xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Diese E-Mail Adresse ist bereits in Verwendung">!</div>
+	    <div  class="xr_required_NACHRICHT required_VAT xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="Bitte gültige UID eingeben">!</div>
+	    <div class="xr_required_NACHRICHT required_NUMERIC xr_error" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte numerischen Wert eingeben">!</div>
+	    <div class="xr_required_NACHRICHT required_CUSTOM_MSG xr_error_tooltip" style="display:none;" data-toggle="tooltip" data-placement="left" title="">!</div>
+	    	</div>
+</div>
+<div class=" col-12 col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<div class="form-group">
+		<label class="small-text checkbox-full-width checkbox-label" for="xr_form_1_field_4409">
+			<input data-onchange="" data-onchange-value="" data-onchange-class="" id="xr_form_1_field_4409" type="checkbox" name="dsgvo_accepted" value="Y"  data-required="Y">
+			<div class="fakebox"></div>
+			<span class="inner-checkbox inner-text">Ich erkl&auml;re mich damit einverstanden, dass die von mir angegebenen personenbezogenen Daten automationsunterst&uuml;tzt verarbeitet werden und akzeptiere die&nbsp;<a href="#" data-toggle="modal" data-target=".datenschutz-modal-lg">Datenschutzbedingungen</a>.</span>
+		</label>
+        <div class="clearfix"></div>
+                	<div class="xr_required_dsgvo_accepted required_Y xr_error_tooltip" style="display: none;" data-toggle="tooltip" data-placement="left" title="Bitte füllen Sie dieses Feld aus">!</div>
+        		
+	</div>
+</div>
+
+</div>
+	
+		
+	
+
+	<div class="required_GENERIC_MSG_MSG xr_error" style="display:none;">Leider ist ein Fehler aufgetreten</div>
+	
+						<div class="xr_form_pflichtinfo">mit * gekennzeichnete Felder sind Pflichtfelder</div>
+				
+				<div class="xr_form_submit_container">
+						<button type="submit" class="xr_form_submit  btn btn-secondary float-right" data-btn-text="Anfrage senden" data-load-text="Anfrage senden">Anfrage senden</button>
+		</div>
+			</form>
+            <div class="show-on-success text-center" style="display:none">
+                <h3>Vielen Dank für Ihre Nachricht. Wir bemühen uns, diese so rasch als möglich zu beantworten.</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="footerWrapper position-relative">
+    <div class="upper">
+        
+        <div class="row no-gutters">
+            <div class="col-12">
+                <div class="left">
+                    <div class="inner">
+                        <h2>Karriere bei uns.</h2>
+                        <p>
+                            Bei Dax, Wutzlhofer und Partner steht das persönliche Engagement für die Interessen unserer MandantInnen im Vordergrund. Mit diesem Ziel vor Augen, suchen wir für unsere Standorte im Burgenland, Wien und der Steiermark engagierte MitarbeiterInnen.
+                        </p>
+                        <a href="https://www.daxundpartner.at/de/karriere/offene-stellen.html" class="btn btn-secondary colors-reverse">mehr erfahren</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <div class="middle">
+        <div class="container">
+            <div class="logo-section">
+            	<div class="row">
+            	    <div class="col-xs-12 col-sm-6 col-md-4">
+            	        <div class="company-name">
+            	            DAX WUTZLHOFER UND PARTNER<br/>
+            	            RECHTSANWÄLTE GMBH
+            	        </div>
+            	    </div>
+            	    <div class="col-xs-12 col-sm-6 col-md-4 text-sm-center">
+            	        <img  class="logo lazyload"  src=""  width="276"  height="45"  alt=""  lazy="1"  data-src="https://www.daxundpartner.at/xstorage/1/_cache/Logo_Dax_7600_1_3e10537c13eec3d10c892c9b4c6e0d18.svg"  />
+            	    </div>
+            	</div>
+                
+            </div>
+        	
+        	<div class="contact-section">
+        	    
+
+                                    <div class="single-contact">
+                        <h3>Wien</h3>
+                        <p>Zaunergasse 4-6, 8. OG<br/>A-1030 Wien</p>
+                        <p><a  href="tel:+4359004300">+43&nbsp;5&nbsp;9004 - 300</a></p>
+                        <p><a href="mailto:wien@daxundpartner.at">wien@daxundpartner.at</a></p>
+                    </div>
+                                    <div class="single-contact">
+                        <h3>Oberwart</h3>
+                        <p>Wienerstraße 8A<br/>A-7400 Oberwart</p>
+                        <p><a  href="tel:+4359004400">+43&nbsp;5&nbsp;9004 - 400</a></p>
+                        <p><a href="mailto:oberwart@daxundpartner.at">oberwart@daxundpartner.at</a></p>
+                    </div>
+                                    <div class="single-contact">
+                        <h3>Eisenstadt</h3>
+                        <p>Ruster Straße  75/3.OG<br/>A-7000 Eisenstadt</p>
+                        <p><a  href="tel:+4359004200">+43&nbsp;5&nbsp;9004 - 200</a></p>
+                        <p><a href="mailto:eisenstadt@daxundpartner.at">eisenstadt@daxundpartner.at</a></p>
+                    </div>
+                                    <div class="single-contact">
+                        <h3>Graz</h3>
+                        <p>Mariahilferstraße 20/2/10<br/>A-8020 Graz</p>
+                        <p><a  href="tel:+4359004500">+43&nbsp;5&nbsp;9004 - 500</a></p>
+                        <p><a href="mailto:graz@daxundpartner.at">graz@daxundpartner.at</a></p>
+                    </div>
+                                    <div class="single-contact">
+                        <h3>Güssing</h3>
+                        <p>Badstraße 12<br/>A-7540 Güssing</p>
+                        <p><a  href="tel:+4359004600">+43&nbsp;5&nbsp;9004 - 600</a></p>
+                        <p><a href="mailto:guessing@daxundpartner.at">guessing@daxundpartner.at</a></p>
+                    </div>
+                
+        	</div>
+        </div>
+    </div>
+    
+    <div class="lower">
+        
+		<ul class="footerMenu list-unstyled list-inline" id="footerMenu">
+		    <li class="list-inline-item">
+                <a href="https://www.daxundpartner.at/de/standorte.html" title="Kontakt">Kontakt</a>
+            </li>
+		    <li class="list-inline-item">
+                <a href="#" data-toggle="modal" data-target=".datenschutz-modal-lg">Datenschutz</a>
+            </li>
+		    <li class="list-inline-item">
+                <a href="#" data-toggle="modal" data-target=".impressum-modal-lg">Impressum</a>
+            </li>
+            <li class="list-inline-item">
+                <a href="#" onclick="cookieconsent.cc_settings(); return false;">Cookie-Einstellungen</a>
+            </li>
+            
+		</ul>
+    </div>
+</div>
+
+
+
+
+<!-- LOGOLEISTE -->
+
+
+
+	    </div>
+		
+		<!-- MODALS -->
+		<!-- Quickview -->
+<div class="modal fade quickview-modal" tabindex="-1" role="dialog" aria-labelledby="QuickviewModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-3">
+            <span class="shopicon-close close-modal" data-dismiss="modal"></span>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Impressum modal -->
+<div class="modal fade impressum-modal-lg" tabindex="-1" role="dialog" aria-labelledby="ImpressumModal" aria-hidden="true" data-xs-meta-page="xs_defaults_page_impressum">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-3">
+            <span class="shopicon-close close-modal" data-dismiss="modal"></span>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datenschutz modal -->
+<div class="modal fade datenschutz-modal-lg" tabindex="-1" role="dialog" aria-labelledby="DatenschutzModal" aria-hidden="true" data-xs-meta-page="xs_defaults_page_datenschutz">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-3">
+            <span class="shopicon-close close-modal" data-dismiss="modal"></span>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AGB modal -->
+<div class="modal fade agb-modal-lg" tabindex="-1" role="dialog" aria-labelledby="AGBModal" aria-hidden="true" data-xs-meta-page="xs_defaults_page_agb">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-3">
+            <span class="shopicon-close close-modal" data-dismiss="modal"></span>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lieferung & Versand modal -->
+<div class="modal fade lieferung-versand-modal-lg" tabindex="-1" role="dialog" aria-labelledby="LieferungVersandModal" aria-hidden="true" data-xs-meta-page="xs_defaults_page_lieferung_zahlung">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-3">
+            <span class="shopicon-close close-modal" data-dismiss="modal"></span>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<xr-mam class="js-xs-mam-placement js-xs-mam-placement-9 xs-mam-placement" style="display: none;"  data-id="9" /></xr-mam>
+
+<xr-mam class="js-xs-mam-placement js-xs-mam-placement-10 xs-mam-placement" style="display: none;"  data-id="10" /></xr-mam>
+
+
+
+
+
+
+
+		
+		<!-- PHOTOSWIPE -->
+		<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+		
+	    <!-- JS ATOM -->
+		
+
+
+
+<script>
+    class mamElement extends HTMLElement {
+        constructor() {
+            super();
+        }
+        connectedCallback() {
+            try {
+                xs_mam.updateStatic();
+            } catch (err) {
+                //console.log(err); 
+            }
+        }
+    }
+    customElements.define("xr-mam", mamElement);
+    
+    
+    
+    
+    class Swipe {
+        constructor(options) {
+            
+            if(options === undefined) return false;
+            var _options = options;
+            
+            this.xDown = null;
+            this.yDown = null;
+            this.element = typeof(_options.element) === 'string' ? document.querySelector(_options.element) : _options.element;
+            this.delta = typeof(_options.delta) === 'number' ? _options.delta : 0;
+            
+            if(this.element == null) return false;
+            
+            this.element.addEventListener('touchstart', function(e) {
+                this.xDown = e.touches[0].clientX;
+                this.yDown = e.touches[0].clientY;
+            }.bind(this), false);
+            
+            this.element.addEventListener('touchend', function(e) {
+                this.xDown = null;
+                this.yDown = null;
+            }.bind(this), false);
+        }
+    
+        onLeft(callback) {
+            if(callback == undefined) return false;
+            this.onLeft = callback;
+    
+            return this;
+        }
+    
+        onRight(callback) {
+            if(callback == undefined) return false;
+            this.onRight = callback;
+    
+            return this;
+        }
+    
+        onUp(callback) {
+            if(callback == undefined) return false;
+            this.onUp = callback;
+    
+            return this;
+        }
+    
+        onDown(callback) {
+            if(callback == undefined) return false;
+            this.onDown = callback;
+    
+            return this;
+        }
+        
+        resetStartpoints(){
+            this.xDown = null;
+            this.yDown = null;
+        }
+    
+        handleTouchMove(e) {
+            if ( ! this.xDown || ! this.yDown ) {
+                return;
+            }
+            
+            if(e.target.classList.value.indexOf('ui-slider-handle') > -1){
+                return false;
+            }
+            
+            var xUp = e.touches[0].clientX;
+            var yUp = e.touches[0].clientY;
+    
+            this.xDiff = this.xDown - xUp;
+            this.yDiff = this.yDown - yUp;
+        
+            if ( Math.abs( this.xDiff ) > Math.abs( this.yDiff ) ) {
+                
+                if ( this.xDiff > this.delta ) {
+                    this.onLeft();
+                    this.resetStartpoints();
+                } else if( this.xDiff < -this.delta ){
+                    this.onRight();
+                    this.resetStartpoints();
+                }
+            } else {
+                if ( this.yDiff > 0 ) {
+                    //this.onUp();
+                    //this.resetStartpoints();
+                } else {
+                    //this.onDown();
+                    //this.resetStartpoints();
+                }
+            }
+        }
+    
+        run() {
+            if(this.element == null) return false;
+            this.element.addEventListener('touchmove', function(e) {
+                this.handleTouchMove(e);
+            }.bind(this), false);
+        }
+    }
+</script>
+		
+		<!-- MINI CART -->
+	    
+<aside class="xs-shop-warenkorb xs-shop-mini-cart js-xs-shop-mini-cart js-xs-shop-flappy " data-target-flappy="wk">
+    
+    <header class="xs-shop-mini-cart-header d-flex align-items-center justify-content-between">
+        
+        <div class="xs-shop-mini-cart-headline lower">
+            <span class="xs-shop-mini-cart-headline-icon -shopicon-shop2">
+                <span class="xs-shop-mini-cart-anzahl js-xs-shop-cart-count-wrapper"></span>
+                <span class="xs-shop-mini-cart-anzahl">
+                    Artikel
+                </span>
+            </span>
+            <br>
+            <span class="xs-shop-mini-cart-headline-text">
+                Warenkorb
+            </span>
+        </div>
+        <div class="xs-shop-mini-cart-headline upper">
+            <span class="xs-shop-mini-cart-close js-close-wk-flappy shopicon-close"></span>
+        </div>
+    </header>
+    
+    
+
+
+
+
+
+<div class="xs-shop-mini-cart-holder js-xs-shop-mini-cart-wrapper" data-mask>
+    
+    <div class="xs-shop-warenkorb-feedback-holder ">
+        <div class="xs-shop-feedback-wrapper-info js-xs-shop-feedback-wrapper-info">
+            
+        </div>
+        <div class="xs-shop-feedback-wrapper-success js-xs-shop-feedback-wrapper-success">
+            
+        </div>
+        <div class="xs-shop-feedback-wrapper-error js-xs-shop-feedback-wrapper-error">
+            
+        </div>
+    </div>  
+    
+    <div class="xs-shop-mini-cart-content-holder">
+        <div class="xs-shop-mini-cart-content">
+                            <div class="no-items">
+                    <p>
+                        Sie haben noch keine Produkte zu Ihrem Warenkorb hinzugefügt!
+                    </p>
+                    <a href="" class="btn btn-primary">zum shop</a>
+                </div>
+                        
+            
+            
+            
+        </div>
+    </div>
+    </div>
+
+    
+</aside>
+<div class="xs-shop-mini-cart-overlay js-close-wk-flappy"></div>
+
+<div class="xs-shop-add-to-cart-feedback-outer js-xs-shop-add-to-cart-feedback"></div>
+
+	    
+	    
+	    
+	    <!-- SCROLL TO TOP ARROW -->
+	    
+	    
+	    <!-- SHOP SEARCH OVERLAY -->
+	    
+	    
+	    
+	    
+	    
+	            
+        <script>!function(e){"use strict"
+            var n=function(n,t,o){function i(e){return f.body?e():void setTimeout(function(){i(e)})}var d,r,a,l,f=e.document,s=f.createElement("link"),u=o||"all"
+                return t?d=t:(r=(f.body||f.getElementsByTagName("head")[0]).childNodes,d=r[r.length-1]),a=f.styleSheets,s.rel="stylesheet",s.href=n,s.media="only x",i(function(){d.parentNode.insertBefore(s,t?d:d.nextSibling)}),l=function(e){for(var n=s.href,t=a.length;t--;)if(a[t].href===n)return e()
+                setTimeout(function(){l(e)})},s.addEventListener&&s.addEventListener("load",function(){this.media=u}),s.onloadcssdefined=l,l(function(){s.media!==u&&(s.media=u)}),s}
+                "undefined"!=typeof exports?exports.xr_loadCSS=n:e.xr_loadCSS=n}("undefined"!=typeof global?global:this)
+                function onloadXrLoadedCSS( xr_loadedCSS, callback ){var called;function newcb(){if( !called && callback ){called = true;callback.call( xr_loadedCSS );}}	if( xr_loadedCSS.addEventListener ){xr_loadedCSS.addEventListener( "load", newcb );}if( xr_loadedCSS.attachEvent ){xr_loadedCSS.attachEvent( "onload", newcb );}if( "isApplicationInstalled" in navigator && "onloadcxr_loadedCSSdefined" in xr_loadedCSS ) {xr_loadedCSS.onloadcxr_loadedCSSdefined( newcb );}}</script>
+<script>setTimeout(function(){var xr_loadedCSS = xr_loadCSS("https://www.daxundpartner.at/xassets/static/5.css?ts=797038567a67849b2edf9875668ee550");onloadXrLoadedCSS( xr_loadedCSS, function(){if (typeof initAfterCompressedCSSLoad === "function"){initAfterCompressedCSSLoad();}});},100);</script>
+        
+        <!-- ASSETS:JS -->        
+<script>(function( w ){
+    	var xr_loadJS = function( src, cb ){
+    		"use strict";
+    		var ref = w.document.getElementsByTagName( "script" )[ 0 ];
+    		var script = w.document.createElement( "script" );
+    		script.src = src;
+    		script.async = true;
+    		ref.parentNode.insertBefore( script, ref );
+    		if (cb && typeof(cb) === "function") {
+    			script.onload = cb;
+    		}
+    		return script;
+    	};
+    	// commonjs
+    	if( typeof module !== "undefined" ){
+    		module.exports = xr_loadJS;
+    	}
+    	else {
+    		w.xr_loadJS = xr_loadJS;
+    	}
+    }( typeof global !== "undefined" ? global : this ));</script>
+    <script>xr_loadJS("https://www.daxundpartner.at/xassets/static/1.js?ts=c4f4ca90c8cf8cc3be16c2b579697922",function() {if (typeof initAfterCompressedLoad === "function"){initAfterCompressedLoad();}});</script>
+        
+        
+        
+    </body>
+</html>

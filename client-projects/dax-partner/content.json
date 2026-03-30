@@ -1,0 +1,170 @@
+{
+  "site": {
+    "name": "Dax, Wutzlhofer und Partner",
+    "tagline": "Recht. Vertrauen. Lösungen.",
+    "description": "Dax, Wutzlhofer und Partner Rechtsanwälte GmbH – Ihre Anwaltskanzlei mit Standorten in Wien, Oberwart, Eisenstadt, Graz und Güssing.",
+    "url": "https://www.daxundpartner.at",
+    "lang": "de",
+    "locale": "de_AT"
+  },
+  "meta": {
+    "title": "Dax, Wutzlhofer & Partner | Rechtsanwälte – Wien, Oberwart, Eisenstadt, Graz, Güssing",
+    "description": "Umfassende Rechtsberatung für Unternehmen und Privatpersonen. Wettbewerbs-, Arbeits-, Familien-, Gesellschafts- und Strafrecht. 5 Standorte in Österreich.",
+    "ogImage": "/images/hero.jpg",
+    "canonical": "https://www.daxundpartner.at"
+  },
+  "variant": "D",
+  "hero": {
+    "headline": "Recht braucht\nstarke Partner.",
+    "subheadline": "Dax, Wutzlhofer und Partner – Ihre Anwaltskanzlei für Recht, Vertrauen und maßgeschneiderte Lösungen. Standorte in Wien, Oberwart, Eisenstadt, Graz und Güssing.",
+    "cta": {
+      "primary":   { "text": "Unverbindlich anfragen",  "href": "#kontakt" },
+      "secondary": { "text": "+43 5 9004 - 300",        "href": "tel:+43590040300" }
+    },
+    "slides": [
+      { "src": "/images/hero.jpg",   "alt": "Kanzlei Dax, Wutzlhofer und Partner" },
+      { "src": "/images/buero1.jpg", "alt": "Büro der Kanzlei" },
+      { "src": "/images/buero2.jpg", "alt": "Besprechungsraum" }
+    ]
+  },
+  "leistungen": {
+    "headline": "Unsere Rechtsgebiete",
+    "subheadline": "Jahrelange Erfahrung, hochqualifizierte AnwältInnen und umfassende juristische Expertise für Unternehmen und Privatpersonen.",
+    "items": [
+      {
+        "image": "/images/buero1.jpg",
+        "title": "Wettbewerbs- & Vergaberecht",
+        "text": "Von der Vorbereitung von Ausschreibungen bis zur Vertretung in Vergabeverfahren. Wir begleiten Sie im gesamten Wettbewerbs- und Vergabeprozess."
+      },
+      {
+        "image": "/images/buero2.jpg",
+        "title": "Arbeits- & Sozialrecht",
+        "text": "Beratung von ArbeitgeberInnen sowie Vertretung von ArbeitnehmerInnen. Wir kennen beide Seiten und finden die beste Lösung für Ihre Situation."
+      },
+      {
+        "image": "/images/buero3.jpg",
+        "title": "Familien- & Erbrecht",
+        "text": "Im Bereich Familien- und Erbrecht stehen wir Ihnen mit großem Erfahrungsschatz zur Seite – einfühlsam, diskret und zielorientiert."
+      },
+      {
+        "image": "/images/buero4.jpg",
+        "title": "Gesellschaftsrecht / M&A",
+        "text": "Beratung und Betreuung in Angelegenheiten rund um Unternehmens- und Gesellschaftsrecht, Fusionen und Akquisitionen."
+      },
+      {
+        "image": "/images/person2.jpg",
+        "title": "Bau-, Immobilien- & Liegenschaftsrecht",
+        "text": "Umfassende Beratung in sämtlichen Aspekten des Bau- und Immobilienrechts – für Bauträger, Eigentümer und Investoren."
+      },
+      {
+        "image": "/images/person3.jpg",
+        "title": "Prozessführung & Strafrecht",
+        "text": "Von Zivilprozessen über wettbewerbsrechtliche Klagen bis zu strafrechtlicher Vertretung – wir setzen Ihre Rechte konsequent durch."
+      }
+    ]
+  },
+  "about": {
+    "headline": "Wir sind Ihr starker Partner für Ihre Anliegen.",
+    "text": "Bei Dax, Wutzlhofer und Partner steht das persönliche Engagement für das Recht und die Interessen unserer MandantInnen im Vordergrund. Ihr Erfolg ist unser Ziel. Umfangreiche juristische Expertise, jahrelange Erfahrung und ein Team aus hochqualifizierten AnwältInnen ermöglichen es uns, Sie in vielfältigen juristischen Angelegenheiten kompetent und effektiv zu beraten. Seit vielen Jahren sind wir der vertrauenswürdige Partner von Unternehmen und Privatpersonen.",
+    "highlights": [
+      "5 Standorte in Österreich",
+      "Erfahrenes Team hochqualifizierter AnwältInnen",
+      "Persönliche Beratung – wir nehmen uns Zeit für Sie",
+      "Unternehmen & Privatpersonen"
+    ]
+  },
+  "testimonials": {
+    "headline": "Was unsere MandantInnen sagen",
+    "items": [
+      {
+        "name": "Unternehmer aus dem Burgenland",
+        "text": "Kompetente, schnelle und persönliche Beratung. Das Team von Dax & Partner hat uns in einem komplexen Vergabeverfahren hervorragend vertreten."
+      },
+      {
+        "name": "Privatperson, Wien",
+        "text": "Im Erbrechtsverfahren wurde ich von Anfang an professionell begleitet. Die Kanzlei war immer erreichbar und hat alles verständlich erklärt."
+      },
+      {
+        "name": "GmbH-Geschäftsführer, Graz",
+        "text": "Besonders schätze ich die klare Kommunikation und die lösungsorientierte Herangehensweise. Hier wird man nicht mit Juristendeutsch überfordert."
+      }
+    ]
+  },
+  "gallery": {
+    "headline": "Unsere Kanzlei",
+    "images": [
+      { "src": "/images/buero1.jpg",  "alt": "Besprechungsraum",       "caption": "Moderne Besprechungsräume" },
+      { "src": "/images/buero2.jpg",  "alt": "Kanzleibüro",            "caption": "Professionelles Arbeitsumfeld" },
+      { "src": "/images/buero3.jpg",  "alt": "Bürobereich",            "caption": "Vertrauliche Beratung" },
+      { "src": "/images/buero4.jpg",  "alt": "Empfang",                "caption": "Persönlicher Empfang" },
+      { "src": "/images/person2.jpg", "alt": "Rechtsanwältin",         "caption": "Unser Team" },
+      { "src": "/images/person3.jpg", "alt": "Rechtsanwalt",           "caption": "Erfahrene ExpertInnen" }
+    ]
+  },
+  "faq": {
+    "headline": "Häufig gestellte Fragen",
+    "items": [
+      {
+        "q": "Wie vereinbare ich einen Beratungstermin?",
+        "a": "Nutzen Sie unser Kontaktformular, rufen Sie uns an oder schreiben Sie eine E-Mail an den gewünschten Standort. Wir melden uns innerhalb eines Werktages."
+      },
+      {
+        "q": "In welchen Rechtsgebieten sind Sie tätig?",
+        "a": "Wir decken ein breites Spektrum ab: Wettbewerbs- und Vergaberecht, Arbeitsrecht, Familienrecht, Erbrecht, Gesellschaftsrecht, Bau- und Immobilienrecht, Strafrecht, Insolvenzrecht und mehr."
+      },
+      {
+        "q": "An welchen Standorten sind Sie vertreten?",
+        "a": "Wir haben Büros in Wien (1030), Oberwart (7400), Eisenstadt (7000), Graz (8020) und Güssing (7540). Termine sind in allen Standorten möglich."
+      },
+      {
+        "q": "Vertreten Sie sowohl Unternehmen als auch Privatpersonen?",
+        "a": "Ja – wir beraten und vertreten sowohl Unternehmen jeder Größe als auch Privatpersonen in allen juristischen Angelegenheiten."
+      },
+      {
+        "q": "Bieten Sie auch Schulungen und Seminare an?",
+        "a": "Ja, unsere ExpertInnen stehen Ihnen gerne für Inhouse-Seminare sowie betriebliche Schulungen und Vorträge zu verschiedenen Rechtsthemen zur Verfügung."
+      },
+      {
+        "q": "Wie läuft eine erste Beratung ab?",
+        "a": "In einem ersten unverbindlichen Gespräch nehmen wir uns Zeit für Ihr Anliegen, analysieren Ihre Situation und erläutern mögliche Handlungsoptionen – klar und verständlich."
+      }
+    ]
+  },
+  "contact": {
+    "headline": "Kontakt aufnehmen",
+    "subheadline": "Wir freuen uns auf Ihre unverbindliche Anfrage. Wir nehmen uns Zeit für Sie.",
+    "phone": "+43 5 9004 - 300",
+    "email": "wien@daxundpartner.at",
+    "address": "Zaunergasse 4-6, 8. OG, 1030 Wien",
+    "hours": [
+      { "label": "Mo – Fr", "time": "08:00 – 17:00" },
+      { "label": "Sa – So", "time": "Geschlossen" }
+    ],
+    "formPlaceholder": {
+      "name":    "Ihr Name",
+      "email":   "Ihre E-Mail-Adresse",
+      "message": "Beschreiben Sie kurz Ihr rechtliches Anliegen...",
+      "submit":  "Anfrage senden"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 Dax, Wutzlhofer und Partner Rechtsanwälte GmbH",
+    "links": [
+      { "text": "Impressum",   "href": "#impressum" },
+      { "text": "Datenschutz", "href": "#datenschutz" }
+    ],
+    "social": []
+  },
+  "impressum": {
+    "title": "Impressum",
+    "lines": [
+      "Dax, Wutzlhofer und Partner Rechtsanwälte GmbH",
+      "Zaunergasse 4-6, 8. OG, A-1030 Wien",
+      "Tel: +43 5 9004 - 300",
+      "E-Mail: wien@daxundpartner.at",
+      "Rechtsform: GmbH",
+      "Mitglied der Rechtsanwaltskammer",
+      "Berufsrecht: Rechtsanwaltsordnung (RAO) – www.ris.bka.gv.at"
+    ]
+  }
+}
