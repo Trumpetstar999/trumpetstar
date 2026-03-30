@@ -114,11 +114,11 @@
   },
 
   "lastWeeklyCheck": {
-    "kw": 13,
-    "date": "2026-03-23",
-    "commit": "37dd59a",
-    "go_no_go": "GO",
-    "p0": 0, "p1": 0, "p2": 1, "p3": 3
+    "kw": 14,
+    "date": "2026-03-30",
+    "commit": "fc4d955e",
+    "go_no_go": "CONDITIONAL GO",
+    "p0": 0, "p1": 1, "p2": 3, "p3": 10
   },
 
   "knownOpenIssues": [
@@ -169,8 +169,10 @@
       "title": "email_log RLS TO public — anon-User können alle E-Mail-Logs lesen (Empfänger, Betreff)",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open",
-      "openedAt": "2026-03-09"
+      "status": "closed",
+      "closedAt": "2026-03-23",
+      "closedBy": "commit-1050144",
+      "fix": "Migration 20260323074000: SELECT policy → admin-only"
     },
     {
       "id": "TS-QA-EMAIL-003",
@@ -238,11 +240,77 @@
     },
     {
       "id": "TS-QA-KW13-PERF-003",
-      "title": "toni-coach.png (873KB) + trumpetstar-logo.png (555KB) + app-screenshot.png (567KB) optimierbar",
+      "title": "trumpetstar-app-screenshot.png (567KB) noch nicht optimiert",
       "severity": "Low",
       "priority": "P3",
       "status": "open",
       "openedAt": "2026-03-23"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-001",
+      "title": "send-email Edge Function: keine Caller-Authentifizierung – Spam/Abuse-Risiko",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-002",
+      "title": "elevenlabs-tts + elevenlabs-stt: keine Auth – API-Cost-Abuse-Risiko",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-003",
+      "title": "vimeo-sync: keine Caller-Authentifizierung",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-004",
+      "title": "WP_OAUTH_CLIENT_ID hardcoded in Sourcecode – sollte in Env-Variable",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-PERF-001",
+      "title": "Asset-Fix unvollständig: .jpg erstellt aber alle refs zeigten noch auf .png",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "closed",
+      "closedAt": "2026-03-30",
+      "closedBy": "seppl-checker-weekly-2026-14",
+      "fix": "11 Dateien .png→.jpg refs aktualisiert (commit fc4d955e)"
+    },
+    {
+      "id": "TS-QA-KW14-PERF-002",
+      "title": "logo-trumpetstar-game.png (556KB) kein JPEG/WebP, referenziert in GameHUD.tsx",
+      "severity": "Medium",
+      "priority": "P2",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-PERF-003",
+      "title": "Orphan PNGs: toni-coach.png (876KB) + trumpetstar-logo.png (556KB) nicht mehr referenziert",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW14-PERF-004",
+      "title": "app-preview.png (252KB) + trumpetstar-lernwelt.jpg (300KB) über 200KB-Schwellwert",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-03-30"
     }
   ]
 }
