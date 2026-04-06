@@ -1,0 +1,76 @@
+{
+  "date": "2026-04-06",
+  "kw": "KW15",
+  "env": "prod",
+  "go_no_go": "GO",
+  "git_head_pre": "32916cd0",
+  "git_head_post": "67594634",
+  "p0_count": 0,
+  "p1_count": 1,
+  "p2_count": 0,
+  "p3_count": 7,
+  "top_risks": [
+    "TS-QA-EMAIL-001: Cross-Project Tracking Pixel-Projekt ≠ Log-Projekt (P1, open)",
+    "TS-QA-KW14-SEC-003: vimeo-sync ohne Caller-Auth (P3, open)",
+    "TS-QA-DB-001: agent_log anon INSERT ohne RLS Policy (P3, open)"
+  ],
+  "next_steps": [
+    "Architektur-Entscheidung TS-QA-EMAIL-001: Cross-Project Pixel-Tracking Lösung definieren",
+    "KW16: vimeo-sync JWT Caller-Auth implementieren (analog send-email)",
+    "KW16: WP_OAUTH_CLIENT_ID aus Env-Variable lesen statt hardcoded",
+    "KW16: trumpetstar-lernwelt.jpg auf < 200KB komprimieren",
+    "KW16: Retest 401-Responses auf send-email + elevenlabs ohne Auth"
+  ],
+  "fixesApplied": [
+    {
+      "commit": "267458d1",
+      "issue": "TS-QA-KW14-SEC-001 + TS-QA-KW14-SEC-002",
+      "description": "JWT Caller-Auth implementiert in send-email, elevenlabs-tts, elevenlabs-stt",
+      "severity": "P2",
+      "type": "security"
+    },
+    {
+      "commit": "d6d5d9f4",
+      "issue": "TS-QA-KW14-PERF-002",
+      "description": "logo-trumpetstar-game.png (567KB) zu JPEG (173KB) konvertiert, GameHUD.tsx updated, PNG gelöscht",
+      "severity": "P2",
+      "type": "performance"
+    },
+    {
+      "commit": "89b44f65",
+      "issue": "TS-QA-KW14-PERF-003 + TS-QA-KW13-PERF-003",
+      "description": "Orphan PNGs gelöscht: toni-coach.png (893KB) + trumpetstar-app-screenshot.png (580KB)",
+      "severity": "P3",
+      "type": "performance"
+    },
+    {
+      "commit": "432f1c19",
+      "issue": "TS-QA-KW15-PERF-001 (new – missed KW14 fix)",
+      "description": "trumpetstar-logo.png Ref in ResetPasswordPage.tsx → .jpg updated, PNG (567KB) gelöscht",
+      "severity": "P3",
+      "type": "performance"
+    },
+    {
+      "commit": "67594634",
+      "issue": "TS-QA-KW14-PERF-004",
+      "description": "app-preview.png (254KB) zu JPEG (148KB) konvertiert, LandingPage.tsx updated, PNG gelöscht",
+      "severity": "P3",
+      "type": "performance"
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "TS-QA-KW15-PERF-001",
+      "title": "Missed KW14 Fix: trumpetstar-logo.png noch in ResetPasswordPage.tsx referenziert",
+      "severity": "P3",
+      "status": "FIXED",
+      "commit": "432f1c19"
+    }
+  ],
+  "newFeatures": [
+    "Audio-Player Feature: audio_levels / audio_files / audio_level_items Tabellen mit sauberen RLS-Policies",
+    "Audio-files Storage Bucket: public read, admin write"
+  ],
+  "totalBytesSaved": 2813000,
+  "notes": "Keine Kern-App-Änderungen seit KW14. Alle P2-Issues geschlossen. P1 (Email-Tracking-Architektur) bleibt open."
+}
