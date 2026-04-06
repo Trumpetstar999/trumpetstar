@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Heart, Mic, MicOff, Activity, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameState } from '@/hooks/useGameLoop';
-import logoImg from '@/assets/logo-trumpetstar-game.png';
+import logoImg from '@/assets/logo-trumpetstar-game.jpg';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface GameHUDProps {
