@@ -114,11 +114,11 @@
   },
 
   "lastWeeklyCheck": {
-    "kw": 14,
-    "date": "2026-03-30",
-    "commit": "fc4d955e",
-    "go_no_go": "CONDITIONAL GO",
-    "p0": 0, "p1": 1, "p2": 3, "p3": 10
+    "kw": 15,
+    "date": "2026-04-06",
+    "commit": "67594634",
+    "go_no_go": "GO",
+    "p0": 0, "p1": 1, "p2": 0, "p3": 7
   },
 
   "knownOpenIssues": [
@@ -251,16 +251,20 @@
       "title": "send-email Edge Function: keine Caller-Authentifizierung – Spam/Abuse-Risiko",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-06",
+      "closedBy": "seppl-checker-weekly-2026-04-06",
+      "fix": "JWT Caller-Auth via supabase.auth.getUser(), Commit 267458d1"
     },
     {
       "id": "TS-QA-KW14-SEC-002",
       "title": "elevenlabs-tts + elevenlabs-stt: keine Auth – API-Cost-Abuse-Risiko",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-06",
+      "closedBy": "seppl-checker-weekly-2026-04-06",
+      "fix": "JWT Caller-Auth implementiert in beiden Functions, Commit 267458d1"
     },
     {
       "id": "TS-QA-KW14-SEC-003",
@@ -293,24 +297,37 @@
       "title": "logo-trumpetstar-game.png (556KB) kein JPEG/WebP, referenziert in GameHUD.tsx",
       "severity": "Medium",
       "priority": "P2",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-06",
+      "closedBy": "seppl-checker-weekly-2026-04-06",
+      "fix": "→ JPEG (173KB), GameHUD.tsx updated, PNG gelöscht. Commit d6d5d9f4"
     },
     {
       "id": "TS-QA-KW14-PERF-003",
       "title": "Orphan PNGs: toni-coach.png (876KB) + trumpetstar-logo.png (556KB) nicht mehr referenziert",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-06",
+      "closedBy": "seppl-checker-weekly-2026-04-06",
+      "fix": "Orphan PNGs gelöscht (toni-coach + trumpetstar-app-screenshot). Commit 89b44f65. trumpetstar-logo Ref in ResetPasswordPage.tsx → .jpg. Commit 432f1c19"
     },
     {
       "id": "TS-QA-KW14-PERF-004",
       "title": "app-preview.png (252KB) + trumpetstar-lernwelt.jpg (300KB) über 200KB-Schwellwert",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
+      "status": "partial",
+      "note": "app-preview.png CLOSED: → JPEG (148KB), Commit 67594634. trumpetstar-lernwelt.jpg (300KB) noch offen → KW16",
       "openedAt": "2026-03-30"
+    },
+    {
+      "id": "TS-QA-KW15-PERF-001",
+      "title": "trumpetstar-lernwelt.jpg (300KB) noch über 200KB-Schwellwert",
+      "severity": "Low",
+      "priority": "P3",
+      "status": "open",
+      "openedAt": "2026-04-06"
     }
   ]
 }
