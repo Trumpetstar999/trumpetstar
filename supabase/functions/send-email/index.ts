@@ -38,6 +38,34 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // ── TS-QA-KW14-SEC-001: Caller Authentication ────────────────────────────
+  // Require a valid Supabase JWT (user session) or service-role key
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized: missing Bearer token" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const callerToken = authHeader.replace("Bearer ", "").trim();
+  // Verify against Supabase – accepts both user JWTs and service-role key
+  const _supabaseCheck = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+  const { data: authData, error: authError } = await _supabaseCheck.auth.getUser(callerToken);
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const isServiceRole = serviceRoleKey && callerToken === serviceRoleKey;
+  if (!isServiceRole && (authError || !authData?.user)) {
+    console.warn("[send-email] Unauthorized caller, token invalid");
+    return new Response(JSON.stringify({ error: "Unauthorized: invalid token" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   try {
     const EMAIL_PROXY_SECRET  = Deno.env.get("EMAIL_PROXY_SECRET");
     const SUPABASE_URL        = Deno.env.get("SUPABASE_URL")!;

@@ -16,6 +16,35 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // ── TS-QA-KW14-SEC-002: Caller Authentication ────────────────────────────
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Unauthorized: missing Bearer token" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const callerToken = authHeader.replace("Bearer ", "").trim();
+  const SUPABASE_URL_CHECK = Deno.env.get("SUPABASE_URL")!;
+  const SUPABASE_ANON_KEY_CHECK = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceRoleKeyTts = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const isServiceRoleTts = serviceRoleKeyTts && callerToken === serviceRoleKeyTts;
+  if (!isServiceRoleTts) {
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const _sb = createClient(SUPABASE_URL_CHECK, SUPABASE_ANON_KEY_CHECK, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: authData, error: authError } = await _sb.auth.getUser(callerToken);
+    if (authError || !authData?.user) {
+      console.warn("[elevenlabs-tts] Unauthorized caller");
+      return new Response(JSON.stringify({ error: "Unauthorized: invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   try {
     const { text, language = "de" } = await req.json();
 
