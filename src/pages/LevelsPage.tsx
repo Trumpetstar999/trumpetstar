@@ -579,47 +579,69 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               </div>
               
-              <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-6">
-                {(() => {
-                  // Pre-process: strip "Level X - 01 " prefix pattern and leading digits
-                  const items = allVideosAZ.map(({ video, levelId, levelTitle }) => {
-                    const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
-                    // Strip patterns like "Level 1 - 01 ", "Level 2 - 03 ", then any remaining leading digits
-                    const displayName = rawTitle
-                      .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
-                      .replace(/^\d+[\s.\-_]*/, '')
-                      .trim();
-                    return { video, levelId, levelTitle, displayName };
-                  });
+              {(() => {
+                // Pre-process: strip "Level X - 01 " prefix pattern and leading digits
+                const items = allVideosAZ.map(({ video, levelId, levelTitle }) => {
+                  const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
+                  const displayName = rawTitle
+                    .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
+                    .replace(/^\d+[\s.\-_]*/, '')
+                    .trim();
+                  return { video, levelId, levelTitle, displayName };
+                });
 
-                  // Group by first letter
-                  let currentLetter = '';
-                  return items.map((item, index) => {
-                    const firstLetter = item.displayName.charAt(0).toUpperCase();
-                    const showHeader = firstLetter !== currentLetter;
-                    if (showHeader) currentLetter = firstLetter;
+                // Group by first letter into ordered map
+                const grouped = new Map<string, typeof items>();
+                items.forEach(item => {
+                  const letter = item.displayName.charAt(0).toUpperCase();
+                  if (!grouped.has(letter)) grouped.set(letter, []);
+                  grouped.get(letter)!.push(item);
+                });
 
-                    return (
-                      <div key={item.video.id} className="break-inside-avoid">
-                        {showHeader && (
-                          <div className="px-3 pt-4 pb-1 text-lg font-bold text-white/80 border-b border-white/10 mb-1">
-                            {firstLetter}
+                // Split letter groups into 3 columns as evenly as possible
+                const letters = Array.from(grouped.entries());
+                const totalItems = items.length + letters.length; // items + headers
+                const targetPerCol = Math.ceil(totalItems / 3);
+                const columns: typeof letters[] = [[], [], []];
+                let colIdx = 0;
+                let colCount = 0;
+                letters.forEach(entry => {
+                  const groupSize = 1 + entry[1].length; // header + items
+                  if (colCount > 0 && colCount + groupSize > targetPerCol && colIdx < 2) {
+                    colIdx++;
+                    colCount = 0;
+                  }
+                  columns[colIdx].push(entry);
+                  colCount += groupSize;
+                });
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-0">
+                    {columns.map((col, cIdx) => (
+                      <div key={cIdx}>
+                        {col.map(([letter, group]) => (
+                          <div key={letter} className="mb-4">
+                            <div className="px-3 pt-2 pb-1 text-lg font-bold text-white/80 border-b border-white/10 mb-1">
+                              {letter}
+                            </div>
+                            {group.map(item => (
+                              <button
+                                key={item.video.id}
+                                onClick={() => handleVideoClick({ video: item.video, levelId: item.levelId, levelTitle: item.levelTitle })}
+                                className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors duration-150"
+                              >
+                                <span className="text-sm text-white hover:text-white/80 transition-colors">
+                                  {item.displayName}
+                                </span>
+                              </button>
+                            ))}
                           </div>
-                        )}
-                        <button
-                          onClick={() => handleVideoClick({ video: item.video, levelId: item.levelId, levelTitle: item.levelTitle })}
-                          className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors duration-150 opacity-0 animate-fade-in"
-                          style={{ animationDelay: `${Math.min(index, 30) * 20}ms`, animationFillMode: 'forwards' }}
-                        >
-                          <span className="text-sm text-white hover:text-white/80 transition-colors">
-                            {item.displayName}
-                          </span>
-                        </button>
+                        ))}
                       </div>
-                    );
-                  });
-                })()}
-              </div>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
