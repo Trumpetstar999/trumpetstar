@@ -580,24 +580,45 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               </div>
               
               <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-6">
-                {allVideosAZ.map(({ video, levelId, levelTitle }, index) => {
-                  // Get localized title and strip leading digits (e.g. "01 Name" → "Name")
-                  const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
-                  const displayName = rawTitle.replace(/^\d+[\s.\-_]*/, '');
-                  
-                  return (
-                    <button
-                      key={video.id}
-                      onClick={() => handleVideoClick({ video, levelId, levelTitle })}
-                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors duration-150 opacity-0 animate-fade-in break-inside-avoid"
-                      style={{ animationDelay: `${Math.min(index, 30) * 20}ms`, animationFillMode: 'forwards' }}
-                    >
-                      <span className="text-sm text-white hover:text-white/80 transition-colors">
-                        {displayName}
-                      </span>
-                    </button>
-                  );
-                })}
+                {(() => {
+                  // Pre-process: strip "Level X - 01 " prefix pattern and leading digits
+                  const items = allVideosAZ.map(({ video, levelId, levelTitle }) => {
+                    const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
+                    // Strip patterns like "Level 1 - 01 ", "Level 2 - 03 ", then any remaining leading digits
+                    const displayName = rawTitle
+                      .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
+                      .replace(/^\d+[\s.\-_]*/, '')
+                      .trim();
+                    return { video, levelId, levelTitle, displayName };
+                  });
+
+                  // Group by first letter
+                  let currentLetter = '';
+                  return items.map((item, index) => {
+                    const firstLetter = item.displayName.charAt(0).toUpperCase();
+                    const showHeader = firstLetter !== currentLetter;
+                    if (showHeader) currentLetter = firstLetter;
+
+                    return (
+                      <div key={item.video.id} className="break-inside-avoid">
+                        {showHeader && (
+                          <div className="px-3 pt-4 pb-1 text-lg font-bold text-white/80 border-b border-white/10 mb-1">
+                            {firstLetter}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => handleVideoClick({ video: item.video, levelId: item.levelId, levelTitle: item.levelTitle })}
+                          className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors duration-150 opacity-0 animate-fade-in"
+                          style={{ animationDelay: `${Math.min(index, 30) * 20}ms`, animationFillMode: 'forwards' }}
+                        >
+                          <span className="text-sm text-white hover:text-white/80 transition-colors">
+                            {item.displayName}
+                          </span>
+                        </button>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           ) : currentLevel && (
