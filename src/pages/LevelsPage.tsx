@@ -345,22 +345,28 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return levels.filter(l => l.difficulty === difficultyFilter);
   }, [levels, difficultyFilter]);
 
-  // Collect all videos alphabetically
+  // Collect all videos alphabetically, pre-cleaned
   const allVideosAZ = useMemo(() => {
-    const all: { video: LocalizedVideo; levelTitle: string; levelId: string }[] = [];
+    const all: { video: LocalizedVideo; levelTitle: string; levelId: string; displayName: string }[] = [];
     levels.forEach(level => {
       const levelTitle = getLocalizedField(level, 'title');
       level.sections.forEach(section => {
         section.videos.forEach(video => {
-          all.push({ video, levelTitle, levelId: level.id });
+          const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
+          const displayName = rawTitle
+            .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
+            .replace(/^\d+[\s.\-_]*/, '')
+            .trim();
+          all.push({ video, levelTitle, levelId: level.id, displayName });
         });
       });
     });
-    // Sort alphabetically by localized title
+    // Sort by cleaned display name, letters before digits
     all.sort((a, b) => {
-      const titleA = (language === 'en' && a.video.title_en ? a.video.title_en : language === 'es' && a.video.title_es ? a.video.title_es : a.video.title).toLowerCase();
-      const titleB = (language === 'en' && b.video.title_en ? b.video.title_en : language === 'es' && b.video.title_es ? b.video.title_es : b.video.title).toLowerCase();
-      return titleA.localeCompare(titleB);
+      const aIsDigit = /^\d/.test(a.displayName);
+      const bIsDigit = /^\d/.test(b.displayName);
+      if (aIsDigit !== bIsDigit) return aIsDigit ? 1 : -1; // letters first
+      return a.displayName.localeCompare(b.displayName, undefined, { sensitivity: 'base' });
     });
     return all;
   }, [levels, language, getLocalizedField]);
@@ -580,15 +586,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               </div>
               
               {(() => {
-                // Pre-process: strip "Level X - 01 " prefix pattern and leading digits
-                const items = allVideosAZ.map(({ video, levelId, levelTitle }) => {
-                  const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
-                  const displayName = rawTitle
-                    .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
-                    .replace(/^\d+[\s.\-_]*/, '')
-                    .trim();
-                  return { video, levelId, levelTitle, displayName };
-                });
+                // Use pre-cleaned items from allVideosAZ
+                const items = allVideosAZ;
 
                 // Group by first letter into ordered map
                 const grouped = new Map<string, typeof items>();
