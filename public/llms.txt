@@ -1,0 +1,44 @@
+# Trumpetstar App
+
+The Trumpetstar App is a digital trumpet learning platform with structured lessons, playalong videos, and guided practice.
+
+## Website
+
+https://trumpetstar.app
+
+## Description
+
+The app supports trumpet students with interactive learning, structured levels, and home practice guidance.
+
+## Features
+
+- Playalong videos
+- Learning levels
+- Structured exercises
+- Guided practice
+- Beginner-friendly system
+
+## Audience
+
+- Trumpet students
+- Adult beginners
+- Returning players
+- Teachers
+
+## Key Topics
+
+- trumpet learning app
+- playalong trumpet
+- learn trumpet online
+- trumpet practice app
+
+## Main Pages
+
+- https://trumpetstar.app
+- https://trumpetstar.app/features
+- https://trumpetstar.app/pricing
+- https://trumpetstar.app/login
+
+## Summary
+
+A digital learning platform that helps trumpet players practice effectively with structured content and playalong support.
