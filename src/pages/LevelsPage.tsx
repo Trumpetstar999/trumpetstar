@@ -7,7 +7,7 @@ import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight, Filter } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -345,6 +345,26 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return levels.filter(l => l.difficulty === difficultyFilter);
   }, [levels, difficultyFilter]);
 
+  // Collect all videos alphabetically
+  const allVideosAZ = useMemo(() => {
+    const all: { video: LocalizedVideo; levelTitle: string; levelId: string }[] = [];
+    levels.forEach(level => {
+      const levelTitle = getLocalizedField(level, 'title');
+      level.sections.forEach(section => {
+        section.videos.forEach(video => {
+          all.push({ video, levelTitle, levelId: level.id });
+        });
+      });
+    });
+    // Sort alphabetically by localized title
+    all.sort((a, b) => {
+      const titleA = (language === 'en' && a.video.title_en ? a.video.title_en : language === 'es' && a.video.title_es ? a.video.title_es : a.video.title).toLowerCase();
+      const titleB = (language === 'en' && b.video.title_en ? b.video.title_en : language === 'es' && b.video.title_es ? b.video.title_es : b.video.title).toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+    return all;
+  }, [levels, language, getLocalizedField]);
+
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
   const isSearching = searchQuery.trim().length > 0;
 
@@ -541,6 +561,42 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                   ))}
                 </div>
               )}
+            </div>
+          ) : activeLevel === 'all-az' ? (
+            /* All Videos A-Z View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
+                  <ListOrdered className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {language === 'en' ? 'All Videos A–Z' : language === 'es' ? 'Todos los Videos A–Z' : 'Alle Videos A–Z'}
+                  </h3>
+                  <p className="text-sm text-white/60">
+                    {language === 'en' ? `${allVideosAZ.length} videos sorted alphabetically` : language === 'es' ? `${allVideosAZ.length} videos ordenados alfabéticamente` : `${allVideosAZ.length} Videos alphabetisch sortiert`}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {allVideosAZ.map(({ video, levelId, levelTitle }, index) => (
+                  <div 
+                    key={video.id} 
+                    className="relative opacity-0 animate-fade-in"
+                    style={{ animationDelay: `${Math.min(index, 20) * 40}ms`, animationFillMode: 'forwards' }}
+                  >
+                    <VideoCard
+                      video={video}
+                      onClick={() => handleVideoClick({ video, levelId, levelTitle })}
+                      index={0}
+                    />
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
+                      {levelTitle}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
