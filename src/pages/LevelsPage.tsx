@@ -345,6 +345,26 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     return levels.filter(l => l.difficulty === difficultyFilter);
   }, [levels, difficultyFilter]);
 
+  // Collect all videos alphabetically
+  const allVideosAZ = useMemo(() => {
+    const all: { video: LocalizedVideo; levelTitle: string; levelId: string }[] = [];
+    levels.forEach(level => {
+      const levelTitle = getLocalizedField(level, 'title');
+      level.sections.forEach(section => {
+        section.videos.forEach(video => {
+          all.push({ video, levelTitle, levelId: level.id });
+        });
+      });
+    });
+    // Sort alphabetically by localized title
+    all.sort((a, b) => {
+      const titleA = (language === 'en' && a.video.title_en ? a.video.title_en : language === 'es' && a.video.title_es ? a.video.title_es : a.video.title).toLowerCase();
+      const titleB = (language === 'en' && b.video.title_en ? b.video.title_en : language === 'es' && b.video.title_es ? b.video.title_es : b.video.title).toLowerCase();
+      return titleA.localeCompare(titleB);
+    });
+    return all;
+  }, [levels, language, getLocalizedField]);
+
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
   const isSearching = searchQuery.trim().length > 0;
 
