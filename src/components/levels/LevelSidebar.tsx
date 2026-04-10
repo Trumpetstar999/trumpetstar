@@ -2,7 +2,7 @@ import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Star, Lock, Crown, Clock } from 'lucide-react';
+import { Star, Lock, Crown, Clock, ListOrdered } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
@@ -78,6 +78,34 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
             <div className="border-t border-white/10 mb-4" />
           </>
         )}
+
+        {/* All Videos A-Z Button */}
+        <button
+          onClick={() => onLevelSelect('all-az')}
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-3 rounded-full transition-all duration-200 mb-4',
+            activeLevel === 'all-az' 
+              ? 'bg-white/18 glow-blue' 
+              : 'hover:bg-white/10'
+          )}
+        >
+          <span className={cn(
+            'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
+            activeLevel === 'all-az' 
+              ? 'bg-white text-brand-blue-mid' 
+              : 'bg-white/15 text-white'
+          )}>
+            <ListOrdered className="w-5 h-5" />
+          </span>
+          <span className={cn(
+            'font-medium',
+            activeLevel === 'all-az' ? 'text-white' : 'text-white/90'
+          )}>
+            {language === 'en' ? 'All Videos A–Z' : language === 'es' ? 'Todos los Videos A–Z' : 'Alle Videos A–Z'}
+          </span>
+        </button>
+
+        <div className="border-t border-white/10 mb-4" />
         
         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 px-2">
           {t('levels.allLevels')}
