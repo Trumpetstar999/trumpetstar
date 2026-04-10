@@ -586,15 +586,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
               </div>
               
               {(() => {
-                // Pre-process: strip "Level X - 01 " prefix pattern and leading digits
-                const items = allVideosAZ.map(({ video, levelId, levelTitle }) => {
-                  const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
-                  const displayName = rawTitle
-                    .replace(/^Level\s*\d+\s*[-–]\s*/i, '')
-                    .replace(/^\d+[\s.\-_]*/, '')
-                    .trim();
-                  return { video, levelId, levelTitle, displayName };
-                });
+                // Use pre-cleaned items from allVideosAZ
+                const items = allVideosAZ;
 
                 // Group by first letter into ordered map
                 const grouped = new Map<string, typeof items>();
