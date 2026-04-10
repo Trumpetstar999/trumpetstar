@@ -579,23 +579,25 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allVideosAZ.map(({ video, levelId, levelTitle }, index) => (
-                  <div 
-                    key={video.id} 
-                    className="relative opacity-0 animate-fade-in"
-                    style={{ animationDelay: `${Math.min(index, 20) * 40}ms`, animationFillMode: 'forwards' }}
-                  >
-                    <VideoCard
-                      video={video}
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-x-6">
+                {allVideosAZ.map(({ video, levelId, levelTitle }, index) => {
+                  // Get localized title and strip leading digits (e.g. "01 Name" → "Name")
+                  const rawTitle = language === 'en' && video.title_en ? video.title_en : language === 'es' && video.title_es ? video.title_es : video.title;
+                  const displayName = rawTitle.replace(/^\d+[\s.\-_]*/, '');
+                  
+                  return (
+                    <button
+                      key={video.id}
                       onClick={() => handleVideoClick({ video, levelId, levelTitle })}
-                      index={0}
-                    />
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
-                      {levelTitle}
-                    </span>
-                  </div>
-                ))}
+                      className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors duration-150 opacity-0 animate-fade-in break-inside-avoid"
+                      style={{ animationDelay: `${Math.min(index, 30) * 20}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <span className="text-sm text-white hover:text-white/80 transition-colors">
+                        {displayName}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : currentLevel && (
