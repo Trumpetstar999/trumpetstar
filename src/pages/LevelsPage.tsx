@@ -17,6 +17,7 @@ import { useLanguage, useLocalizedContent, SkillLevel } from '@/hooks/useLanguag
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 
 interface LevelsPageProps {
   onStarEarned: () => void;
@@ -615,30 +616,43 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 });
 
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-0">
-                    {columns.map((col, cIdx) => (
-                      <div key={cIdx}>
-                        {col.map(([letter, group]) => (
-                          <div key={letter} className="mb-4">
-                            <div className="px-3 pt-2 pb-1 text-lg font-bold text-white/80 border-b border-white/10 mb-1">
-                              {letter}
+                  <TooltipProvider delayDuration={200}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-0">
+                      {columns.map((col, cIdx) => (
+                        <div key={cIdx}>
+                          {col.map(([letter, group]) => (
+                            <div key={letter} className="mb-4">
+                              <div className="px-3 pt-2 pb-1 text-lg font-bold text-white/80 border-b border-white/10 mb-1">
+                                {letter}
+                              </div>
+                              {group.map(item => (
+                                <Tooltip key={item.video.id}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={() => handleVideoClick({ video: item.video, levelId: item.levelId, levelTitle: item.levelTitle })}
+                                      className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors duration-150"
+                                    >
+                                      <span className="text-sm text-white hover:text-white/80 transition-colors">
+                                        {item.displayName}
+                                      </span>
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="p-1 bg-black/90 border-white/20">
+                                    <img
+                                      src={item.video.thumbnail}
+                                      alt={item.displayName}
+                                      className="w-[120px] h-auto rounded"
+                                      loading="lazy"
+                                    />
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
                             </div>
-                            {group.map(item => (
-                              <button
-                                key={item.video.id}
-                                onClick={() => handleVideoClick({ video: item.video, levelId: item.levelId, levelTitle: item.levelTitle })}
-                                className="w-full text-left px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors duration-150"
-                              >
-                                <span className="text-sm text-white hover:text-white/80 transition-colors">
-                                  {item.displayName}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </TooltipProvider>
                 );
               })()}
             </div>
