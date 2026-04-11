@@ -50,40 +50,40 @@ export function RecordingShareDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden border-border/50 bg-card">
+      <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden" style={{ background: '#1a1f35', border: '1px solid rgba(255,255,255,0.12)' }}>
         {/* Header */}
         <DialogHeader className="px-6 pt-6 pb-4">
-          <DialogTitle className="text-lg font-semibold text-foreground">
+          <DialogTitle className="text-lg font-semibold" style={{ color: '#ffffff' }}>
             {isTeacherShare ? 'An meinen Lehrer senden' : 'Feedback an Admin senden'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="px-6 pb-6 space-y-5">
           {/* Video info */}
-          <div className="flex items-start gap-3 p-3.5 rounded-lg bg-muted/50 border border-border/40">
-            <Music className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-3 p-3.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <Music className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }} />
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground mb-0.5">Video</p>
-              <p className="text-sm font-medium text-foreground leading-snug">{videoTitle}</p>
+              <p className="text-xs mb-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Video</p>
+              <p className="text-sm font-medium leading-snug" style={{ color: '#ffffff' }}>{videoTitle}</p>
             </div>
           </div>
 
           {/* Teacher info */}
           {isTeacherShare && (
             hasTeacher ? (
-              <div className="flex items-center gap-3 p-3.5 rounded-lg bg-primary/5 border border-primary/15">
-                <UserCheck className="w-4 h-4 text-primary flex-shrink-0" />
+              <div className="flex items-center gap-3 p-3.5 rounded-lg" style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)' }}>
+                <UserCheck className="w-4 h-4 flex-shrink-0" style={{ color: 'rgb(96,165,250)' }} />
                 <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">Empfänger</p>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-xs mb-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Empfänger</p>
+                  <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
                     {teacherAssignment?.teacher_profile?.display_name || 'Dein Lehrer'}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-3.5 rounded-lg bg-destructive/5 border border-destructive/20">
-                <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-                <p className="text-sm text-destructive">
+              <div className="flex items-center gap-3 p-3.5 rounded-lg" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'rgb(248,113,113)' }} />
+                <p className="text-sm" style={{ color: 'rgb(248,113,113)' }}>
                   Dir ist noch kein Lehrer zugewiesen. Bitte kontaktiere einen Admin.
                 </p>
               </div>
@@ -92,7 +92,7 @@ export function RecordingShareDialog({
 
           {/* Message input */}
           <div className="space-y-2">
-            <label htmlFor="share-message" className="text-sm font-medium text-foreground">
+            <label htmlFor="share-message" className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
               {isTeacherShare ? 'Nachricht (optional)' : 'Wobei wünschst du dir Feedback?'}
             </label>
             <Textarea
@@ -105,12 +105,13 @@ export function RecordingShareDialog({
                   : 'z.B. Was ist dir schwer gefallen? Was möchtest du verbessern?'
               }
               rows={3}
-              className="resize-none bg-background border-border/60 focus-visible:ring-primary/30"
+              className="resize-none"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff' }}
             />
           </div>
 
           {/* Privacy note */}
-          <p className="text-xs text-muted-foreground/70 flex items-center gap-1.5">
+          <p className="text-xs flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>
             <span>🔒</span>
             Dein Video wird nur mit {isTeacherShare ? 'deinem Lehrer' : 'dem Admin'} geteilt.
           </p>
@@ -120,7 +121,7 @@ export function RecordingShareDialog({
             <Button
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="text-muted-foreground hover:text-foreground"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
             >
               Abbrechen
             </Button>
