@@ -244,8 +244,8 @@ export function AudioPlayer() {
               <p className="text-white/30 text-sm">{isSearchMode ? 'Keine Ergebnisse' : 'Keine Tracks in diesem Level'}</p>
             </div>
           ) : (() => {
-            const visibleTracks = isSearchMode || showAllTracks ? displayTracks : displayTracks.slice(0, TRACKS_PREVIEW);
-            const hasMore = !isSearchMode && displayTracks.length > TRACKS_PREVIEW;
+            const visibleTracks = displayTracks;
+            const hasMore = false;
             return (
               <>
                 {visibleTracks.map((track, i) => {
