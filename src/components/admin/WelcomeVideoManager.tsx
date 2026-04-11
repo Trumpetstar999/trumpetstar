@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Trash2, Save, Loader2, Pencil, X, Check } from 'lucide-react';
 import { toast } from 'sonner';
-import { Switch } from '@/components/ui/Switch';
+import { Switch } from '@/components/ui/switch';
 
 interface WelcomeVideo {
   id: string;
