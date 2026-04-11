@@ -33,6 +33,12 @@ export default function AuthPage() {
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   const getRedirectPath = () => {
+    // Check URL query param first (used by QR redirect)
+    const params = new URLSearchParams(window.location.search);
+    const redirectParam = params.get('redirect');
+    if (redirectParam && redirectParam.startsWith('/')) {
+      return redirectParam;
+    }
     const returnTo = sessionStorage.getItem('returnTo');
     if (returnTo && returnTo.startsWith('/app')) {
       sessionStorage.removeItem('returnTo');
