@@ -111,40 +111,42 @@ export function useVideoChat() {
 
       if (profilesError) throw profilesError;
 
-      // Fetch last message and unread count for each chat
-      const chatsWithDetails = await Promise.all(
-        (chatsData || []).map(async (chat) => {
-          const { data: lastMsg } = await supabase
-            .from('video_chat_messages')
-            .select('*')
-            .eq('chat_id', chat.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
+      // Batch fetch: all messages for these chats, ordered to extract last message & unread count
+      const { data: allMessages } = await supabase
+        .from('video_chat_messages')
+        .select('*')
+        .in('chat_id', chatIds)
+        .order('created_at', { ascending: false });
 
-          const { count: unreadCount } = await supabase
-            .from('video_chat_messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('chat_id', chat.id)
-            .eq('is_read', false)
-            .neq('sender_user_id', user.id);
+      // Build last message map and unread counts from the batch result
+      const lastMessageMap = new Map<string, ChatMessage>();
+      const unreadCountMap = new Map<string, number>();
 
-          const chatParticipants = allParticipants
-            ?.filter(p => p.chat_id === chat.id)
-            .map(p => ({
-              ...p,
-              profile: profiles?.find(pr => pr.id === p.user_id)
-            }));
+      for (const msg of allMessages || []) {
+        if (!lastMessageMap.has(msg.chat_id)) {
+          lastMessageMap.set(msg.chat_id, msg as ChatMessage);
+        }
+        if (!msg.is_read && msg.sender_user_id !== user.id) {
+          unreadCountMap.set(msg.chat_id, (unreadCountMap.get(msg.chat_id) || 0) + 1);
+        }
+      }
 
-          return {
-            ...chat,
-            context_type: chat.context_type as 'user_video' | 'teacher_discussion' | 'admin_feedback',
-            participants: chatParticipants,
-            last_message: lastMsg as ChatMessage | undefined,
-            unread_count: unreadCount || 0
-          } as VideoChat;
-        })
-      );
+      const chatsWithDetails = (chatsData || []).map((chat) => {
+        const chatParticipants = allParticipants
+          ?.filter(p => p.chat_id === chat.id)
+          .map(p => ({
+            ...p,
+            profile: profiles?.find(pr => pr.id === p.user_id)
+          }));
+
+        return {
+          ...chat,
+          context_type: chat.context_type as 'user_video' | 'teacher_discussion' | 'admin_feedback',
+          participants: chatParticipants,
+          last_message: lastMessageMap.get(chat.id),
+          unread_count: unreadCountMap.get(chat.id) || 0
+        } as VideoChat;
+      });
 
       setChats(chatsWithDetails);
     } catch (error) {
