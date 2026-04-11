@@ -24,7 +24,7 @@ import {
   Truck,
   Receipt,
   Headphones
-} from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -51,6 +51,7 @@ const menuItems = [
   { id: 'digistore24', label: 'Digistore24', icon: CreditCard },
   { id: 'beats', label: 'Drum Beats', icon: Music2 },
   { id: 'audioplayer', label: 'Audio Player', icon: Headphones },
+  { id: 'qrcodes', label: 'QR-Codes', icon: QrCode },
   { id: 'assistant', label: 'KI-Assistent', icon: MessageSquare },
   { id: 'classrooms', label: 'Klassenzimmer', icon: Video },
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
