@@ -33,7 +33,8 @@ import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { ShippingPanel } from '@/components/admin/ShippingPanel';
 import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones, HandHeart } from 'lucide-react';
+import { WelcomeVideoManager } from '@/components/admin/WelcomeVideoManager';
 import { AudioPlayerManager } from '@/components/admin/AudioPlayerManager';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
@@ -70,7 +71,7 @@ export default function AdminPage() {
   const [levelsView, setLevelsView] = useState<View>('levels');
   const [context, setContext] = useState<SelectedContext | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [levelsSubTab, setLevelsSubTab] = useState<'import' | 'manage'>('import');
+  const [levelsSubTab, setLevelsSubTab] = useState<'import' | 'manage' | 'welcome'>('import');
   const [assistantSubTab, setAssistantSubTab] = useState<AssistantSubTab>('content');
   const [pdfSubTab, setPdfSubTab] = useState<PdfSubTab>('documents');
   const [pdfAudioContext, setPdfAudioContext] = useState<PdfAudioContext | null>(null);
@@ -281,6 +282,13 @@ export default function AdminPage() {
                   <Settings className="w-4 h-4" />
                   Levels verwalten
                 </button>
+                <button
+                  onClick={() => setLevelsSubTab('welcome')}
+                  className={`admin-tab ${levelsSubTab === 'welcome' ? 'admin-tab-active' : ''}`}
+                >
+                  <HandHeart className="w-4 h-4" />
+                  Willkommen
+                </button>
               </div>
 
               {levelsSubTab === 'import' && (
@@ -350,6 +358,10 @@ export default function AdminPage() {
                     />
                   )}
                 </>
+              )}
+
+              {levelsSubTab === 'welcome' && (
+                <WelcomeVideoManager />
               )}
             </div>
           )}

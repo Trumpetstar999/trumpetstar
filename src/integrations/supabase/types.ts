@@ -3635,6 +3635,86 @@ export type Database = {
           },
         ]
       }
+      welcome_video_progress: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          watched: boolean | null
+          watched_at: string | null
+          welcome_video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          watched?: boolean | null
+          watched_at?: string | null
+          welcome_video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          watched?: boolean | null
+          watched_at?: string | null
+          welcome_video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "welcome_video_progress_welcome_video_id_fkey"
+            columns: ["welcome_video_id"]
+            isOneToOne: false
+            referencedRelation: "welcome_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      welcome_videos: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          is_active: boolean | null
+          sort_order: number | null
+          thumbnail_url: string | null
+          title: string
+          title_en: string | null
+          title_es: string | null
+          updated_at: string
+          vimeo_player_url: string | null
+          vimeo_video_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          thumbnail_url?: string | null
+          title: string
+          title_en?: string | null
+          title_es?: string | null
+          updated_at?: string
+          vimeo_player_url?: string | null
+          vimeo_video_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          thumbnail_url?: string | null
+          title?: string
+          title_en?: string | null
+          title_es?: string | null
+          updated_at?: string
+          vimeo_player_url?: string | null
+          vimeo_video_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       admin_dashboard_stats: {

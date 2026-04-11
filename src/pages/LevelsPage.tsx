@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
+import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
 
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
@@ -464,6 +465,13 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         
         {/* Main content */}
         <div className="flex-1 overflow-y-auto relative">
+          {/* Welcome Section - always visible at the top when not searching */}
+          {!isSearching && activeLevel !== 'all-az' && (
+            <div className="pt-4">
+              <WelcomeSection />
+            </div>
+          )}
+          
           {isSearching ? (
             /* Search Results - Grid Layout */
             <div className="p-6">
