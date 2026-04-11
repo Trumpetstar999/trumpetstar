@@ -23,8 +23,8 @@ import {
   BookOpen,
   Truck,
   Receipt,
-  Headphones
-import { QrCode } from 'lucide-react';
+  Headphones,
+  QrCode
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
