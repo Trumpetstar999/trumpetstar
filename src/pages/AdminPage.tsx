@@ -359,6 +359,10 @@ export default function AdminPage() {
                   )}
                 </>
               )}
+
+              {levelsSubTab === 'welcome' && (
+                <WelcomeVideoManager />
+              )}
             </div>
           )}
 
