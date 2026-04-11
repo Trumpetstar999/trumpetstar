@@ -12,7 +12,7 @@ export function TempoSlider({ tempo, onTempoChange }: TempoSliderProps) {
         <span className="text-sm font-medium">Tempo</span>
         <span className="text-sm font-bold text-gold">{tempo}%</span>
       </div>
-      <div className="py-2">
+      <div className="py-4">
         <Slider
           value={[tempo]}
           onValueChange={([value]) => onTempoChange(value)}
