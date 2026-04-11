@@ -42,6 +42,7 @@ import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
 import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
 import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
 import HelpCenterPage from "./pages/HelpCenterPage";
+import QRRedirectPage from "./pages/QRRedirectPage";
 import NotFound from "./pages/NotFound";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ImpressumPage from "./pages/ImpressumPage";
@@ -129,6 +130,9 @@ const App = () => {
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         <Route path="/impressum" element={<ImpressumPage />} />
                         <Route path="/datenschutz" element={<DatenschutzPage />} />
+                        
+                        {/* QR Code redirect */}
+                        <Route path="/qr/:code" element={<QRRedirectPage />} />
                         
                         {/* Common URL redirects */}
                         <Route path="/shop" element={<Navigate to="/pricing" replace />} />

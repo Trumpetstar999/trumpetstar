@@ -2709,6 +2709,57 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_codes: {
+        Row: {
+          audio_id: string | null
+          code: string
+          content_type: string
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string | null
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          audio_id?: string | null
+          code: string
+          content_type: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          audio_id?: string | null
+          code?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_codes_audio_id_fkey"
+            columns: ["audio_id"]
+            isOneToOne: false
+            referencedRelation: "audio_files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qr_codes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recording_shares: {
         Row: {
           id: string

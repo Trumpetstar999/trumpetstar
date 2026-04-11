@@ -35,12 +35,13 @@ import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones, HandHeart } from 'lucide-react';
 import { WelcomeVideoManager } from '@/components/admin/WelcomeVideoManager';
+import { QRCodeManager } from '@/components/admin/QRCodeManager';
 import { AudioPlayerManager } from '@/components/admin/AudioPlayerManager';
 import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'qrcodes' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -482,6 +483,8 @@ export default function AdminPage() {
           {activeTab === 'beats' && <DrumBeatManager />}
 
           {activeTab === 'audioplayer' && <AudioPlayerManager />}
+
+          {activeTab === 'qrcodes' && <QRCodeManager />}
 
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'emails' && <EmailTemplateManager />}
