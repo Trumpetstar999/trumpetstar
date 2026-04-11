@@ -33,8 +33,21 @@ export function WelcomeSection() {
   const { getLocalizedField } = useLocalizedContent();
 
   useEffect(() => {
-    fetchVideos();
+    checkVisibilityAndFetch();
   }, []);
+
+  async function checkVisibilityAndFetch() {
+    const { data: flag } = await supabase
+      .from('feature_flags')
+      .select('is_enabled')
+      .eq('key', 'welcome_videos_visible')
+      .single();
+    if (!flag || !flag.is_enabled) {
+      setIsLoading(false);
+      return;
+    }
+    fetchVideos();
+  }
 
   useEffect(() => {
     if (user) fetchProgress();

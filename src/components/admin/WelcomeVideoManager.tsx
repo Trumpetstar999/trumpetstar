@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Trash2, GripVertical, Save, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Save, Loader2, Pencil, X, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { Switch } from '@/components/ui/switch';
 
 interface WelcomeVideo {
   id: string;
@@ -20,9 +21,31 @@ export function WelcomeVideoManager() {
   const [videos, setVideos] = useState<WelcomeVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [sectionVisible, setSectionVisible] = useState(true);
   const [newVideo, setNewVideo] = useState({ title: '', vimeo_video_id: '', title_en: '', title_es: '' });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', title_en: '', title_es: '', vimeo_video_id: '' });
 
-  useEffect(() => { fetchVideos(); }, []);
+  useEffect(() => { fetchVideos(); fetchVisibility(); }, []);
+
+  async function fetchVisibility() {
+    const { data } = await supabase
+      .from('feature_flags')
+      .select('is_enabled')
+      .eq('key', 'welcome_videos_visible')
+      .single();
+    if (data) setSectionVisible(data.is_enabled);
+  }
+
+  async function toggleVisibility(enabled: boolean) {
+    setSectionVisible(enabled);
+    const { error } = await supabase
+      .from('feature_flags')
+      .update({ is_enabled: enabled })
+      .eq('key', 'welcome_videos_visible');
+    if (error) toast.error('Fehler: ' + error.message);
+    else toast.success(enabled ? 'Willkommens-Videos sichtbar' : 'Willkommens-Videos ausgeblendet');
+  }
 
   async function fetchVideos() {
     const { data } = await supabase
@@ -64,6 +87,34 @@ export function WelcomeVideoManager() {
     fetchVideos();
   }
 
+  function startEdit(video: WelcomeVideo) {
+    setEditingId(video.id);
+    setEditForm({
+      title: video.title,
+      title_en: video.title_en || '',
+      title_es: video.title_es || '',
+      vimeo_video_id: video.vimeo_video_id,
+    });
+  }
+
+  async function saveEdit() {
+    if (!editingId) return;
+    if (!editForm.title.trim() || !editForm.vimeo_video_id.trim()) {
+      toast.error('Titel und Vimeo-ID sind Pflichtfelder');
+      return;
+    }
+    const { error } = await supabase.from('welcome_videos').update({
+      title: editForm.title.trim(),
+      title_en: editForm.title_en.trim() || null,
+      title_es: editForm.title_es.trim() || null,
+      vimeo_video_id: editForm.vimeo_video_id.trim(),
+    }).eq('id', editingId);
+    if (error) { toast.error('Fehler: ' + error.message); return; }
+    toast.success('Gespeichert');
+    setEditingId(null);
+    fetchVideos();
+  }
+
   async function saveOrder() {
     setIsSaving(true);
     for (let i = 0; i < videos.length; i++) {
@@ -85,8 +136,15 @@ export function WelcomeVideoManager() {
 
   return (
     <div className="space-y-6">
+      {/* Header with global toggle */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-800">Willkommens-Videos</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-semibold text-slate-800">Willkommens-Videos</h2>
+          <div className="flex items-center gap-2">
+            <Switch checked={sectionVisible} onCheckedChange={toggleVisibility} />
+            <span className="text-sm text-slate-500">{sectionVisible ? 'Sichtbar' : 'Ausgeblendet'}</span>
+          </div>
+        </div>
         <button onClick={saveOrder} disabled={isSaving} className="admin-btn-primary flex items-center gap-2">
           {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Reihenfolge speichern
@@ -97,30 +155,10 @@ export function WelcomeVideoManager() {
       <div className="admin-card p-4">
         <h3 className="text-sm font-medium text-slate-700 mb-3">Neues Video hinzufügen</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <input
-            className="admin-input"
-            placeholder="Titel (DE)"
-            value={newVideo.title}
-            onChange={e => setNewVideo({ ...newVideo, title: e.target.value })}
-          />
-          <input
-            className="admin-input"
-            placeholder="Titel (EN, optional)"
-            value={newVideo.title_en}
-            onChange={e => setNewVideo({ ...newVideo, title_en: e.target.value })}
-          />
-          <input
-            className="admin-input"
-            placeholder="Titel (ES, optional)"
-            value={newVideo.title_es}
-            onChange={e => setNewVideo({ ...newVideo, title_es: e.target.value })}
-          />
-          <input
-            className="admin-input"
-            placeholder="Vimeo Video ID"
-            value={newVideo.vimeo_video_id}
-            onChange={e => setNewVideo({ ...newVideo, vimeo_video_id: e.target.value })}
-          />
+          <input className="admin-input" placeholder="Titel (DE)" value={newVideo.title} onChange={e => setNewVideo({ ...newVideo, title: e.target.value })} />
+          <input className="admin-input" placeholder="Titel (EN, optional)" value={newVideo.title_en} onChange={e => setNewVideo({ ...newVideo, title_en: e.target.value })} />
+          <input className="admin-input" placeholder="Titel (ES, optional)" value={newVideo.title_es} onChange={e => setNewVideo({ ...newVideo, title_es: e.target.value })} />
+          <input className="admin-input" placeholder="Vimeo Video ID" value={newVideo.vimeo_video_id} onChange={e => setNewVideo({ ...newVideo, vimeo_video_id: e.target.value })} />
         </div>
         <button onClick={addVideo} className="admin-btn-primary mt-3 flex items-center gap-2">
           <Plus className="w-4 h-4" /> Hinzufügen
@@ -133,27 +171,46 @@ export function WelcomeVideoManager() {
           <p className="p-4 text-sm text-slate-500">Noch keine Willkommens-Videos angelegt.</p>
         ) : (
           videos.map((video, index) => (
-            <div key={video.id} className="flex items-center gap-3 p-3">
-              <div className="flex flex-col gap-0.5">
-                <button onClick={() => moveVideo(index, -1)} disabled={index === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30">▲</button>
-                <button onClick={() => moveVideo(index, 1)} disabled={index === videos.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30">▼</button>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-800 truncate">{video.title}</p>
-                <p className="text-xs text-slate-500">Vimeo: {video.vimeo_video_id}</p>
-              </div>
-              <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={video.is_active}
-                  onChange={() => toggleActive(video.id, video.is_active)}
-                  className="rounded border-slate-300"
-                />
-                Aktiv
-              </label>
-              <button onClick={() => deleteVideo(video.id)} className="text-red-400 hover:text-red-600 p-1">
-                <Trash2 className="w-4 h-4" />
-              </button>
+            <div key={video.id} className="p-3">
+              {editingId === video.id ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <input className="admin-input" placeholder="Titel (DE)" value={editForm.title} onChange={e => setEditForm({ ...editForm, title: e.target.value })} />
+                    <input className="admin-input" placeholder="Titel (EN)" value={editForm.title_en} onChange={e => setEditForm({ ...editForm, title_en: e.target.value })} />
+                    <input className="admin-input" placeholder="Titel (ES)" value={editForm.title_es} onChange={e => setEditForm({ ...editForm, title_es: e.target.value })} />
+                    <input className="admin-input" placeholder="Vimeo Video ID" value={editForm.vimeo_video_id} onChange={e => setEditForm({ ...editForm, vimeo_video_id: e.target.value })} />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={saveEdit} className="admin-btn-primary flex items-center gap-1.5 text-sm">
+                      <Check className="w-3.5 h-3.5" /> Speichern
+                    </button>
+                    <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-sm text-slate-600 hover:text-slate-800 border border-slate-300 rounded-md">
+                      Abbrechen
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-0.5">
+                    <button onClick={() => moveVideo(index, -1)} disabled={index === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30">▲</button>
+                    <button onClick={() => moveVideo(index, 1)} disabled={index === videos.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30">▼</button>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{video.title}</p>
+                    <p className="text-xs text-slate-500">Vimeo: {video.vimeo_video_id}</p>
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+                    <input type="checkbox" checked={video.is_active} onChange={() => toggleActive(video.id, video.is_active)} className="rounded border-slate-300" />
+                    Aktiv
+                  </label>
+                  <button onClick={() => startEdit(video)} className="text-slate-400 hover:text-slate-600 p-1" title="Bearbeiten">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => deleteVideo(video.id)} className="text-red-400 hover:text-red-600 p-1">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}
