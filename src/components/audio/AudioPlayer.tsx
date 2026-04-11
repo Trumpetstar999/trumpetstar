@@ -244,8 +244,8 @@ export function AudioPlayer() {
               <p className="text-white/30 text-sm">{isSearchMode ? 'Keine Ergebnisse' : 'Keine Tracks in diesem Level'}</p>
             </div>
           ) : (() => {
-            const visibleTracks = isSearchMode || showAllTracks ? displayTracks : displayTracks.slice(0, TRACKS_PREVIEW);
-            const hasMore = !isSearchMode && displayTracks.length > TRACKS_PREVIEW;
+            const visibleTracks = displayTracks;
+            const hasMore = false;
             return (
               <>
                 {visibleTracks.map((track, i) => {
@@ -278,17 +278,6 @@ export function AudioPlayer() {
                     </button>
                   );
                 })}
-                {hasMore && (
-                  <button
-                    onClick={() => setShowAllTracks(v => !v)}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl mb-1 text-sm font-semibold transition-all hover:bg-white/5"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
-                  >
-                    {showAllTracks
-                      ? <><ChevronUp className="w-4 h-4" /> Weniger anzeigen</>
-                      : <><ChevronDown className="w-4 h-4" /> {displayTracks.length - TRACKS_PREVIEW} weitere Tracks</>}
-                  </button>
-                )}
               </>
             );
           })()}
