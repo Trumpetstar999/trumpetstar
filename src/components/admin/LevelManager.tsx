@@ -89,6 +89,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [originalLevels, setOriginalLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [syncingLevelId, setSyncingLevelId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ 
     title: '', title_en: '', title_es: '',
