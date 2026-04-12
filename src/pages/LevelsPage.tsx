@@ -73,7 +73,7 @@ interface SelectedVideo {
 export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [levels, setLevels] = useState<LocalizedLevel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeLevel, setActiveLevel] = useState<string>('recent');
+  const [activeLevel, setActiveLevel] = useState<string>('all');
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
