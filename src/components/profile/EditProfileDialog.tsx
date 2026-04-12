@@ -80,6 +80,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
         .update({
           display_name: displayName.trim() || null,
           avatar_url: avatarUrl || null,
+          privacy_setting: isPublic ? 'public' : 'private',
         })
         .eq('id', profile.id);
 
