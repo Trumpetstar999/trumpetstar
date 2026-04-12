@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2, Globe } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2, Globe, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
