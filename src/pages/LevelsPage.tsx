@@ -8,7 +8,7 @@ import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -77,6 +77,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
+  const [newestVideos, setNewestVideos] = useState<LocalizedVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
   const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
   const [limitOverlayOpen, setLimitOverlayOpen] = useState(false);
