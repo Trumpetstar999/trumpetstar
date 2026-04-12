@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2, Globe } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ChevronRight, Crown, Lock, Save, Loader2, Globe, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 
@@ -89,6 +89,7 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
   const [originalLevels, setOriginalLevels] = useState<Level[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [syncingLevelId, setSyncingLevelId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ 
     title: '', title_en: '', title_es: '',
@@ -325,6 +326,32 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
       sort_order: level.sort_order,
       language: level.language,
     });
+  }
+
+  async function handleSyncLevel(levelId: string) {
+    setSyncingLevelId(levelId);
+    try {
+      const { data, error } = await supabase.functions.invoke('vimeo-sync', {
+        body: { action: 'sync', levelId },
+      });
+
+      if (error) throw error;
+
+      const result = data?.results?.[0];
+      if (result?.error) {
+        toast.error(`Sync-Fehler: ${result.error}`);
+      } else {
+        toast.success(
+          `Sync abgeschlossen: ${result?.videosAdded || 0} neu, ${result?.videosUpdated || 0} aktualisiert, ${result?.videosDeactivated || 0} deaktiviert`
+        );
+        fetchLevels();
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast.error('Fehler beim Synchronisieren mit Vimeo');
+    } finally {
+      setSyncingLevelId(null);
+    }
   }
 
   function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
@@ -679,6 +706,15 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                           ))}
                         </SelectContent>
                       </Select>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleSyncLevel(level.id)}
+                        disabled={syncingLevelId === level.id}
+                        title="Mit Vimeo synchronisieren"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${syncingLevelId === level.id ? 'animate-spin' : ''}`} />
+                      </Button>
                       <Button
                         size="icon"
                         variant="ghost"
