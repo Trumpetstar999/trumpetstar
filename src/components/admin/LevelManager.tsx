@@ -709,6 +709,15 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
                       <Button
                         size="icon"
                         variant="ghost"
+                        onClick={() => handleSyncLevel(level.id)}
+                        disabled={syncingLevelId === level.id}
+                        title="Mit Vimeo synchronisieren"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${syncingLevelId === level.id ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
                         onClick={() => startEditing(level)}
                       >
                         <Edit2 className="w-4 h-4" />
