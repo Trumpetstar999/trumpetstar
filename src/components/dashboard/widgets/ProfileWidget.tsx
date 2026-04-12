@@ -119,7 +119,7 @@ export function ProfileWidget() {
       <EditProfileDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        profile={profile || { id: user?.id || '', display_name: null, avatar_url: null, privacy_setting: 'private', created_at: '' }}
+        profile={profile || { id: user?.id || '', display_name: null, avatar_url: null, privacy_setting: 'private' }}
         onUpdate={fetchProfile}
       />
 
