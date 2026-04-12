@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit2, Settings, LogOut, UserPlus } from 'lucide-react';
+import { Edit2, Settings, LogOut, UserPlus, Users } from 'lucide-react';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
+import { SocialDialog } from '@/components/social/SocialDialog';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,6 +24,7 @@ export function ProfileWidget() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [socialDialogOpen, setSocialDialogOpen] = useState(false);
 
   const fetchProfile = async () => {
     if (!user) return;
