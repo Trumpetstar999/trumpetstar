@@ -69,11 +69,21 @@ export function ProfileWidget() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setInviteDialogOpen(true)}
+        onClick={() => setSocialDialogOpen(true)}
         className="w-full mt-3 text-white hover:text-white hover:bg-white/20 bg-white/10 gap-2"
       >
+        <Users className="w-4 h-4" />
+        Freunde & Ranking ⭐
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setInviteDialogOpen(true)}
+        className="w-full mt-1 text-white hover:text-white hover:bg-white/20 bg-white/10 gap-2"
+      >
         <UserPlus className="w-4 h-4" />
-        Freunde einladen ⭐
+        Freunde einladen
       </Button>
 
       <div className="flex gap-2 mt-2 w-full">
