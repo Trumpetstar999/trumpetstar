@@ -8,7 +8,7 @@ import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -77,6 +77,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideo | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
+  const [newestVideos, setNewestVideos] = useState<LocalizedVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
   const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
   const [limitOverlayOpen, setLimitOverlayOpen] = useState(false);
@@ -133,12 +134,45 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     fetchLevels(language);
   }, [language]);
 
-  // Fetch recent videos when user is available - no dependency on levels
+  // Fetch recent videos when user is available
   useEffect(() => {
     if (user) {
       fetchRecentVideos();
     }
   }, [user]);
+
+  // Fetch newest videos
+  useEffect(() => {
+    fetchNewestVideos();
+  }, []);
+
+  async function fetchNewestVideos() {
+    try {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('*, levels!inner(title)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(8);
+
+      if (error) throw error;
+
+      const mapped: LocalizedVideo[] = (data || []).map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        title_en: v.title_en,
+        title_es: v.title_es,
+        thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+        duration: v.duration_seconds || 0,
+        vimeoId: v.vimeo_video_id,
+        vimeoPlayerUrl: v.vimeo_player_url || undefined,
+        completions: 0,
+      }));
+      setNewestVideos(mapped);
+    } catch (err) {
+      console.error('[NewestVideos] Error:', err);
+    }
+  }
 
   async function fetchRecentVideos() {
     if (!user) {
@@ -572,6 +606,48 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                       <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 text-xs text-white/80 backdrop-blur-sm">
                         {video.levelTitle}
                       </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : activeLevel === 'newest' ? (
+            /* Newest Videos View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {language === 'en' ? 'Newest Videos' : language === 'es' ? 'Videos Nuevos' : 'Neueste Videos'}
+                  </h3>
+                  <p className="text-sm text-white/60">
+                    {language === 'en' ? 'Recently added content' : language === 'es' ? 'Contenido añadido recientemente' : 'Zuletzt hinzugefügte Inhalte'}
+                  </p>
+                </div>
+              </div>
+
+              {newestVideos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center opacity-0 animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+                    <Sparkles className="w-7 h-7 text-white/40" />
+                  </div>
+                  <h3 className="text-base font-medium text-white mb-1">Keine neuen Videos</h3>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {newestVideos.map((video, index) => (
+                    <div 
+                      key={video.id}
+                      className="relative opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <VideoCard
+                        video={video}
+                        onClick={() => handleVideoClick({ video })}
+                        index={0}
+                      />
                     </div>
                   ))}
                 </div>
