@@ -328,6 +328,32 @@ export function LevelManager({ onSelectLevel }: LevelManagerProps) {
     });
   }
 
+  async function handleSyncLevel(levelId: string) {
+    setSyncingLevelId(levelId);
+    try {
+      const { data, error } = await supabase.functions.invoke('vimeo-sync', {
+        body: { action: 'sync', levelId },
+      });
+
+      if (error) throw error;
+
+      const result = data?.results?.[0];
+      if (result?.error) {
+        toast.error(`Sync-Fehler: ${result.error}`);
+      } else {
+        toast.success(
+          `Sync abgeschlossen: ${result?.videosAdded || 0} neu, ${result?.videosUpdated || 0} aktualisiert, ${result?.videosDeactivated || 0} deaktiviert`
+        );
+        fetchLevels();
+      }
+    } catch (error) {
+      console.error('Sync error:', error);
+      toast.error('Fehler beim Synchronisieren mit Vimeo');
+    } finally {
+      setSyncingLevelId(null);
+    }
+  }
+
   function handleDifficultyChange(levelId: string, difficulty: Difficulty) {
     // Update local state only - save with Save button
     setLevels(prev => prev.map(l => 
