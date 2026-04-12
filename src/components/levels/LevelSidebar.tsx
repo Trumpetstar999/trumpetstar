@@ -105,6 +105,32 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
           </span>
         </button>
 
+        {/* Newest Videos Button */}
+        <button
+          onClick={() => onLevelSelect('newest')}
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-3 rounded-full transition-all duration-200 mb-4',
+            activeLevel === 'newest' 
+              ? 'bg-white/18 glow-blue' 
+              : 'hover:bg-white/10'
+          )}
+        >
+          <span className={cn(
+            'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
+            activeLevel === 'newest' 
+              ? 'bg-white text-brand-blue-mid' 
+              : 'bg-white/15 text-white'
+          )}>
+            <Sparkles className="w-5 h-5" />
+          </span>
+          <span className={cn(
+            'font-medium',
+            activeLevel === 'newest' ? 'text-white' : 'text-white/90'
+          )}>
+            {language === 'en' ? 'Newest Videos' : language === 'es' ? 'Videos Nuevos' : 'Neueste Videos'}
+          </span>
+        </button>
+
         <div className="border-t border-white/10 mb-4" />
         
         <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4 px-2">
