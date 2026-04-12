@@ -2,7 +2,7 @@ import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Star, Lock, Crown, Clock, ListOrdered } from 'lucide-react';
+import { Star, Lock, Crown, Clock, ListOrdered, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
