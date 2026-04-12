@@ -134,12 +134,45 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
     fetchLevels(language);
   }, [language]);
 
-  // Fetch recent videos when user is available - no dependency on levels
+  // Fetch recent videos when user is available
   useEffect(() => {
     if (user) {
       fetchRecentVideos();
     }
   }, [user]);
+
+  // Fetch newest videos
+  useEffect(() => {
+    fetchNewestVideos();
+  }, []);
+
+  async function fetchNewestVideos() {
+    try {
+      const { data, error } = await supabase
+        .from('videos')
+        .select('*, levels!inner(title)')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(8);
+
+      if (error) throw error;
+
+      const mapped: LocalizedVideo[] = (data || []).map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        title_en: v.title_en,
+        title_es: v.title_es,
+        thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+        duration: v.duration_seconds || 0,
+        vimeoId: v.vimeo_video_id,
+        vimeoPlayerUrl: v.vimeo_player_url || undefined,
+        completions: 0,
+      }));
+      setNewestVideos(mapped);
+    } catch (err) {
+      console.error('[NewestVideos] Error:', err);
+    }
+  }
 
   async function fetchRecentVideos() {
     if (!user) {
