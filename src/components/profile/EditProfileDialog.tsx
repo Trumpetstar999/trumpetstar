@@ -17,6 +17,7 @@ interface EditProfileDialogProps {
     id: string;
     display_name: string | null;
     avatar_url: string | null;
+    privacy_setting?: string | null;
   };
   onUpdate: () => void;
 }
@@ -25,6 +26,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
   const { t } = useLanguage();
   const [displayName, setDisplayName] = useState(profile.display_name || '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
+  const [isPublic, setIsPublic] = useState(profile.privacy_setting === 'public');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
