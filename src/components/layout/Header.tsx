@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.jpg';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { TunerButton } from '@/components/tuner/TunerButton';
 import { DailyPassIndicator } from '@/components/premium/DailyPassIndicator';

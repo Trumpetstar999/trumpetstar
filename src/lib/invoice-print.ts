@@ -303,7 +303,7 @@ ${invoice.notes ? `<p style="margin-top:6px;font-size:8.5pt;"><strong>Anmerkung:
 // Convert local image to base64 data URL for embedding
 async function getLogoDataUrl(): Promise<string | undefined> {
   try {
-    const logoModule = await import('@/assets/trumpetstar-logo.png');
+    const logoModule = await import('@/assets/trumpetstar-logo.jpg');
     const logoUrl = logoModule.default;
     const response = await fetch(logoUrl);
     const blob = await response.blob();
