@@ -611,6 +611,48 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               )}
             </div>
+          ) : activeLevel === 'newest' ? (
+            /* Newest Videos View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">
+                    {language === 'en' ? 'Newest Videos' : language === 'es' ? 'Videos Nuevos' : 'Neueste Videos'}
+                  </h3>
+                  <p className="text-sm text-white/60">
+                    {language === 'en' ? 'Recently added content' : language === 'es' ? 'Contenido añadido recientemente' : 'Zuletzt hinzugefügte Inhalte'}
+                  </p>
+                </div>
+              </div>
+
+              {newestVideos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center opacity-0 animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+                    <Sparkles className="w-7 h-7 text-white/40" />
+                  </div>
+                  <h3 className="text-base font-medium text-white mb-1">Keine neuen Videos</h3>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {newestVideos.map((video, index) => (
+                    <div 
+                      key={video.id}
+                      className="relative opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <VideoCard
+                        video={video}
+                        onClick={() => handleVideoClick({ video })}
+                        index={0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : activeLevel === 'all-az' ? (
             /* All Videos A-Z View */
             <div className="p-6">
