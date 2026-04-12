@@ -163,6 +163,14 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
             />
           </div>
 
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <Label>Öffentliches Profil</Label>
+              <p className="text-xs text-muted-foreground">Andere können dich finden und im Ranking sehen</p>
+            </div>
+            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
+          </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {t('common.cancel')}
