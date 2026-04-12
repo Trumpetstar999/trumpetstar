@@ -3794,6 +3794,24 @@ export type Database = {
       }
       can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
       finalize_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
+      get_friends_star_ranking: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          star_count: number
+          user_id: string
+        }[]
+      }
+      get_public_star_ranking: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          display_name: string
+          star_count: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

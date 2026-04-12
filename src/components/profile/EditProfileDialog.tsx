@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +17,7 @@ interface EditProfileDialogProps {
     id: string;
     display_name: string | null;
     avatar_url: string | null;
+    privacy_setting?: string | null;
   };
   onUpdate: () => void;
 }
@@ -24,6 +26,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
   const { t } = useLanguage();
   const [displayName, setDisplayName] = useState(profile.display_name || '');
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || '');
+  const [isPublic, setIsPublic] = useState(profile.privacy_setting === 'public');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +80,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
         .update({
           display_name: displayName.trim() || null,
           avatar_url: avatarUrl || null,
+          privacy_setting: isPublic ? 'public' : 'private',
         })
         .eq('id', profile.id);
 
@@ -157,6 +161,14 @@ export function EditProfileDialog({ open, onOpenChange, profile, onUpdate }: Edi
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder={t('editProfile.namePlaceholder')}
             />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div>
+              <Label>Öffentliches Profil</Label>
+              <p className="text-xs text-muted-foreground">Andere können dich finden und im Ranking sehen</p>
+            </div>
+            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
