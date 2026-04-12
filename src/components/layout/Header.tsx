@@ -61,7 +61,7 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
 
   return (
     <header className="sticky top-0 z-40 glass safe-top">
-      <div className="flex items-center justify-between px-6 py-3">
+      <div className="relative flex items-center justify-between px-6 py-3">
         {/* Left: Logo */}
         <div className="flex items-center gap-4">
           <a 
