@@ -132,6 +132,11 @@ export function ProfileWidget() {
         open={inviteDialogOpen}
         onOpenChange={setInviteDialogOpen}
       />
+
+      <SocialDialog
+        open={socialDialogOpen}
+        onOpenChange={setSocialDialogOpen}
+      />
     </div>
   );
 }
