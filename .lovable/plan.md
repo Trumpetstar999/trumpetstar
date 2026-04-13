@@ -1,99 +1,99 @@
 
 
-## Plan: Freunde finden, Sterneranking und Datenschutz-Einstellung
+## Plan: Playlist-System fur trumpetstar.app
 
-### Was wird gebaut
+### Ubersicht
 
-1. **Freunde finden** -- Suche nach anderen Nutzern (nur offentliche Profile), Freundschaftsanfragen senden/annehmen/ablehnen, Freundesliste anzeigen
-2. **Offentliches Sterneranking** -- Top-20 aller offentlichen Nutzer nach Gesamtsternen
-3. **Freunde-Sterneranking** -- Ranking nur unter akzeptierten Freunden
-4. **Profil-Datenschutz-Einstellung** -- Toggle im Profil-Bearbeiten-Dialog: offentlich (alle konnen dich sehen/finden) vs. privat (unsichtbar in Suche und Rankings)
+Ein personliches Playlist-System, das Usern erlaubt, Ubeplaylists zu erstellen, Videos per Drag & Drop zu organisieren und diese direkt auf den Level-Seiten als Ubeplan zu nutzen. Tablet-optimiert, Duolingo/Spotify-inspiriert.
 
-### Datenbank
+### Datenbank (2 neue Tabellen + RLS)
 
-Keine neuen Tabellen notig. Es existieren bereits:
-- `profiles` mit `privacy_setting` (default: 'private')
-- `friendships` mit `requester_id`, `addressee_id`, `status` und passenden RLS-Policies
-
-Benotigte RLS-Anderung:
-- **Neue SELECT-Policy auf `profiles`**: Authentifizierte Nutzer konnen Profile lesen, bei denen `privacy_setting = 'public'` ist (fur die Suche und das offentliche Ranking). Die eigene Zeile bleibt immer lesbar.
-- **Neue SELECT-Policy auf `video_completions`**: Aggregierter Lesezugriff fur offentliche Rankings -- hier wird eine DB-Funktion `get_public_star_ranking()` als SECURITY DEFINER erstellt, die die Sterne zahlt und nur offentliche Profile zuruckgibt. Gleiches fur `get_friends_star_ranking(user_id)`.
-
-Migration:
 ```sql
--- Allow reading public profiles
-CREATE POLICY "Authenticated can read public profiles"
-ON public.profiles FOR SELECT TO authenticated
-USING (privacy_setting = 'public' OR id = auth.uid());
+-- Playlists
+CREATE TABLE public.playlists (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  description text,
+  level_id uuid REFERENCES public.levels(id) ON DELETE SET NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
 
--- Function: public star ranking
-CREATE OR REPLACE FUNCTION public.get_public_star_ranking()
-RETURNS TABLE(user_id uuid, display_name text, avatar_url text, star_count bigint)
-LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
-  SELECT p.id, p.display_name, p.avatar_url, COUNT(vc.id) as star_count
-  FROM profiles p
-  LEFT JOIN video_completions vc ON vc.user_id = p.id
-  WHERE p.privacy_setting = 'public'
-  GROUP BY p.id
-  ORDER BY star_count DESC
-  LIMIT 20;
-$$;
+ALTER TABLE public.playlists ENABLE ROW LEVEL SECURITY;
 
--- Function: friends star ranking
-CREATE OR REPLACE FUNCTION public.get_friends_star_ranking(_user_id uuid)
-RETURNS TABLE(user_id uuid, display_name text, avatar_url text, star_count bigint)
-LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
-  SELECT p.id, p.display_name, p.avatar_url, COUNT(vc.id) as star_count
-  FROM profiles p
-  LEFT JOIN video_completions vc ON vc.user_id = p.id
-  WHERE p.id = _user_id
-     OR p.id IN (
-       SELECT CASE WHEN requester_id = _user_id THEN addressee_id ELSE requester_id END
-       FROM friendships
-       WHERE (requester_id = _user_id OR addressee_id = _user_id) AND status = 'accepted'
-     )
-  GROUP BY p.id
-  ORDER BY star_count DESC
-  LIMIT 50;
-$$;
+CREATE POLICY "Users manage own playlists" ON public.playlists
+  FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- Playlist Items
+CREATE TABLE public.playlist_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  playlist_id uuid NOT NULL REFERENCES public.playlists(id) ON DELETE CASCADE,
+  video_id uuid NOT NULL REFERENCES public.videos(id) ON DELETE CASCADE,
+  order_index integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.playlist_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own playlist items" ON public.playlist_items
+  FOR ALL TO authenticated
+  USING (playlist_id IN (SELECT id FROM public.playlists WHERE user_id = auth.uid()))
+  WITH CHECK (playlist_id IN (SELECT id FROM public.playlists WHERE user_id = auth.uid()));
+
+-- Updated-at trigger
+CREATE TRIGGER update_playlists_updated_at
+  BEFORE UPDATE ON public.playlists
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
-### Neue Komponenten
+### Neue Dateien
 
-1. **`src/components/social/FriendSearch.tsx`**
-   - Textfeld zur Namenssuche, fragt `profiles` mit `privacy_setting = 'public'` ab
-   - Zeigt Avatar + Name + "Anfrage senden"-Button
-   - Verhindert doppelte Anfragen
+| Datei | Zweck |
+|-------|-------|
+| `src/hooks/usePlaylists.tsx` | CRUD-Hook: Playlists & Items laden, erstellen, loschen, Reihenfolge speichern |
+| `src/components/playlists/CreatePlaylistDialog.tsx` | Modal: Name, Beschreibung, Level-Dropdown |
+| `src/components/playlists/PlaylistEditor.tsx` | Drag & Drop Videoliste, Video-Suche/Hinzufugen |
+| `src/components/playlists/PlaylistVideoSearch.tsx` | Such-Overlay mit Filter (Level, Titel) |
+| `src/components/playlists/PlaylistCard.tsx` | Karte mit Name, Videoanzahl, Fortschritt, Start-Button |
+| `src/components/playlists/PlaylistPlayerOverlay.tsx` | Autoplay-Player: spielt Videos nacheinander ab |
+| `src/components/playlists/LevelPlaylistSection.tsx` | "Deine Playlists"-Sektion auf Level-Seiten |
 
-2. **`src/components/social/FriendsList.tsx`**
-   - Zeigt akzeptierte Freunde und offene Anfragen (eingehend/ausgehend)
-   - Annehmen/Ablehnen/Entfernen-Aktionen
+### Integration in LevelsPage
 
-3. **`src/components/social/StarRanking.tsx`**
-   - Tabs: "Offentlich" / "Freunde"
-   - Ruft `get_public_star_ranking()` bzw. `get_friends_star_ranking(user_id)` auf
-   - Zeigt Rang, Avatar, Name, Sternezahl
-   - Eigene Position hervorgehoben
+- Neue Sektion "Deine Playlists" oberhalb der Video-Sektionen wenn ein Level ausgewahlt ist
+- Zeigt PlaylistCards fur Playlists mit passendem `level_id`
+- "Starten"-Button offnet den PlaylistPlayerOverlay
 
-4. **`src/components/social/SocialPage.tsx`** (oder als neue Dashboard-Widgets)
-   - Kombiniert FriendSearch, FriendsList und StarRanking
+### Plan-Limits (Free vs Premium)
 
-### Integration ins Profil
+- Im `usePlaylists`-Hook wird `useMembership` gepruft:
+  - FREE: max 1 Playlist, max 5 Videos pro Playlist
+  - Alles ab PLAN_A: unbegrenzt
+- Bei Limit-Uberschreitung: Upgrade-Hinweis anzeigen
 
-- **ProfileWidget**: Neuer Button "Freunde & Ranking" der ein Dialog/Sheet offnet mit den Social-Komponenten
-- **EditProfileDialog**: Neuer Switch "Offentliches Profil" der `privacy_setting` zwischen 'public' und 'private' toggled
-- Alternativ: Neue Dashboard-Widgets `friends` und `star-ranking` hinzufugen
+### Fortschritt
+
+- Fortschritt wird aus `video_completions` berechnet (wie viele Videos der Playlist bereits abgeschlossen)
+- Kein neuer DB-State notig
+
+### Drag & Drop
+
+- Verwendung von `@dnd-kit/core` + `@dnd-kit/sortable` (bereits bewahrt in React-Okosystem)
+- Smooth Animationen, Touch-optimiert fur iPad
+
+### Player-Logik
+
+- Ahnlich wie bestehender `SessionPlayerPage` aber schlanker
+- Autoplay nachstes Video nach Abschluss
+- Fortschrittsanzeige (X/Y Videos)
+- Zuruck/Weiter/Beenden-Buttons
 
 ### Dateien die geandert werden
 
 | Datei | Anderung |
 |-------|----------|
-| `src/components/profile/EditProfileDialog.tsx` | Privacy-Toggle hinzufugen |
-| `src/components/dashboard/widgets/ProfileWidget.tsx` | Social-Button hinzufugen |
-| `src/components/social/FriendSearch.tsx` | Neu |
-| `src/components/social/FriendsList.tsx` | Neu |
-| `src/components/social/StarRanking.tsx` | Neu |
-| `src/components/social/SocialDialog.tsx` | Neu -- Hauptcontainer mit Tabs |
-| `src/hooks/useDashboardLayout.tsx` | Ggf. neues Widget-ID |
-| DB-Migration | RLS Policy + 2 Funktionen |
+| `src/pages/LevelsPage.tsx` | LevelPlaylistSection einbinden |
+| `package.json` | `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` hinzufugen |
+| DB-Migration | 2 Tabellen + RLS + Trigger |
 
