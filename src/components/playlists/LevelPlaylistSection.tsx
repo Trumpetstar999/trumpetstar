@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, ListMusic, Lock } from 'lucide-react';
 import { PlaylistCard } from './PlaylistCard';
-import { CreatePlaylistPage } from './CreatePlaylistPage';
 import { PlaylistEditor } from './PlaylistEditor';
 import { PlaylistPlayerOverlay } from './PlaylistPlayerOverlay';
 import { usePlaylists, PlaylistWithItems } from '@/hooks/usePlaylists';
@@ -22,13 +22,13 @@ interface LevelPlaylistSectionProps {
 
 export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: LevelPlaylistSectionProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const {
-    playlists, isLoading, canCreatePlaylist, canAddVideo,
-    createPlaylist, deletePlaylist, addVideo, removeVideo, reorderItems,
+    playlists, isLoading, canCreatePlaylist,
+    deletePlaylist, addVideo, removeVideo, reorderItems,
     getPlaylistsForLevel, isPremium, FREE_MAX_PLAYLISTS,
   } = usePlaylists();
 
-  const [createOpen, setCreateOpen] = useState(false);
   const [editingPlaylist, setEditingPlaylist] = useState<PlaylistWithItems | null>(null);
   const [playingPlaylist, setPlayingPlaylist] = useState<PlaylistWithItems | null>(null);
   const [completedVideoIds, setCompletedVideoIds] = useState<string[]>([]);
@@ -49,7 +49,6 @@ export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: L
 
   if (!user) return null;
 
-  // Update editing playlist reference when playlists change
   const currentEditingPlaylist = editingPlaylist
     ? playlists.find(p => p.id === editingPlaylist.id) || editingPlaylist
     : null;
@@ -68,7 +67,7 @@ export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: L
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => setCreateOpen(true)}
+            onClick={() => navigate(`/app/playlists/new?levelId=${currentLevelId}`)}
             disabled={!canCreatePlaylist()}
             className="gap-1.5 text-white/70 hover:text-white hover:bg-white/10 text-xs"
           >
@@ -86,7 +85,7 @@ export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: L
           </div>
         ) : levelPlaylists.length === 0 ? (
           <button
-            onClick={() => setCreateOpen(true)}
+            onClick={() => navigate(`/app/playlists/new?levelId=${currentLevelId}`)}
             className="w-full p-6 rounded-xl border-2 border-dashed border-white/15 hover:border-primary/40 transition-colors flex flex-col items-center gap-2 group"
           >
             <Plus className="w-8 h-8 text-white/30 group-hover:text-primary transition-colors" />
@@ -101,22 +100,13 @@ export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: L
                 key={playlist.id}
                 playlist={playlist}
                 completedVideoIds={completedVideoIds}
-                onEdit={() => setEditingPlaylist(playlist)}
+                onEdit={() => navigate(`/app/playlists/${playlist.id}/edit`)}
                 onStart={() => setPlayingPlaylist(playlist)}
               />
             ))}
           </div>
         )}
       </div>
-
-      <CreatePlaylistPage
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        levels={levels}
-        defaultLevelId={currentLevelId}
-        onCreate={createPlaylist}
-        onAddVideoToPlaylist={addVideo}
-      />
 
       {currentEditingPlaylist && (
         <PlaylistEditor
