@@ -3,6 +3,7 @@ import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
+import { LevelPlaylistSection } from '@/components/playlists/LevelPlaylistSection';
 
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
@@ -743,6 +744,13 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
             <div className="p-6">
+              {/* Playlist Section */}
+              <LevelPlaylistSection
+                currentLevelId={currentLevel.id}
+                levels={levels.map(l => ({ id: l.id, title: l.title }))}
+                onStarEarned={onStarEarned}
+              />
+              
               {currentLevel.sections.map((section, sectionIndex) => (
                 <SectionRow
                   key={section.id}

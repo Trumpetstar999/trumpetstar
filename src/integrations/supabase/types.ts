@@ -2447,6 +2447,83 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          playlist_id: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          playlist_id: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          playlist_id?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_items_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_items_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          level_id: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          level_id?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          level_id?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlists_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       practice_session_items: {
         Row: {
           created_at: string
