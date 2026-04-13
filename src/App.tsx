@@ -31,6 +31,7 @@ import PricingPage from "./pages/PricingPage";
 
 import GamePlayPage from "./pages/GamePlayPage";
 import SessionBuilderPage from "./pages/SessionBuilderPage";
+import PlaylistBuilderPage from "./pages/PlaylistBuilderPage";
 import SessionListPage from "./pages/SessionListPage";
 import SessionPlayerPage from "./pages/SessionPlayerPage";
 import SharedSessionPage from "./pages/SharedSessionPage";
@@ -113,6 +114,8 @@ const App = () => {
                         <Route path="/app/practice/sessions/new" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/practice/sessions/:id/edit" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/practice/sessions/:id/play" element={<ProtectedRoute><SessionPlayerPage /></ProtectedRoute>} />
+                        <Route path="/app/playlists/new" element={<ProtectedRoute><PlaylistBuilderPage /></ProtectedRoute>} />
+                        <Route path="/app/playlists/:id/edit" element={<ProtectedRoute><PlaylistBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/hilfe" element={<ProtectedRoute><HelpCenterPage /></ProtectedRoute>} />
                         
                         {/* Public Routes */}
