@@ -62,9 +62,15 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   const handleVideoComplete = useCallback(() => {
     onStarEarned();
-    // Stars are awarded immediately on video open, so don't auto-advance here.
-    // Users navigate with skip buttons instead.
   }, [onStarEarned]);
+
+  const handleNext = useCallback(() => {
+    if (currentIndex < videos.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      setCompleted(true);
+    }
+  }, [currentIndex, videos.length]);
 
   if (isLoading || videos.length === 0) return null;
 
@@ -85,14 +91,6 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   const currentVideo = videos[currentIndex];
   const progressPercent = ((currentIndex + 1) / videos.length) * 100;
-
-  const handleNext = useCallback(() => {
-    if (currentIndex < videos.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else {
-      setCompleted(true);
-    }
-  }, [currentIndex, videos.length]);
 
   return (
     <div className="fixed inset-0 z-50">
