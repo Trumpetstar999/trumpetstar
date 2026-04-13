@@ -3,6 +3,7 @@ import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
+import { LevelPlaylistSection } from '@/components/playlists/LevelPlaylistSection';
 
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
