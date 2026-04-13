@@ -7,7 +7,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 const app = express();
-const PORT = 3006;
+const PORT = process.env.PORT || 3006;
 
 const CONTENT_JSON = path.join(__dirname, '../content.json');
 const IMAGES_DIR = path.join(__dirname, '../public/images');
