@@ -301,7 +301,7 @@ export default function PlaylistBuilderPage() {
         </div>
 
         {/* CENTER: Videos */}
-        <div className="flex-1 flex flex-col glass">
+        <div className="w-80 flex flex-col glass shrink-0">
           <div className="p-4 border-b border-border/50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -364,7 +364,7 @@ export default function PlaylistBuilderPage() {
         </div>
 
         {/* RIGHT: Playlist Items */}
-        <div className="w-80 flex flex-col glass">
+        <div className="flex-1 flex flex-col glass">
           <div className="px-5 py-3 border-b border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-1 h-8 rounded-full shrink-0 bg-primary" />
