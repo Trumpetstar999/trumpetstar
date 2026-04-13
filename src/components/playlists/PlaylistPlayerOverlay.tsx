@@ -62,13 +62,9 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   const handleVideoComplete = useCallback(() => {
     onStarEarned();
-    // Auto-advance to next video
-    if (currentIndex < videos.length - 1) {
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 1500);
-    } else {
-      setCompleted(true);
-    }
-  }, [currentIndex, videos.length, onStarEarned]);
+    // Stars are awarded immediately on video open, so don't auto-advance here.
+    // Users navigate with skip buttons instead.
+  }, [onStarEarned]);
 
   if (isLoading || videos.length === 0) return null;
 
