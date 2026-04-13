@@ -62,13 +62,15 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   const handleVideoComplete = useCallback(() => {
     onStarEarned();
-    // Auto-advance to next video
+  }, [onStarEarned]);
+
+  const handleNext = useCallback(() => {
     if (currentIndex < videos.length - 1) {
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 1500);
+      setCurrentIndex(prev => prev + 1);
     } else {
       setCompleted(true);
     }
-  }, [currentIndex, videos.length, onStarEarned]);
+  }, [currentIndex, videos.length]);
 
   if (isLoading || videos.length === 0) return null;
 
@@ -88,12 +90,12 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
   }
 
   const currentVideo = videos[currentIndex];
-  const progressPercent = ((currentIndex) / videos.length) * 100;
+  const progressPercent = ((currentIndex + 1) / videos.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-50">
-      {/* Progress bar top */}
-      <div className="absolute top-0 left-0 right-0 z-[60] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
+    <div className="fixed inset-0 z-[110]">
+      {/* Progress bar top - must be above VideoPlayer z-[100] */}
+      <div className="absolute top-0 left-0 right-0 z-[130] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
         <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
@@ -113,9 +115,8 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
             <SkipBack className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setCurrentIndex(Math.min(videos.length - 1, currentIndex + 1))}
-            disabled={currentIndex === videos.length - 1}
-            className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30 transition-colors"
+            onClick={handleNext}
+            className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"
           >
             <SkipForward className="w-4 h-4" />
           </button>
