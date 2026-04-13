@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { LevelPlaylistSection } from '@/components/playlists/LevelPlaylistSection';
+import { PlaylistPlayerOverlay } from '@/components/playlists/PlaylistPlayerOverlay';
+import { usePlaylists, PlaylistWithItems } from '@/hooks/usePlaylists';
 
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles, ListMusic, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -86,8 +88,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const { canAccessLevel } = useMembership();
   const { canStartVideo, recordVideoStart } = useDailyUsage();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { t, language, skillLevel } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
+  const { playlists, canCreatePlaylist } = usePlaylists();
+  const [playingPlaylist, setPlayingPlaylist] = useState<PlaylistWithItems | null>(null);
+  const [playlistVideos, setPlaylistVideos] = useState<LocalizedVideo[]>([]);
 
   // Gated video start handler
   const handleVideoClick = useCallback(async (videoData: SelectedVideo) => {
@@ -409,7 +415,46 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }, [levels, language, getLocalizedField]);
 
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
+  const activePlaylist = activeLevel?.startsWith('playlist-')
+    ? playlists.find(p => p.id === activeLevel.replace('playlist-', ''))
+    : null;
   const isSearching = searchQuery.trim().length > 0;
+
+  // Fetch videos for the active playlist
+  useEffect(() => {
+    if (!activePlaylist || activePlaylist.items.length === 0) {
+      setPlaylistVideos([]);
+      return;
+    }
+    const videoIds = activePlaylist.items.map(i => i.video_id);
+    supabase
+      .from('videos')
+      .select('*')
+      .in('id', videoIds)
+      .eq('is_active', true)
+      .then(({ data }) => {
+        if (!data) { setPlaylistVideos([]); return; }
+        // Preserve playlist order
+        const ordered = activePlaylist.items
+          .map(item => {
+            const v = data.find((d: any) => d.id === item.video_id);
+            if (!v) return null;
+            return {
+              id: v.id,
+              title: v.title,
+              title_en: v.title_en,
+              title_es: v.title_es,
+              thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+              duration: v.duration_seconds || 0,
+              vimeoId: v.vimeo_video_id,
+              vimeoPlayerUrl: v.vimeo_player_url || undefined,
+              completions: 0,
+            } as LocalizedVideo;
+          })
+          .filter(Boolean) as LocalizedVideo[];
+        setPlaylistVideos(ordered);
+      });
+  }, [activePlaylist]);
 
   if (isLoading) {
     return (
@@ -495,6 +540,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
             levels={filteredLevels}
             activeLevel={activeLevel}
             onLevelSelect={setActiveLevel}
+            playlists={playlists}
+            onCreatePlaylist={canCreatePlaylist() ? () => navigate('/app/playlists/new') : undefined}
           />
         )}
         
@@ -654,6 +701,72 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               )}
             </div>
+          ) : activePlaylist ? (
+            /* Playlist View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
+                  <ListMusic className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white">{activePlaylist.name}</h3>
+                  <p className="text-sm text-white/60">
+                    {playlistVideos.length} {playlistVideos.length === 1 ? 'Video' : 'Videos'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/app/playlists/${activePlaylist.id}/edit`)}
+                    className="text-white/70 hover:text-white hover:bg-white/10 text-xs"
+                  >
+                    Bearbeiten
+                  </Button>
+                  {playlistVideos.length > 0 && (
+                    <Button
+                      size="sm"
+                      onClick={() => setPlayingPlaylist(activePlaylist)}
+                      className="gap-1.5 text-xs"
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      Üben starten
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {playlistVideos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <ListMusic className="w-12 h-12 text-white/20 mb-4" />
+                  <p className="text-white/50 mb-2">Noch keine Videos in dieser Playlist</p>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/app/playlists/${activePlaylist.id}/edit`)}
+                    className="text-white/70 hover:text-white"
+                  >
+                    Videos hinzufügen
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {playlistVideos.map((video, index) => (
+                    <div
+                      key={video.id}
+                      className="relative opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <VideoCard
+                        video={video}
+                        onClick={() => handleVideoClick({ video })}
+                        index={0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : activeLevel === 'all-az' ? (
             /* All Videos A-Z View */
             <div className="p-6">
@@ -744,13 +857,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
             <div className="p-6">
-              {/* Playlist Section */}
-              <LevelPlaylistSection
-                currentLevelId={currentLevel.id}
-                levels={levels.map(l => ({ id: l.id, title: l.title }))}
-                onStarEarned={onStarEarned}
-              />
-              
               {currentLevel.sections.map((section, sectionIndex) => (
                 <SectionRow
                   key={section.id}
@@ -784,6 +890,14 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         type="video"
         onClose={() => setLimitOverlayOpen(false)}
       />
+
+      {playingPlaylist && (
+        <PlaylistPlayerOverlay
+          playlist={playingPlaylist}
+          onClose={() => setPlayingPlaylist(null)}
+          onStarEarned={onStarEarned}
+        />
+      )}
     </div>
   );
 }

@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Level } from '@/types';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Star, Lock, Crown, Clock, ListOrdered, Sparkles } from 'lucide-react';
+import { Star, Lock, Crown, Clock, ListOrdered, Sparkles, ListMusic, ChevronDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PlaylistWithItems } from '@/hooks/usePlaylists';
 
 type Difficulty = 'basics' | 'beginner' | 'easy' | 'medium' | 'advanced';
 
@@ -20,11 +22,14 @@ interface LevelSidebarProps {
   activeLevel: string | null;
   onLevelSelect: (levelId: string) => void;
   showRecent?: boolean;
+  playlists?: PlaylistWithItems[];
+  onCreatePlaylist?: () => void;
 }
 
-export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
+export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true, playlists = [], onCreatePlaylist }: LevelSidebarProps) {
   const { canAccessLevel } = useMembership();
   const { t, language } = useLanguage();
+  const [playlistsOpen, setPlaylistsOpen] = useState(true);
 
   const DIFFICULTY_COLORS: Record<Difficulty, string> = {
     basics: 'text-purple-400',
@@ -130,6 +135,79 @@ export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = 
             {language === 'en' ? 'Newest Videos' : language === 'es' ? 'Videos Nuevos' : 'Neueste Videos'}
           </span>
         </button>
+
+        <div className="border-t border-white/10 mb-4" />
+
+        {/* Eigene Playlists - collapsible */}
+        <div className="mb-4">
+          <button
+            onClick={() => setPlaylistsOpen(!playlistsOpen)}
+            className="w-full flex items-center justify-between px-2 mb-2"
+          >
+            <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider flex items-center gap-1.5">
+              <ListMusic className="w-3.5 h-3.5" />
+              {language === 'en' ? 'My Playlists' : language === 'es' ? 'Mis Playlists' : 'Eigene Playlists'}
+            </h2>
+            <ChevronDown className={cn(
+              'w-3.5 h-3.5 text-white/40 transition-transform duration-200',
+              playlistsOpen && 'rotate-180'
+            )} />
+          </button>
+
+          {playlistsOpen && (
+            <nav className="space-y-1">
+              {playlists.map(playlist => {
+                const isActive = activeLevel === `playlist-${playlist.id}`;
+                return (
+                  <button
+                    key={playlist.id}
+                    onClick={() => onLevelSelect(`playlist-${playlist.id}`)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-full transition-all duration-200',
+                      isActive
+                        ? 'bg-white/18 glow-blue'
+                        : 'hover:bg-white/10'
+                    )}
+                  >
+                    <span className={cn(
+                      'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+                      isActive
+                        ? 'bg-white text-brand-blue-mid'
+                        : 'bg-white/15 text-white'
+                    )}>
+                      <ListMusic className="w-4 h-4" />
+                    </span>
+                    <div className="flex-1 min-w-0 text-left">
+                      <span className={cn(
+                        'block text-sm font-medium truncate',
+                        isActive ? 'text-white' : 'text-white/90'
+                      )}>
+                        {playlist.name}
+                      </span>
+                      <span className="text-[11px] text-white/40">
+                        {playlist.items.length} {playlist.items.length === 1 ? 'Video' : 'Videos'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+
+              {onCreatePlaylist && (
+                <button
+                  onClick={onCreatePlaylist}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-full hover:bg-white/10 transition-all duration-200"
+                >
+                  <span className="w-8 h-8 rounded-full flex items-center justify-center bg-white/10 text-white/50">
+                    <Plus className="w-4 h-4" />
+                  </span>
+                  <span className="text-sm text-white/50">
+                    {language === 'en' ? 'New Playlist' : language === 'es' ? 'Nueva Playlist' : 'Neue Playlist'}
+                  </span>
+                </button>
+              )}
+            </nav>
+          )}
+        </div>
 
         <div className="border-t border-white/10 mb-4" />
         
