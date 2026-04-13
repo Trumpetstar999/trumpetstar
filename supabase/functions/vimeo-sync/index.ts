@@ -48,6 +48,52 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // ── TS-QA-KW14-SEC-003: Caller Authentication ────────────────────────────
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return new Response(JSON.stringify({ error: 'Unauthorized: missing Bearer token' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  const callerToken = authHeader.replace('Bearer ', '').trim();
+  const _supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const _serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const _anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+  const isServiceRole = _serviceRoleKey && callerToken === _serviceRoleKey;
+  if (!isServiceRole) {
+    const { createClient: _createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    const _sb = _createClient(_supabaseUrl, _anonKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: authData, error: authError } = await _sb.auth.getUser(callerToken);
+    if (authError || !authData?.user) {
+      console.warn('[vimeo-sync] Unauthorized caller');
+      return new Response(JSON.stringify({ error: 'Unauthorized: invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    // Only admins may trigger vimeo-sync
+    const _supabaseAdmin = _createClient(_supabaseUrl, _serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: roleData } = await _supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', authData.user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+    if (!roleData) {
+      console.warn('[vimeo-sync] Non-admin caller rejected');
+      return new Response(JSON.stringify({ error: 'Forbidden: admin only' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   try {
     const VIMEO_TOKEN = Deno.env.get('VIMEO_TOKEN');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
