@@ -415,7 +415,46 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }, [levels, language, getLocalizedField]);
 
   const currentLevel = filteredLevels.find(l => l.id === activeLevel) || (filteredLevels.length > 0 ? filteredLevels[0] : null);
+  const activePlaylist = activeLevel?.startsWith('playlist-')
+    ? playlists.find(p => p.id === activeLevel.replace('playlist-', ''))
+    : null;
   const isSearching = searchQuery.trim().length > 0;
+
+  // Fetch videos for the active playlist
+  useEffect(() => {
+    if (!activePlaylist || activePlaylist.items.length === 0) {
+      setPlaylistVideos([]);
+      return;
+    }
+    const videoIds = activePlaylist.items.map(i => i.video_id);
+    supabase
+      .from('videos')
+      .select('*')
+      .in('id', videoIds)
+      .eq('is_active', true)
+      .then(({ data }) => {
+        if (!data) { setPlaylistVideos([]); return; }
+        // Preserve playlist order
+        const ordered = activePlaylist.items
+          .map(item => {
+            const v = data.find((d: any) => d.id === item.video_id);
+            if (!v) return null;
+            return {
+              id: v.id,
+              title: v.title,
+              title_en: v.title_en,
+              title_es: v.title_es,
+              thumbnail: v.thumbnail_url || 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=225&fit=crop',
+              duration: v.duration_seconds || 0,
+              vimeoId: v.vimeo_video_id,
+              vimeoPlayerUrl: v.vimeo_player_url || undefined,
+              completions: 0,
+            } as LocalizedVideo;
+          })
+          .filter(Boolean) as LocalizedVideo[];
+        setPlaylistVideos(ordered);
+      });
+  }, [activePlaylist]);
 
   if (isLoading) {
     return (
