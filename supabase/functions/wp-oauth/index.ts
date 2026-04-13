@@ -7,7 +7,7 @@ const corsHeaders = {
 
 // WordPress OAuth Configuration
 const WP_BASE_URL = 'https://www.trumpetstar.com';
-const WP_OAUTH_CLIENT_ID = 'WjGtEhetRuRSQOktowbaLUvzKuyrUGgl';
+const WP_OAUTH_CLIENT_ID = Deno.env.get('WP_OAUTH_CLIENT_ID') || 'WjGtEhetRuRSQOktowbaLUvzKuyrUGgl'; // TS-QA-KW14-SEC-004 fix: prefer env var
 const WP_OAUTH_AUTHORIZE_URL = `${WP_BASE_URL}/wp-json/moserver/authorize`;
 const WP_OAUTH_TOKEN_URL = `${WP_BASE_URL}/wp-json/moserver/token`;
 const WP_OAUTH_USERINFO_URL = `${WP_BASE_URL}/wp-json/trumpetstar/v1/me`;
