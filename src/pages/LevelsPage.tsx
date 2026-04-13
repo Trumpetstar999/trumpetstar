@@ -501,6 +501,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
             levels={filteredLevels}
             activeLevel={activeLevel}
             onLevelSelect={setActiveLevel}
+            playlists={playlists}
+            onCreatePlaylist={canCreatePlaylist() ? () => navigate('/app/playlists/new') : undefined}
           />
         )}
         
