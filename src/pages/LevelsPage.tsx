@@ -701,6 +701,72 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </div>
               )}
             </div>
+          ) : activePlaylist ? (
+            /* Playlist View */
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6 opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-float">
+                  <ListMusic className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-white">{activePlaylist.name}</h3>
+                  <p className="text-sm text-white/60">
+                    {playlistVideos.length} {playlistVideos.length === 1 ? 'Video' : 'Videos'}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/app/playlists/${activePlaylist.id}/edit`)}
+                    className="text-white/70 hover:text-white hover:bg-white/10 text-xs"
+                  >
+                    Bearbeiten
+                  </Button>
+                  {playlistVideos.length > 0 && (
+                    <Button
+                      size="sm"
+                      onClick={() => setPlayingPlaylist(activePlaylist)}
+                      className="gap-1.5 text-xs"
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      Üben starten
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {playlistVideos.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <ListMusic className="w-12 h-12 text-white/20 mb-4" />
+                  <p className="text-white/50 mb-2">Noch keine Videos in dieser Playlist</p>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => navigate(`/app/playlists/${activePlaylist.id}/edit`)}
+                    className="text-white/70 hover:text-white"
+                  >
+                    Videos hinzufügen
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {playlistVideos.map((video, index) => (
+                    <div
+                      key={video.id}
+                      className="relative opacity-0 animate-fade-in"
+                      style={{ animationDelay: `${index * 60}ms`, animationFillMode: 'forwards' }}
+                    >
+                      <VideoCard
+                        video={video}
+                        onClick={() => handleVideoClick({ video })}
+                        index={0}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : activeLevel === 'all-az' ? (
             /* All Videos A-Z View */
             <div className="p-6">
