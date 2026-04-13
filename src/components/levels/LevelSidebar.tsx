@@ -22,6 +22,8 @@ interface LevelSidebarProps {
   activeLevel: string | null;
   onLevelSelect: (levelId: string) => void;
   showRecent?: boolean;
+  playlists?: PlaylistWithItems[];
+  onCreatePlaylist?: () => void;
 }
 
 export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
