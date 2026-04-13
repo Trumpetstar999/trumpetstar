@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, ListMusic, Lock } from 'lucide-react';
 import { PlaylistCard } from './PlaylistCard';
-import { CreatePlaylistDialog } from './CreatePlaylistDialog';
+import { CreatePlaylistPage } from './CreatePlaylistPage';
 import { PlaylistEditor } from './PlaylistEditor';
 import { PlaylistPlayerOverlay } from './PlaylistPlayerOverlay';
 import { usePlaylists, PlaylistWithItems } from '@/hooks/usePlaylists';
@@ -109,12 +109,13 @@ export function LevelPlaylistSection({ currentLevelId, levels, onStarEarned }: L
         )}
       </div>
 
-      <CreatePlaylistDialog
+      <CreatePlaylistPage
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onClose={() => setCreateOpen(false)}
         levels={levels}
         defaultLevelId={currentLevelId}
         onCreate={createPlaylist}
+        onAddVideoToPlaylist={addVideo}
       />
 
       {currentEditingPlaylist && (
