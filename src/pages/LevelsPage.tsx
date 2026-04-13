@@ -94,7 +94,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const { playlists, canCreatePlaylist } = usePlaylists();
   const [playingPlaylist, setPlayingPlaylist] = useState<PlaylistWithItems | null>(null);
   const [playlistVideos, setPlaylistVideos] = useState<LocalizedVideo[]>([]);
-  const { getLocalizedField } = useLocalizedContent();
 
   // Gated video start handler
   const handleVideoClick = useCallback(async (videoData: SelectedVideo) => {
