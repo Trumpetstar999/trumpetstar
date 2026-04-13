@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable } from '@dnd-kit/sortable';
@@ -6,6 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePlaylists } from '@/hooks/usePlaylists';
+import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,12 +17,13 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 
-interface LibraryItem {
+interface LibraryVideo {
   id: string;
   title: string;
-  duration?: number | null;
-  level_title?: string;
-  thumbnail?: string | null;
+  duration_seconds: number | null;
+  level_id: string;
+  thumbnail_url: string | null;
+  sort_order: number;
 }
 
 interface LocalPlaylistItem {
@@ -38,42 +40,67 @@ export default function PlaylistBuilderPage() {
   const [searchParams] = useSearchParams();
   const defaultLevelId = searchParams.get('levelId') || '';
   const { user } = useAuth();
-  const { playlists, createPlaylist, addVideo, removeVideo, reorderItems, refreshPlaylists } = usePlaylists();
+  const { language } = useLanguage();
+  const { playlists, createPlaylist, refreshPlaylists } = usePlaylists();
 
   const [playlistName, setPlaylistName] = useState('');
   const [description, setDescription] = useState('');
-  const [levelId, setLevelId] = useState(defaultLevelId);
+  const [selectedLevelId, setSelectedLevelId] = useState(defaultLevelId);
   const [items, setItems] = useState<LocalPlaylistItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [saving, setSaving] = useState(false);
   const [playlistId, setPlaylistId] = useState<string | null>(editId || null);
 
-  // Load levels
+  // Language filter
+  const langFilter = useMemo(() => {
+    if (language === 'en') return 'en';
+    if (language === 'es') return 'es';
+    return 'de';
+  }, [language]);
+
+  // Load levels filtered by language
   const { data: levels = [] } = useQuery({
-    queryKey: ['playlist-levels'],
+    queryKey: ['playlist-levels', langFilter],
     queryFn: async () => {
-      const { data } = await supabase.from('levels').select('id, title').eq('is_active', true).order('sort_order');
+      const { data } = await supabase
+        .from('levels')
+        .select('id, title')
+        .eq('is_active', true)
+        .or(`language.eq.${langFilter},language.eq.all,language.is.null`)
+        .order('sort_order');
       return data || [];
     },
   });
 
-  // Load library videos
-  const { data: libraryItems = [] } = useQuery({
-    queryKey: ['playlist-library', searchQuery],
-    queryFn: async (): Promise<LibraryItem[]> => {
-      let q = (supabase as any).from('videos').select('id, title, duration_seconds, level_id, thumbnail_url').eq('is_active', true);
-      if (searchQuery) q = q.ilike('title', `%${searchQuery}%`);
-      const { data } = await q.order('sort_order').limit(80);
-      return (data || []).map((v: any) => ({
-        id: v.id,
-        title: v.title,
-        duration: v.duration_seconds,
-        thumbnail: v.thumbnail_url,
-        level_title: levels.find((l: any) => l.id === v.level_id)?.title,
-      }));
+  // Load ALL videos for these levels
+  const { data: allVideos = [] } = useQuery({
+    queryKey: ['playlist-all-videos', levels.map(l => l.id).join(',')],
+    queryFn: async (): Promise<LibraryVideo[]> => {
+      const levelIds = levels.map(l => l.id);
+      if (levelIds.length === 0) return [];
+      const { data } = await supabase
+        .from('videos')
+        .select('id, title, duration_seconds, level_id, thumbnail_url, sort_order')
+        .eq('is_active', true)
+        .in('level_id', levelIds)
+        .order('sort_order');
+      return (data as LibraryVideo[]) || [];
     },
     enabled: levels.length > 0,
   });
+
+  // Filter videos by selected level + search
+  const filteredVideos = useMemo(() => {
+    let vids = allVideos;
+    if (selectedLevelId) {
+      vids = vids.filter(v => v.level_id === selectedLevelId);
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      vids = vids.filter(v => v.title.toLowerCase().includes(q));
+    }
+    return vids;
+  }, [allVideos, selectedLevelId, searchQuery]);
 
   // Load existing playlist for editing
   useEffect(() => {
@@ -82,21 +109,19 @@ export default function PlaylistBuilderPage() {
       if (existing) {
         setPlaylistName(existing.name);
         setDescription(existing.description || '');
-        setLevelId(existing.level_id || '');
+        setSelectedLevelId(existing.level_id || '');
         setPlaylistId(existing.id);
-        // We need video details for items
-        loadPlaylistItems(existing.items.map(i => i.video_id));
+        loadPlaylistItems(existing.items.map(i => i.video_id), existing.items);
       }
     }
   }, [editId, playlists]);
 
-  async function loadPlaylistItems(videoIds: string[]) {
+  async function loadPlaylistItems(videoIds: string[], orderedItems: { id: string; video_id: string; order_index: number }[]) {
     if (videoIds.length === 0) return;
     const { data } = await supabase.from('videos').select('id, title, thumbnail_url, duration_seconds').in('id', videoIds);
     if (data) {
-      const existing = playlists.find(p => p.id === editId);
-      const ordered = existing?.items.sort((a, b) => a.order_index - b.order_index) || [];
-      setItems(ordered.map(item => {
+      const sorted = [...orderedItems].sort((a, b) => a.order_index - b.order_index);
+      setItems(sorted.map(item => {
         const video = data.find((v: any) => v.id === item.video_id);
         return {
           tempId: item.id,
@@ -124,17 +149,17 @@ export default function PlaylistBuilderPage() {
     }
   };
 
-  const addLibraryItem = (lib: LibraryItem) => {
-    if (items.some(i => i.video_id === lib.id)) {
+  const addVideo = (video: LibraryVideo) => {
+    if (items.some(i => i.video_id === video.id)) {
       toast({ title: 'Video ist bereits in der Playlist' });
       return;
     }
     setItems(prev => [...prev, {
       tempId: crypto.randomUUID(),
-      video_id: lib.id,
-      title: lib.title,
-      thumbnail: lib.thumbnail,
-      duration: lib.duration,
+      video_id: video.id,
+      title: video.title,
+      thumbnail: video.thumbnail_url,
+      duration: video.duration_seconds,
     }]);
   };
 
@@ -142,7 +167,7 @@ export default function PlaylistBuilderPage() {
     setItems(prev => prev.filter(i => i.tempId !== tempId));
   };
 
-  const handleSave = async (andStart = false) => {
+  const handleSave = async () => {
     if (!playlistName.trim()) {
       toast({ title: 'Bitte gib einen Namen ein', variant: 'destructive' });
       return;
@@ -152,21 +177,18 @@ export default function PlaylistBuilderPage() {
       let pid = playlistId;
 
       if (!pid) {
-        // Create playlist first
-        const result = await createPlaylist(playlistName.trim(), description.trim() || undefined, levelId || undefined);
+        const result = await createPlaylist(playlistName.trim(), description.trim() || undefined, selectedLevelId || undefined);
         if (!result) { setSaving(false); return; }
         pid = result.id;
         setPlaylistId(pid);
       } else {
-        // Update name/description/level
         await supabase.from('playlists').update({
           name: playlistName.trim(),
           description: description.trim() || null,
-          level_id: levelId || null,
+          level_id: selectedLevelId || null,
         }).eq('id', pid);
       }
 
-      // Sync items: delete all existing, re-insert in order
       await supabase.from('playlist_items').delete().eq('playlist_id', pid);
       if (items.length > 0) {
         await supabase.from('playlist_items').insert(
@@ -180,13 +202,7 @@ export default function PlaylistBuilderPage() {
 
       await refreshPlaylists();
       toast({ title: editId ? 'Playlist gespeichert' : 'Playlist erstellt!' });
-
-      if (andStart) {
-        // Navigate back – the LevelPlaylistSection will handle playing
-        navigate(-1);
-      } else {
-        navigate(-1);
-      }
+      navigate(-1);
     } catch (e: any) {
       toast({ title: 'Fehler beim Speichern', description: e.message, variant: 'destructive' });
     } finally {
@@ -224,7 +240,7 @@ export default function PlaylistBuilderPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleSave(false)}
+            onClick={handleSave}
             disabled={saving}
             className="border-border bg-secondary text-foreground hover:bg-secondary/80 gap-1.5"
           >
@@ -232,21 +248,61 @@ export default function PlaylistBuilderPage() {
           </Button>
           <Button
             size="sm"
-            onClick={() => handleSave(true)}
+            onClick={handleSave}
             disabled={saving || items.length === 0}
             className="bg-gold text-gold-foreground hover:bg-gold/90 gap-1.5 font-semibold shadow-lg"
             style={{ boxShadow: '0 0 20px rgba(255, 204, 0, 0.3)' }}
           >
-            <Play className="w-4 h-4" /> Speichern
+            <Play className="w-4 h-4" /> Speichern & Zurück
           </Button>
         </div>
       </div>
 
-      {/* 2-Column Layout */}
+      {/* 3-Column Layout */}
       <div className="flex-1 flex overflow-hidden gap-px">
-        {/* LEFT: Library */}
-        <div className="w-80 flex flex-col glass">
-          <div className="p-4 space-y-3">
+        {/* LEFT: Levels */}
+        <div className="w-56 flex flex-col glass">
+          <div className="px-4 py-3 border-b border-border">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.15em]">Levels</h2>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-1">
+            <button
+              onClick={() => setSelectedLevelId('')}
+              className={cn(
+                'w-full text-left px-3 py-2.5 rounded-xl transition-all text-sm font-medium',
+                !selectedLevelId
+                  ? 'bg-primary/15 text-primary shadow-sm'
+                  : 'text-foreground/70 hover:bg-secondary/40'
+              )}
+            >
+              Alle Videos
+            </button>
+            {levels.map((level: any) => (
+              <button
+                key={level.id}
+                onClick={() => setSelectedLevelId(level.id)}
+                className={cn(
+                  'w-full text-left px-3 py-2.5 rounded-xl transition-all text-sm font-medium flex items-center justify-between',
+                  selectedLevelId === level.id
+                    ? 'bg-primary/15 text-primary shadow-sm'
+                    : 'text-foreground/70 hover:bg-secondary/40'
+                )}
+              >
+                <span className="truncate">{level.title}</span>
+                <span className={cn(
+                  'text-[10px] tabular-nums rounded-full px-1.5 py-0.5',
+                  selectedLevelId === level.id ? 'bg-primary/20 text-primary' : 'bg-foreground/5 text-muted-foreground'
+                )}>
+                  {allVideos.filter(v => v.level_id === level.id).length}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* CENTER: Videos */}
+        <div className="flex-1 flex flex-col glass">
+          <div className="p-4 border-b border-border/50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -256,64 +312,38 @@ export default function PlaylistBuilderPage() {
                 className="pl-9 h-10 bg-secondary border-border text-foreground placeholder:text-muted-foreground rounded-xl"
               />
             </div>
-            {/* Level filter chips */}
-            <div className="flex gap-1.5 flex-wrap">
-              <button
-                onClick={() => setLevelId('')}
-                className={cn(
-                  'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                  !levelId
-                    ? 'bg-foreground text-background shadow-sm'
-                    : 'bg-secondary text-foreground/80 hover:bg-secondary/80'
-                )}
-              >
-                Alle Levels
-              </button>
-              {levels.map((l: any) => (
-                <button
-                  key={l.id}
-                  onClick={() => setLevelId(l.id)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                    levelId === l.id
-                      ? 'bg-foreground text-background shadow-sm'
-                      : 'bg-secondary text-foreground/80 hover:bg-secondary/80'
-                  )}
-                >
-                  {l.title}
-                </button>
-              ))}
-            </div>
           </div>
-          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1">
-            {libraryItems.map((lib: LibraryItem) => {
-              const added = isAdded(lib.id);
+          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1 pt-2">
+            {filteredVideos.map(video => {
+              const added = isAdded(video.id);
               return (
                 <button
-                  key={lib.id}
-                  onClick={() => !added && addLibraryItem(lib)}
+                  key={video.id}
+                  onClick={() => !added && addVideo(video)}
                   disabled={added}
                   className={cn(
                     'w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center gap-3 group',
                     added ? 'opacity-50 cursor-default' : 'hover:bg-secondary/80 active:scale-[0.98]'
                   )}
                 >
-                  {lib.thumbnail ? (
-                    <img src={lib.thumbnail} alt="" className="w-10 h-7 rounded-md object-cover shrink-0 bg-secondary" />
+                  {video.thumbnail_url ? (
+                    <img src={video.thumbnail_url} alt="" className="w-10 h-7 rounded-md object-cover shrink-0 bg-secondary" />
                   ) : (
                     <div className="w-10 h-7 rounded-md flex items-center justify-center shrink-0 bg-primary/20">
                       <Video className="w-4 h-4 text-primary-foreground" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm truncate block text-foreground">{lib.title}</span>
-                    {lib.level_title && (
-                      <span className="text-[10px] text-muted-foreground">{lib.level_title}</span>
+                    <span className="text-sm truncate block text-foreground">{video.title}</span>
+                    {!selectedLevelId && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {levels.find((l: any) => l.id === video.level_id)?.title}
+                      </span>
                     )}
                   </div>
-                  {lib.duration && (
+                  {video.duration_seconds && (
                     <span className="text-xs text-muted-foreground shrink-0 tabular-nums">
-                      {Math.floor(lib.duration / 60)}m
+                      {Math.floor(video.duration_seconds / 60)}m
                     </span>
                   )}
                   {added ? (
@@ -324,17 +354,17 @@ export default function PlaylistBuilderPage() {
                 </button>
               );
             })}
-            {libraryItems.length === 0 && (
+            {filteredVideos.length === 0 && (
               <div className="text-center py-12">
                 <Search className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-40" />
-                <p className="text-xs text-muted-foreground">Keine Ergebnisse</p>
+                <p className="text-xs text-muted-foreground">Keine Videos gefunden</p>
               </div>
             )}
           </div>
         </div>
 
         {/* RIGHT: Playlist Items */}
-        <div className="flex-1 flex flex-col glass">
+        <div className="w-80 flex flex-col glass">
           <div className="px-5 py-3 border-b border-border/50 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-1 h-8 rounded-full shrink-0 bg-primary" />
@@ -351,7 +381,7 @@ export default function PlaylistBuilderPage() {
 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={items.map(i => i.tempId)} strategy={verticalListSortingStrategy}>
-              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {items.map((item, idx) => (
                   <SortablePlaylistItem
                     key={item.tempId}
@@ -368,7 +398,7 @@ export default function PlaylistBuilderPage() {
                     </div>
                     <p className="text-sm text-muted-foreground font-medium">Noch keine Videos</p>
                     <p className="text-xs text-muted-foreground mt-1 max-w-[200px]">
-                      Klicke links auf ein Video, um es hinzuzufügen
+                      Klicke in der Mitte auf ein Video, um es hinzuzufügen
                     </p>
                   </div>
                 )}
@@ -403,9 +433,9 @@ function SortablePlaylistItem({ id, item, index, onRemove }: {
       </span>
 
       {item.thumbnail ? (
-        <img src={item.thumbnail} alt="" className="w-12 h-8 rounded-md object-cover shrink-0 shadow-sm" />
+        <img src={item.thumbnail} alt="" className="w-10 h-7 rounded-md object-cover shrink-0 shadow-sm" />
       ) : (
-        <div className="w-12 h-8 rounded-md flex items-center justify-center shrink-0 bg-primary/10 border border-border/30">
+        <div className="w-10 h-7 rounded-md flex items-center justify-center shrink-0 bg-primary/10 border border-border/30">
           <Video className="w-4 h-4 text-muted-foreground" />
         </div>
       )}
@@ -414,7 +444,7 @@ function SortablePlaylistItem({ id, item, index, onRemove }: {
         <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
         {item.duration && (
           <p className="text-[11px] text-muted-foreground">
-            {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, '0')}
+            {Math.floor(item.duration / 60)}:{((item.duration % 60) || 0).toString().padStart(2, '0')}
           </p>
         )}
       </div>
