@@ -301,7 +301,7 @@ export default function PlaylistBuilderPage() {
         </div>
 
         {/* CENTER: Videos */}
-        <div className="w-80 flex flex-col glass shrink-0">
+        <div className="flex flex-col glass shrink-0" style={{ width: '470px' }}>
           <div className="p-4 border-b border-border/50">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
