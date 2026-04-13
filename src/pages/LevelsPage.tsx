@@ -890,6 +890,14 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         type="video"
         onClose={() => setLimitOverlayOpen(false)}
       />
+
+      {playingPlaylist && (
+        <PlaylistPlayerOverlay
+          playlist={playingPlaylist}
+          onClose={() => setPlayingPlaylist(null)}
+          onStarEarned={onStarEarned}
+        />
+      )}
     </div>
   );
 }
