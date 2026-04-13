@@ -12,7 +12,7 @@ import {
 
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.jpg';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import appPreview from '@/assets/app-preview.jpg';
 import { useLanguage } from '@/hooks/useLanguage';
 
