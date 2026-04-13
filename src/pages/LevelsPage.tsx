@@ -88,7 +88,12 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const { canAccessLevel } = useMembership();
   const { canStartVideo, recordVideoStart } = useDailyUsage();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { t, language, skillLevel } = useLanguage();
+  const { getLocalizedField } = useLocalizedContent();
+  const { playlists, canCreatePlaylist } = usePlaylists();
+  const [playingPlaylist, setPlayingPlaylist] = useState<PlaylistWithItems | null>(null);
+  const [playlistVideos, setPlaylistVideos] = useState<LocalizedVideo[]>([]);
   const { getLocalizedField } = useLocalizedContent();
 
   // Gated video start handler
