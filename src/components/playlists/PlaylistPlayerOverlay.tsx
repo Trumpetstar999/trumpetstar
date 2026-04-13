@@ -84,7 +84,15 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
   }
 
   const currentVideo = videos[currentIndex];
-  const progressPercent = ((currentIndex) / videos.length) * 100;
+  const progressPercent = ((currentIndex + 1) / videos.length) * 100;
+
+  const handleNext = useCallback(() => {
+    if (currentIndex < videos.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    } else {
+      setCompleted(true);
+    }
+  }, [currentIndex, videos.length]);
 
   return (
     <div className="fixed inset-0 z-50">
@@ -109,9 +117,8 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
             <SkipBack className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setCurrentIndex(Math.min(videos.length - 1, currentIndex + 1))}
-            disabled={currentIndex === videos.length - 1}
-            className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white disabled:opacity-30 transition-colors"
+            onClick={handleNext}
+            className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors"
           >
             <SkipForward className="w-4 h-4" />
           </button>
