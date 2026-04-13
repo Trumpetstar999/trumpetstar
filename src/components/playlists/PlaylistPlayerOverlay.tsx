@@ -76,7 +76,7 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
     return (
       <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
         <div className="text-center space-y-6 animate-fade-in">
-          <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto" />
+          <CheckCircle2 className="w-20 h-20 text-primary mx-auto" />
           <h2 className="text-2xl font-bold text-white">Playlist abgeschlossen! 🎉</h2>
           <p className="text-white/60">{playlist.name} – alle {videos.length} Videos geschafft</p>
           <Button onClick={onClose} className="bg-primary hover:bg-primary/90">
