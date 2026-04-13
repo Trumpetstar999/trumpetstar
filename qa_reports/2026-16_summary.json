@@ -1,0 +1,71 @@
+{
+  "date": "2026-04-13",
+  "kw": "KW16",
+  "env": "prod",
+  "go_no_go": "GO",
+  "git_head_pre": "68647973",
+  "git_head_post": "d840ffbd",
+  "p0_count": 0,
+  "p1_count": 1,
+  "p2_count": 0,
+  "p3_count": 4,
+  "top_risks": [
+    "TS-QA-EMAIL-001: Cross-Project Email Tracking — Architektur-Entscheidung ausstehend (P1)",
+    "TS-QA-KW13-SEC-003: send-invoice-email ohne Rate Limiting (P3)",
+    "TS-QA-DEP-001: xlsx Prototype Pollution + ReDoS — kein Fix verfügbar (P3)",
+    "TS-QA-KW16-CODE-001: QRCodeManager 'any' TypeScript-Typ (P3)"
+  ],
+  "next_steps": [
+    "TS-QA-EMAIL-001: Architektur-Entscheidung für Cross-Project Tracking fällen",
+    "WP_OAUTH_CLIENT_ID: Secret in Supabase Edge Function Secrets eintragen, Fallback entfernen",
+    "send-invoice-email: Rate Limiting implementieren (5 req/min per user)",
+    "QRCodeManager: 'any' Typen durch konkrete TypeScript-Typen ersetzen",
+    "npm audit fix: yaml + esbuild (moderate severities)"
+  ],
+  "fixesApplied": [
+    {
+      "id": "TS-QA-KW15-PERF-001",
+      "commit": "fbc83bf4",
+      "description": "trumpetstar-lernwelt.jpg 305KB → 114KB komprimiert (quality 72, 1200px max-width)"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-003",
+      "commit": "4c9ffc69",
+      "description": "vimeo-sync JWT Caller-Auth + Admin-only Guard implementiert (analog send-email Pattern)"
+    },
+    {
+      "id": "TS-QA-KW14-SEC-004",
+      "commit": "e9e910b8",
+      "description": "WP_OAUTH_CLIENT_ID auf Deno.env.get() umgestellt (mit Backwards-Compat-Fallback)"
+    },
+    {
+      "id": "TS-QA-KW16-DEP-001",
+      "commit": "d840ffbd",
+      "description": "react-router-dom 6.30.1 → 6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx)"
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "TS-QA-KW16-DEP-001",
+      "title": "react-router-dom XSS via Open Redirects",
+      "severity": "HIGH",
+      "cve": "GHSA-2w69-qvjg-hvjx",
+      "status": "FIXED",
+      "description": "react-router-dom ≤6.30.2 erlaubt XSS via Open Redirects. Direkt relevant für QRRedirectPage. Sofort auf 6.30.3 gepatcht."
+    },
+    {
+      "id": "TS-QA-KW16-CODE-001",
+      "title": "QRCodeManager verwendet 'any' TypeScript-Typ",
+      "severity": "P3",
+      "status": "OFFEN",
+      "description": "Insert/Update-Objekte in QRCodeManager.tsx nutzen 'any' Typ. Kein Runtime-Risiko wegen RLS, aber TypeScript-Code-Smell."
+    },
+    {
+      "id": "TS-QA-EMAIL-003-CLOSED",
+      "title": "SMTP tls.rejectUnauthorized = false — CLOSED",
+      "severity": "INFO",
+      "status": "CLOSED",
+      "description": "Setting nicht mehr im Codebase vorhanden. SMTP wurde auf Email-Proxy migriert. Issue geschlossen."
+    }
+  ]
+}
