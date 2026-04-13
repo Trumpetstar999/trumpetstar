@@ -26,9 +26,10 @@ interface LevelSidebarProps {
   onCreatePlaylist?: () => void;
 }
 
-export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true }: LevelSidebarProps) {
+export function LevelSidebar({ levels, activeLevel, onLevelSelect, showRecent = true, playlists = [], onCreatePlaylist }: LevelSidebarProps) {
   const { canAccessLevel } = useMembership();
   const { t, language } = useLanguage();
+  const [playlistsOpen, setPlaylistsOpen] = useState(true);
 
   const DIFFICULTY_COLORS: Record<Difficulty, string> = {
     basics: 'text-purple-400',
