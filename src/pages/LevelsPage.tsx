@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LevelSidebar } from '@/components/levels/LevelSidebar';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { LevelPlaylistSection } from '@/components/playlists/LevelPlaylistSection';
+import { PlaylistPlayerOverlay } from '@/components/playlists/PlaylistPlayerOverlay';
+import { usePlaylists, PlaylistWithItems } from '@/hooks/usePlaylists';
 
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
