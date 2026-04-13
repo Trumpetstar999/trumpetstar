@@ -750,13 +750,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
             <div className="p-6">
-              {/* Playlist Section */}
-              <LevelPlaylistSection
-                currentLevelId={currentLevel.id}
-                levels={levels.map(l => ({ id: l.id, title: l.title }))}
-                onStarEarned={onStarEarned}
-              />
-              
               {currentLevel.sections.map((section, sectionIndex) => (
                 <SectionRow
                   key={section.id}
