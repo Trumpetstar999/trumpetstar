@@ -219,7 +219,7 @@ export default function PlaylistBuilderPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(-1)}
+          onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/app/playlists')}
           className="text-foreground hover:bg-secondary rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />
