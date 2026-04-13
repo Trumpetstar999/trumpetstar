@@ -6,7 +6,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const TRACK_BASE = `${Deno.env.get("SUPABASE_URL")}/functions/v1/track`;
+// ── TS-QA-EMAIL-001 FIX (Option A): Tracking IMMER auf Haupt-Projekt ────────
+// TRACK_BASE ist explizit auf das Haupt-Projekt osgrjouxwpnokfvzztji fixiert.
+// Grund: SUPABASE_URL ist deployment-kontextabhängig und kann auf falsche DB zeigen.
+// Architektur-Entscheidung 2026-04-13: Ein Projekt, eine email_log-Tabelle.
+const MAIN_PROJECT_URL = "https://osgrjouxwpnokfvzztji.supabase.co";
+const TRACK_BASE = `${MAIN_PROJECT_URL}/functions/v1/track`;
 const EMAIL_PROXY_URL = "http://72.60.17.112/email-proxy/send";
 
 // ─── Tracking Helpers ─────────────────────────────────────────────────────────
