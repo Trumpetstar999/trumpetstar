@@ -76,7 +76,7 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   if (completed) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center">
         <div className="text-center space-y-6 animate-fade-in">
           <CheckCircle2 className="w-20 h-20 text-primary mx-auto" />
           <h2 className="text-2xl font-bold text-white">Playlist abgeschlossen! 🎉</h2>
