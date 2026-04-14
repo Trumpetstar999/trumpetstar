@@ -93,9 +93,9 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
   const progressPercent = ((currentIndex + 1) / videos.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-[200]" style={{ isolation: 'isolate' }}>
-      {/* Progress bar top - must be above VideoPlayer z-[100] */}
-      <div className="absolute top-0 left-0 right-0 z-[130] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
+    <div className="fixed inset-0 z-[200] bg-black">
+      {/* Progress bar top - above VideoPlayer */}
+      <div className="fixed top-0 left-0 right-0 z-[210] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
         <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
