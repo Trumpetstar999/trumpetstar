@@ -241,7 +241,7 @@ export default function AuthPage() {
   // --- Magic link sent screen ---
   if (magicLinkSent) {
     return (
-      <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex" style={{ background: 'linear-gradient(180deg, hsl(212 100% 56%) 0%, hsl(218 88% 46%) 40%, hsl(222 86% 29%) 100%)' }}>
         {/* Left: confirmation */}
         <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
           <div
@@ -275,7 +275,7 @@ export default function AuthPage() {
 
   // --- Main auth page ---
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex" style={{ background: 'linear-gradient(180deg, hsl(212 100% 56%) 0%, hsl(218 88% 46%) 40%, hsl(222 86% 29%) 100%)' }}>
       {/* Left Column: Form */}
       <div className="flex-1 flex flex-col justify-between p-6 lg:p-12 overflow-y-auto">
         {/* Top: language switcher */}
