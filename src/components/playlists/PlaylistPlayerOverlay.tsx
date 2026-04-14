@@ -5,6 +5,7 @@ import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 
 interface VideoInfo {
   id: string;
