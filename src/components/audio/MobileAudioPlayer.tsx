@@ -295,12 +295,20 @@ export function MobileAudioPlayer() {
         {/* Progress bar */}
         <div className="space-y-1">
           <div
-            className="relative h-3 rounded-full cursor-pointer"
+            className="relative h-3 rounded-full cursor-pointer touch-none"
             style={{ background: 'rgba(255,255,255,0.12)' }}
-            onClick={(e) => {
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
               const rect = e.currentTarget.getBoundingClientRect();
               const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
               player.seek((x / rect.width) * player.duration);
+            }}
+            onPointerMove={(e) => {
+              if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+                player.seek((x / rect.width) * player.duration);
+              }
             }}
           >
             {player.loop.enabled && player.duration > 0 && (
@@ -310,11 +318,11 @@ export function MobileAudioPlayer() {
               />
             )}
             <div
-              className="absolute top-0 left-0 h-full rounded-full"
+              className="absolute top-0 left-0 h-full rounded-full pointer-events-none"
               style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, hsl(212 100% 56%), hsl(218 88% 46%))' }}
             />
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full shadow-lg"
+              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none"
               style={{ left: `calc(${progressPercent}% - 8px)`, background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.4)' }}
             />
           </div>
