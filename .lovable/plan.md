@@ -1,39 +1,31 @@
 
 
-## Plan: Redesign Login Page with Video Background
+# Plan: QR-Codes importieren und htaccess-Datei bereitstellen
 
-### Overview
-Redesign the AuthPage to use the provided sign-in component layout: a two-column design with the form on the left and a Vimeo HLS video playing in the background on the right (instead of a static image). All existing auth functionality (magic link, login, signup tabs, Google/Apple OAuth, forgot password, language switcher, i18n, redirect logic) will be preserved.
+## Zusammenfassung
 
-### Changes
+Die 350 QR-Code-Einträge (V001-V350) werden aus der htaccess-Datei extrahiert und in die `qr_codes`-Datenbanktabelle eingefügt. Zusätzlich wird die htaccess-Datei als Download bereitgestellt.
 
-**1. Add CSS animations to `src/index.css`**
-- Add the three keyframe animations (`fadeSlideIn`, `slideRightIn`, `testimonialIn`) needed by the new design.
+## Schritte
 
-**2. Rewrite `src/pages/AuthPage.tsx`**
-- **Layout**: Change from single centered card to a two-column layout (left: form, right: video background).
-- **Left column**: Dark/glass-styled form area containing:
-  - Language switcher (top-right)
-  - Trumpetstar logo + header with `t()` translations
-  - Google + Apple OAuth buttons (existing handlers)
-  - Divider
-  - Tabs (Magic Link / Login / Signup) with all existing form logic preserved
-  - Forgot password, remember me, error handling -- all kept
-  - Footer with Terms/Privacy links
-- **Right column**: Full-height section with the Vimeo HLS video as background:
-  - Use an HTML `<video>` element with HLS.js to play `https://player.vimeo.com/external/1182895999.m3u8?s=79486abc8212f3e32ae79db02772c8c750c1f891&logging=false`
-  - Video: autoplay, muted, loop, no controls, `object-fit: cover`
-  - Dark gradient overlay for readability
-  - Optional: testimonial cards overlaid on the video (can use existing student reviews or placeholder content)
-- **Mobile**: On small screens, hide the right column and show full-width form (with video as subtle background if desired).
-- **No functionality changes**: All handlers (`handleSignIn`, `handleSignUp`, `handleMagicLink`, `handleGoogleSignIn`, `handleAppleSignIn`, `handleForgotPassword`) remain identical.
+### 1. QR-Codes in die Datenbank einfügen
+- Ein Python-Skript parst die htaccess-Datei und extrahiert alle eindeutigen V-Codes (V001-V350)
+- Für jeden Code wird ein Eintrag in `qr_codes` erstellt mit:
+  - `code`: z.B. "V001"
+  - `content_type`: "video" (Standard, da alle V-Codes auf Videos verweisen)
+  - `video_id`: NULL (wird später im Admin-Panel zugeordnet)
+  - `label`: Automatisch generiert aus dem Pfad (z.B. "Band 1 - Level 1 Lied 1")
+  - `is_active`: true
+- Die 5 externen Links (checkout, trumpetstar.com, neusnoise.com) werden **nicht** importiert, da sie keine V-Codes sind
+- Insert erfolgt per `psql` oder Supabase Insert-Tool in Batches
 
-**3. Install `hls.js` dependency**
-- Required to play the `.m3u8` HLS stream in the `<video>` element on non-Safari browsers. Safari supports HLS natively.
+### 2. htaccess-Datei bereitstellen
+- Die hochgeladene htaccess-Datei wird nach `/mnt/documents/htaccess_qr_redirects.txt` kopiert und als Download-Artifact bereitgestellt
 
-### Technical Details
-- HLS.js will be loaded in a `useEffect` that attaches to the video element ref, checking for native HLS support first (Safari) before falling back to hls.js.
-- The dark glass styling from the provided component will be adapted to match the existing Trumpetstar blue gradient theme.
-- Animations will use the CSS keyframes for fade-in effects on form elements.
-- The `magicLinkSent` confirmation screen will also be updated to match the new design.
+## Technische Details
+
+- Die qr_codes-Tabelle existiert bereits mit dem passenden Schema (id, code, content_type, video_id, audio_id, label, is_active)
+- Die Tabelle ist aktuell leer, kein Konfliktrisiko
+- Nach dem Import können die Video-Zuordnungen im QR-Code-Manager im Admin-Panel vorgenommen werden
+- Es werden ca. 350 INSERT-Statements ausgeführt
 
