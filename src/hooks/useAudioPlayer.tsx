@@ -67,6 +67,15 @@ export function useAudioPlayer() {
     const shifter = pitchShifterRef.current;
     const time = shifter.timePlayed;
     setCurrentTime(time);
+    // End of track detection
+    if (duration > 0 && time >= duration - 0.05) {
+      shifter.disconnect();
+      pitchShifterRef.current = null;
+      pausedTimeRef.current = 0;
+      setCurrentTime(duration);
+      setIsPlaying(false);
+      return;
+    }
     if (loop.enabled && loop.end > loop.start && time >= loop.end) {
       shifter.percentagePlayed = loop.start / duration;
     }
@@ -180,9 +189,11 @@ export function useAudioPlayer() {
   }, []);
 
   const seek = useCallback((time: number) => {
-    if (!pitchShifterRef.current || duration === 0) return;
+    if (duration === 0) return;
     const clampedTime = Math.max(0, Math.min(time, duration));
-    pitchShifterRef.current.percentagePlayed = clampedTime / duration;
+    if (pitchShifterRef.current) {
+      pitchShifterRef.current.percentagePlayed = clampedTime / duration;
+    }
     pausedTimeRef.current = clampedTime;
     setCurrentTime(clampedTime);
   }, [duration]);
