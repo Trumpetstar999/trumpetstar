@@ -24,10 +24,16 @@ interface PlaylistPlayerOverlayProps {
 }
 
 export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: PlaylistPlayerOverlayProps) {
+  const { setIsVideoPlaying } = useVideoPlayer();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [videos, setVideos] = useState<VideoInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+
+  useEffect(() => {
+    setIsVideoPlaying(true);
+    return () => setIsVideoPlaying(false);
+  }, [setIsVideoPlaying]);
 
   useEffect(() => {
     async function loadVideos() {
