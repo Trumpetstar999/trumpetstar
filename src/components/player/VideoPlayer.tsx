@@ -29,7 +29,7 @@ interface VimeoErrorLog {
   timestamp: string;
 }
 
-export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }: VideoPlayerProps) {
+export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, hideCloseButton }: VideoPlayerProps) {
   const { user } = useAuth();
   const recorder = useVideoRecorder();
   const { saveRecording } = useRecordings();
@@ -525,12 +525,14 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete }:
       )}
       
       {/* Close button - Glass style */}
-      <button
-        onClick={handleCloseWithRecording}
-        className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
-      >
-        <X className="w-6 h-6" />
-      </button>
+      {!hideCloseButton && (
+        <button
+          onClick={handleCloseWithRecording}
+          className="absolute top-4 right-4 z-[110] p-3 rounded-full glass hover:bg-white/20 text-white transition-all"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Recording error overlay */}
       {recorder.error && (
