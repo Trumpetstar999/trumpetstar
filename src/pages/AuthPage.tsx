@@ -211,6 +211,12 @@ export default function AuthPage() {
   // --- Video Background Column (shared) ---
   const VideoColumn = () => (
     <div className="hidden lg:block relative w-full h-full overflow-hidden rounded-3xl">
+      {/* Fallback background image – visible while video loads or if it fails */}
+      <img
+        src="/images/auth-fallback.jpg"
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+      />
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
