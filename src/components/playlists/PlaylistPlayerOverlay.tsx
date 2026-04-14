@@ -136,6 +136,7 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
         video={currentVideo}
         onClose={onClose}
         onComplete={handleVideoComplete}
+        hideCloseButton
       />
     </div>
   );

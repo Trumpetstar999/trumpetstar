@@ -16,6 +16,7 @@ interface VideoPlayerProps {
   levelTitle?: string;
   onClose: () => void;
   onComplete: () => void;
+  hideCloseButton?: boolean;
 }
 
 type VimeoError = 'embed_blocked' | 'csp_blocked' | 'network_error' | 'unknown';
