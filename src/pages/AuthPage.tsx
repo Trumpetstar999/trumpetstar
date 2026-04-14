@@ -34,32 +34,31 @@ export default function AuthPage() {
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // HLS video setup
+  // HLS video setup - lazy load hls.js only on desktop
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    // Only load HLS on screens wide enough to show the video column
+    if (window.innerWidth < 1024) return;
 
-    let hls: Hls | null = null;
+    let hlsInstance: any = null;
 
-    if (Hls.isSupported()) {
-      hls = new Hls({ enableWorker: true });
-      hls.loadSource(VIMEO_HLS_URL);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {});
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    // Safari supports HLS natively
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = VIMEO_HLS_URL;
-      video.addEventListener('loadedmetadata', () => {
-        video.play().catch(() => {});
+      video.addEventListener('loadedmetadata', () => { video.play().catch(() => {}); });
+    } else {
+      // Dynamically import hls.js (234KB saved from initial bundle)
+      import('hls.js').then(({ default: Hls }) => {
+        if (!Hls.isSupported() || !video) return;
+        hlsInstance = new Hls({ enableWorker: true });
+        hlsInstance.loadSource(VIMEO_HLS_URL);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
       });
     }
 
-    return () => {
-      if (hls) {
-        hls.destroy();
-      }
-    };
+    return () => { if (hlsInstance) hlsInstance.destroy(); };
   }, []);
 
   const getRedirectPath = () => {
