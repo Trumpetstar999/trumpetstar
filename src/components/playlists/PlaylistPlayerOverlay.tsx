@@ -5,6 +5,7 @@ import { VideoPlayer } from '@/components/player/VideoPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 
 interface VideoInfo {
   id: string;
@@ -23,10 +24,16 @@ interface PlaylistPlayerOverlayProps {
 }
 
 export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: PlaylistPlayerOverlayProps) {
+  const { setIsVideoPlaying } = useVideoPlayer();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [videos, setVideos] = useState<VideoInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [completed, setCompleted] = useState(false);
+
+  useEffect(() => {
+    setIsVideoPlaying(true);
+    return () => setIsVideoPlaying(false);
+  }, [setIsVideoPlaying]);
 
   useEffect(() => {
     async function loadVideos() {
@@ -76,7 +83,7 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
 
   if (completed) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
+      <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center">
         <div className="text-center space-y-6 animate-fade-in">
           <CheckCircle2 className="w-20 h-20 text-primary mx-auto" />
           <h2 className="text-2xl font-bold text-white">Playlist abgeschlossen! 🎉</h2>
@@ -93,9 +100,9 @@ export function PlaylistPlayerOverlay({ playlist, onClose, onStarEarned }: Playl
   const progressPercent = ((currentIndex + 1) / videos.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-[110]">
-      {/* Progress bar top - must be above VideoPlayer z-[100] */}
-      <div className="absolute top-0 left-0 right-0 z-[130] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
+    <div className="fixed inset-0 z-[200] bg-black">
+      {/* Progress bar top - above VideoPlayer */}
+      <div className="fixed top-0 left-0 right-0 z-[210] bg-black/80 backdrop-blur-sm px-4 py-2 flex items-center gap-3">
         <button onClick={onClose} className="p-1.5 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-colors">
           <X className="w-5 h-5" />
         </button>
