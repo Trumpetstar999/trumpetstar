@@ -48,7 +48,7 @@ export function CollapsibleLoopControls({
         <div className="pt-3 space-y-3">
           <div className="flex items-center justify-between px-1">
             <span className="text-sm text-muted-foreground">Loop aktivieren</span>
-            <Switch checked={loopEnabled} onCheckedChange={onToggleLoop} className="data-[state=checked]:bg-gold" />
+            <Switch checked={loopEnabled} onCheckedChange={onToggleLoop} />
           </div>
           <div className="flex gap-2">
             <Button
