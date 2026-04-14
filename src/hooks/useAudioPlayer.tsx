@@ -180,9 +180,11 @@ export function useAudioPlayer() {
   }, []);
 
   const seek = useCallback((time: number) => {
-    if (!pitchShifterRef.current || duration === 0) return;
+    if (duration === 0) return;
     const clampedTime = Math.max(0, Math.min(time, duration));
-    pitchShifterRef.current.percentagePlayed = clampedTime / duration;
+    if (pitchShifterRef.current) {
+      pitchShifterRef.current.percentagePlayed = clampedTime / duration;
+    }
     pausedTimeRef.current = clampedTime;
     setCurrentTime(clampedTime);
   }, [duration]);
