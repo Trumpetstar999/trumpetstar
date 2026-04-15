@@ -95,7 +95,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
 
   const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
 
-  // Load saved playback speed, create progress entry, AND award star immediately on mount
+  // Load saved playback speed and create progress entry on mount
   useEffect(() => {
     if (user) {
       // Load existing playback speed
@@ -125,28 +125,8 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
           onConflict: 'user_id,video_id',
           ignoreDuplicates: false,
         });
-      
-      // Award star immediately when video player opens
-      if (!hasCompletedRef.current) {
-        hasCompletedRef.current = true;
-        supabase
-          .from('video_completions')
-          .insert({
-            user_id: user.id,
-            video_id: video.id,
-            playback_speed: 100,
-          })
-          .then(({ error }) => {
-            if (error) {
-              console.error('[VideoPlayer] Error saving star:', error);
-            } else {
-              console.log('[VideoPlayer] Star awarded for video:', video.id);
-              onComplete();
-            }
-          });
-      }
     }
-  }, [user, video.id, onComplete]);
+  }, [user, video.id]);
 
   // Save progress to database
   const saveProgress = useCallback(async (seconds: number, dur: number) => {
