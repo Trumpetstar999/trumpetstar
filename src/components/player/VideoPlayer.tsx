@@ -47,16 +47,31 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const loadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Save completion to database
+  // Save completion to database (max 1 star per video per day)
   const saveCompletion = useCallback(async () => {
     if (!user) {
       console.log('[VideoPlayer] No user, skipping save');
       return false;
     }
     
-    console.log('[VideoPlayer] Saving star for video:', video.id);
-    
     try {
+      // Check if a star was already awarded for this video today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { data: existing } = await supabase
+        .from('video_completions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('video_id', video.id)
+        .gte('completed_at', today.toISOString())
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        console.log('[VideoPlayer] Star already awarded today for video:', video.id);
+        return false;
+      }
+
+      console.log('[VideoPlayer] Saving star for video:', video.id);
       const { error } = await supabase
         .from('video_completions')
         .insert({
