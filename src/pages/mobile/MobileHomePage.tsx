@@ -341,6 +341,52 @@ export default function MobileHomePage() {
             )}
           </div>
 
+          {/* ── Tools: Metronom & Stimmgerät (collapsible) ── */}
+          <div className="mx-4 mb-4">
+            <button
+              onClick={() => setShowToolsSection(v => !v)}
+              className="w-full flex items-center gap-3 mb-3 group"
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, hsl(260 80% 52%), hsl(270 70% 42%))' }}>
+                <Timer className="w-4 h-4 text-white" />
+              </div>
+              <div className="text-left flex-1">
+                <h2 className="text-white font-bold text-base leading-tight">Übe-Tools</h2>
+                <p className="text-white/50 text-xs">Metronom &amp; Stimmgerät</p>
+              </div>
+              {showToolsSection
+                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+            </button>
+
+            {showToolsSection && (
+              <div className="space-y-3">
+                <MetronomeSheet />
+                <button
+                  onClick={() => setTunerOpen(true)}
+                  className="w-full rounded-2xl px-5 py-4 flex items-center gap-4 transition-all active:scale-[0.98]"
+                  style={{
+                    background: 'rgba(8,18,45,0.88)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                  }}
+                >
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, hsl(40 80% 48%), hsl(30 70% 38%))' }}>
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-white font-bold text-base">Stimmgerät</div>
+                    <div className="text-white/50 text-xs">Bb Trompete • A=440 Hz</div>
+                  </div>
+                  <div className="ml-auto text-white/30 text-xs">Öffnen →</div>
+                </button>
+              </div>
+            )}
+          </div>
 
         </div>
       </MobileLayout>
