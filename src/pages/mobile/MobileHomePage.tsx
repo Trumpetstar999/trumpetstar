@@ -42,6 +42,8 @@ const TEXTS = {
     close: 'Verstanden',
     audioTitle: 'Begleit-Audios',
     audioSubtitle: 'Spiele mit professionellen Begleittracks',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Lerne mit professionellen Videos',
   },
   en: {
     greeting: 'Hello',
@@ -66,6 +68,8 @@ const TEXTS = {
     close: 'Got it',
     audioTitle: 'Backing Tracks',
     audioSubtitle: 'Play along with professional backing tracks',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Learn with professional videos',
   },
   es: {
     greeting: 'Hola',
@@ -90,6 +94,8 @@ const TEXTS = {
     close: 'Entendido',
     audioTitle: 'Pistas de acompañamiento',
     audioSubtitle: 'Toca con pistas profesionales de acompañamiento',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Aprende con videos profesionales',
   },
 };
 
@@ -105,6 +111,7 @@ export default function MobileHomePage() {
   const [linkCopied, setLinkCopied] = useState(false);
   const [showIpadCard, setShowIpadCard] = useState(false);
   const [showAudioSection, setShowAudioSection] = useState(true);
+  const [showVideoSection, setShowVideoSection] = useState(true);
   const [showToolsSection, setShowToolsSection] = useState(true);
   const [tunerOpen, setTunerOpen] = useState(false);
 
