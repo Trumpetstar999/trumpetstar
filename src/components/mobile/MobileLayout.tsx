@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, CreditCard, HelpCircle, User } from 'lucide-react';
+import { Home, CreditCard, HelpCircle, User, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/useLanguage';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
@@ -32,6 +32,21 @@ export function MobileLayout({ children }: MobileLayoutProps) {
   const labels = TAB_LABELS[language] || TAB_LABELS.de;
 
   const activeTab = TAB_CONFIG.find(t => location.pathname.startsWith(t.route))?.id || 'home';
+
+  // Best-effort portrait lock for mobile (works on Chrome/Android, silently fails on iOS Safari)
+  useEffect(() => {
+    const so = (screen as any).orientation;
+    if (so?.lock) {
+      so.lock('portrait').catch(() => { /* iOS / unsupported — ignored */ });
+    }
+  }, []);
+
+  const rotateText: Record<string, string> = {
+    de: 'Bitte drehe dein Gerät ins Hochformat',
+    en: 'Please rotate your device to portrait',
+    es: 'Por favor, gira tu dispositivo a vertical',
+    sl: 'Prosimo, obrnite napravo pokončno',
+  };
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -77,6 +92,12 @@ export function MobileLayout({ children }: MobileLayoutProps) {
           })}
         </div>
       </nav>
+
+      {/* Landscape rotation hint (CSS-controlled, only visible in landscape on mobile) */}
+      <div className="mobile-landscape-overlay">
+        <RotateCw className="w-12 h-12 text-white animate-spin" style={{ animationDuration: '3s' }} />
+        <p className="text-white text-base font-semibold text-center px-6">{rotateText[language] || rotateText.de}</p>
+      </div>
     </div>
   );
 }

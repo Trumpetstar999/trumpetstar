@@ -459,9 +459,18 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
     handleClose();
   }, [recorder, handleClose]);
 
+  // Toggle orientation lock: unlock for fullscreen video, re-lock to portrait on close
+  useEffect(() => {
+    const so = (screen as any).orientation;
+    try { so?.unlock?.(); } catch { /* ignored */ }
+    return () => {
+      try { so?.lock?.('portrait').catch(() => {}); } catch { /* ignored */ }
+    };
+  }, []);
+
   return (
     <div 
-      className="fixed inset-0 z-[100] flex flex-col animate-fade-in overflow-hidden"
+      className="fixed inset-0 z-[100] flex flex-col animate-fade-in overflow-hidden video-player-fullscreen"
       style={{ 
         background: 'linear-gradient(180deg, rgba(11, 46, 138, 0.98) 0%, rgba(0, 0, 0, 0.98) 100%)',
         height: '100dvh'

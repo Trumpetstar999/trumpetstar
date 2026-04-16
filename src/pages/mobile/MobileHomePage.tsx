@@ -13,8 +13,10 @@ import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
+import { MobileVideoPlayer } from '@/components/levels/MobileVideoPlayer';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
 import { MetronomeSheet } from '@/components/mobile/MetronomeSheet';
+import { Play as PlayIcon } from 'lucide-react';
 
 const TEXTS = {
   de: {
@@ -40,6 +42,8 @@ const TEXTS = {
     close: 'Verstanden',
     audioTitle: 'Begleit-Audios',
     audioSubtitle: 'Spiele mit professionellen Begleittracks',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Lerne mit professionellen Videos',
   },
   en: {
     greeting: 'Hello',
@@ -64,6 +68,8 @@ const TEXTS = {
     close: 'Got it',
     audioTitle: 'Backing Tracks',
     audioSubtitle: 'Play along with professional backing tracks',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Learn with professional videos',
   },
   es: {
     greeting: 'Hola',
@@ -88,6 +94,8 @@ const TEXTS = {
     close: 'Entendido',
     audioTitle: 'Pistas de acompañamiento',
     audioSubtitle: 'Toca con pistas profesionales de acompañamiento',
+    videoTitle: 'Videos',
+    videoSubtitle: 'Aprende con videos profesionales',
   },
 };
 
@@ -103,6 +111,7 @@ export default function MobileHomePage() {
   const [linkCopied, setLinkCopied] = useState(false);
   const [showIpadCard, setShowIpadCard] = useState(false);
   const [showAudioSection, setShowAudioSection] = useState(true);
+  const [showVideoSection, setShowVideoSection] = useState(true);
   const [showToolsSection, setShowToolsSection] = useState(true);
   const [tunerOpen, setTunerOpen] = useState(false);
 
@@ -296,9 +305,44 @@ export default function MobileHomePage() {
             )}
           </div>
 
+          {/* ── Video Section (collapsible) ── */}
+          <div className="mx-4 mb-4">
+            <button
+              onClick={() => setShowVideoSection(v => !v)}
+              className="w-full flex items-center gap-3 mb-3 group"
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, hsl(355 77% 56%), hsl(345 70% 46%))' }}>
+                <PlayIcon className="w-4 h-4 text-white" fill="currentColor" />
+              </div>
+              <div className="text-left flex-1">
+                <h2 className="text-white font-bold text-base leading-tight">{t.videoTitle}</h2>
+                <p className="text-white/50 text-xs">{t.videoSubtitle}</p>
+              </div>
+              {showVideoSection
+                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+            </button>
+
+            {showVideoSection && (
+              <div
+                className="overflow-hidden flex flex-col rounded-2xl"
+                style={{
+                  background: 'rgba(8,18,45,0.88)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                  minHeight: 440,
+                }}
+              >
+                <MobileVideoPlayer />
+              </div>
+            )}
+          </div>
+
           {/* ── Tools: Metronom & Stimmgerät (collapsible) ── */}
           <div className="mx-4 mb-4">
-            {/* Clickable header */}
             <button
               onClick={() => setShowToolsSection(v => !v)}
               className="w-full flex items-center gap-3 mb-3 group"
@@ -318,10 +362,7 @@ export default function MobileHomePage() {
 
             {showToolsSection && (
               <div className="space-y-3">
-                {/* Metronom card */}
                 <MetronomeSheet />
-
-                {/* Tuner card */}
                 <button
                   onClick={() => setTunerOpen(true)}
                   className="w-full rounded-2xl px-5 py-4 flex items-center gap-4 transition-all active:scale-[0.98]"
@@ -346,7 +387,6 @@ export default function MobileHomePage() {
               </div>
             )}
           </div>
-
 
         </div>
       </MobileLayout>
