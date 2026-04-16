@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Loader2, Search, ChevronDown, ChevronUp, Check, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -146,6 +147,11 @@ export function MobileVideoPlayer() {
     }
     const allowed = await recordVideoStart();
     if (allowed) {
+      // Best-effort landscape lock for fullscreen video (Chrome/Android)
+      try {
+        const so = (screen as any).orientation;
+        so?.lock?.('landscape').catch(() => { /* iOS / unsupported — ignored */ });
+      } catch { /* ignored */ }
       setSelectedVideo(v);
     } else {
       setLimitOpen(true);
@@ -292,15 +298,16 @@ export function MobileVideoPlayer() {
         })()}
       </div>
 
-      {/* Fullscreen player */}
-      {selectedVideo && (
+      {/* Fullscreen player — portal to body to escape backdrop-filter containing block */}
+      {selectedVideo && createPortal(
         <VideoPlayer
           video={toVideoType(selectedVideo)}
           levelId={selectedVideo.level_id}
           levelTitle={selectedLevel ? getTitle(selectedLevel) : undefined}
           onClose={() => setSelectedVideo(null)}
           onComplete={() => { /* star handled inside VideoPlayer */ }}
-        />
+        />,
+        document.body
       )}
 
       <DailyLimitOverlay
