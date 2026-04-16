@@ -257,6 +257,42 @@ export default function MobileHomePage() {
             )}
           </div>
 
+          {/* ── Video Section (collapsible) ── */}
+          <div className="mx-4 mb-4">
+            <button
+              onClick={() => setShowVideoSection(v => !v)}
+              className="w-full flex items-center gap-3 mb-3 group"
+            >
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, hsl(355 77% 56%), hsl(345 70% 46%))' }}>
+                <PlayIcon className="w-4 h-4 text-white" fill="currentColor" />
+              </div>
+              <div className="text-left flex-1">
+                <h2 className="text-white font-bold text-base leading-tight">{t.videoTitle}</h2>
+                <p className="text-white/50 text-xs">{t.videoSubtitle}</p>
+              </div>
+              {showVideoSection
+                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
+            </button>
+
+            {showVideoSection && (
+              <div
+                className="overflow-hidden flex flex-col rounded-2xl"
+                style={{
+                  background: 'rgba(8,18,45,0.88)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
+                  minHeight: 440,
+                }}
+              >
+                <MobileVideoPlayer />
+              </div>
+            )}
+          </div>
+
           {/* ── Audio Player Section (collapsible) ── */}
           <div className="mx-4 mb-4">
             {/* Clickable header */}
@@ -301,42 +337,6 @@ export default function MobileHomePage() {
                 }}
               >
                 <MobileAudioPlayer />
-              </div>
-            )}
-          </div>
-
-          {/* ── Video Section (collapsible) ── */}
-          <div className="mx-4 mb-4">
-            <button
-              onClick={() => setShowVideoSection(v => !v)}
-              className="w-full flex items-center gap-3 mb-3 group"
-            >
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, hsl(355 77% 56%), hsl(345 70% 46%))' }}>
-                <PlayIcon className="w-4 h-4 text-white" fill="currentColor" />
-              </div>
-              <div className="text-left flex-1">
-                <h2 className="text-white font-bold text-base leading-tight">{t.videoTitle}</h2>
-                <p className="text-white/50 text-xs">{t.videoSubtitle}</p>
-              </div>
-              {showVideoSection
-                ? <ChevronUp className="w-4 h-4 text-white/40 flex-shrink-0" />
-                : <ChevronDown className="w-4 h-4 text-white/40 flex-shrink-0" />}
-            </button>
-
-            {showVideoSection && (
-              <div
-                className="overflow-hidden flex flex-col rounded-2xl"
-                style={{
-                  background: 'rgba(8,18,45,0.88)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  boxShadow: '0 24px 64px rgba(0,0,0,0.45)',
-                  minHeight: 440,
-                }}
-              >
-                <MobileVideoPlayer />
               </div>
             )}
           </div>
