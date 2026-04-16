@@ -147,6 +147,11 @@ export function MobileVideoPlayer() {
     }
     const allowed = await recordVideoStart();
     if (allowed) {
+      // Best-effort landscape lock for fullscreen video (Chrome/Android)
+      try {
+        const so = (screen as any).orientation;
+        so?.lock?.('landscape').catch(() => { /* iOS / unsupported — ignored */ });
+      } catch { /* ignored */ }
       setSelectedVideo(v);
     } else {
       setLimitOpen(true);
