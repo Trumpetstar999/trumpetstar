@@ -298,15 +298,16 @@ export function MobileVideoPlayer() {
         })()}
       </div>
 
-      {/* Fullscreen player */}
-      {selectedVideo && (
+      {/* Fullscreen player — portal to body to escape backdrop-filter containing block */}
+      {selectedVideo && createPortal(
         <VideoPlayer
           video={toVideoType(selectedVideo)}
           levelId={selectedVideo.level_id}
           levelTitle={selectedLevel ? getTitle(selectedLevel) : undefined}
           onClose={() => setSelectedVideo(null)}
           onComplete={() => { /* star handled inside VideoPlayer */ }}
-        />
+        />,
+        document.body
       )}
 
       <DailyLimitOverlay
