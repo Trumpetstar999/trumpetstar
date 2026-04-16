@@ -13,8 +13,10 @@ import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
+import { MobileVideoPlayer } from '@/components/levels/MobileVideoPlayer';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
 import { MetronomeSheet } from '@/components/mobile/MetronomeSheet';
+import { Play as PlayIcon } from 'lucide-react';
 
 const TEXTS = {
   de: {
