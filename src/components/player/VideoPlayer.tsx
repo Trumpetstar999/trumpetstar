@@ -459,10 +459,10 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
     handleClose();
   }, [recorder, handleClose]);
 
-  // Toggle orientation lock: unlock for fullscreen video, re-lock to portrait on close
+  // Toggle orientation lock: landscape for fullscreen video, re-lock to portrait on close
   useEffect(() => {
     const so = (screen as any).orientation;
-    try { so?.unlock?.(); } catch { /* ignored */ }
+    try { so?.lock?.('landscape').catch(() => {}); } catch { /* ignored */ }
     return () => {
       try { so?.lock?.('portrait').catch(() => {}); } catch { /* ignored */ }
     };
