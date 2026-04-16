@@ -92,6 +92,12 @@ export function MobileLayout({ children }: MobileLayoutProps) {
           })}
         </div>
       </nav>
+
+      {/* Landscape rotation hint (CSS-controlled, only visible in landscape on mobile) */}
+      <div className="mobile-landscape-overlay">
+        <RotateCw className="w-12 h-12 text-white animate-spin" style={{ animationDuration: '3s' }} />
+        <p className="text-white text-base font-semibold text-center px-6">{rotateText[language] || rotateText.de}</p>
+      </div>
     </div>
   );
 }
