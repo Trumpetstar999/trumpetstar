@@ -2,26 +2,30 @@ import { useState, useEffect } from 'react';
 
 const MINI_MODE_BREAKPOINT = 768;
 
+/**
+ * Detects "mini mode" (phone-class device) using the *smallest* viewport dimension.
+ * This is rotation-stable: a phone in landscape still reports its short side (~390-430px)
+ * as < 768, so we don't flip to desktop mode mid-session (which would unmount the
+ * mobile route tree — e.g. a fullscreen video player rotating into landscape).
+ */
+function computeMiniMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  const shortSide = Math.min(window.innerWidth, window.innerHeight);
+  return shortSide < MINI_MODE_BREAKPOINT;
+}
+
 export function useMiniMode() {
-  const [isMiniMode, setIsMiniMode] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < MINI_MODE_BREAKPOINT;
-  });
+  const [isMiniMode, setIsMiniMode] = useState<boolean>(computeMiniMode);
 
   useEffect(() => {
-    const checkWidth = () => {
-      setIsMiniMode(window.innerWidth < MINI_MODE_BREAKPOINT);
-    };
+    const checkSize = () => setIsMiniMode(computeMiniMode());
 
-    const mql = window.matchMedia(`(max-width: ${MINI_MODE_BREAKPOINT - 1}px)`);
-    mql.addEventListener('change', checkWidth);
-    
-    // Also listen for resize (covers rotation)
-    window.addEventListener('resize', checkWidth);
-    
+    window.addEventListener('resize', checkSize);
+    window.addEventListener('orientationchange', checkSize);
+
     return () => {
-      mql.removeEventListener('change', checkWidth);
-      window.removeEventListener('resize', checkWidth);
+      window.removeEventListener('resize', checkSize);
+      window.removeEventListener('orientationchange', checkSize);
     };
   }, []);
 
