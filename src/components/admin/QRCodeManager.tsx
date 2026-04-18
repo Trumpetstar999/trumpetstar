@@ -186,6 +186,7 @@ export function QRCodeManager() {
           <QrCode className="w-5 h-5" /> QR-Codes ({qrCodes.length})
         </h3>
         <div className="flex items-center gap-2">
+          <QRAutoLinkDialog onApplied={fetchAll} />
           <Button size="sm" variant="outline" onClick={handleDownloadHtaccess}>
             <Download className="w-4 h-4 mr-1" /> .htaccess herunterladen
           </Button>
