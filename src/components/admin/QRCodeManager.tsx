@@ -253,7 +253,7 @@ export function QRCodeManager() {
       )}
 
       <div className="space-y-2">
-        {qrCodes.map(qr => (
+        {visibleCodes.map(qr => (
           <div key={qr.id} className="admin-card p-4">
             {editingId === qr.id ? (
               <div className="space-y-3">
