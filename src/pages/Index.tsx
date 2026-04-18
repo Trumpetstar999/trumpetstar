@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
@@ -111,11 +111,7 @@ const Index = () => {
   }, [loading]);
 
   if (loading && !loadingTimedOut) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <TrumpetstarLoader />;
   }
 
   // Don't render if not logged in (redirect will happen)
