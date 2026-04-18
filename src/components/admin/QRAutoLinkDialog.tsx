@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Sparkles, Loader2, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 interface Suggestion {
   qr_id: string;
@@ -31,11 +32,48 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
   const [applying, setApplying] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState('');
+  const progressTimer = useRef<number | null>(null);
+
+  // Simulated progress while waiting for the edge function (which is a single blocking call)
+  const startProgress = () => {
+    setProgress(2);
+    setProgressLabel('Lade QR-Codes & Inhalte...');
+    let p = 2;
+    // Estimated total ~60s; advance asymptotically toward 90% then wait for response
+    progressTimer.current = window.setInterval(() => {
+      // Slow down as we approach 90
+      const step = p < 30 ? 1.5 : p < 60 ? 0.8 : p < 85 ? 0.3 : 0.1;
+      p = Math.min(90, p + step);
+      setProgress(p);
+      if (p < 15) setProgressLabel('Lade QR-Codes & Inhalte...');
+      else if (p < 35) setProgressLabel('Wende Legacy-Mapping an...');
+      else if (p < 60) setProgressLabel('Suche exakte Titel-Treffer...');
+      else if (p < 88) setProgressLabel('KI analysiert verbleibende Codes...');
+      else setProgressLabel('Fast fertig...');
+    }, 500);
+  };
+
+  const stopProgress = (final = 100) => {
+    if (progressTimer.current) {
+      clearInterval(progressTimer.current);
+      progressTimer.current = null;
+    }
+    setProgress(final);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+    };
+  }, []);
 
   const runAnalysis = async () => {
     setOpen(true);
     setLoading(true);
     setSuggestions([]);
+    startProgress();
     try {
       const { data, error } = await supabase.functions.invoke('qr-auto-link', { body: { mode: 'suggest' } });
       if (error) throw error;
@@ -49,8 +87,11 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
         }
       });
       setSelected(auto);
+      stopProgress(100);
+      setProgressLabel('Analyse abgeschlossen');
       toast.success(`${sugs.length} QR-Codes analysiert`);
     } catch (e: any) {
+      stopProgress(0);
       toast.error('Analyse fehlgeschlagen: ' + (e?.message || 'Unbekannt'));
     } finally {
       setLoading(false);
@@ -128,9 +169,15 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
           </DialogHeader>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <div className="flex flex-col items-center justify-center py-16 gap-4 px-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-sm text-slate-600">Analysiere QR-Codes mit Legacy-Mapping & KI...</p>
+              <div className="w-full max-w-md space-y-2">
+                <Progress value={progress} className="h-2" />
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-600">{progressLabel}</span>
+                  <span className="font-mono text-slate-500">{Math.round(progress)}%</span>
+                </div>
+              </div>
               <p className="text-xs text-slate-400">Kann bei vielen Codes 30–60 Sekunden dauern.</p>
             </div>
           ) : suggestions.length === 0 ? (
