@@ -4,11 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, ArrowLeft, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { VideoPlayer } from '@/components/player/VideoPlayer';
+import type { Video } from '@/types';
 
 interface VideoContent {
   type: 'video';
-  vimeoId: string;
-  title: string;
+  video: Video;
+  levelId?: string;
+  levelTitle?: string;
 }
 
 interface AudioContent {
@@ -57,15 +60,33 @@ export default function QRRedirectPage() {
       if (data.content_type === 'video' && data.video_id) {
         const { data: video } = await supabase
           .from('videos')
-          .select('vimeo_video_id, title')
+          .select('id, title, thumbnail_url, duration_seconds, vimeo_video_id, vimeo_player_url, level_id')
           .eq('id', data.video_id)
           .single();
 
         if (video?.vimeo_video_id) {
+          let levelTitle: string | undefined;
+          if (video.level_id) {
+            const { data: lvl } = await supabase
+              .from('levels')
+              .select('title')
+              .eq('id', video.level_id)
+              .maybeSingle();
+            levelTitle = lvl?.title ?? undefined;
+          }
           setContent({
             type: 'video',
-            vimeoId: video.vimeo_video_id,
-            title: video.title,
+            video: {
+              id: video.id,
+              title: video.title,
+              thumbnail: video.thumbnail_url || '',
+              duration: video.duration_seconds || 0,
+              vimeoId: video.vimeo_video_id,
+              vimeoPlayerUrl: video.vimeo_player_url || undefined,
+              completions: 0,
+            },
+            levelId: video.level_id || undefined,
+            levelTitle,
           });
         } else {
           setError('Video nicht gefunden.');
@@ -136,32 +157,15 @@ export default function QRRedirectPage() {
   }
 
   if (content.type === 'video') {
-    // Vimeo iframe with autoplay + fullscreen — counted as user gesture from QR-link click
+    // Use the standard fullscreen VideoPlayer (autoplays, recording, completion tracking)
     return (
-      <div className="fixed inset-0 bg-black flex flex-col">
-        <div className="flex items-center justify-between p-3 bg-black/80 text-white">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/app')}
-            className="text-white hover:bg-white/10"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Zurück zur App
-          </Button>
-          <h1 className="text-sm font-medium truncate max-w-[60%]">{content.title}</h1>
-          <div className="w-24" />
-        </div>
-        <div className="flex-1 relative">
-          <iframe
-            src={`https://player.vimeo.com/video/${content.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
-            className="absolute inset-0 w-full h-full"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            title={content.title}
-          />
-        </div>
-      </div>
+      <VideoPlayer
+        video={content.video}
+        levelId={content.levelId}
+        levelTitle={content.levelTitle}
+        onClose={() => navigate('/app')}
+        onComplete={() => { /* completion handled inside VideoPlayer */ }}
+      />
     );
   }
 

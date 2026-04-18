@@ -13,6 +13,7 @@ const MOBILE_ALLOWED_PREFIXES = [
   '/mobile/profile',
   '/mobile/locked',
   '/pricing',
+  '/qr/',
 ];
 
 // Desktop app routes that should redirect to locked on mobile
