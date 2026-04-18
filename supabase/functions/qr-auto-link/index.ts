@@ -162,7 +162,9 @@ Deno.serve(async (req) => {
     })) as AudioOption[];
 
     const suggestions: Suggestion[] = [];
+    const aiQueue: QRCode[] = [];
 
+    // Pass 1: synchronous legacy + exact matching, collect AI candidates
     for (const qr of qrCodes) {
       const currentId = qr.content_type === 'video' ? qr.video_id : qr.audio_id;
       const currentTitle = currentId
@@ -171,7 +173,6 @@ Deno.serve(async (req) => {
             : (() => { const a = audios.find(a => a.id === currentId); return a ? (a.level_name ? `${a.display_name} (${a.level_name})` : a.display_name) : null; })())
         : null;
 
-      // 1) Try legacy/level-song mapping
       const legacy = findByLevelSong(qr, videos, audios);
       if (legacy?.id) {
         suggestions.push({
@@ -185,7 +186,6 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // 2) Exact title match (label contains a video/audio title)
       if (qr.label && qr.content_type === 'video') {
         const exact = videos.find(v => qr.label!.toLowerCase().includes(v.title.toLowerCase()) && v.title.length > 4);
         if (exact) {
@@ -201,35 +201,56 @@ Deno.serve(async (req) => {
         }
       }
 
-      // 3) AI fallback (only if label exists)
       if (qr.label && qr.label.trim().length > 2) {
+        aiQueue.push(qr);
+      } else {
+        suggestions.push({
+          qr_id: qr.id, qr_code: qr.code, qr_label: qr.label,
+          content_type: qr.content_type,
+          current_id: currentId, current_title: currentTitle,
+          suggested_id: null, suggested_title: null,
+          confidence: 'none', source: 'none',
+          reason: 'Kein Label vorhanden',
+        });
+      }
+    }
+
+    // Pass 2: parallel AI calls in batches
+    const CONCURRENCY = 8;
+    for (let i = 0; i < aiQueue.length; i += CONCURRENCY) {
+      const batch = aiQueue.slice(i, i + CONCURRENCY);
+      const results = await Promise.all(batch.map(async (qr) => {
+        const currentId = qr.content_type === 'video' ? qr.video_id : qr.audio_id;
+        const currentTitle = currentId
+          ? (qr.content_type === 'video'
+              ? videos.find(v => v.id === currentId)?.title || null
+              : (() => { const a = audios.find(a => a.id === currentId); return a ? (a.level_name ? `${a.display_name} (${a.level_name})` : a.display_name) : null; })())
+          : null;
         try {
           const ai = await aiSuggest(qr, videos, audios, apiKey);
           if (ai?.id) {
-            suggestions.push({
+            return {
               qr_id: qr.id, qr_code: qr.code, qr_label: qr.label,
               content_type: qr.content_type,
               current_id: currentId, current_title: currentTitle,
               suggested_id: ai.id, suggested_title: ai.title,
-              confidence: 'medium', source: 'ai',
+              confidence: 'medium' as const, source: 'ai' as const,
               reason: ai.reason,
-            });
-            continue;
+            };
           }
         } catch (e) {
-          // AI failed — keep going with no suggestion
           console.error('AI error for', qr.code, e);
         }
-      }
-
-      suggestions.push({
-        qr_id: qr.id, qr_code: qr.code, qr_label: qr.label,
-        content_type: qr.content_type,
-        current_id: currentId, current_title: currentTitle,
-        suggested_id: null, suggested_title: null,
-        confidence: 'none', source: 'none',
-        reason: qr.label ? 'Kein Treffer gefunden' : 'Kein Label vorhanden',
-      });
+        return {
+          qr_id: qr.id, qr_code: qr.code, qr_label: qr.label,
+          content_type: qr.content_type,
+          current_id: currentId, current_title: currentTitle,
+          suggested_id: null, suggested_title: null,
+          confidence: 'none' as const, source: 'none' as const,
+          reason: 'Kein Treffer gefunden',
+        };
+      }));
+      suggestions.push(...results);
     }
 
     // If apply mode: update the requested QR codes
