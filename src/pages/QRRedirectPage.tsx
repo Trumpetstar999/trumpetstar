@@ -4,11 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2, ArrowLeft, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { VideoPlayer } from '@/components/player/VideoPlayer';
+import type { Video } from '@/types';
 
 interface VideoContent {
   type: 'video';
-  vimeoId: string;
-  title: string;
+  video: Video;
+  levelId?: string;
+  levelTitle?: string;
 }
 
 interface AudioContent {
