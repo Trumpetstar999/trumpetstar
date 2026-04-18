@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { Plus, Pencil, Check, X, Trash2, QrCode } from 'lucide-react';
+import { Plus, Pencil, Check, X, Trash2, QrCode, Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QRCode {
@@ -39,6 +39,62 @@ export function QRCodeManager() {
   const [editForm, setEditForm] = useState<Partial<QRCode>>({});
   const [showAdd, setShowAdd] = useState(false);
   const [newForm, setNewForm] = useState({ code: '', content_type: 'video', video_id: '', audio_id: '', label: '' });
+  const [tab, setTab] = useState<'all' | 'linked' | 'unlinked'>('all');
+
+  const isLinked = (qr: QRCode) =>
+    (qr.content_type === 'video' && !!qr.video_id) ||
+    (qr.content_type === 'audio' && !!qr.audio_id);
+
+  const linkedCodes = qrCodes.filter(isLinked);
+  const unlinkedCodes = qrCodes.filter(qr => !isLinked(qr));
+  const visibleCodes =
+    tab === 'linked' ? linkedCodes : tab === 'unlinked' ? unlinkedCodes : qrCodes;
+
+  const handleDownloadHtaccess = () => {
+    const base = 'https://www.trumpetstar.app';
+    const lines: string[] = [
+      '# ============================================================',
+      '# Trumpetstar QR-Code Redirects (.htaccess)',
+      `# Generiert: ${new Date().toISOString()}`,
+      `# Gesamt: ${qrCodes.length} | Verlinkt: ${linkedCodes.length} | Nicht verlinkt: ${unlinkedCodes.length}`,
+      '# ============================================================',
+      '',
+      'RewriteEngine On',
+      '',
+      '# --- Verlinkte QR-Codes ---',
+      '',
+    ];
+
+    for (const qr of [...linkedCodes].sort((a, b) => a.code.localeCompare(b.code))) {
+      const info = getContentLabel(qr).replace(/\n/g, ' ');
+      const label = qr.label ? ` | ${qr.label}` : '';
+      lines.push(`# ${qr.code}${label} -> ${info}`);
+      lines.push(`Redirect 301 /qr/${qr.code} ${base}/qr/${qr.code}`);
+      lines.push('');
+    }
+
+    if (unlinkedCodes.length > 0) {
+      lines.push('# --- Nicht verlinkte QR-Codes (Fallback auf App-Startseite) ---');
+      lines.push('');
+      for (const qr of [...unlinkedCodes].sort((a, b) => a.code.localeCompare(b.code))) {
+        const label = qr.label ? ` | ${qr.label}` : '';
+        lines.push(`# ${qr.code}${label} -> NICHT VERLINKT`);
+        lines.push(`Redirect 301 /qr/${qr.code} ${base}/qr/${qr.code}`);
+        lines.push('');
+      }
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `htaccess_qr_redirects_${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`.htaccess mit ${qrCodes.length} Redirects heruntergeladen`);
+  };
 
   const fetchAll = async () => {
     setLoading(true);
@@ -120,13 +176,38 @@ export function QRCodeManager() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
           <QrCode className="w-5 h-5" /> QR-Codes ({qrCodes.length})
         </h3>
-        <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
-          <Plus className="w-4 h-4 mr-1" /> Neuer QR-Code
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={handleDownloadHtaccess}>
+            <Download className="w-4 h-4 mr-1" /> .htaccess herunterladen
+          </Button>
+          <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
+            <Plus className="w-4 h-4 mr-1" /> Neuer QR-Code
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 border-b border-slate-200">
+        {([
+          ['all', `Alle (${qrCodes.length})`],
+          ['linked', `Verlinkt (${linkedCodes.length})`],
+          ['unlinked', `Nicht verlinkt (${unlinkedCodes.length})`],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              tab === key
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {showAdd && (
@@ -172,7 +253,7 @@ export function QRCodeManager() {
       )}
 
       <div className="space-y-2">
-        {qrCodes.map(qr => (
+        {visibleCodes.map(qr => (
           <div key={qr.id} className="admin-card p-4">
             {editingId === qr.id ? (
               <div className="space-y-3">
@@ -234,8 +315,14 @@ export function QRCodeManager() {
             )}
           </div>
         ))}
-        {qrCodes.length === 0 && (
-          <p className="text-center text-slate-400 py-6">Noch keine QR-Codes angelegt.</p>
+        {visibleCodes.length === 0 && (
+          <p className="text-center text-slate-400 py-6">
+            {tab === 'linked'
+              ? 'Keine verlinkten QR-Codes.'
+              : tab === 'unlinked'
+              ? 'Alle QR-Codes sind verlinkt. 🎉'
+              : 'Noch keine QR-Codes angelegt.'}
+          </p>
         )}
       </div>
     </div>
