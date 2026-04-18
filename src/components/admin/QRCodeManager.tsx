@@ -110,7 +110,8 @@ export function QRCodeManager() {
     }
     if (qr.content_type === 'audio' && qr.audio_id) {
       const a = audios.find(a => a.id === qr.audio_id);
-      return a ? `🎵 ${a.display_name}` : '🎵 (unbekannt)';
+      if (!a) return '🎵 (unbekannt)';
+      return a.level_name ? `🎵 ${a.display_name} (${a.level_name})` : `🎵 ${a.display_name}`;
     }
     return '– nicht verknüpft –';
   };
