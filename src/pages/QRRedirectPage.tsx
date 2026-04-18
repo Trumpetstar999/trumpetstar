@@ -167,8 +167,8 @@ export default function QRRedirectPage() {
 
   // Audio
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted p-6">
-      <div className="w-full max-w-md bg-card rounded-2xl shadow-xl p-8 space-y-6 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5 p-6">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6 text-center">
         <div className="w-32 h-32 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
           <button
             onClick={togglePlay}
@@ -179,8 +179,8 @@ export default function QRRedirectPage() {
           </button>
         </div>
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{content.title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">QR-Code: {code}</p>
+          <h1 className="text-xl font-semibold text-slate-900">{content.title}</h1>
+          <p className="text-sm text-slate-500 mt-1">QR-Code: {code}</p>
         </div>
         <audio
           ref={audioRef}
