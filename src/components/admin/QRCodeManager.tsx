@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { Plus, Pencil, Check, X, Trash2, QrCode, Download } from 'lucide-react';
+import { Plus, Pencil, Check, X, Trash2, QrCode, Download, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface QRCode {
   id: string;
