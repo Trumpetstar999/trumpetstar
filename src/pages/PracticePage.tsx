@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { SessionWithDetails } from '@/types/sessions';
 import { ShareSessionDialog } from '@/components/sessions/ShareSessionDialog';
+import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
 
 // ─── Session Card (inline) ────────────────────────────────────────────────────
 function SessionCard({ session, index, thumbnails, onPlay, onEdit, onDuplicate, onShare, onDelete }: {
