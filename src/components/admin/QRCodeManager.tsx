@@ -45,11 +45,19 @@ export function QRCodeManager() {
     const [qrRes, vidRes, audRes] = await Promise.all([
       supabase.from('qr_codes').select('*').order('code'),
       supabase.from('videos').select('id, title, vimeo_video_id').eq('is_active', true).order('title'),
-      supabase.from('audio_files').select('id, display_name').order('display_name'),
+      supabase.from('audio_files').select('id, display_name, audio_levels(name)').order('display_name'),
     ]);
     if (qrRes.data) setQrCodes(qrRes.data);
     if (vidRes.data) setVideos(vidRes.data);
-    if (audRes.data) setAudios(audRes.data);
+    if (audRes.data) {
+      setAudios(
+        audRes.data.map((a: any) => ({
+          id: a.id,
+          display_name: a.display_name,
+          level_name: a.audio_levels?.name ?? null,
+        }))
+      );
+    }
     setLoading(false);
   };
 
