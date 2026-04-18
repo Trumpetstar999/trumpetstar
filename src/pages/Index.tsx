@@ -157,15 +157,22 @@ const Index = () => {
           title={getTabTitle(activeTab)}
           stars={totalStars}
         >
-          <div 
-            className={cn(
-              "h-full transition-all duration-300 ease-out",
-              isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
-              isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
-              !isTransitioning && "opacity-100 translate-x-0"
+          <div className="relative h-full">
+            {isTransitioning && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
+                <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
+              </div>
             )}
-          >
-            {renderPage()}
+            <div 
+              className={cn(
+                "h-full transition-all duration-300 ease-out",
+                isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+                isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
+                !isTransitioning && "opacity-100 translate-x-0"
+              )}
+            >
+              {renderPage()}
+            </div>
           </div>
         </AppShell>
       </TabNavigationProvider>
