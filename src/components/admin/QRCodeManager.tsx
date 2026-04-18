@@ -27,6 +27,7 @@ interface VideoOption {
 interface AudioOption {
   id: string;
   display_name: string;
+  level_name?: string | null;
 }
 
 export function QRCodeManager() {
