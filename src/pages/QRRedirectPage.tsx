@@ -60,15 +60,33 @@ export default function QRRedirectPage() {
       if (data.content_type === 'video' && data.video_id) {
         const { data: video } = await supabase
           .from('videos')
-          .select('vimeo_video_id, title')
+          .select('id, title, thumbnail_url, duration_seconds, vimeo_video_id, vimeo_player_url, level_id')
           .eq('id', data.video_id)
           .single();
 
         if (video?.vimeo_video_id) {
+          let levelTitle: string | undefined;
+          if (video.level_id) {
+            const { data: lvl } = await supabase
+              .from('levels')
+              .select('title')
+              .eq('id', video.level_id)
+              .maybeSingle();
+            levelTitle = lvl?.title ?? undefined;
+          }
           setContent({
             type: 'video',
-            vimeoId: video.vimeo_video_id,
-            title: video.title,
+            video: {
+              id: video.id,
+              title: video.title,
+              thumbnail: video.thumbnail_url || '',
+              duration: video.duration_seconds || 0,
+              vimeoId: video.vimeo_video_id,
+              vimeoPlayerUrl: video.vimeo_player_url || undefined,
+              completions: 0,
+            },
+            levelId: video.level_id || undefined,
+            levelTitle,
           });
         } else {
           setError('Video nicht gefunden.');
