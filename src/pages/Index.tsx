@@ -1,17 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
-import { LevelsPage } from './LevelsPage';
-import { PdfsPage } from './PdfsPage';
-import { MusicXMLPage } from './MusicXMLPage';
-import { PracticePage } from './PracticePage';
-import { RecordingsPage } from './RecordingsPage';
-import { ChatsPage } from './ChatsPage';
-import { ClassroomPage } from './ClassroomPage';
-import { ProfilePage } from './ProfilePage';
-import { GamePage } from './GamePage';
-import { MetronomePage } from './MetronomePage';
-import { AudiosPage } from './AudiosPage';
 import { TabId } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -22,6 +11,19 @@ import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
+
+// Lazy-loaded tab pages — only the active tab's bundle is fetched
+const LevelsPage = lazy(() => import('./LevelsPage').then(m => ({ default: m.LevelsPage })));
+const PdfsPage = lazy(() => import('./PdfsPage').then(m => ({ default: m.PdfsPage })));
+const MusicXMLPage = lazy(() => import('./MusicXMLPage').then(m => ({ default: m.MusicXMLPage })));
+const PracticePage = lazy(() => import('./PracticePage').then(m => ({ default: m.PracticePage })));
+const RecordingsPage = lazy(() => import('./RecordingsPage').then(m => ({ default: m.RecordingsPage })));
+const ChatsPage = lazy(() => import('./ChatsPage').then(m => ({ default: m.ChatsPage })));
+const ClassroomPage = lazy(() => import('./ClassroomPage').then(m => ({ default: m.ClassroomPage })));
+const ProfilePage = lazy(() => import('./ProfilePage').then(m => ({ default: m.ProfilePage })));
+const GamePage = lazy(() => import('./GamePage').then(m => ({ default: m.GamePage })));
+const MetronomePage = lazy(() => import('./MetronomePage').then(m => ({ default: m.MetronomePage })));
+const AudiosPage = lazy(() => import('./AudiosPage').then(m => ({ default: m.AudiosPage })));
 
 // Define tab order for determining slide direction
 const tabOrder: TabId[] = ['levels', 'pdfs', 'musicxml', 'practice', 'recordings', 'game', 'metronome', 'audios', 'chats', 'classroom', 'profile'];
@@ -169,7 +171,13 @@ const Index = () => {
               !isTransitioning && "opacity-100 translate-x-0"
             )}
           >
-            {renderPage()}
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full py-20">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            }>
+              {renderPage()}
+            </Suspense>
           </div>
         </AppShell>
       </TabNavigationProvider>

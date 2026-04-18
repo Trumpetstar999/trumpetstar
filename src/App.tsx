@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,76 +7,82 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { VideoPlayerProvider } from "@/hooks/useVideoPlayer";
 import { MembershipProvider } from "@/hooks/useMembership";
-
 import { PdfViewerProvider } from "@/hooks/usePdfViewer";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LanguageDetector } from "@/components/LanguageDetector";
-import Index from "./pages/Index";
-import LandingPage from "./pages/LandingPage";
-import BlogPage from "./pages/BlogPage";
-import TrompeteLernenErwachsene from "./pages/blog/TrompeteLernenErwachsene";
-import ErsterTonTrompete from "./pages/blog/ErsterTonTrompete";
-import TrompeteUebenRoutine from "./pages/blog/TrompeteUebenRoutine";
-import TrompeteLernenKinder from "./pages/blog/TrompeteLernenKinder";
-import TrompeteFluegelhorn from "./pages/blog/TrompeteFluegelhorn";
-import TrompeteKinderKaufen from "./pages/blog/TrompeteKinderKaufen";
-import BlaeserklasseEltern from "./pages/blog/BlaeserklasseEltern";
-import AuthPage from "./pages/AuthPage";
-import AdminPage from "./pages/AdminPage";
-import { ChatsPage } from "./pages/ChatsPage";
-import { ClassroomPage } from "./pages/ClassroomPage";
-import { MusicXMLPage } from "./pages/MusicXMLPage";
-import { MusicXMLViewerPage } from "./pages/MusicXMLViewerPage";
-import PricingPage from "./pages/PricingPage";
+import { Loader2 } from "lucide-react";
+import { MobileRouteGuard } from "./components/mobile/MobileRouteGuard";
 
-import GamePlayPage from "./pages/GamePlayPage";
-import SessionBuilderPage from "./pages/SessionBuilderPage";
-import PlaylistBuilderPage from "./pages/PlaylistBuilderPage";
-import SessionListPage from "./pages/SessionListPage";
-import SessionPlayerPage from "./pages/SessionPlayerPage";
-import SharedSessionPage from "./pages/SharedSessionPage";
-import TrompeteLernenPage from "./pages/TrompeteLernenPage";
-import TrompeteLernenErwachsenePage from "./pages/TrompeteLernenErwachsenePage";
-import TrompeteLernenKinderPage from "./pages/TrompeteLernenKinderPage";
-import TrompeteAnsatzAtmungPage from "./pages/TrompeteAnsatzAtmungPage";
-import TrompeteErsterTonPage from "./pages/TrompeteErsterTonPage";
-import TrompeteTonumfangPage from "./pages/TrompeteTonumfangPage";
-import HilfeKeinTonPage from "./pages/HilfeKeinTonPage";
-import HelpCenterPage from "./pages/HelpCenterPage";
-import QRRedirectPage from "./pages/QRRedirectPage";
-import NotFound from "./pages/NotFound";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import ImpressumPage from "./pages/ImpressumPage";
-import DatenschutzPage from "./pages/DatenschutzPage";
+// Eager: landing & auth (likely first paint targets)
+import LandingPage from "./pages/LandingPage";
+import AuthPage from "./pages/AuthPage";
+
+// Lazy: app shell + all secondary routes
+const Index = lazy(() => import("./pages/Index"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const BlogPage = lazy(() => import("./pages/BlogPage"));
+const TrompeteLernenErwachsene = lazy(() => import("./pages/blog/TrompeteLernenErwachsene"));
+const ErsterTonTrompete = lazy(() => import("./pages/blog/ErsterTonTrompete"));
+const TrompeteUebenRoutine = lazy(() => import("./pages/blog/TrompeteUebenRoutine"));
+const TrompeteLernenKinder = lazy(() => import("./pages/blog/TrompeteLernenKinder"));
+const TrompeteFluegelhorn = lazy(() => import("./pages/blog/TrompeteFluegelhorn"));
+const TrompeteKinderKaufen = lazy(() => import("./pages/blog/TrompeteKinderKaufen"));
+const BlaeserklasseEltern = lazy(() => import("./pages/blog/BlaeserklasseEltern"));
+const ChatsPage = lazy(() => import("./pages/ChatsPage").then(m => ({ default: m.ChatsPage })));
+const ClassroomPage = lazy(() => import("./pages/ClassroomPage").then(m => ({ default: m.ClassroomPage })));
+const MusicXMLPage = lazy(() => import("./pages/MusicXMLPage").then(m => ({ default: m.MusicXMLPage })));
+const MusicXMLViewerPage = lazy(() => import("./pages/MusicXMLViewerPage").then(m => ({ default: m.MusicXMLViewerPage })));
+const PricingPage = lazy(() => import("./pages/PricingPage"));
+const GamePlayPage = lazy(() => import("./pages/GamePlayPage"));
+const SessionBuilderPage = lazy(() => import("./pages/SessionBuilderPage"));
+const PlaylistBuilderPage = lazy(() => import("./pages/PlaylistBuilderPage"));
+const SessionListPage = lazy(() => import("./pages/SessionListPage"));
+const SessionPlayerPage = lazy(() => import("./pages/SessionPlayerPage"));
+const SharedSessionPage = lazy(() => import("./pages/SharedSessionPage"));
+const TrompeteLernenPage = lazy(() => import("./pages/TrompeteLernenPage"));
+const TrompeteLernenErwachsenePage = lazy(() => import("./pages/TrompeteLernenErwachsenePage"));
+const TrompeteLernenKinderPage = lazy(() => import("./pages/TrompeteLernenKinderPage"));
+const TrompeteAnsatzAtmungPage = lazy(() => import("./pages/TrompeteAnsatzAtmungPage"));
+const TrompeteErsterTonPage = lazy(() => import("./pages/TrompeteErsterTonPage"));
+const TrompeteTonumfangPage = lazy(() => import("./pages/TrompeteTonumfangPage"));
+const HilfeKeinTonPage = lazy(() => import("./pages/HilfeKeinTonPage"));
+const HelpCenterPage = lazy(() => import("./pages/HelpCenterPage"));
+const QRRedirectPage = lazy(() => import("./pages/QRRedirectPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const ImpressumPage = lazy(() => import("./pages/ImpressumPage"));
+const DatenschutzPage = lazy(() => import("./pages/DatenschutzPage"));
 
 // Mobile Mini-Mode pages
-import MobileHomePage from "./pages/mobile/MobileHomePage";
-import MobilePlanPage from "./pages/mobile/MobilePlanPage";
-import MobileHelpPage from "./pages/mobile/MobileHelpPage";
-import MobileProfilePage from "./pages/mobile/MobileProfilePage";
-import MobileLockedPage from "./pages/mobile/MobileLockedPage";
-import { MobileRouteGuard } from "./components/mobile/MobileRouteGuard";
+const MobileHomePage = lazy(() => import("./pages/mobile/MobileHomePage"));
+const MobilePlanPage = lazy(() => import("./pages/mobile/MobilePlanPage"));
+const MobileHelpPage = lazy(() => import("./pages/mobile/MobileHelpPage"));
+const MobileProfilePage = lazy(() => import("./pages/mobile/MobileProfilePage"));
+const MobileLockedPage = lazy(() => import("./pages/mobile/MobileLockedPage"));
 
 const queryClient = new QueryClient();
 
-console.log('[App.tsx] App component loading...');
+const RouteFallback = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
 
-const App = () => {
-  console.log('[App.tsx] App component rendering...');
-  return (
+const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
         <LanguageProvider>
-            <MembershipProvider>
-              <VideoPlayerProvider>
-                <PdfViewerProvider>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <LanguageDetector />
-                    <MobileRouteGuard>
+          <MembershipProvider>
+            <VideoPlayerProvider>
+              <PdfViewerProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <LanguageDetector />
+                  <MobileRouteGuard>
+                    <Suspense fallback={<RouteFallback />}>
                       <Routes>
                         {/* Public Landing */}
                         <Route path="/" element={<LandingPage />} />
@@ -88,20 +95,20 @@ const App = () => {
                         <Route path="/blog/trompete-fluegelhorn-kind" element={<TrompeteFluegelhorn />} />
                         <Route path="/blog/trompete-kinder-kaufen" element={<TrompeteKinderKaufen />} />
                         <Route path="/blog/blaeserklasse-trompete" element={<BlaeserklasseEltern />} />
-                        
+
                         {/* Auth Routes */}
                         <Route path="/auth" element={<AuthPage />} />
                         <Route path="/login" element={<AuthPage />} />
                         <Route path="/signup" element={<AuthPage />} />
                         <Route path="/reset-password" element={<ResetPasswordPage />} />
-                        
+
                         {/* Mobile Mini-Mode Routes */}
                         <Route path="/mobile/home" element={<MobileHomePage />} />
                         <Route path="/mobile/plan" element={<MobilePlanPage />} />
                         <Route path="/mobile/help" element={<MobileHelpPage />} />
                         <Route path="/mobile/profile" element={<MobileProfilePage />} />
                         <Route path="/mobile/locked" element={<MobileLockedPage />} />
-                        
+
                         {/* Protected App Routes */}
                         <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                         <Route path="/app/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
@@ -117,11 +124,11 @@ const App = () => {
                         <Route path="/app/playlists/new" element={<ProtectedRoute><PlaylistBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/playlists/:id/edit" element={<ProtectedRoute><PlaylistBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/hilfe" element={<ProtectedRoute><HelpCenterPage /></ProtectedRoute>} />
-                        
+
                         {/* Public Routes */}
                         <Route path="/pricing" element={<PricingPage />} />
                         <Route path="/practice/sessions/share/:slug" element={<SharedSessionPage />} />
-                        
+
                         {/* SEO Pillar Pages */}
                         <Route path="/trompete-lernen" element={<TrompeteLernenPage />} />
                         <Route path="/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsenePage />} />
@@ -133,31 +140,31 @@ const App = () => {
                         <Route path="/hilfe/trompete-kein-ton" element={<HilfeKeinTonPage />} />
                         <Route path="/impressum" element={<ImpressumPage />} />
                         <Route path="/datenschutz" element={<DatenschutzPage />} />
-                        
+
                         {/* QR Code redirect */}
                         <Route path="/qr/:code" element={<QRRedirectPage />} />
-                        
+
                         {/* Common URL redirects */}
                         <Route path="/shop" element={<Navigate to="/pricing" replace />} />
                         <Route path="/levels" element={<Navigate to="/app" replace />} />
                         <Route path="/dashboard" element={<Navigate to="/app" replace />} />
                         <Route path="/register" element={<Navigate to="/signup" replace />} />
-                        
+
                         {/* Legacy redirect: old /musicxml/:id links */}
                         <Route path="/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
                         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                         <Route path="*" element={<NotFound />} />
                       </Routes>
-                    </MobileRouteGuard>
-                  </BrowserRouter>
-                </PdfViewerProvider>
-              </VideoPlayerProvider>
-            </MembershipProvider>
+                    </Suspense>
+                  </MobileRouteGuard>
+                </BrowserRouter>
+              </PdfViewerProvider>
+            </VideoPlayerProvider>
+          </MembershipProvider>
         </LanguageProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
-  );
-};
+);
 
 export default App;
