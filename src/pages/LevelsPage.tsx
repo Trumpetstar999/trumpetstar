@@ -459,10 +459,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-140px)]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-white/70">{t('common.loading')}</p>
-        </div>
+        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
       </div>
     );
   }

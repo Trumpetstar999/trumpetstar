@@ -247,7 +247,7 @@ export function PracticePage() {
           {/* Sessions list */}
           {sessionsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
             </div>
           ) : sessions.length === 0 ? (
             <div className="glass rounded-2xl p-10 text-center">

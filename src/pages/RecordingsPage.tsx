@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Video, Users, Plus, Loader2 } from 'lucide-react';
+import { Video, Users, Plus } from 'lucide-react';
+import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RecordingDialog } from '@/components/recordings/RecordingDialog';
@@ -45,7 +46,7 @@ export function RecordingsPage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
       </div>
     );
   }
