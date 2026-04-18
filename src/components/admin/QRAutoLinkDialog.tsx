@@ -32,11 +32,48 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
   const [applying, setApplying] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState('');
+  const progressTimer = useRef<number | null>(null);
+
+  // Simulated progress while waiting for the edge function (which is a single blocking call)
+  const startProgress = () => {
+    setProgress(2);
+    setProgressLabel('Lade QR-Codes & Inhalte...');
+    let p = 2;
+    // Estimated total ~60s; advance asymptotically toward 90% then wait for response
+    progressTimer.current = window.setInterval(() => {
+      // Slow down as we approach 90
+      const step = p < 30 ? 1.5 : p < 60 ? 0.8 : p < 85 ? 0.3 : 0.1;
+      p = Math.min(90, p + step);
+      setProgress(p);
+      if (p < 15) setProgressLabel('Lade QR-Codes & Inhalte...');
+      else if (p < 35) setProgressLabel('Wende Legacy-Mapping an...');
+      else if (p < 60) setProgressLabel('Suche exakte Titel-Treffer...');
+      else if (p < 88) setProgressLabel('KI analysiert verbleibende Codes...');
+      else setProgressLabel('Fast fertig...');
+    }, 500);
+  };
+
+  const stopProgress = (final = 100) => {
+    if (progressTimer.current) {
+      clearInterval(progressTimer.current);
+      progressTimer.current = null;
+    }
+    setProgress(final);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (progressTimer.current) clearInterval(progressTimer.current);
+    };
+  }, []);
 
   const runAnalysis = async () => {
     setOpen(true);
     setLoading(true);
     setSuggestions([]);
+    startProgress();
     try {
       const { data, error } = await supabase.functions.invoke('qr-auto-link', { body: { mode: 'suggest' } });
       if (error) throw error;
@@ -50,8 +87,11 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
         }
       });
       setSelected(auto);
+      stopProgress(100);
+      setProgressLabel('Analyse abgeschlossen');
       toast.success(`${sugs.length} QR-Codes analysiert`);
     } catch (e: any) {
+      stopProgress(0);
       toast.error('Analyse fehlgeschlagen: ' + (e?.message || 'Unbekannt'));
     } finally {
       setLoading(false);
