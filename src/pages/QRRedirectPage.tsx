@@ -157,32 +157,15 @@ export default function QRRedirectPage() {
   }
 
   if (content.type === 'video') {
-    // Vimeo iframe with autoplay + fullscreen — counted as user gesture from QR-link click
+    // Use the standard fullscreen VideoPlayer (autoplays, recording, completion tracking)
     return (
-      <div className="fixed inset-0 bg-black flex flex-col">
-        <div className="flex items-center justify-between p-3 bg-black/80 text-white">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/app')}
-            className="text-white hover:bg-white/10"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Zurück zur App
-          </Button>
-          <h1 className="text-sm font-medium truncate max-w-[60%]">{content.title}</h1>
-          <div className="w-24" />
-        </div>
-        <div className="flex-1 relative">
-          <iframe
-            src={`https://player.vimeo.com/video/${content.vimeoId}?autoplay=1&title=0&byline=0&portrait=0`}
-            className="absolute inset-0 w-full h-full"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowFullScreen
-            title={content.title}
-          />
-        </div>
-      </div>
+      <VideoPlayer
+        video={content.video}
+        levelId={content.levelId}
+        levelTitle={content.levelTitle}
+        onClose={() => navigate('/app')}
+        onComplete={() => { /* completion handled inside VideoPlayer */ }}
+      />
     );
   }
 
