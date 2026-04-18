@@ -171,7 +171,13 @@ const Index = () => {
               !isTransitioning && "opacity-100 translate-x-0"
             )}
           >
-            {renderPage()}
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full py-20">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            }>
+              {renderPage()}
+            </Suspense>
           </div>
         </AppShell>
       </TabNavigationProvider>
