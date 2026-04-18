@@ -6,7 +6,8 @@ import { TeacherChatPanel } from '@/components/chat/TeacherChatPanel';
 import { TeacherStudentList } from '@/components/chat/TeacherStudentList';
 import { PremiumFeatureLock } from '@/components/premium/PremiumFeatureLock';
 import { useMembership } from '@/hooks/useMembership';
-import { MessageCircle, Loader2 } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
 
 export function ChatsPage() {
   const { user } = useAuth();
@@ -28,7 +29,7 @@ export function ChatsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
       </div>
     );
   }
