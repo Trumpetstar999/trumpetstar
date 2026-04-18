@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getLegacyUrl } from '@/lib/legacy-qr-redirects';
 
-const LEGACY_BASE = 'https://www.deinetrompetenschule.com';
+const LEGACY_BASE = 'https://www.trumpetstar.com';
 
 interface QRCode {
   id: string;
