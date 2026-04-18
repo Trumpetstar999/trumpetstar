@@ -57,7 +57,11 @@ export function TrumpetstarLoader({
       )}
     >
       <div className="ts-loader-stack">
-        <div className="ts-loader" aria-hidden="true">
+        <div
+          className="ts-loader"
+          aria-hidden="true"
+          style={!fullscreen ? { width: logoSize * 2.6, height: logoSize * 2.6 } : undefined}
+        >
           {/* Whirl layers */}
           <div className="ts-whirl">
             <div className="ts-whirl-sweep ts-slow" />
