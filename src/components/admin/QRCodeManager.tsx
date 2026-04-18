@@ -301,7 +301,7 @@ export function QRCodeManager() {
               </div>
             ) : (
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                   <TooltipProvider delayDuration={150}>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -318,7 +318,7 @@ export function QRCodeManager() {
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs">
                         <div className="space-y-1 text-xs">
-                          <div className="font-semibold">Vorschau-Link</div>
+                          <div className="font-semibold">Vorschau-Link (NEU)</div>
                           <div className="font-mono text-[11px] break-all opacity-80">
                             https://www.trumpetstar.app/qr/{qr.code}
                           </div>
@@ -332,6 +332,42 @@ export function QRCodeManager() {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+
+                  {(() => {
+                    const legacy = getLegacyUrl(qr.label, qr.content_type);
+                    if (!legacy) return null;
+                    const fullLegacy = legacy.startsWith('http') ? legacy : `${LEGACY_BASE}${legacy}`;
+                    return (
+                      <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <a
+                              href={fullLegacy}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded text-xs font-mono text-amber-800 inline-flex items-center gap-1 transition-colors border border-amber-300"
+                              title="Alter Link aus htaccess.txt"
+                            >
+                              ALT
+                              <ExternalLink className="w-3 h-3 opacity-60" />
+                            </a>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <div className="space-y-1 text-xs">
+                              <div className="font-semibold text-amber-700">Alter Link (htaccess.txt)</div>
+                              <div className="font-mono text-[11px] break-all opacity-80">
+                                {fullLegacy}
+                              </div>
+                              <div className="pt-1 border-t border-border/40 text-[10px] opacity-70">
+                                Vergleiche, ob der neue Link denselben Inhalt zeigt
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    );
+                  })()}
+
                   <span className="text-sm text-slate-600">{qr.label || '–'}</span>
                   <span className="text-xs text-slate-400">{getContentLabel(qr)}</span>
                 </div>
