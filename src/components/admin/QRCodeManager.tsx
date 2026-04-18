@@ -8,6 +8,9 @@ import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Plus, Pencil, Check, X, Trash2, QrCode, Download, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getLegacyUrl } from '@/lib/legacy-qr-redirects';
+
+const LEGACY_BASE = 'https://www.deinetrompetenschule.com';
 
 interface QRCode {
   id: string;
