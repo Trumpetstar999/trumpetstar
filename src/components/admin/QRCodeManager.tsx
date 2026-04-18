@@ -9,6 +9,7 @@ import { Plus, Pencil, Check, X, Trash2, QrCode, Download, ExternalLink } from '
 import { toast } from 'sonner';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getLegacyUrl } from '@/lib/legacy-qr-redirects';
+import { QRAutoLinkDialog } from './QRAutoLinkDialog';
 
 const LEGACY_BASE = 'https://www.trumpetstar.com';
 
@@ -185,6 +186,7 @@ export function QRCodeManager() {
           <QrCode className="w-5 h-5" /> QR-Codes ({qrCodes.length})
         </h3>
         <div className="flex items-center gap-2">
+          <QRAutoLinkDialog onApplied={fetchAll} />
           <Button size="sm" variant="outline" onClick={handleDownloadHtaccess}>
             <Download className="w-4 h-4 mr-1" /> .htaccess herunterladen
           </Button>
