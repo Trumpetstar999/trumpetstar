@@ -144,19 +144,24 @@ export function QRCodeManager() {
               </SelectContent>
             </Select>
             {newForm.content_type === 'video' ? (
-              <Select value={newForm.video_id} onValueChange={v => setNewForm(f => ({ ...f, video_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Video auswählen" /></SelectTrigger>
-                <SelectContent>
-                  {videos.map(v => <SelectItem key={v.id} value={v.id}>{v.title}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={newForm.video_id}
+                onChange={v => setNewForm(f => ({ ...f, video_id: v }))}
+                options={videos.map(v => ({ value: v.id, label: v.title }))}
+                placeholder="Video auswählen"
+                searchPlaceholder="Video suchen..."
+              />
             ) : (
-              <Select value={newForm.audio_id} onValueChange={v => setNewForm(f => ({ ...f, audio_id: v }))}>
-                <SelectTrigger><SelectValue placeholder="Audio auswählen" /></SelectTrigger>
-                <SelectContent>
-                  {audios.map(a => <SelectItem key={a.id} value={a.id}>{a.display_name}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={newForm.audio_id}
+                onChange={v => setNewForm(f => ({ ...f, audio_id: v }))}
+                options={audios.map(a => ({
+                  value: a.id,
+                  label: a.level_name ? `${a.display_name} (${a.level_name})` : a.display_name,
+                }))}
+                placeholder="Audio auswählen"
+                searchPlaceholder="Audio suchen..."
+              />
             )}
           </div>
           <div className="flex gap-2">
