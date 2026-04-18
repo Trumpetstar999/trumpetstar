@@ -6,7 +6,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { useLanguage } from '@/hooks/useLanguage';
 import { AssistantPanel } from '@/components/assistant/AssistantPanel';
-import toniAvatar from '@/assets/toni-coach.jpg';
+import toniAvatar from '@/assets/toni-coach.webp';
 
 interface TabBarProps {
   activeTab: TabId;

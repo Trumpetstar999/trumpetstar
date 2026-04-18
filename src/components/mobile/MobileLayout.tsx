@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, CreditCard, HelpCircle, User, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/hooks/useLanguage';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.webp';
 
 type MobileTab = 'home' | 'plan' | 'help' | 'profile';
 

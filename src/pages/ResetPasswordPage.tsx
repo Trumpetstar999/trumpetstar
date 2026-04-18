@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.webp';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');

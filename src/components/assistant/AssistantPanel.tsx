@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAssistant, AssistantMode, AssistantLanguage } from '@/hooks/useAssistant';
 import { useLanguage } from '@/hooks/useLanguage';
 import { format } from 'date-fns';
-import toniAvatar from '@/assets/toni-coach.jpg';
+import toniAvatar from '@/assets/toni-coach.webp';
 
 interface AssistantPanelProps {
   isOpen: boolean;
