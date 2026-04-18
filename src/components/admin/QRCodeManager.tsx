@@ -315,8 +315,14 @@ export function QRCodeManager() {
             )}
           </div>
         ))}
-        {qrCodes.length === 0 && (
-          <p className="text-center text-slate-400 py-6">Noch keine QR-Codes angelegt.</p>
+        {visibleCodes.length === 0 && (
+          <p className="text-center text-slate-400 py-6">
+            {tab === 'linked'
+              ? 'Keine verlinkten QR-Codes.'
+              : tab === 'unlinked'
+              ? 'Alle QR-Codes sind verlinkt. 🎉'
+              : 'Noch keine QR-Codes angelegt.'}
+          </p>
         )}
       </div>
     </div>
