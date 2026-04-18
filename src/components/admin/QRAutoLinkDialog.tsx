@@ -169,9 +169,15 @@ export function QRAutoLinkDialog({ onApplied }: Props) {
           </DialogHeader>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <div className="flex flex-col items-center justify-center py-16 gap-4 px-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-sm text-slate-600">Analysiere QR-Codes mit Legacy-Mapping & KI...</p>
+              <div className="w-full max-w-md space-y-2">
+                <Progress value={progress} className="h-2" />
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-600">{progressLabel}</span>
+                  <span className="font-mono text-slate-500">{Math.round(progress)}%</span>
+                </div>
+              </div>
               <p className="text-xs text-slate-400">Kann bei vielen Codes 30–60 Sekunden dauern.</p>
             </div>
           ) : suggestions.length === 0 ? (
