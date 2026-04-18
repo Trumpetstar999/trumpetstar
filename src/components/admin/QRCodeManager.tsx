@@ -176,13 +176,38 @@ export function QRCodeManager() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
           <QrCode className="w-5 h-5" /> QR-Codes ({qrCodes.length})
         </h3>
-        <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
-          <Plus className="w-4 h-4 mr-1" /> Neuer QR-Code
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={handleDownloadHtaccess}>
+            <Download className="w-4 h-4 mr-1" /> .htaccess herunterladen
+          </Button>
+          <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
+            <Plus className="w-4 h-4 mr-1" /> Neuer QR-Code
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 border-b border-slate-200">
+        {([
+          ['all', `Alle (${qrCodes.length})`],
+          ['linked', `Verlinkt (${linkedCodes.length})`],
+          ['unlinked', `Nicht verlinkt (${unlinkedCodes.length})`],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              tab === key
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {showAdd && (
