@@ -663,7 +663,21 @@ input[type="range"]:focus {
   transform-origin: 50% calc(35vmin);
 }
 
-/* Logo plate */
+/* Globe canvas */
+.ts-globe-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+  pointer-events: none;
+}
+.ts-globe {
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.25));
+}
+
+/* Logo plate (kept as fallback / center halo) */
 .ts-logo-plate {
   position: relative;
   display: grid;
