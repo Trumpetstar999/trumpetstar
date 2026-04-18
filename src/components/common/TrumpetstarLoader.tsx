@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.webp';
 import { cn } from '@/lib/utils';
 
 interface TrumpetstarLoaderProps {

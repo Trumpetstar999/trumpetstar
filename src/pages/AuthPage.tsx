@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import trumpetstarLogo from '@/assets/trumpetstar-logo.webp';
 const VIMEO_HLS_URL = 'https://player.vimeo.com/external/1182895999.m3u8?s=79486abc8212f3e32ae79db02772c8c750c1f891&logging=false';
 
 export default function AuthPage() {
