@@ -17,7 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { supabase } from '@/integrations/supabase/client';
-import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
+import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
 import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
@@ -111,7 +111,11 @@ const Index = () => {
   }, [loading]);
 
   if (loading && !loadingTimedOut) {
-    return <TrumpetstarLoader />;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   // Don't render if not logged in (redirect will happen)
@@ -157,22 +161,15 @@ const Index = () => {
           title={getTabTitle(activeTab)}
           stars={totalStars}
         >
-          <div className="relative h-full">
-            {isTransitioning && (
-              <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-                <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
-              </div>
+          <div 
+            className={cn(
+              "h-full transition-all duration-300 ease-out",
+              isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
+              isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
+              !isTransitioning && "opacity-100 translate-x-0"
             )}
-            <div 
-              className={cn(
-                "h-full transition-all duration-300 ease-out",
-                isTransitioning && slideDirection === 'left' && "opacity-0 translate-x-[-20px]",
-                isTransitioning && slideDirection === 'right' && "opacity-0 translate-x-[20px]",
-                !isTransitioning && "opacity-100 translate-x-0"
-              )}
-            >
-              {renderPage()}
-            </div>
+          >
+            {renderPage()}
           </div>
         </AppShell>
       </TabNavigationProvider>

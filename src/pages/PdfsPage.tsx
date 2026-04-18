@@ -10,8 +10,7 @@ import { PdfBookCard } from '@/components/pdfs/PdfBookCard';
 import { LanguageTabs } from '@/components/common/LanguageTabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FileText, Search, Music } from 'lucide-react';
-import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
+import { Loader2, FileText, Search, Music } from 'lucide-react';
 import { PlanKey } from '@/types/plans';
 import { toast } from 'sonner';
 import { usePdfViewer } from '@/hooks/usePdfViewer';
@@ -215,7 +214,7 @@ export function PdfsPage() {
   if (isLoading) {
     return (
       <div className="flex h-[calc(100vh-140px)] items-center justify-center">
-        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }

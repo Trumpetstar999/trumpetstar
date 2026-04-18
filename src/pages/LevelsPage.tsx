@@ -11,8 +11,7 @@ import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles, ListMusic, Play } from 'lucide-react';
-import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles, ListMusic, Play } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -460,7 +459,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-140px)]">
-        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-white" />
+          <p className="text-white/70">{t('common.loading')}</p>
+        </div>
       </div>
     );
   }

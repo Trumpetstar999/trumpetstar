@@ -12,8 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LanguageTabs } from '@/components/common/LanguageTabs';
-import { FileMusic, Search, Lock, Music, ChevronRight } from 'lucide-react';
-import { TrumpetstarLoader } from '@/components/common/TrumpetstarLoader';
+import { Loader2, FileMusic, Search, Lock, Music, ChevronRight } from 'lucide-react';
 import { PlanKey, PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { toast } from 'sonner';
 interface MusicXMLDocument {
@@ -119,7 +118,7 @@ export function MusicXMLPage() {
   if (isLoading) {
     return (
       <div className="flex h-[calc(100vh-140px)] items-center justify-center">
-        <TrumpetstarLoader fullscreen={false} showTagline={false} logoSize={96} />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }

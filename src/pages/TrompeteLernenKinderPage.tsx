@@ -1,5 +1,5 @@
 import { FAQSchema } from "@/components/SEO/FAQSchema";
-import lernweltImg from "@/assets/trumpetstar-lernwelt.webp";
+import lernweltImg from "@/assets/trumpetstar-lernwelt.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
