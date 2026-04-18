@@ -299,7 +299,36 @@ export function QRCodeManager() {
             ) : (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <code className="bg-slate-100 px-2 py-1 rounded text-sm font-mono font-bold">{qr.code}</code>
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <a
+                          href={`/qr/${qr.code}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-slate-100 hover:bg-primary/10 px-2 py-1 rounded text-sm font-mono font-bold text-primary inline-flex items-center gap-1 transition-colors"
+                          title={`Öffnet /qr/${qr.code}`}
+                        >
+                          {qr.code}
+                          <ExternalLink className="w-3 h-3 opacity-60" />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-xs">
+                        <div className="space-y-1 text-xs">
+                          <div className="font-semibold">Vorschau-Link</div>
+                          <div className="font-mono text-[11px] break-all opacity-80">
+                            https://www.trumpetstar.app/qr/{qr.code}
+                          </div>
+                          <div className="pt-1 border-t border-border/40">
+                            → {getContentLabel(qr)}
+                          </div>
+                          <div className="text-[10px] opacity-60 pt-1">
+                            Klick öffnet automatisch das verknüpfte Lied/Video
+                          </div>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <span className="text-sm text-slate-600">{qr.label || '–'}</span>
                   <span className="text-xs text-slate-400">{getContentLabel(qr)}</span>
                 </div>
