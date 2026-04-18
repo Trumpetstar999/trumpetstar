@@ -39,6 +39,62 @@ export function QRCodeManager() {
   const [editForm, setEditForm] = useState<Partial<QRCode>>({});
   const [showAdd, setShowAdd] = useState(false);
   const [newForm, setNewForm] = useState({ code: '', content_type: 'video', video_id: '', audio_id: '', label: '' });
+  const [tab, setTab] = useState<'all' | 'linked' | 'unlinked'>('all');
+
+  const isLinked = (qr: QRCode) =>
+    (qr.content_type === 'video' && !!qr.video_id) ||
+    (qr.content_type === 'audio' && !!qr.audio_id);
+
+  const linkedCodes = qrCodes.filter(isLinked);
+  const unlinkedCodes = qrCodes.filter(qr => !isLinked(qr));
+  const visibleCodes =
+    tab === 'linked' ? linkedCodes : tab === 'unlinked' ? unlinkedCodes : qrCodes;
+
+  const handleDownloadHtaccess = () => {
+    const base = 'https://www.trumpetstar.app';
+    const lines: string[] = [
+      '# ============================================================',
+      '# Trumpetstar QR-Code Redirects (.htaccess)',
+      `# Generiert: ${new Date().toISOString()}`,
+      `# Gesamt: ${qrCodes.length} | Verlinkt: ${linkedCodes.length} | Nicht verlinkt: ${unlinkedCodes.length}`,
+      '# ============================================================',
+      '',
+      'RewriteEngine On',
+      '',
+      '# --- Verlinkte QR-Codes ---',
+      '',
+    ];
+
+    for (const qr of [...linkedCodes].sort((a, b) => a.code.localeCompare(b.code))) {
+      const info = getContentLabel(qr).replace(/\n/g, ' ');
+      const label = qr.label ? ` | ${qr.label}` : '';
+      lines.push(`# ${qr.code}${label} -> ${info}`);
+      lines.push(`Redirect 301 /qr/${qr.code} ${base}/qr/${qr.code}`);
+      lines.push('');
+    }
+
+    if (unlinkedCodes.length > 0) {
+      lines.push('# --- Nicht verlinkte QR-Codes (Fallback auf App-Startseite) ---');
+      lines.push('');
+      for (const qr of [...unlinkedCodes].sort((a, b) => a.code.localeCompare(b.code))) {
+        const label = qr.label ? ` | ${qr.label}` : '';
+        lines.push(`# ${qr.code}${label} -> NICHT VERLINKT`);
+        lines.push(`Redirect 301 /qr/${qr.code} ${base}/qr/${qr.code}`);
+        lines.push('');
+      }
+    }
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `htaccess_qr_redirects_${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`.htaccess mit ${qrCodes.length} Redirects heruntergeladen`);
+  };
 
   const fetchAll = async () => {
     setLoading(true);
