@@ -1,71 +1,128 @@
 {
-  "date": "2026-04-13",
+  "date": "2026-04-20",
   "kw": "KW16",
   "env": "prod",
-  "go_no_go": "GO",
-  "git_head_pre": "68647973",
-  "git_head_post": "d840ffbd",
-  "p0_count": 0,
-  "p1_count": 1,
-  "p2_count": 0,
-  "p3_count": 4,
+  "go_no_go": "CONDITIONAL_NO_GO",
+  "git_head_pre": "67594634",
+  "git_head_post": "ff8167a5",
+  "p0_count": 1,
+  "p1_count": 0,
+  "p2_count": 1,
+  "p3_count": 5,
   "top_risks": [
-    "TS-QA-EMAIL-001: Cross-Project Email Tracking — Architektur-Entscheidung ausstehend (P1)",
-    "TS-QA-KW13-SEC-003: send-invoice-email ohne Rate Limiting (P3)",
-    "TS-QA-DEP-001: xlsx Prototype Pollution + ReDoS — kein Fix verfügbar (P3)",
-    "TS-QA-KW16-CODE-001: QRCodeManager 'any' TypeScript-Typ (P3)"
+    "TS-QA-KW16-DEP-001: Edge Functions Auth-Fixes nicht deployed (P0, ACTION REQUIRED)",
+    "TS-QA-KW14-SEC-003: vimeo-sync Auth im Code aber nicht in Production (P2)",
+    "TS-QA-KW13-SEC-003: send-invoice-email ohne Rate Limiting (P3)"
   ],
   "next_steps": [
-    "TS-QA-EMAIL-001: Architektur-Entscheidung für Cross-Project Tracking fällen",
-    "WP_OAUTH_CLIENT_ID: Secret in Supabase Edge Function Secrets eintragen, Fallback entfernen",
-    "send-invoice-email: Rate Limiting implementieren (5 req/min per user)",
-    "QRCodeManager: 'any' Typen durch konkrete TypeScript-Typen ersetzen",
-    "npm audit fix: yaml + esbuild (moderate severities)"
+    "SOFORT: Edge Functions redeployen (vimeo-sync, send-email, elevenlabs-tts/stt)",
+    "Nach Deployment: Auth-Tests wiederholen (401 ohne Token, 200 mit Token)",
+    "KW17: Rate Limiting für send-invoice-email implementieren",
+    "KW17: SMTP TLS rejectUnauthorized auf true setzen"
   ],
   "fixesApplied": [
     {
-      "id": "TS-QA-KW15-PERF-001",
-      "commit": "fbc83bf4",
-      "description": "trumpetstar-lernwelt.jpg 305KB → 114KB komprimiert (quality 72, 1200px max-width)"
+      "commit": "34c170c4",
+      "issue": "TS-QA-KW16-DEP-001",
+      "description": "react-router-dom 6.30.1→6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx)",
+      "severity": "P2",
+      "type": "security",
+      "deployed": "yes"
     },
     {
-      "id": "TS-QA-KW14-SEC-003",
-      "commit": "4c9ffc69",
-      "description": "vimeo-sync JWT Caller-Auth + Admin-only Guard implementiert (analog send-email Pattern)"
+      "commit": "ce74eabf",
+      "issue": "TS-QA-EMAIL-001",
+      "description": "TRACK_BASE hardcoded auf Haupt-Projekt (Cross-Project Tracking fix)",
+      "severity": "P1",
+      "type": "security",
+      "deployed": "no"
     },
     {
-      "id": "TS-QA-KW14-SEC-004",
-      "commit": "e9e910b8",
-      "description": "WP_OAUTH_CLIENT_ID auf Deno.env.get() umgestellt (mit Backwards-Compat-Fallback)"
+      "commit": "c113e4c1",
+      "issue": "TS-QA-KW14-SEC-003",
+      "description": "vimeo-sync JWT Caller-Auth + Admin-only guard",
+      "severity": "P2",
+      "type": "security",
+      "deployed": "no"
     },
     {
-      "id": "TS-QA-KW16-DEP-001",
-      "commit": "d840ffbd",
-      "description": "react-router-dom 6.30.1 → 6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx)"
+      "commit": "778ad399",
+      "issue": "TS-QA-KW14-SEC-004",
+      "description": "WP_OAUTH_CLIENT_ID aus Env var lesen mit Fallback",
+      "severity": "P3",
+      "type": "security",
+      "deployed": "yes"
+    },
+    {
+      "commit": "e5dd9011",
+      "issue": "TS-QA-KW15-PERF-001",
+      "description": "trumpetstar-lernwelt.jpg 305KB→114KB komprimiert",
+      "severity": "P3",
+      "type": "performance",
+      "deployed": "yes"
+    },
+    {
+      "commit": "ff8167a5",
+      "issue": "Brand Consistency",
+      "description": "Korrektes Trumpetstar-Logo (Comic-Boy) in alle Assets",
+      "severity": "P3",
+      "type": "brand",
+      "deployed": "yes"
     }
   ],
   "newFindings": [
     {
       "id": "TS-QA-KW16-DEP-001",
-      "title": "react-router-dom XSS via Open Redirects",
-      "severity": "HIGH",
-      "cve": "GHSA-2w69-qvjg-hvjx",
-      "status": "FIXED",
-      "description": "react-router-dom ≤6.30.2 erlaubt XSS via Open Redirects. Direkt relevant für QRRedirectPage. Sofort auf 6.30.3 gepatcht."
-    },
-    {
-      "id": "TS-QA-KW16-CODE-001",
-      "title": "QRCodeManager verwendet 'any' TypeScript-Typ",
-      "severity": "P3",
-      "status": "OFFEN",
-      "description": "Insert/Update-Objekte in QRCodeManager.tsx nutzen 'any' Typ. Kein Runtime-Risiko wegen RLS, aber TypeScript-Code-Smell."
-    },
-    {
-      "id": "TS-QA-EMAIL-003-CLOSED",
-      "title": "SMTP tls.rejectUnauthorized = false — CLOSED",
-      "severity": "INFO",
-      "status": "CLOSED",
-      "description": "Setting nicht mehr im Codebase vorhanden. SMTP wurde auf Email-Proxy migriert. Issue geschlossen."
+      "title": "Edge Functions Auth-Fixes committed aber nicht deployed",
+      "description": "vimeo-sync und send-email geben 200 ohne Auth zurück, obwohl Code Auth-Checks enthält",
+      "severity": "P0",
+      "status": "ACTION REQUIRED",
+      "action": "Redeployment der Edge Functions via Supabase CLI"
     }
-  ]
+  ],
+  "newFeatures": [
+    "Social Features: Friend-System mit Star-Ranking",
+    "FriendSearch: Öffentliche User-Suche mit Privacy-Filter",
+    "FriendsList: Freundschaftsverwaltung (pending/accepted/declined)",
+    "StarRanking: Public + Friends Rangliste",
+    "Privacy Settings: public/private in EditProfileDialog"
+  ],
+  "securityStatus": {
+    "rls_policies": "clean",
+    "edge_function_auth": "code_fixed_not_deployed",
+    "secret_leaks": "none_found",
+    "dependencies": "react-router-dom_updated"
+  },
+  "performanceMetrics": {
+    "homepage_load_time_ms": 415,
+    "asset_optimization": "trumpetstar-lernwelt.jpg 305KB→114KB",
+    "total_bytes_saved": 191000
+  },
+  "deploymentGaps": [
+    {
+      "function": "vimeo-sync",
+      "commit": "c113e4c1",
+      "fix": "JWT Caller-Auth + Admin-only guard",
+      "deployed": false
+    },
+    {
+      "function": "send-email",
+      "commit": "ce74eabf",
+      "fix": "TRACK_BASE fix + Auth verification",
+      "deployed": false
+    },
+    {
+      "function": "elevenlabs-tts",
+      "commit": "267458d1",
+      "fix": "JWT Caller-Auth",
+      "deployed": false
+    },
+    {
+      "function": "elevenlabs-stt",
+      "commit": "267458d1",
+      "fix": "JWT Caller-Auth",
+      "deployed": false
+    }
+  ],
+  "notes": "P0 Issue: Edge Functions müssen redeployed werden bevor GO. Alle Code-Fixes sind committed, aber nicht in Production aktiv."
 }

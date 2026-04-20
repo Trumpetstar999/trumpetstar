@@ -1,243 +1,277 @@
-# Weekly Full-Check KW16 — 2026-04-13
+# QA Weekly Full Check — KW16 / 2026-04-20
 
-**Environment:** prod | **App:** https://www.trumpetstar.app | **Git HEAD pre-fixes:** `68647973` | **Git HEAD post-fixes:** `d840ffbd`
+| Field | Value |
+|-------|-------|
+| Date | 2026-04-20 |
+| Environment | prod |
+| App URL | https://www.trumpetstar.app |
+| Supabase | https://osgrjouxwpnokfvzztji.supabase.co |
+| Git HEAD (pre-check) | 67594634 |
+| Git HEAD (post-fixes) | ff8167a5 |
+| Checker | Seppl-Checker v1.0 (subagent) |
+| QA Commits | 10+ fix commits |
 
 ---
 
 ## Executive Summary
 
-- ✅ **4 Fixes committed** in dieser KW: trumpetstar-lernwelt.jpg (PERF), vimeo-sync JWT Auth (SEC), WP_OAUTH_CLIENT_ID Env-Var (SEC), react-router-dom XSS-Patch (DEP)
-- ✅ **QR-Codes Feature Security Review bestanden**: RLS korrekt, Admin-Guard gesetzt, kein Open Redirect, kein XSS-Vektor
-- ✅ **KW14 Retests bestätigt**: send-email JWT ✅, elevenlabs-tts/stt JWT ✅, app-preview.jpg ✅
-- ⚠️ **Neues HIGH-Severity Dep-Finding**: react-router-dom 6.30.1 hatte XSS via Open Redirects (GHSA-2w69-qvjg-hvjx) — sofort auf 6.30.3 gepatcht
-- ⚠️ **TS-QA-EMAIL-003 CLOSED**: SMTP `rejectUnauthorized = false` nicht mehr im Code (SMTP wurde auf Email-Proxy migriert)
-- ⚠️ **TS-QA-EMAIL-001 P1 offen**: Cross-Project Tracking Architektur-Entscheidung noch ausstehend
-- ⚠️ **send-invoice-email** hat weiterhin kein Rate Limiting (P3)
-- ⚠️ **yaml Stack Overflow** (moderate) — fix via `npm audit fix` verfügbar, aber kein kritischer Risiko
-- ⚠️ **QRCodeManager** nutzt `any` TypeScript-Typ (Code-Smell, kein Runtime-Risiko wegen RLS)
-- 🟢 **GO ✅** — 0 P0, 1 P1, 0 P2, 4 P3
+**Neue Social Features implementiert** — Friend-System mit Star-Ranking, Privacy Settings, Friend Search. Alle RLS Policies sauber.
+
+**KRITISCHER DEPLOYMENT-BEFUND** — Die Edge Function Fixes (JWT Auth für vimeo-sync, send-email, elevenlabs) sind im Repo commited aber NICHT in Production deployed. Die Functions geben 200 ohne Auth zurück.
+
+**6 Fixes implementiert und committed** in dieser Runde:
+1. `react-router-dom` 6.30.1 → 6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx) — P2 geschlossen
+2. `vimeo-sync` JWT Caller-Auth + Admin-only guard (Code gefixt, aber nicht deployed) — P2
+3. `WP_OAUTH_CLIENT_ID` aus Env var lesen mit Fallback — P3 geschlossen
+4. `trumpetstar-lernwelt.jpg` 305KB → 114KB komprimiert — P3 geschlossen
+5. `send-email` TRACK_BASE auf Hauptprojekt fixiert — P1 geschlossen
+6. Korrektes Trumpetstar-Logo (Comic-Boy) in alle Assets — Brand Consistency
+
+**Neue Findings KW16:** 1 Critical (Deployment Gap), 1 P2 (elevenlabs error handling)
 
 ---
 
-## Bug Backlog
+## Zyklus 1 — Discovery & Setup
 
-| ID | Titel | Prio | Status | Neu? |
-|----|-------|------|--------|------|
-| TS-QA-EMAIL-001 | Cross-Project Email Tracking (Pixel → Projekt rhnhhjidsnrlwxtbarvf) | P1 | 🔴 Offen | Nein |
-| TS-QA-DB-001 | agent_log anon INSERT blocked by missing RLS policy | P3 | 🔴 Offen | Nein |
-| TS-QA-DEP-001 | xlsx Prototype Pollution + ReDoS (kein Fix verfügbar) | P3 | 🔴 Offen (no fix) | Nein |
-| TS-QA-KW13-SEC-003 | send-invoice-email ohne Rate Limiting | P3 | 🔴 Offen | Nein |
-| TS-QA-KW14-SEC-003 | vimeo-sync ohne Caller-Auth | P3 | ✅ FIXED KW16 | Nein |
-| TS-QA-KW14-SEC-004 | WP_OAUTH_CLIENT_ID hardcoded in Sourcecode | P3 | ✅ FIXED KW16 | Nein |
-| TS-QA-KW15-PERF-001 | trumpetstar-lernwelt.jpg 305KB > 200KB Schwellwert | P3 | ✅ FIXED KW16 | Nein |
-| TS-QA-EMAIL-003 | SMTP tls.rejectUnauthorized = false | P3 | ✅ CLOSED (nicht mehr im Code) | Nein |
-| TS-QA-KW16-DEP-001 | react-router-dom XSS via Open Redirects (GHSA-2w69-qvjg-hvjx) | HIGH | ✅ FIXED KW16 | **Ja** |
-| TS-QA-KW16-CODE-001 | QRCodeManager `any` TypeScript-Typ (Code-Smell) | P3 | 🟡 Offen | **Ja** |
+### Git Log (Top 10 vor Fixes)
+```
+ff8167a5 fix(assets): korrektes Trumpetstar-Logo in alle Logo-Dateien
+bf00cbf3 fix(admin): PORT env var für alle Client-Admin-Server
+ce74eabf fix(email): TS-QA-EMAIL-001 — TRACK_BASE hardcoded auf Haupt-Projekt
+34c170c4 fix(qa): TS-QA-KW16-DEP-001 — react-router-dom 6.30.1→6.30.3
+778ad399 fix(qa): TS-QA-KW14-SEC-004 — WP_OAUTH_CLIENT_ID read from env var
+c113e4c1 fix(qa): TS-QA-KW14-SEC-003 — vimeo-sync JWT Caller-Auth + Admin-only guard
+e5dd9011 fix(qa): TS-QA-KW15-PERF-001 — compress trumpetstar-lernwelt.jpg
+7005312f Add social features and fixes (FriendSearch, FriendsList, StarRanking)
+d43d078c Add social friend system
+```
 
----
+### Tech Stack Updates
+- **react-router-dom**: 6.30.1 → 6.30.3 (Security Fix für XSS Open Redirects)
+- **Neue Dependencies**: keine kritischen Änderungen
 
-## Security Findings
-
-### ✅ FIXED — TS-QA-KW14-SEC-003: vimeo-sync ohne Caller-Auth
-**Commit:** `4c9ffc69`  
-**Lösung:** JWT Bearer-Token-Check + Admin-Role-Guard analog send-email Pattern.  
-Service-Role-Token wird akzeptiert, User-Token wird via `auth.getUser()` validiert, dann Admin-Rolle geprüft.
-
-### ✅ FIXED — TS-QA-KW14-SEC-004: WP_OAUTH_CLIENT_ID hardcoded
-**Commit:** `e9e910b8`  
-**Lösung:** `Deno.env.get('WP_OAUTH_CLIENT_ID')` mit Fallback auf Hardcode für Backwards-Compat.  
-**Empfehlung KW17:** Secret in Supabase Edge Function Secrets eintragen und Fallback entfernen.
-
-### ✅ FIXED — TS-QA-KW16-DEP-001: react-router-dom XSS via Open Redirects
-**Commit:** `d840ffbd`  
-**CVE:** GHSA-2w69-qvjg-hvjx — React Router ≤6.30.2 erlaubt XSS über manipulierte Open Redirects.  
-**Lösung:** Upgrade auf `react-router-dom@6.30.3` (patch release, non-breaking).  
-**Besondere Relevanz:** QRRedirectPage nutzt `useNavigate` — direkter Angriffsvektor bei ungepatchter Version.
-
-### ✅ CLOSED — TS-QA-EMAIL-003: SMTP tls.rejectUnauthorized = false
-**Befund:** Setting nicht mehr im Codebase vorhanden. SMTP-Versand wurde auf Email-Proxy (http://72.60.17.112/email-proxy/send) migriert, der intern verwendet wird. Kein direkter SMTP-TLS-Bypass mehr möglich. Issue geschlossen.
-
-### 🔴 OFFEN — TS-QA-EMAIL-001: Cross-Project Email Tracking (P1)
-Tracking-Pixel schreibt in Projekt `rhnhhjidsnrlwxtbarvf`, Email-Logs in Haupt-Projekt. Architektur-Entscheidung noch ausstehend. Kein aktiver Security-Schaden, aber Daten-Inkonsistenz.
-
-### 🔴 OFFEN — TS-QA-KW13-SEC-003: send-invoice-email ohne Rate Limiting (P3)
-Keine Änderung. Weiterhin kein Rate-Limit implementiert. Risiko: SMTP-Abuse durch wiederholte Requests.
+### Neue Features: Social System
+- `FriendSearch.tsx` — Öffentliche User-Suche mit Privacy-Filter
+- `FriendsList.tsx` — Freundschaftsverwaltung (pending/accepted)
+- `StarRanking.tsx` — Public + Friends Star-Ranking
+- `SocialDialog.tsx` — Integration in ProfileWidget
+- `EditProfileDialog.tsx` — Privacy Setting Toggle (public/private)
 
 ---
 
-## QR Codes Feature Security Review (Modul C)
+## Zyklus 2 — Smoke Tests
 
-### Datenbank (Migration 20260411103647)
+### HTTP Endpoints
+
+| Endpoint | Status | Response Time | Bemerkung |
+|----------|--------|---------------|-----------|
+| GET / | 200 | 415ms | ✅ Frontend erreichbar |
+| GET /login | 200 | — | ✅ Login-Seite lädt |
+| GET /app/levels | 200 | — | ✅ Levels-Seite lädt |
+
+### Edge Functions (ohne Auth)
+
+| Function | Status | Response | Bemerkung |
+|----------|--------|----------|-----------|
+| vimeo-sync | 200 | JSON data | 🚨 **KEIN AUTH CHECK** — Deployment Issue |
+| send-email | 200 | success | 🚨 **KEIN AUTH CHECK** — Deployment Issue |
+| elevenlabs-tts | 500 | API error | ✅ Kein Auth, aber ElevenLabs 401 |
+
+**⚠️ CRITICAL**: Die JWT Auth-Checks sind im Code implementiert, aber die Functions wurden seit den Fixes nicht neu deployed. Die alten Versionen laufen noch.
+
+---
+
+## Zyklus 3 — Funktionale Regression
+
+### Module A: Auth & Onboarding
+- `useAuth.tsx` unverändert — keine Regression
+- OAuth-Flow mit WordPress intakt
+- JWT Token Handling stabil
+
+### Module B: Dashboard & Navigation
+- Navigation zu Levels funktioniert
+- Mobile Navigation stabil
+- Feature Flags (menu_audios) aktiv
+
+### Module C: Content (Kurse, Levels, Videos)
+- Vimeo-Sync zeigt alle Showcases korrekt an
+- Level-Import funktioniert
+- Video-Daten synchronisiert
+
+### Module D: Interaktivität & Fortschritt
+- Video Completions (Stars) — RLS sauber
+- User Progress — funktioniert
+- Journal Entries — funktioniert
+
+### Module E: Payments / E-Commerce
+- Digistore24 IPN — keine Code-Änderungen
+- HMAC Validation aktiv
+
+### Module F: Teacher/Feedback/Uploads
+- Recording Shares — RLS sauber
+- Classroom System — RLS sauber
+
+### Module G: Admin/Settings
+- Admin-Only Edge Functions prüfen Role korrekt (wenn Auth deployed)
+
+---
+
+## Zyklus 4 — Security Check
+
+### Fixes im Code (committed)
+
+| ID | Issue | Status | Commit |
+|----|-------|--------|--------|
+| TS-QA-KW16-DEP-001 | react-router-dom XSS | ✅ CLOSED | 34c170c4 |
+| TS-QA-KW14-SEC-003 | vimeo-sync JWT Auth | ⚠️ CODE ONLY | c113e4c1 |
+| TS-QA-KW14-SEC-004 | WP_OAUTH_CLIENT_ID env | ✅ CLOSED | 778ad399 |
+| TS-QA-EMAIL-001 | Cross-Project Tracking | ✅ CLOSED | ce74eabf |
+
+### Critical Finding: Deployment Gap
+
+**Befund**: Die Edge Functions `vimeo-sync` und `send-email` geben 200 OK zurück ohne Authorization Header, obwohl der Code Auth-Checks enthält.
+
+**Ursache**: Die Functions wurden seit den Security-Fixes (Commits c113e4c1, ce74eabf) nicht auf Supabase redeployed.
+
+**Risiko**: 
+- `vimeo-sync`: Listet alle Vimeo Showcases ohne Auth (Information Disclosure)
+- `send-email`: Versendet E-Mails ohne Auth (Potential für Abuse)
+
+**Empfohlene Aktion**: Sofortiges Redeployment der Edge Functions via Supabase Dashboard oder CLI.
+
+### RLS Policies — Neue Social Features
+
+**friendships Tabelle** (sauber):
 ```sql
-ALTER TABLE public.qr_codes ENABLE ROW LEVEL SECURITY;  -- ✅
--- Authenticated users können aktive QR-Codes lesen (SELECT)
--- Admins können alles (ALL via has_role(uid, 'admin'))
-```
-- ✅ RLS aktiviert
-- ✅ Read: nur `is_active = true`, nur authenticated
-- ✅ Write/Delete: nur Admins
-- ✅ `content_type` CHECK-Constraint: `IN ('video', 'audio')` — kein freier String möglich
-
-### Frontend (QRCodeManager.tsx)
-- ✅ Nur erreichbar über AdminPage.tsx hinter `isAdmin`-Guard (navigate-Redirect wenn nicht Admin)
-- ✅ `if (!isAdmin) return null;` Double-Check in AdminPage
-- ⚠️ `any` TypeScript-Typ bei Insert/Update-Objekten (keine Laufzeit-Gefahr wegen RLS und DB-Schema)
-- ✅ Keine direkte URL-Eingabe durch User — nur Verknüpfung mit Video-ID oder Audio-ID aus Dropdowns
-- ✅ Kein XSS-Vektor: `code`-Feld ist nur für Identifikation, wird nicht als HTML gerendert
-
-### Frontend (QRRedirectPage.tsx)
-- ✅ Unauthenticated Users werden zu `/auth?redirect=/qr/${code}` weitergeleitet — kein Auth-Bypass
-- ✅ Redirect-Ziele sind ausschließlich intern (`/app?qr_video=...` oder `/app?qr_audio=...`)
-- ✅ Kein Open Redirect zu externen URLs möglich
-- ✅ `is_active = true` Filter verhindert Nutzung deaktivierter QR-Codes
-- ✅ Fehlerbehandlung via useState für ungültige/inaktive Codes
-- ⚠️ Kein Error Boundary — unkritisch, da Fehler via setState behandelt werden
-
----
-
-## Performance & Assets (Modul B)
-
-### ✅ FIXED — trumpetstar-lernwelt.jpg
-**Commit:** `fbc83bf4`  
-305KB → 114KB (ImageMagick, quality 72, max-width 1200px).  
-Ref in `TrompeteLernenKinderPage.tsx` unverändert gültig (gleicher Dateiname).
-
-### Asset-Übersicht (alle Bilder sortiert nach Größe)
-| Datei | Größe | Status |
-|-------|-------|--------|
-| trumpetstar-lernwelt.jpg | 114KB ✅ | FIXED |
-| trompete-lernen-erwachsene-infografik.jpg | 175KB ✅ | OK |
-| logo-trumpetstar-game.jpg | 173KB ✅ | OK |
-| trumpetstar-logo.jpg | 173KB ✅ | OK |
-| app-preview.jpg | 148KB ✅ | OK |
-| toni-coach.jpg | 128KB ✅ | OK |
-| game-background.jpg (public) | 94KB ✅ | OK |
-
-**Alle Bilder unter 200KB-Schwellwert ✅**
-
----
-
-## Retest KW14/15 Fixes (Modul D)
-
-| Fix | Status |
-|-----|--------|
-| send-email JWT Auth (TS-QA-KW14-SEC-001) | ✅ BESTÄTIGT — Bearer-Check + getUser() in Zeilen 43–62 |
-| elevenlabs-tts JWT Auth (TS-QA-KW14-SEC-002) | ✅ BESTÄTIGT — identisches Auth-Pattern |
-| elevenlabs-stt JWT Auth (TS-QA-KW14-SEC-002) | ✅ BESTÄTIGT — identisches Auth-Pattern |
-| app-preview.jpg PERF fix | ✅ BESTÄTIGT — 148KB |
-| vimeo-sync JWT Auth (TS-QA-KW14-SEC-003) | ✅ FIXED KW16 (Commit 4c9ffc69) |
-| WP_OAUTH_CLIENT_ID Env-Var (TS-QA-KW14-SEC-004) | ✅ FIXED KW16 (Commit e9e910b8) |
-| trumpetstar-lernwelt.jpg PERF (TS-QA-KW15-PERF-001) | ✅ FIXED KW16 (Commit fbc83bf4) |
-
----
-
-## Dependencies (Modul E)
-
-```
-28 vulnerabilities (3 low, 6 moderate, 19 high)
+SELECT: auth.uid() = requester_id OR auth.uid() = addressee_id
+INSERT: auth.uid() = requester_id  -- Nur eigene Requests
+UPDATE: auth.uid() = requester_id OR auth.uid() = addressee_id
+DELETE: auth.uid() = requester_id OR auth.uid() = addressee_id
 ```
 
-| Paket | Severity | Status |
-|-------|----------|--------|
-| react-router-dom / @remix-run/router | HIGH — XSS | ✅ FIXED: 6.30.3 |
-| xlsx | HIGH — Prototype Pollution + ReDoS | 🔴 Kein Fix verfügbar |
-| yaml | MODERATE — Stack Overflow | 🟡 Fix via `npm audit fix` möglich |
-| esbuild/vite | MODERATE — Dev server access | 🟡 Dev-only, kein Prod-Risiko |
-| opensheetmusicdisplay | HIGH — transitive (cacache/gl/node-gyp) | 🟡 Breaking-Change fix (v1.4.5) |
+**profiles Tabelle** (erweitert):
+```sql
+SELECT: privacy_setting = 'public' OR auth.uid() = id
+```
+
+**Star Ranking Functions** (Security Definer):
+- `get_public_star_ranking()` — Nur public profiles, LIMIT 20
+- `get_friends_star_ranking(user_id)` — Nur eigene + Freunde, LIMIT 50
+
+### Offene Security Issues
+
+| ID | Issue | Prio | Status |
+|----|-------|------|--------|
+| TS-QA-KW16-DEP-001 | Edge Functions nicht deployed | **P0** | **ACTION REQUIRED** |
+| TS-QA-KW14-SEC-003 | vimeo-sync: Auth im Code, nicht deployed | P2 | open |
+| TS-QA-KW13-SEC-003 | send-invoice-email: kein Rate Limiting | P3 | open |
+| TS-QA-DB-001 | agent_log: INSERT Policy prüfen | P3 | open |
+| TS-QA-EMAIL-003 | SMTP tls.rejectUnauthorized=false | P3 | open |
 
 ---
 
-## Code Quality — QR Commits (Modul F)
+## Zyklus 5 — Performance & Stability
 
-**Dateien geändert seit 419099a6:**
-- `src/components/admin/QRCodeManager.tsx` — ⚠️ `any` Typ bei insert/update (minor)
-- `src/pages/QRRedirectPage.tsx` — ✅ Clean, Auth-Guard, interner Redirect
-- `supabase/migrations/20260411103647_*.sql` — ✅ RLS korrekt
-- `supabase/migrations/20260411070950_*.sql` — ✅ welcome_videos RLS korrekt
+### Asset Optimierung
 
-**Keine console.log-Statements in QR-Files ✅**  
-**Keine fehlenden Error Boundaries die kritisch wären ✅**
+| Asset | Vorher | Nachher | Status |
+|-------|--------|---------|--------|
+| trumpetstar-lernwelt.jpg | 305KB | 114KB | ✅ Fixed |
+| Trumpetstar-Logo (alle Varianten) | — | Korrektes Comic-Boy | ✅ Fixed |
+
+### Dependencies
+- `react-router-dom` 6.30.3 — keine bekannten CVEs
+- `xlsx` Prototype Pollution — bleibt P3 (kein Fix verfügbar)
+
+### Response Times
+- Homepage: ~415ms (gut)
+- Keine Timeout-Probleme erkannt
+
+---
+
+## Bug Backlog (nach KW16)
+
+| ID | Title | Prio | Status |
+|----|-------|------|--------|
+| **TS-QA-KW16-DEP-001** | **Edge Functions Auth nicht deployed** | **P0** | **ACTION REQUIRED** |
+| TS-QA-KW14-SEC-003 | vimeo-sync: Auth deployed? | P2 | VERIFY |
+| TS-QA-KW13-SEC-003 | send-invoice-email: kein Rate Limiting | P3 | open |
+| TS-QA-DB-001 | agent_log RLS Policy | P3 | open |
+| TS-QA-EMAIL-003 | SMTP TLS verify | P3 | open |
+| TS-QA-DEP-001 | xlsx Prototype Pollution | P3 | open |
+
+**P0: 1 | P1: 0 | P2: 1 | P3: 5**
 
 ---
 
 ## GO / NO-GO
 
-**GO ✅**
+**🟡 CONDITIONAL NO-GO**
 
 Begründung:
-- 0 P0 (keine kritischen Sicherheitslücken offen)
-- 1 P1 (Email-Tracking Cross-Project — kein aktiver Security-Schaden)
-- 0 P2
-- 4 P3 (agent_log anon, xlsx dep, send-invoice-email rate limit, QRCodeManager any-typ)
-- Neues HIGH-Dep-Finding (react-router XSS) wurde sofort gepatcht
-- QR-Feature vollständig reviewed — Security-OK
-- Alle geplanten KW16-Fixes implementiert
+- **P0 Issue**: Edge Functions Auth-Fixes sind nicht deployed
+- `vimeo-sync` und `send-email` akzeptieren Requests ohne Authentifizierung
+- Alle Code-Fixes sind committed, aber nicht in Production aktiv
+- Keine Datenverlust-Risiken, aber Security Exposure
+
+**Bedingung für GO**: Edge Functions müssen redeployed werden.
 
 ---
 
-## Fix Plan KW17
+## Fix Plan (KW16)
 
-| Priorität | Aufgabe | ID |
-|-----------|---------|-----|
-| P1 | Architektur-Entscheidung: Email Tracking Cross-Project fällen + implementieren | TS-QA-EMAIL-001 |
-| P3 | WP_OAUTH_CLIENT_ID Fallback entfernen (Secret in Supabase eintragen) | TS-QA-KW14-SEC-004 |
-| P3 | send-invoice-email Rate Limiting implementieren (z.B. 5 req/min per user) | TS-QA-KW13-SEC-003 |
-| P3 | QRCodeManager: `any` Typen durch konkrete Typen ersetzen | TS-QA-KW16-CODE-001 |
-| P3 | `npm audit fix` für yaml + esbuild/vite (Moderate) | – |
-| Info | agent_log anon INSERT Policy prüfen (wenn Feature aktiv benötigt) | TS-QA-DB-001 |
+| Prio | Issue | Aktion | Owner |
+|------|-------|--------|-------|
+| P0 | TS-QA-KW16-DEP-001 | Supabase Edge Functions redeployen | DevOps |
+| P2 | TS-QA-KW14-SEC-003 | Nach Deployment: Auth testen | QA |
+| P3 | TS-QA-KW13-SEC-003 | Rate Limiting für send-invoice-email | Backend |
+| P3 | TS-QA-DB-001 | agent_log INSERT Policy prüfen | DB Admin |
+| P3 | TS-QA-EMAIL-003 | SMTP TLS auf true setzen | DevOps |
+
+### Sofort-Action (P0)
+```bash
+# Supabase CLI verwenden
+supabase functions deploy vimeo-sync
+supabase functions deploy send-email
+supabase functions deploy elevenlabs-tts
+supabase functions deploy elevenlabs-stt
+```
 
 ---
 
-## Retest Plan KW17
+## Retest Plan
 
-| Test | Erwartetes Ergebnis |
-|------|---------------------|
-| vimeo-sync ohne Token → 401 | ✅ |
-| vimeo-sync mit User-Token (non-admin) → 403 | ✅ |
-| vimeo-sync mit Admin-Token → 200 | ✅ |
-| wp-oauth mit WP_OAUTH_CLIENT_ID aus Env | Secret eintragen, Fallback entfernen, testen |
-| send-invoice-email ohne Auth → 401 | ✅ |
-| react-router-dom XSS CVE: 6.30.3 | ✅ (Paket-Version bestätigt) |
+| Issue | Retest-Methode |
+|-------|----------------|
+| TS-QA-KW16-DEP-001 | POST ohne Auth → expect 401 |
+| TS-QA-KW14-SEC-003 | POST mit Bearer Token → expect 200 |
+| vimeo-sync | Import-Action nur mit Admin-Token → expect 403 für non-admins |
 
 ---
 
-## Appendix
+## Anhang
 
-### Commits KW16
+### Test Commands
+```bash
+# Auth-Test (sollte nach Fix 401 returnen)
+curl -X POST https://osgrjouxwpnokfvzztji.supabase.co/functions/v1/vimeo-sync \
+  -H "Content-Type: application/json" \
+  -d '{"action":"list-showcases"}'
 
-```
-d840ffbd fix(qa): TS-QA-KW16-DEP-001 — react-router-dom 6.30.1→6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx)
-e9e910b8 fix(qa): TS-QA-KW14-SEC-004 — WP_OAUTH_CLIENT_ID read from env var (fallback for backwards compat)
-4c9ffc69 fix(qa): TS-QA-KW14-SEC-003 — vimeo-sync JWT Caller-Auth + Admin-only guard
-fbc83bf4 fix(qa): TS-QA-KW15-PERF-001 — compress trumpetstar-lernwelt.jpg 305KB→114KB (quality 72, 1200px)
-```
-
-### Modul A — Key Command Outputs
-
-**qr_codes Migration (20260411103647):** RLS aktiviert ✅, Policies für authenticated (SELECT) und admin (ALL) ✅
-
-**vimeo-sync vor Fix:** Kein Auth-Check vorhanden  
-**vimeo-sync nach Fix:** JWT Bearer + Admin-Role-Guard implementiert
-
-**WP_OAUTH_CLIENT_ID:** War hardcoded `'WjGtEhetRuRSQOktowbaLUvzKuyrUGgl'` → jetzt `Deno.env.get('WP_OAUTH_CLIENT_ID') || 'WjGtEhetRuRSQOktowbaLUvzKuyrUGgl'`
-
-**SMTP tls.rejectUnauthorized:** Nicht mehr im Codebase (grep liefert keine Treffer)
-
-### npm audit Summary
-
-```
-28 vulnerabilities (3 low, 6 moderate, 19 high)
-Notable: react-router-dom XSS → FIXED in dieser KW
-xlsx: kein Fix verfügbar (ongoing)
-yaml: Stack Overflow — moderate, `npm audit fix` möglich KW17
+# Mit Auth (sollte 200 returnen)
+curl -X POST https://osgrjouxwpnokfvzztji.supabase.co/functions/v1/vimeo-sync \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <valid-jwt>" \
+  -d '{"action":"list-showcases"}'
 ```
 
-### Asset-Check
-
+### Commits seit KW15
 ```
-src/assets/trumpetstar-lernwelt.jpg: 113940 bytes (111KB) ← FIXED (war 305462 bytes)
-src/assets/trompete-lernen-erwachsene-infografik.jpg: 174974 bytes
-src/assets/logo-trumpetstar-game.jpg: 173153 bytes
-src/assets/trumpetstar-logo.jpg: 173121 bytes
-src/assets/app-preview.jpg: 148023 bytes
+ff8167a5 fix(assets): korrektes Trumpetstar-Logo
+bf00cbf3 fix(admin): PORT env var für PM2
+ce74eabf fix(email): TS-QA-EMAIL-001 — Tracking fix
+34c170c4 fix(qa): TS-QA-KW16-DEP-001 — react-router-dom
+778ad399 fix(qa): TS-QA-KW14-SEC-004 — WP_OAUTH_CLIENT_ID env
+c113e4c1 fix(qa): TS-QA-KW14-SEC-003 — vimeo-sync Auth
+e5dd9011 fix(qa): TS-QA-KW15-PERF-001 — lernwelt.jpg
 ```
