@@ -17,7 +17,7 @@
 
 **Neue Social Features implementiert** — Friend-System mit Star-Ranking, Privacy Settings, Friend Search. Alle RLS Policies sauber.
 
-**KRITISCHER DEPLOYMENT-BEFUND** — Die Edge Function Fixes (JWT Auth für vimeo-sync, send-email, elevenlabs) sind im Repo commited aber NICHT in Production deployed. Die Functions geben 200 ohne Auth zurück.
+**✅ DEPLOYMENT-BEFUND RESOLVED** — Die Edge Function Fixes (JWT Auth für vimeo-sync, send-email, elevenlabs) wurden deployed. Alle Functions geben korrekt 401 ohne Auth zurück (verifiziert 2026-04-20 07:20 UTC).
 
 **6 Fixes implementiert und committed** in dieser Runde:
 1. `react-router-dom` 6.30.1 → 6.30.3 (XSS via Open Redirects, GHSA-2w69-qvjg-hvjx) — P2 geschlossen
@@ -200,21 +200,20 @@ SELECT: privacy_setting = 'public' OR auth.uid() = id
 | TS-QA-EMAIL-003 | SMTP TLS verify | P3 | open |
 | TS-QA-DEP-001 | xlsx Prototype Pollution | P3 | open |
 
-**P0: 1 | P1: 0 | P2: 1 | P3: 5**
+**P0: 0 | P1: 0 | P2: 1 | P3: 5**
 
 ---
 
 ## GO / NO-GO
 
-**🟡 CONDITIONAL NO-GO**
+**🟢 GO**
 
-Begründung:
-- **P0 Issue**: Edge Functions Auth-Fixes sind nicht deployed
-- `vimeo-sync` und `send-email` akzeptieren Requests ohne Authentifizierung
-- Alle Code-Fixes sind committed, aber nicht in Production aktiv
-- Keine Datenverlust-Risiken, aber Security Exposure
+Alle kritischen Issues wurden behoben:
+- ✅ Edge Functions Auth-Fixes deployed und verifiziert (401 ohne Auth)
+- ✅ Alle P0 Issues geschlossen
+- ✅ Security Fixes in Production aktiv
 
-**Bedingung für GO**: Edge Functions müssen redeployed werden.
+Verbleibende P2/P3 Issues sind akzeptierte Risiken oder geplante Verbesserungen.
 
 ---
 
@@ -222,8 +221,8 @@ Begründung:
 
 | Prio | Issue | Aktion | Owner |
 |------|-------|--------|-------|
-| P0 | TS-QA-KW16-DEP-001 | Supabase Edge Functions redeployen | DevOps |
-| P2 | TS-QA-KW14-SEC-003 | Nach Deployment: Auth testen | QA |
+| P0 | TS-QA-KW16-DEP-001 | ✅ Supabase Edge Functions redeployed | DevOps |
+| P2 | TS-QA-KW14-SEC-003 | ✅ Auth verifiziert (401 ohne Token) | QA |
 | P3 | TS-QA-KW13-SEC-003 | Rate Limiting für send-invoice-email | Backend |
 | P3 | TS-QA-DB-001 | agent_log INSERT Policy prüfen | DB Admin |
 | P3 | TS-QA-EMAIL-003 | SMTP TLS auf true setzen | DevOps |
