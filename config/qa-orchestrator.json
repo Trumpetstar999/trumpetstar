@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "updatedAt": "2026-03-03",
+  "updatedAt": "2026-04-27",
   "orchestrator": "Valentin (OpenClaw)",
   "subagent": "Seppl-Checker",
 
@@ -114,11 +114,11 @@
   },
 
   "lastWeeklyCheck": {
-    "kw": 15,
-    "date": "2026-04-06",
-    "commit": "67594634",
+    "kw": 18,
+    "date": "2026-04-27",
+    "commit": "ff8167a5",
     "go_no_go": "GO",
-    "p0": 0, "p1": 1, "p2": 0, "p3": 7
+    "p0": 0, "p1": 0, "p2": 0, "p3": 4
   },
 
   "knownOpenIssues": [
@@ -154,15 +154,18 @@
       "title": "agent_log anon INSERT blocked by missing RLS policy",
       "severity": "Low",
       "priority": "P3",
-      "status": "open"
+      "status": "cannot_reproduce",
+      "note": "Tabelle 'agent_log' nicht im Schema gefunden. Möglicherweise obsolete oder umbenannt zu 'activity_logs'"
     },
     {
       "id": "TS-QA-EMAIL-001",
       "title": "Cross-Project Tracking: Pixel → rhnhhjidsnrlwxtbarvf, Log → Haupt-Projekt — Tracking kann silent broken sein",
       "severity": "High",
       "priority": "P1",
-      "status": "open",
-      "openedAt": "2026-03-09"
+      "status": "closed",
+      "closedAt": "2026-04-13",
+      "closedBy": "commit-ce74eabf",
+      "fix": "TRACK_BASE auf Haupt-Projekt fixiert"
     },
     {
       "id": "TS-QA-EMAIL-002",
@@ -179,8 +182,8 @@
       "title": "SMTP tls.rejectUnauthorized = false — schwache TLS-Verifikation",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
-      "openedAt": "2026-03-09"
+      "status": "cannot_reproduce",
+      "note": "Keine 'rejectUnauthorized' Referenzen im Code gefunden. Vermutlich auf Email-Proxy Server (VPS) zu prüfen."
     },
     {
       "id": "TS-QA-DEP-001",
@@ -271,16 +274,20 @@
       "title": "vimeo-sync: keine Caller-Authentifizierung",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-20",
+      "closedBy": "KW16-Deployment-Verification",
+      "fix": "JWT Caller-Auth deployed, verifiziert via curl 401-Test"
     },
     {
       "id": "TS-QA-KW14-SEC-004",
       "title": "WP_OAUTH_CLIENT_ID hardcoded in Sourcecode – sollte in Env-Variable",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
-      "openedAt": "2026-03-30"
+      "status": "closed",
+      "closedAt": "2026-04-13",
+      "closedBy": "commit-778ad399",
+      "fix": "WP_OAUTH_CLIENT_ID wird nun aus Env-Variable gelesen (mit Fallback)"
     },
     {
       "id": "TS-QA-KW14-PERF-001",
@@ -326,8 +333,10 @@
       "title": "trumpetstar-lernwelt.jpg (300KB) noch über 200KB-Schwellwert",
       "severity": "Low",
       "priority": "P3",
-      "status": "open",
-      "openedAt": "2026-04-06"
+      "status": "closed",
+      "closedAt": "2026-04-13",
+      "closedBy": "commit-e5dd9011",
+      "fix": "305KB → 114KB komprimiert (quality 72, 1200px)"
     }
   ]
 }
