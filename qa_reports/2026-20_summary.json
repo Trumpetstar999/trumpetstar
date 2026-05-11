@@ -1,0 +1,137 @@
+{
+  "date": "2026-05-11",
+  "week": "KW20",
+  "env": "prod",
+  "go_no_go": "GO",
+  "p0_count": 0,
+  "p1_count": 0,
+  "p2_count": 3,
+  "p3_count": 6,
+  "commit": "ff8167a50a28caf9c298507e2086ae24c814dbaf",
+  "fixesApplied": [],
+  "top_risks": [
+    {
+      "id": "TS-QA-KW20-PERF-001",
+      "risk": "Large bundle affects mobile UX",
+      "likelihood": "High",
+      "impact": "Medium",
+      "description": "Main bundle (index.js) is 3MB/850KB gzipped, exceeding recommended 500KB threshold"
+    },
+    {
+      "id": "TS-QA-KW20-DEP-001",
+      "risk": "Dependency vulnerabilities in transitive deps",
+      "likelihood": "Low",
+      "impact": "Low",
+      "description": "High severity in transitive dependencies (canvas via @mapbox/node-pre-gyp)"
+    },
+    {
+      "id": "TS-QA-KW20-ESLINT",
+      "risk": "Type safety gaps in admin panel",
+      "likelihood": "Medium",
+      "impact": "Low",
+      "description": "47 instances of explicit 'any' type in admin components reduce type safety"
+    }
+  ],
+  "next_steps": [
+    {
+      "priority": "P2",
+      "task": "Implement code splitting for admin routes",
+      "estimated_savings": "500-800KB",
+      "owner": "dev-team"
+    },
+    {
+      "priority": "P2",
+      "task": "Monitor opensheetmusicdisplay for security updates",
+      "dependencies": ["upstream fix"],
+      "owner": "dev-team"
+    },
+    {
+      "priority": "P3",
+      "task": "Replace 'any' types in admin components with proper TypeScript types",
+      "files_affected": ["AdminSidebar.tsx", "Digistore24CustomersPanel.tsx", "LeadsCRMPanel.tsx"],
+      "owner": "dev-team"
+    },
+    {
+      "priority": "P3",
+      "task": "Update browserslist database",
+      "command": "npx update-browserslist-db@latest",
+      "owner": "dev-team"
+    },
+    {
+      "priority": "P3",
+      "task": "Evaluate Rate Limiting for send-invoice-email",
+      "note": "Currently Admin-only, may be acceptable without rate limiting",
+      "owner": "security-team"
+    }
+  ],
+  "metrics": {
+    "typescript_files": 341,
+    "typescript_errors": 0,
+    "eslint_errors": 47,
+    "bundle_size_raw_mb": 3.05,
+    "bundle_size_gzip_kb": 850,
+    "build_time_seconds": 29.58,
+    "edge_functions_count": 26,
+    "rls_policies_references": 400,
+    "vulnerabilities": {
+      "critical": 0,
+      "high": 16,
+      "moderate": 7,
+      "low": 3
+    },
+    "website_status": {
+      "http_code": 200,
+      "response_time_ms": 420
+    }
+  },
+  "check_results": {
+    "static_analysis": {
+      "status": "PASS_WITH_WARNINGS",
+      "typescript_errors": 0,
+      "eslint_errors": 47,
+      "eslint_warnings": 0
+    },
+    "build": {
+      "status": "PASS",
+      "chunks": 5,
+      "total_assets": 9,
+      "build_time_seconds": 29.58
+    },
+    "security": {
+      "status": "PASS",
+      "rls_enabled": true,
+      "edge_function_auth": "ALL_PROTECTED",
+      "hardcoded_secrets": false,
+      "admin_guards": "IMPLEMENTED"
+    },
+    "integration": {
+      "status": "PASS",
+      "payment_webhooks": "FUNCTIONAL",
+      "email_flow": "FUNCTIONAL",
+      "vimeo_sync": "IMPLEMENTED",
+      "assistant_chat": "FUNCTIONAL"
+    },
+    "performance": {
+      "status": "WARN",
+      "main_bundle_size_kb": 3050,
+      "main_bundle_gzip_kb": 850,
+      "osmd_chunk_kb": 1183,
+      "recommendation": "Implement code splitting"
+    },
+    "availability": {
+      "status": "PASS",
+      "url": "https://www.trumpetstar.app",
+      "http_code": 200,
+      "response_time_ms": 420
+    }
+  },
+  "modules_status": {
+    "A_authentication": "🟢 OK",
+    "B_dashboard_navigation": "🟢 OK",
+    "C_content_courses": "🟢 OK",
+    "D_gamification_progress": "🟢 OK",
+    "E_payments_webhooks": "🟢 OK",
+    "F_teacher_feedback": "🟢 OK",
+    "G_admin_settings": "🟢 OK"
+  }
+}

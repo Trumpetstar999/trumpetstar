@@ -114,11 +114,11 @@
   },
 
   "lastWeeklyCheck": {
-    "kw": 18,
-    "date": "2026-04-27",
+    "kw": 20,
+    "date": "2026-05-11",
     "commit": "ff8167a5",
     "go_no_go": "GO",
-    "p0": 0, "p1": 0, "p2": 0, "p3": 4
+    "p0": 0, "p1": 0, "p2": 3, "p3": 6
   },
 
   "knownOpenIssues": [
