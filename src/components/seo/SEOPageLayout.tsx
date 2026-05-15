@@ -7,10 +7,23 @@ import { useLanguage } from '@/hooks/useLanguage';
 import type { Language } from '@/hooks/useLanguage';
 
 
+interface ArticleSchema {
+  headline: string;
+  description?: string;
+  datePublished?: string;
+  dateModified?: string;
+  author?: string;
+  image?: string;
+}
+
 interface SEOPageLayoutProps {
   children: ReactNode;
   title?: string;
   description?: string;
+  /** Path part of the canonical URL, e.g. "/blog/erster-ton-trompete". Defaults to current pathname. */
+  canonicalPath?: string;
+  /** When set, an Article JSON-LD block is injected for the page. */
+  article?: ArticleSchema;
 }
 
 // hreflang URLs for all supported languages (single-domain setup)
@@ -23,16 +36,25 @@ const HREFLANG_LANGS: { lang: string; href: string }[] = [
   { lang: 'x-default', href: BASE_URL + '/' },
 ];
 
-export function SEOPageLayout({ children, title, description }: SEOPageLayoutProps) {
+function upsertMeta(selector: string, attrs: Record<string, string>) {
+  let el = document.head.querySelector<HTMLMetaElement>(selector);
+  if (!el) {
+    el = document.createElement('meta');
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k !== 'content') el!.setAttribute(k, v);
+    });
+    document.head.appendChild(el);
+  }
+  if (attrs.content !== undefined) el.setAttribute('content', attrs.content);
+}
+
+export function SEOPageLayout({ children, title, description, canonicalPath, article }: SEOPageLayoutProps) {
   const { user } = useAuth();
   const { language, setLanguage, t } = useLanguage();
 
-  // Inject hreflang + update document title/meta description
   useEffect(() => {
-    // Remove existing hreflang tags added by us
+    // hreflang
     document.querySelectorAll('link[data-hreflang="trumpetstar"]').forEach(el => el.remove());
-
-    // Add new hreflang tags
     HREFLANG_LANGS.forEach(({ lang, href }) => {
       const link = document.createElement('link');
       link.rel = 'alternate';
@@ -42,27 +64,66 @@ export function SEOPageLayout({ children, title, description }: SEOPageLayoutPro
       document.head.appendChild(link);
     });
 
-    // Update document title
-    if (title) {
-      document.title = title;
+    // Title + description
+    if (title) document.title = title;
+    if (description) {
+      upsertMeta('meta[name="description"]', { name: 'description', content: description });
     }
 
-    // Update meta description
-    if (description) {
-      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.name = 'description';
-        document.head.appendChild(metaDesc);
-      }
-      metaDesc.content = description;
+    // Canonical
+    const path = canonicalPath ?? window.location.pathname;
+    const canonicalHref = BASE_URL + path;
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    canonical.href = canonicalHref;
+
+    // Open Graph (per-page)
+    if (title) upsertMeta('meta[property="og:title"]', { property: 'og:title', content: title });
+    if (description) upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
+    upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalHref });
+    upsertMeta('meta[property="og:type"]', { property: 'og:type', content: article ? 'article' : 'website' });
+
+    // Twitter
+    if (title) upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
+    if (description) upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
+
+    // Article JSON-LD
+    let articleScript: HTMLScriptElement | null = null;
+    if (article) {
+      articleScript = document.createElement('script');
+      articleScript.type = 'application/ld+json';
+      articleScript.id = 'article-schema';
+      const existing = document.getElementById('article-schema');
+      if (existing) existing.remove();
+      articleScript.text = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: article.headline,
+        description: article.description,
+        datePublished: article.datePublished,
+        dateModified: article.dateModified ?? article.datePublished,
+        author: { '@type': 'Person', name: article.author ?? 'Trumpetstar' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Trumpetstar',
+          logo: { '@type': 'ImageObject', url: BASE_URL + '/logo.png' },
+        },
+        mainEntityOfPage: canonicalHref,
+        image: article.image,
+      });
+      document.head.appendChild(articleScript);
     }
 
     return () => {
-      // Cleanup on unmount
       document.querySelectorAll('link[data-hreflang="trumpetstar"]').forEach(el => el.remove());
+      const a = document.getElementById('article-schema');
+      if (a) a.remove();
     };
-  }, [title, description]);
+  }, [title, description, canonicalPath, article]);
 
   return (
     <div className="min-h-screen">

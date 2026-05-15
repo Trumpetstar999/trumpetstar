@@ -245,7 +245,8 @@ export default function LandingPage() {
   return (
     <SEOPageLayout
       title="Trompete lernen | Trumpetstar – Online Trompetenunterricht"
-      description="Trompete lernen für Anfänger, Kinder & Erwachsene. 300+ Videos, Playbacks, KI-Coach & persönliches Feedback. Bekannt aus 2 Minuten 2 Millionen. Jetzt kostenlos starten."
+      description="Trompete lernen für Kinder & Erwachsene: 300+ Videos, Playbacks, KI-Coach & echtes Feedback. Jetzt kostenlos starten."
+      canonicalPath="/"
     >
       <FAQSchema faqs={landingFaqs} />
 

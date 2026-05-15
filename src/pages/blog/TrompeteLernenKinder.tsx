@@ -7,7 +7,17 @@ import { ArrowRight, CheckCircle, Baby } from "lucide-react";
 
 export default function TrompeteLernenKinder() {
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Trompete lernen für Kinder – Tipps für Eltern"
+      description="Wie Kinder die Trompete am besten lernen: Einstiegsalter, Motivation, Instrument, Üben zuhause – Tipps aus der Praxis."
+      canonicalPath="/blog/trompete-lernen-kinder"
+      article={{
+        headline: "Trompete lernen für Kinder – Tipps für Eltern",
+        description: "Wie Kinder die Trompete am besten lernen: Einstiegsalter, Motivation, Instrument, Üben zuhause – Tipps aus der Praxis.",
+        datePublished: "2026-02-12",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

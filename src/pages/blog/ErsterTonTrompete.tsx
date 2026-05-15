@@ -9,7 +9,17 @@ import { useLanguage } from "@/hooks/useLanguage";
 export default function ErsterTonTrompete() {
   const { t, language } = useLanguage();
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Erster Ton auf der Trompete – Schritt-für-Schritt Anleitung"
+      description="Den ersten Ton auf der Trompete erzeugen: Ansatz, Atmung, Lippenspannung – einfach erklärt für Anfänger jeden Alters."
+      canonicalPath="/blog/erster-ton-trompete"
+      article={{
+        headline: "Erster Ton auf der Trompete – Schritt-für-Schritt Anleitung",
+        description: "Den ersten Ton auf der Trompete erzeugen: Ansatz, Atmung, Lippenspannung – einfach erklärt für Anfänger jeden Alters.",
+        datePublished: "2026-02-22",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
