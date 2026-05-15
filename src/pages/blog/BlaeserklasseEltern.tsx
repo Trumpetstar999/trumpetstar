@@ -7,7 +7,17 @@ import { ArrowRight, CheckCircle, School } from "lucide-react";
 
 export default function BlaeserklasseEltern() {
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Bläserklasse – das müssen Eltern wissen"
+      description="Bläserklasse erklärt: Ablauf, Kosten, Instrumentenwahl und wie Eltern ihr Kind beim Üben optimal unterstützen können."
+      canonicalPath="/blog/blaeserklasse-trompete"
+      article={{
+        headline: "Bläserklasse – das müssen Eltern wissen",
+        description: "Bläserklasse erklärt: Ablauf, Kosten, Instrumentenwahl und wie Eltern ihr Kind beim Üben optimal unterstützen können.",
+        datePublished: "2026-03-15",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

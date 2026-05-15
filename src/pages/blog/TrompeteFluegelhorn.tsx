@@ -7,7 +7,17 @@ import { ArrowRight, CheckCircle, Music } from "lucide-react";
 
 export default function TrompeteFluegelhorn() {
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Trompete oder Flügelhorn für Kinder? Vergleich & Empfehlung"
+      description="Trompete oder Flügelhorn als Einsteigerinstrument für Kinder? Unterschiede, Spielgefühl, Gewicht & Empfehlung im Vergleich."
+      canonicalPath="/blog/trompete-fluegelhorn-kind"
+      article={{
+        headline: "Trompete oder Flügelhorn für Kinder? Vergleich & Empfehlung",
+        description: "Trompete oder Flügelhorn als Einsteigerinstrument für Kinder? Unterschiede, Spielgefühl, Gewicht & Empfehlung im Vergleich.",
+        datePublished: "2026-02-15",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

@@ -17,7 +17,17 @@ const slots = [
 export default function TrompeteUebenRoutine() {
   const { t } = useLanguage();
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Trompete üben: Effektive Übe-Routine für Anfänger"
+      description="Wie du eine effektive tägliche Übe-Routine auf der Trompete aufbaust – Aufwärmen, Dauer, Pausen und realistische Ziele."
+      canonicalPath="/blog/trompete-ueben-routine"
+      article={{
+        headline: "Trompete üben: Effektive Übe-Routine für Anfänger",
+        description: "Wie du eine effektive tägliche Übe-Routine auf der Trompete aufbaust – Aufwärmen, Dauer, Pausen und realistische Ziele.",
+        datePublished: "2026-02-20",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

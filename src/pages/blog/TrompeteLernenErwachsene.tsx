@@ -9,7 +9,17 @@ import { useLanguage } from "@/hooks/useLanguage";
 export default function TrompeteLernenErwachsene() {
   const { t, language } = useLanguage();
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Trompete lernen als Erwachsener – So gelingt der Einstieg"
+      description="Trompete lernen als Erwachsener: realistische Erwartungen, Übe-Strategie, Lehrer vs. Online-Kurs – kompakter Praxis-Guide."
+      canonicalPath="/blog/trompete-lernen-erwachsene"
+      article={{
+        headline: "Trompete lernen als Erwachsener – So gelingt der Einstieg",
+        description: "Trompete lernen als Erwachsener: realistische Erwartungen, Übe-Strategie, Lehrer vs. Online-Kurs – kompakter Praxis-Guide.",
+        datePublished: "2026-02-10",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">

@@ -7,7 +7,17 @@ import { ArrowRight, CheckCircle, ShoppingBag } from "lucide-react";
 
 export default function TrompeteKinderKaufen() {
   return (
-    <SEOPageLayout>
+    <SEOPageLayout
+      title="Trompete für Kinder kaufen – Kaufberatung & Empfehlungen"
+      description="Trompete für Kinder kaufen: worauf achten? Marken, Größe, Preisrahmen, Mieten vs. Kaufen – kompakte Kaufberatung."
+      canonicalPath="/blog/trompete-kinder-kaufen"
+      article={{
+        headline: "Trompete für Kinder kaufen – Kaufberatung & Empfehlungen",
+        description: "Trompete für Kinder kaufen: worauf achten? Marken, Größe, Preisrahmen, Mieten vs. Kaufen – kompakte Kaufberatung.",
+        datePublished: "2026-02-18",
+        author: "Trumpetstar",
+      }}
+    >
       {/* Hero */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
