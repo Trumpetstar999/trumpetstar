@@ -1,44 +1,33 @@
 # Trumpetstar App
 
-The Trumpetstar App is a digital trumpet learning platform with structured lessons, playalong videos, and guided practice.
+> Digital trumpet learning platform with structured lessons, playalong videos, and guided practice for kids, adult beginners, and teachers.
 
-## Website
+The Trumpetstar App helps trumpet students practice effectively with 300+ professional videos, real playbacks, gamification, and a built-in AI coach. Content is available in German, English, Spanish, and Slovenian.
 
-https://trumpetstar.app
+## Pages
 
-## Description
+- [Home](/): Overview of the Trumpetstar trumpet learning platform.
+- [Trompete lernen](/trompete-lernen): Online trumpet lessons for beginners, kids, and adults.
+- [Trumpet for kids](/trompete-lernen-kinder): The Star method for children ages 5+.
+- [Trumpet for adults](/trompete-lernen-erwachsene): Self-paced trumpet course for adult beginners and returners.
+- [First note guide](/trompete-erster-ton): How to produce your very first note on the trumpet.
+- [Embouchure & breathing](/trompete-ansatz-atmung): Foundations of embouchure and breath support.
+- [Range building](/trompete-tonumfang): How to expand your trumpet range safely.
+- [Pricing](/pricing): Free, Basic, and Pro plans.
+- [Blog](/blog): Articles on trumpet learning, practice, and gear.
 
-The app supports trumpet students with interactive learning, structured levels, and home practice guidance.
+## Blog
 
-## Features
+- [Trumpet for adults](/blog/trompete-lernen-erwachsene): Tips for starting trumpet as an adult.
+- [Your first note](/blog/erster-ton-trompete): Step-by-step guide to the first sound.
+- [Practice routine](/blog/trompete-ueben-routine): Building an effective daily routine.
+- [Trumpet for kids](/blog/trompete-lernen-kinder): How children learn trumpet best.
+- [Trumpet vs flugelhorn for kids](/blog/trompete-fluegelhorn-kind): Choosing the right starter instrument.
+- [Buying a kids trumpet](/blog/trompete-kinder-kaufen): Buying guide for parents.
+- [Bläserklasse for parents](/blog/blaeserklasse-trompete): What parents should know about school wind classes.
+- [No sound — help](/hilfe/trompete-kein-ton): Troubleshooting when no note comes out.
 
-- Playalong videos
-- Learning levels
-- Structured exercises
-- Guided practice
-- Beginner-friendly system
+## Optional
 
-## Audience
-
-- Trumpet students
-- Adult beginners
-- Returning players
-- Teachers
-
-## Key Topics
-
-- trumpet learning app
-- playalong trumpet
-- learn trumpet online
-- trumpet practice app
-
-## Main Pages
-
-- https://trumpetstar.app
-- https://trumpetstar.app/features
-- https://trumpetstar.app/pricing
-- https://trumpetstar.app/login
-
-## Summary
-
-A digital learning platform that helps trumpet players practice effectively with structured content and playalong support.
+- [Imprint](/impressum)
+- [Privacy](/datenschutz)

@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://trumpetstar.com/sitemap.xml
+Sitemap: https://www.trumpetstar.app/sitemap.xml
 
 # Disallow admin and auth pages
 Disallow: /admin/
