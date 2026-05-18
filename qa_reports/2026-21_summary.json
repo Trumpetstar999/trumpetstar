@@ -1,0 +1,144 @@
+{
+  "date": "2026-05-18",
+  "kw": 21,
+  "env": "prod",
+  "app_url": "https://www.trumpetstar.app",
+  "commit": "ff8167a5",
+  "go_no_go": "GO",
+  "go_reason": "Keine Critical Security Issues, keine Datenverlust-Risiken, Payments funktional",
+  "p0_count": 0,
+  "p1_count": 1,
+  "p2_count": 7,
+  "p3_count": 5,
+  "top_risks": [
+    {
+      "id": "TS-QA-KW21-PERF-001",
+      "title": "Bundle Size zu groß (3MB Main Chunk)",
+      "severity": "P1",
+      "impact": "Lange Ladezeiten auf langsamen Verbindungen",
+      "probability": "Hoch"
+    },
+    {
+      "id": "TS-QA-KW21-DEP-001",
+      "title": "lodash Prototype Pollution",
+      "severity": "P2",
+      "impact": "Potenzielle Sicherheitslücke",
+      "probability": "Niedrig (keine direkte Nutzung von _.template)"
+    },
+    {
+      "id": "TS-QA-KW21-DEP-002",
+      "title": "pdfjs-dist XSS via malicious PDF",
+      "severity": "P2",
+      "impact": "XSS wenn bösartige PDF hochgeladen",
+      "probability": "Niedrig (nur Admin-Uploads)"
+    }
+  ],
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0,
+    "positive": [
+      "Edge Function Auth (vimeo-sync): Caller Authentication + Admin-Check",
+      "Edge Function Auth (admin-users): Token-Verifizierung + Admin-Check",
+      "WP OAuth: Client ID aus Env-Var",
+      "Social Features: Privacy-Check (public only)",
+      "Digistore24 IPN: Idempotency + Secret Validation"
+    ]
+  },
+  "performance": {
+    "bundle_size_total": "7.2MB",
+    "main_js_chunk": "3,050 KB",
+    "main_js_gzip": "850 KB",
+    "osmd_chunk": "1,183 KB",
+    "css": "171 KB",
+    "build_time": "30s",
+    "status": "OVER_LIMIT"
+  },
+  "dependencies": {
+    "total_vulnerabilities": 11,
+    "high": 6,
+    "moderate": 5,
+    "low": 0,
+    "critical_packages": [
+      "lodash <=4.17.23",
+      "pdfjs-dist <=4.7.76",
+      "glob 10.2.0-10.4.5",
+      "minimatch",
+      "picomatch",
+      "flatted <=3.4.1"
+    ]
+  },
+  "smoke_tests": {
+    "A_auth_onboarding": "PASS",
+    "B_dashboard_navigation": "PASS",
+    "C_content_videos": "PASS",
+    "D_gamification": "PASS",
+    "E_payments": "PASS",
+    "F_teacher_feedback": "PASS",
+    "G_admin": "PASS"
+  },
+  "new_features": [
+    {
+      "name": "Social Features (Friend System)",
+      "status": "IMPLEMENTED",
+      "components": ["FriendSearch", "FriendsList", "SocialDialog", "StarRanking"]
+    }
+  ],
+  "fixes_applied": [
+    {
+      "commit": "ff8167a5",
+      "title": "fix(assets): korrektes Trumpetstar-Logo (Comic-Boy)"
+    },
+    {
+      "commit": "bf00cbf3",
+      "title": "fix(admin): PORT env var für Admin-Server"
+    },
+    {
+      "commit": "ce74eabf",
+      "title": "fix(email): TS-QA-EMAIL-001 — TRACK_BASE hardcoded fix"
+    },
+    {
+      "commit": "34c170c4",
+      "title": "fix(qa): react-router-dom 6.30.1→6.30.3 (XSS fix)"
+    },
+    {
+      "commit": "778ad399",
+      "title": "fix(qa): WP_OAUTH_CLIENT_ID read from env var"
+    },
+    {
+      "commit": "c113e4c1",
+      "title": "fix(qa): vimeo-sync JWT Caller-Auth + Admin-only guard"
+    },
+    {
+      "commit": "e5dd9011",
+      "title": "fix(qa): trumpetstar-lernwelt.jpg compress"
+    }
+  ],
+  "next_steps": [
+    "Bundle-Analyse mit vite-bundle-visualizer (P1)",
+    "Lazy Loading für OpenSheetMusicDisplay implementieren (P1)",
+    "npm audit fix für automatisch fixbare Issues (P2)",
+    "lodash → lodash-es wechseln (P2)",
+    "Manuelles RLS Policy Audit in Supabase Dashboard (P2)"
+  ],
+  "retest_plan": [
+    {
+      "id": "TS-QA-KW21-PERF-001",
+      "what": "Bundle Size nach Optimierung",
+      "when": "Nach Fix"
+    },
+    {
+      "id": "TS-QA-KW21-DEP",
+      "what": "npm audit nach Updates",
+      "when": "Nach Fix"
+    },
+    {
+      "id": "SECURITY-RLS",
+      "what": "RLS Policy Audit",
+      "when": "KW22"
+    }
+  ],
+  "report_generated": "2026-05-18T03:45:00Z",
+  "reported_by": "seppl-checker-agent"
+}
