@@ -68,10 +68,10 @@ const AUDIENCE_CONTENT = {
     ],
   },
   default: {
-    badge: '🎺 Für Anfänger & Kinder',
-    headline: 'Trompete lernen – der Weg vom ersten Ton bis zu deinen ersten Stücken',
-    sub: 'Mit 300+ professionellen Videos, echten Playbacks und dem KI-Coach Tim lernst du strukturiert, motiviert und vollständig digital – für Kinder und Erwachsene.',
-    cta: 'Jetzt kostenlos starten',
+    badge: '🎺 Für Anfänger, Kinder & Erwachsene',
+    headline: 'Trompete lernen? Kinderleicht – auch für Erwachsene!',
+    sub: 'Mit 300+ Lernvideos, echten Playbacks und dem KI-Coach Toni lernst du strukturiert von zuhause aus – mit optionalem, persönlichem Feedback von Mario Schulter.',
+    cta: 'Jetzt starten',
     ctaHref: null,
     stats: [
       { value: '300+', label: 'Lernvideos' },
