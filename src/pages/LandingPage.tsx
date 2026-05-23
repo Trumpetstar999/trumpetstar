@@ -407,8 +407,8 @@ export default function LandingPage() {
                     type="button"
                     aria-label={`Screen ${i + 1}`}
                     onClick={() => setSlideIdx(i)}
-                    className={`h-2 rounded-full transition-all ${
-                      i === slideIdx ? 'w-6 bg-[hsl(var(--reward-gold))]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    className={`h-2 w-2 rounded-full transition-all ${
+                      i === slideIdx ? 'bg-[hsl(var(--reward-gold))] scale-125' : 'bg-white/40 hover:bg-white/70'
                     }`}
                   />
                 ))}
