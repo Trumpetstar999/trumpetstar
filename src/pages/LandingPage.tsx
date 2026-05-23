@@ -243,7 +243,7 @@ export default function LandingPage() {
     }
     const params = new URLSearchParams(window.location.search);
     const utmString = params.toString();
-    navigate(`/signup${utmString ? `?${utmString}` : ''}`);
+    navigate(`/auth${utmString ? `?${utmString}` : ''}`);
   };
 
   const ac = audience === 'child'
