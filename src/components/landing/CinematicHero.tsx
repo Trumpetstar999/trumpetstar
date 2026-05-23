@@ -316,9 +316,10 @@ export function CinematicHero({
         <div className="card-sheen" />
 
         {/* Card content grid */}
-        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-6 p-6 md:p-12">
+        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
           {/* LEFT TEXT */}
-          <div className="card-left-text md:col-span-3 flex flex-col justify-center space-y-4">
+          <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
+
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
               <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
