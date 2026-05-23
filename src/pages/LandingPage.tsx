@@ -290,13 +290,17 @@ export default function LandingPage() {
 
       {/* ══════════════════════════════════════
           CINEMATIC HERO (GSAP scroll-pinned)
+          Nur Safari Desktop — alle anderen Browser/Geräte ausblenden
       ══════════════════════════════════════ */}
-      <CinematicHero
-        logoSrc={trumpetstarLogo}
-        screenshotSrc={shotLevels}
-        onPrimaryCta={() => handleCta(null)}
-        onSecondaryCta={() => navigate('/pricing')}
-      />
+      {isSafariDesktop() && (
+        <CinematicHero
+          logoSrc={trumpetstarLogo}
+          screenshotSrc={shotLevels}
+          onPrimaryCta={() => handleCta(null)}
+          onSecondaryCta={() => navigate('/pricing')}
+        />
+      )}
+
 
       <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen">
 
