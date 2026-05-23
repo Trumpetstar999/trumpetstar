@@ -460,7 +460,12 @@ export default function LandingPage() {
                     <div className="w-full md:w-1/2">
                       <div className="relative group lp-hover-lift">
                         <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
-                        <div className="lp-img-zoom lp-premium-frame relative bg-[hsl(218,88%,46%)]">
+                        <div
+                          onClick={() => handleCta(null)}
+                          role="button"
+                          aria-label="Jetzt anmelden"
+                          className="lp-img-zoom lp-premium-frame relative bg-[hsl(218,88%,46%)] cursor-pointer"
+                        >
                           <img
                             src={s.src}
                             alt={s.title}
@@ -590,7 +595,13 @@ export default function LandingPage() {
                 <span className="text-slate-500 text-sm ml-2">4,9 von 5 · 500+ Schüler:innen</span>
               </div>
             </div>
-            <div data-reveal className="lp-img-zoom rounded-2xl overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-200 transition-shadow hover:shadow-2xl">
+            <div
+              data-reveal
+              onClick={() => handleCta(null)}
+              role="button"
+              aria-label="Jetzt anmelden"
+              className="lp-img-zoom rounded-2xl overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-200 transition-shadow hover:shadow-2xl cursor-pointer"
+            >
               <img
                 src={testimonialsImg}
                 alt="Echte Amazon-Rezensionen und Junior-Stars aus der Trumpetstar-Community"
@@ -732,7 +743,12 @@ export default function LandingPage() {
 
         {/* Bekannt aus – Press Logos */}
         <section className="py-12 px-6" data-reveal>
-          <div className="max-w-5xl mx-auto bg-white rounded-2xl p-6 md:p-8 shadow-xl">
+          <div
+            onClick={() => handleCta(null)}
+            role="button"
+            aria-label="Jetzt anmelden"
+            className="max-w-5xl mx-auto bg-white rounded-2xl p-6 md:p-8 shadow-xl cursor-pointer transition-transform hover:-translate-y-0.5 hover:shadow-2xl"
+          >
             <img
               src={bekanntAus}
               alt="Bekannt aus: ServusTV, 2 Minuten 2 Millionen (PULS 4), PULS 4, Austrian Startups, Kronen Zeitung"
