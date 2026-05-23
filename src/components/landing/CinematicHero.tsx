@@ -353,7 +353,7 @@ export function CinematicHero({
         <div className="card-sheen" />
 
         {/* Card content grid */}
-        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
+        <div className="hero-card-grid relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
           {/* LEFT TEXT */}
           <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
 
@@ -366,18 +366,18 @@ export function CinematicHero({
             <p className="text-white/65 text-sm md:text-base leading-relaxed">
               {cardDescription}
             </p>
-            <p className="text-white/55 text-xs md:text-sm leading-relaxed">
+            <p className="optional-feedback-copy text-white/55 text-xs md:text-sm leading-relaxed">
               Optional auch mit persönlichem Feedback von ausgebildeten Trompetenlehrern.
             </p>
           </div>
 
           {/* iPAD LANDSCAPE MOCKUP */}
-          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
+          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative py-4 md:py-0" style={{ perspective: "1500px" }}>
             {/* iPad + badges share this relative wrapper so badges anchor to the iPad corners */}
-            <div className="relative" style={{ width: "min(540px, 100%)" }}>
+            <div className="ipad-stage relative" style={{ width: "min(540px, 100%)" }}>
               <div
                 ref={mockupRef}
-                className="iphone-bezel relative w-full"
+                className="iphone-bezel ipad-bezel-mobile relative w-full"
                 style={{
                   aspectRatio: "4 / 3",
                   borderRadius: "26px",
@@ -387,7 +387,7 @@ export function CinematicHero({
                 {/* Camera dot */}
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
                 {/* Screen */}
-                <div className="absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
+                <div className="ipad-screen-mobile absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
                   {screenshotSrc && (
                     <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover object-top" />
                   )}
