@@ -262,11 +262,6 @@ export default function LandingPage() {
     ? AUDIENCE_CONTENT.adult
     : AUDIENCE_CONTENT.default;
 
-  const features = audience === 'child'
-    ? FEATURES_CHILD
-    : audience === 'adult'
-    ? FEATURES_ADULT
-    : FEATURES_DEFAULT;
 
   const landingFaqs = FAQS.map(f => ({ question: f.q, answer: f.a }));
 
