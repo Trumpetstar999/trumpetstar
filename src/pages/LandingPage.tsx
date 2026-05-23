@@ -26,6 +26,20 @@ import testimonialsImg from '@/assets/testimonials-real.webp';
 import { useLanguage } from '@/hooks/useLanguage';
 import { CinematicHero } from '@/components/landing/CinematicHero';
 
+/* ─── Nur Safari auf Desktop (kein Chrome/Edge/Firefox, kein iPad/iPhone/Android) ─── */
+function isSafariDesktop(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const isSafari = /^((?!chrome|chromium|crios|fxios|android|edg|opr).)*safari/i.test(ua);
+  if (!isSafari) return false;
+  // iPadOS meldet sich teils als Mac — Touch-Erkennung schließt iPad/iPhone aus
+  const isTouch = (navigator.maxTouchPoints ?? 0) > 1 || /iphone|ipad|ipod/i.test(ua);
+  if (isTouch) return false;
+  // Desktop-Breakpoint
+  return window.innerWidth >= 1024;
+}
+
+
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
   { src: shotLevels,     title: '440+ Mitspielvideos in 24+ Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
