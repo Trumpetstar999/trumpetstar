@@ -14,7 +14,25 @@ import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import appPreview from '@/assets/app-preview.jpg';
+import shotLevels from '@/assets/screenshots/levels.webp';
+import shotNoten from '@/assets/screenshots/noten.webp';
+import shotNotenhefte from '@/assets/screenshots/notenhefte.webp';
+import shotGame from '@/assets/screenshots/game.webp';
+import shotCoach from '@/assets/screenshots/coach.webp';
+import shotAudios from '@/assets/screenshots/audios.webp';
+import shotProfil from '@/assets/screenshots/profil.webp';
 import { useLanguage } from '@/hooks/useLanguage';
+
+/* ─── Screenshots: was dich in der App erwartet ─── */
+const SCREENSHOTS = [
+  { src: shotLevels,     title: '449 Lernvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
+  { src: shotNoten,      title: 'Noten mitlesen & üben',                desc: 'Synchrone Noten zum Mitspielen – mit Tempo-Regler, A–B-Loop und Grifftabelle direkt im Bild.' },
+  { src: shotCoach,      title: 'Toni, dein KI-Trompeten-Coach',        desc: 'Fragen zu Griffen, Ansatz oder Technik? Toni antwortet in Echtzeit – mit Verlinkung zur passenden Übung.' },
+  { src: shotGame,       title: 'NoteRunner – Notenlesen als Spiel',    desc: 'Spiele die richtige Note auf deiner Trompete – das Mikrofon erkennt jeden Ton in Echtzeit.' },
+  { src: shotAudios,     title: 'Playbacks für jede Transposition',     desc: 'Bb, C, Horn F, Horn Es, Tenorhorn – alle Mitspiel-Aufnahmen für jedes Instrument verfügbar.' },
+  { src: shotNotenhefte, title: '8 Notenhefte – digital im Zugang',     desc: 'Anfängerschule, Buzzing Special, Techno Tunes, Klavierbegleitungen – sofort verfügbar und druckbar.' },
+  { src: shotProfil,     title: 'Dein Fortschritt auf einen Blick',     desc: 'Wochen-Sterne, Aufnahmen, Freunde & Ranking – sieh, wie du Tag für Tag besser wirst.' },
+];
 
 /* ─── Produkt-URLs aus Wissensdatenbank ─── */
 const PRO_CHECKOUT_URL = 'https://www.digistore24.com/product/346007';
