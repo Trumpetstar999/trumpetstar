@@ -705,6 +705,18 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Bekannt aus – Press Logos */}
+        <section className="py-12 px-6" data-reveal>
+          <div className="max-w-5xl mx-auto bg-white rounded-2xl p-6 md:p-8 shadow-xl">
+            <img
+              src={bekanntAus}
+              alt="Bekannt aus: ServusTV, 2 Minuten 2 Millionen (PULS 4), PULS 4, Austrian Startups, Kronen Zeitung"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
+          </div>
+        </section>
+
       </div>
     </SEOPageLayout>
   );
