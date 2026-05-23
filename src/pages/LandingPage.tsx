@@ -62,7 +62,7 @@ const AUDIENCE_CONTENT = {
     cta: 'Erwachsenenkurs ansehen',
     ctaHref: ADULT_COURSE_URL,
     stats: [
-      { value: '300+', label: 'Videos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '0', label: 'Vorkenntnisse nötig' },
       { value: '100%', label: 'Online & flexibel' },
       { value: '30 Tage', label: 'Geld-zurück-Garantie' },
@@ -71,11 +71,11 @@ const AUDIENCE_CONTENT = {
   default: {
     badge: '🎺 Für Anfänger, Kinder & Erwachsene',
     headline: 'Trompete lernen? Kinderleicht – auch für Erwachsene!',
-    sub: '440+ Lernvideos mit optionalem Feedback von ausgebildeten Trompetenlehrern.',
+    sub: '440+ Mitspielvideos mit optionalem Feedback von ausgebildeten Trompetenlehrern.',
     cta: 'Jetzt starten',
     ctaHref: null,
     stats: [
-      { value: '300+', label: 'Lernvideos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '500+', label: 'Schüler:innen' },
       { value: '4,9★', label: 'Bewertung' },
       { value: '30 Tage', label: 'Geld-zurück-Garantie' },
