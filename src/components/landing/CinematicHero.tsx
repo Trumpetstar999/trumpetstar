@@ -14,8 +14,8 @@ const INJECTED_STYLES = `
   .cinematic-hero .bg-grid-theme {
     background-size: 60px 60px;
     background-image:
-      linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255,255,255,0.10) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.10) 1px, transparent 1px);
     mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
     -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
   }
@@ -33,7 +33,7 @@ const INJECTED_STYLES = `
     filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)) drop-shadow(0 2px 4px rgba(0,0,0,0.3));
   }
   .cinematic-hero .text-gold-matte {
-    background: linear-gradient(180deg, #FFE9A8 0%, #C9A24C 100%);
+    background: linear-gradient(180deg, #FFE9A8 0%, #FFCC00 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -50,7 +50,7 @@ const INJECTED_STYLES = `
   }
 
   .cinematic-hero .premium-depth-card {
-    background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%);
+    background: linear-gradient(145deg, #0F5EDB 0%, #0B2E8A 100%);
     box-shadow:
       0 40px 100px -20px rgba(0,0,0,0.9),
       0 20px 40px -20px rgba(0,0,0,0.8),
@@ -78,7 +78,7 @@ const INJECTED_STYLES = `
     background: linear-gradient(110deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 45%);
   }
   .cinematic-hero .widget-depth {
-    background: linear-gradient(180deg, rgba(20,30,60,0.85) 0%, rgba(10,15,30,0.85) 100%);
+    background: linear-gradient(180deg, rgba(15,94,219,0.85) 0%, rgba(11,46,138,0.85) 100%);
     box-shadow:
       0 10px 20px rgba(0,0,0,0.4),
       inset 0 1px 1px rgba(255,255,255,0.08),
@@ -102,7 +102,7 @@ const INJECTED_STYLES = `
     transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   }
   .cinematic-hero .btn-modern-light {
-    background: linear-gradient(180deg, #FFE9A8 0%, #C9A24C 100%);
+    background: linear-gradient(180deg, #FFE9A8 0%, #FFCC00 100%);
     color: #0F172A;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.1), 0 12px 24px -4px rgba(201,162,76,0.45), inset 0 1px 1px rgba(255,255,255,0.6), inset 0 -3px 6px rgba(0,0,0,0.08);
   }
@@ -284,7 +284,7 @@ export function CinematicHero({
   return (
     <div
       ref={containerRef}
-      className={cn("cinematic-hero relative w-full h-screen overflow-hidden bg-[#06080F] text-white", className)}
+      className={cn("cinematic-hero relative w-full h-screen overflow-hidden bg-[#0B2E8A] text-white", className)}
       {...props}
     >
       <style>{INJECTED_STYLES}</style>
@@ -319,7 +319,7 @@ export function CinematicHero({
           {/* LEFT TEXT */}
           <div className="card-left-text md:col-span-3 flex flex-col justify-center space-y-4">
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
-              <Star className="w-3 h-3 text-[#C9A24C]" /> 4,9 ★ · 500+ Schüler:innen
+              <Star className="w-3 h-3 text-[#FFCC00]" /> 4,9 ★ · 500+ Schüler:innen
             </span>
             <h2 className="text-card-silver-matte text-3xl md:text-4xl font-bold leading-tight">
               {cardHeading}
@@ -342,7 +342,7 @@ export function CinematicHero({
               }}
             >
               {/* Screen */}
-              <div className="absolute inset-[10px] rounded-[36px] overflow-hidden bg-[#0A101D]">
+              <div className="absolute inset-[10px] rounded-[36px] overflow-hidden bg-[#0B2E8A]">
                 {screenshotSrc && (
                   <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover" />
                 )}
@@ -359,7 +359,7 @@ export function CinematicHero({
                       <circle
                         className="progress-ring"
                         cx="72" cy="72" r="64"
-                        stroke="#C9A24C" strokeWidth="10" fill="none"
+                        stroke="#FFCC00" strokeWidth="10" fill="none"
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -376,22 +376,22 @@ export function CinematicHero({
 
             {/* Floating badges */}
             <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:top-6 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Star className="w-4 h-4 text-[#C9A24C]" />
+              <Star className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">4,9 ★</span>
               <span className="text-white/50">Bewertung</span>
             </div>
             <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Users className="w-4 h-4 text-[#C9A24C]" />
+              <Users className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">500+</span>
               <span className="text-white/50">Schüler:innen</span>
             </div>
             <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:bottom-8 md:-left-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <ShieldCheck className="w-4 h-4 text-[#C9A24C]" />
+              <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">30 Tage</span>
               <span className="text-white/50">Geld-zurück</span>
             </div>
             <div className="floating-badge floating-ui-badge absolute bottom-10 -right-2 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Smartphone className="w-4 h-4 text-[#C9A24C]" />
+              <Smartphone className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white/80">iOS · Android · Web</span>
             </div>
           </div>
@@ -401,15 +401,15 @@ export function CinematicHero({
             <div className="space-y-1">
               <div className="text-card-silver-matte text-6xl md:text-7xl font-black leading-none">
                 <span className="counter-val">0</span>
-                <span className="text-[#C9A24C]">+</span>
+                <span className="text-[#FFCC00]">+</span>
               </div>
               <p className="text-white/60 text-sm uppercase tracking-widest">{metricLabel}</p>
             </div>
             <ul className="space-y-2 text-sm text-white/70">
-              <li className="flex items-start gap-2"><span className="text-[#C9A24C] mt-0.5">●</span> Strukturiert in 24+ Levels</li>
-              <li className="flex items-start gap-2"><span className="text-[#C9A24C] mt-0.5">●</span> Playbacks für Bb, C, Horn F/Es</li>
-              <li className="flex items-start gap-2"><span className="text-[#C9A24C] mt-0.5">●</span> KI-Coach Tim & NoteRunner-Spiel</li>
-              <li className="flex items-start gap-2"><span className="text-[#C9A24C] mt-0.5">●</span> 8 Notenhefte inklusive</li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Strukturiert in 24+ Levels</li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Playbacks für Bb, C, Horn F/Es</li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> KI-Coach Tim & NoteRunner-Spiel</li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> 8 Notenhefte inklusive</li>
             </ul>
           </div>
         </div>
