@@ -389,9 +389,9 @@ export function CinematicHero({
         {/* Card content grid */}
         <div className="hero-card-grid relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10 text-center">
           {/* LEFT TEXT */}
-          <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
+          <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center items-center text-center space-y-3 md:space-y-4">
 
-            <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
               <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
             <h2 className="text-card-silver-matte text-xl md:text-3xl lg:text-4xl font-bold leading-tight">
@@ -475,9 +475,9 @@ export function CinematicHero({
           </div>
 
           {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
-          <div className="card-right-text hidden md:flex md:col-span-3 min-w-0 flex-col justify-center space-y-3 md:space-y-4">
+          <div className="card-right-text hidden md:flex md:col-span-3 min-w-0 flex-col justify-center items-center text-center space-y-3 md:space-y-4">
             <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
-            <ul className="space-y-2 text-xs md:text-sm text-white/80">
+            <ul className="space-y-2 text-xs md:text-sm text-white/80 inline-block text-left">
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Strukturiert in 24+ Levels</span></li>
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Playbacks für Bb, C, Horn F/Es</span></li>
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>KI-Coach Tim & NoteRunner-Spiel</span></li>
