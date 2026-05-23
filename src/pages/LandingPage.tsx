@@ -470,6 +470,7 @@ export default function LandingPage() {
                             loading="lazy"
                             decoding="async"
                             width={1280}
+                            height={800}
                             className="w-full h-auto object-cover object-top aspect-[16/10]"
                           />
                         </div>
