@@ -22,7 +22,7 @@ import shotGame from '@/assets/screenshots/game.webp';
 import shotCoach from '@/assets/screenshots/coach.webp';
 import shotAudios from '@/assets/screenshots/audios.webp';
 import shotProfil from '@/assets/screenshots/profil.webp';
-import testimonialsImg from '@/assets/testimonials-real.png';
+import testimonialsImg from '@/assets/testimonials-real.webp';
 import { useLanguage } from '@/hooks/useLanguage';
 import { CinematicHero } from '@/components/landing/CinematicHero';
 
@@ -308,7 +308,7 @@ export default function LandingPage() {
 
           {/* Logo */}
           <div className="flex justify-center mb-7">
-            <img src={trumpetstarLogo} alt="Trumpetstar" className="h-14 w-auto drop-shadow-lg" />
+            <img src={trumpetstarLogo} alt="Trumpetstar" width={224} height={56} fetchPriority="high" decoding="async" className="h-14 w-auto drop-shadow-lg" />
           </div>
 
 
@@ -389,7 +389,9 @@ export default function LandingPage() {
                       alt={s.title}
                       loading={i === 0 ? 'eager' : 'lazy'}
                       decoding="async"
+                      fetchPriority={i === 0 ? 'high' : 'low'}
                       width={1280}
+                      height={720}
                       className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700 ${
                         i === slideIdx ? 'opacity-100' : 'opacity-0'
                       }`}
@@ -603,6 +605,8 @@ export default function LandingPage() {
                 alt="Echte Amazon-Rezensionen und Junior-Stars aus der Trumpetstar-Community"
                 loading="lazy"
                 decoding="async"
+                width={1400}
+                height={438}
                 className="w-full h-auto block"
               />
             </div>
@@ -748,8 +752,11 @@ export default function LandingPage() {
             <img
               src={bekanntAus}
               alt="Bekannt aus: ServusTV, 2 Minuten 2 Millionen (PULS 4), PULS 4, Austrian Startups, Kronen Zeitung"
+              width={1000}
+              height={140}
               className="w-full h-auto object-contain"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </section>
