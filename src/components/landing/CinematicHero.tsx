@@ -320,41 +320,44 @@ export function CinematicHero({
           {/* LEFT TEXT */}
           <div className="card-left-text md:col-span-3 flex flex-col justify-center space-y-4">
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
-              <Star className="w-3 h-3 text-[#FFCC00]" /> 4,9 ★ · 500+ Schüler:innen
+              <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
             <h2 className="text-card-silver-matte text-3xl md:text-4xl font-bold leading-tight">
               {cardHeading}
             </h2>
-            <p className="text-white/55 text-sm md:text-base leading-relaxed">
+            <p className="text-white/65 text-sm md:text-base leading-relaxed">
               {cardDescription}
+            </p>
+            <p className="text-white/55 text-xs md:text-sm leading-relaxed">
+              Optional auch mit persönlichem Feedback von ausgebildeten Trompetenlehrern.
             </p>
           </div>
 
-          {/* iPHONE MOCKUP */}
+          {/* iPAD LANDSCAPE MOCKUP */}
           <div className="mockup-scroll-wrapper md:col-span-6 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
             <div
               ref={mockupRef}
               className="iphone-bezel relative"
               style={{
-                width: "min(280px, 70%)",
-                aspectRatio: "9 / 19.5",
-                borderRadius: "44px",
+                width: "min(640px, 95%)",
+                aspectRatio: "4 / 3",
+                borderRadius: "28px",
                 transformStyle: "preserve-3d",
               }}
             >
+              {/* Camera dot */}
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
               {/* Screen */}
-              <div className="absolute inset-[10px] rounded-[36px] overflow-hidden bg-[#0B2E8A]">
+              <div className="absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
                 {screenshotSrc && (
-                  <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover" />
+                  <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover object-top" />
                 )}
-                {/* Notch */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-5 rounded-full bg-black z-20" />
                 {/* Glare */}
                 <div className="screen-glare absolute inset-0 z-10 pointer-events-none" />
 
                 {/* Overlay widget: progress ring */}
-                <div className="phone-widget widget-depth absolute left-3 right-3 bottom-3 rounded-2xl p-3 z-30 flex items-center gap-3">
-                  <div className="relative w-16 h-16 shrink-0">
+                <div className="phone-widget widget-depth absolute right-3 bottom-3 rounded-2xl p-3 z-30 flex items-center gap-3 max-w-[60%]">
+                  <div className="relative w-14 h-14 shrink-0">
                     <svg viewBox="0 0 144 144" className="w-full h-full">
                       <circle cx="72" cy="72" r="64" stroke="rgba(255,255,255,0.08)" strokeWidth="10" fill="none" />
                       <circle
@@ -364,7 +367,7 @@ export function CinematicHero({
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="counter-val text-white font-bold text-lg">0</span>
+                      <span className="counter-val text-white font-bold text-sm">0</span>
                     </div>
                   </div>
                   <div className="min-w-0">
@@ -376,45 +379,41 @@ export function CinematicHero({
             </div>
 
             {/* Floating badges */}
-            <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:top-6 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Star className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">4,9 ★</span>
               <span className="text-white/50">Bewertung</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Users className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">500+</span>
               <span className="text-white/50">Schüler:innen</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:bottom-8 md:-left-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:-bottom-4 md:-left-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">30 Tage</span>
               <span className="text-white/50">Geld-zurück</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute bottom-10 -right-2 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -bottom-2 right-2 md:-bottom-4 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Smartphone className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white/80">iOS · Android · Web</span>
             </div>
           </div>
 
-          {/* RIGHT TEXT */}
+          {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
           <div className="card-right-text md:col-span-3 flex flex-col justify-center space-y-4">
-            <div className="space-y-1">
-              <div className="text-card-silver-matte text-6xl md:text-7xl font-black leading-none">
-                <span className="counter-val">0</span>
-                <span className="text-[#FFCC00]">+</span>
-              </div>
-              <p className="text-white/60 text-sm uppercase tracking-widest">{metricLabel}</p>
-            </div>
-            <ul className="space-y-2 text-sm text-white/70">
+            <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
+            <ul className="space-y-2.5 text-sm md:text-base text-white/80">
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Strukturiert in 24+ Levels</li>
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Playbacks für Bb, C, Horn F/Es</li>
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> KI-Coach Tim & NoteRunner-Spiel</li>
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> 8 Notenhefte inklusive</li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Optional: Feedback vom Trompetenlehrer</li>
             </ul>
           </div>
         </div>
       </div>
+
 
       {/* FINAL CTA */}
       <div className="cta-wrapper absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none">
