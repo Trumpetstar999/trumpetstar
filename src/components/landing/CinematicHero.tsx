@@ -403,16 +403,17 @@ export function CinematicHero({
           </div>
 
           {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
-          <div className="card-right-text md:col-span-3 flex flex-col justify-center space-y-4">
+          <div className="card-right-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
             <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
-            <ul className="space-y-2.5 text-sm md:text-base text-white/80">
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Strukturiert in 24+ Levels</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Playbacks für Bb, C, Horn F/Es</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> KI-Coach Tim & NoteRunner-Spiel</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> 8 Notenhefte inklusive</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Optional: Feedback vom Trompetenlehrer</li>
+            <ul className="space-y-2 text-xs md:text-sm text-white/80">
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Strukturiert in 24+ Levels</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Playbacks für Bb, C, Horn F/Es</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>KI-Coach Tim & NoteRunner-Spiel</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>8 Notenhefte inklusive</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Optional: Feedback vom Trompetenlehrer</span></li>
             </ul>
           </div>
+
         </div>
       </div>
 
