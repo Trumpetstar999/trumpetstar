@@ -217,6 +217,26 @@ export default function LandingPage() {
     return () => clearInterval(id);
   }, []);
 
+  // Scroll-reveal: fade-up on enter viewport
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const els = document.querySelectorAll<HTMLElement>('[data-reveal]');
+    const io = new IntersectionObserver(
+      entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+    );
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [checking]);
+
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
@@ -297,34 +317,35 @@ export default function LandingPage() {
                 {ac.badge}
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
+              <h1 data-reveal className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
                 {ac.headline}
               </h1>
 
-              <p className="text-lg text-white/75 leading-relaxed mb-7">
+              <p data-reveal data-reveal-delay="1" className="text-lg text-white/75 leading-relaxed mb-7">
                 {ac.sub}
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
+              <div data-reveal data-reveal-delay="2" className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
                 <Button
                   size="lg"
                   onClick={() => handleCta(null)}
-                  className="h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2"
+                  className="lp-btn-shine h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2"
                 >
-                  Jetzt anmelden <ArrowRight className="w-5 h-5" />
+                  Jetzt anmelden <ArrowRight className="w-5 h-5 lp-icon-pop" />
                 </Button>
                 {audience && ac.ctaHref && (
                   <Button
                     size="lg"
                     variant="outline"
                     onClick={() => handleCta(ac.ctaHref)}
-                    className="h-14 px-7 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
+                    className="lp-btn-shine h-14 px-7 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
                   >
-                    {ac.cta} <ArrowRight className="w-4 h-4" />
+                    {ac.cta} <ArrowRight className="w-4 h-4 lp-icon-pop" />
                   </Button>
                 )}
               </div>
+
 
               {/* Slim trust line */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-white/70 text-xs">
@@ -347,10 +368,10 @@ export default function LandingPage() {
             </div>
 
             {/* RIGHT – Slideshow of real app screens */}
-            <div className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
+            <div data-reveal data-reveal-delay="2" className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
               <div
                 onClick={() => handleCta(null)}
-                className="relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)]"
+                className="group lp-img-zoom relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-yellow-500/20"
                 aria-label="App starten"
                 role="button"
               >
@@ -376,6 +397,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
+
 
               {/* Dots BELOW the image */}
               <div className="flex justify-center gap-2 mt-4">
@@ -421,13 +443,14 @@ export default function LandingPage() {
                 return (
                   <div
                     key={s.title}
+                    data-reveal
                     className={`flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-14`}
                   >
                     {/* Screenshot */}
                     <div className="w-full md:w-1/2">
-                      <div className="relative group">
-                        <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity" />
-                        <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/15 bg-[hsl(218,88%,46%)]">
+                      <div className="relative group lp-hover-lift">
+                        <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
+                        <div className="lp-img-zoom relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/15 bg-[hsl(218,88%,46%)]">
                           <img
                             src={s.src}
                             alt={s.title}
@@ -449,20 +472,22 @@ export default function LandingPage() {
                     </div>
                   </div>
                 );
+
               })}
             </div>
 
             {/* CTA */}
-            <div className="text-center mt-20">
+            <div data-reveal className="text-center mt-20">
               <Button
                 size="lg"
                 onClick={() => handleCta(null)}
-                className="h-14 px-9 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
+                className="lp-btn-shine h-14 px-9 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
               >
-                Jetzt in der App anmelden <ArrowRight className="w-5 h-5" />
+                Jetzt in der App anmelden <ArrowRight className="w-5 h-5 lp-icon-pop" />
               </Button>
               <p className="text-slate-500 text-xs mt-3">Kostenlos starten · Keine Kreditkarte nötig</p>
             </div>
+
           </div>
         </section>
 
@@ -479,7 +504,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-6 items-stretch">
 
             {/* FREE */}
-            <div className="bg-white/[0.07] border border-white/[0.12] rounded-2xl p-7 flex flex-col">
+            <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-white/30 rounded-2xl p-7 flex flex-col">
               <div className="mb-5">
                 <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Kostenlos</p>
                 <div className="flex items-end gap-1 mb-1">
@@ -500,14 +525,14 @@ export default function LandingPage() {
                 size="lg"
                 variant="outline"
                 onClick={() => handleCta(null)}
-                className="w-full h-12 font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl"
+                className="lp-btn-shine w-full h-12 font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl"
               >
                 Kostenlos starten
               </Button>
             </div>
 
             {/* PRO */}
-            <div className="bg-white/[0.10] border-2 border-[hsl(var(--reward-gold))]/50 rounded-2xl p-7 flex flex-col relative overflow-hidden">
+            <div data-reveal data-reveal-delay="1" className="lp-hover-lift bg-white/[0.10] border-2 border-[hsl(var(--reward-gold))]/50 hover:border-[hsl(var(--reward-gold))] rounded-2xl p-7 flex flex-col relative overflow-hidden hover:shadow-2xl hover:shadow-yellow-500/20">
               <div className="absolute top-0 right-0 bg-[hsl(var(--reward-gold))] text-slate-900 text-xs font-bold px-3 py-1.5 rounded-bl-xl uppercase tracking-wide">
                 Beliebt
               </div>
@@ -529,15 +554,16 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 onClick={() => handleCta(PRO_CHECKOUT_URL)}
-                className="w-full h-12 font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
+                className="lp-btn-shine w-full h-12 font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
               >
-                PRO jetzt freischalten <ArrowRight className="w-4 h-4" />
+                PRO jetzt freischalten <ArrowRight className="w-4 h-4 lp-icon-pop" />
               </Button>
               <p className="text-white/35 text-xs text-center mt-3">30 Tage Geld-zurück-Garantie · Keine versteckten Kosten</p>
             </div>
 
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 5 — TESTIMONIALS (echte Amazon-Rezensionen & Junior-Stars)
@@ -554,13 +580,16 @@ export default function LandingPage() {
                 <span className="text-slate-500 text-sm ml-2">4,9 von 5 · 500+ Schüler:innen</span>
               </div>
             </div>
-            <img
-              src={testimonialsImg}
-              alt="Echte Amazon-Rezensionen und Junior-Stars aus der Trumpetstar-Community"
-              loading="lazy"
-              decoding="async"
-              className="w-full h-auto rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200"
-            />
+            <div data-reveal className="lp-img-zoom rounded-2xl overflow-hidden shadow-xl shadow-slate-900/10 border border-slate-200 transition-shadow hover:shadow-2xl">
+              <img
+                src={testimonialsImg}
+                alt="Echte Amazon-Rezensionen und Junior-Stars aus der Trumpetstar-Community"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-auto block"
+              />
+            </div>
+
           </div>
         </section>
 
@@ -568,8 +597,8 @@ export default function LandingPage() {
             SECTION 6 — TV BADGE + TEAM
         ══════════════════════════════════════ */}
         <section className="max-w-3xl mx-auto px-5 py-10">
-          <div className="bg-white/[0.07] border border-white/[0.12] rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <div className="text-5xl shrink-0">📺</div>
+          <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-[hsl(var(--reward-gold))]/40 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <div className="text-5xl shrink-0 lp-icon-pop">📺</div>
             <div>
               <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-1">Bekannt aus dem TV</p>
               <p className="text-white text-lg font-bold mb-1">„2 Minuten 2 Millionen" – die österreichische Startup-Show</p>
@@ -579,6 +608,7 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 7 — FAQ
@@ -591,8 +621,10 @@ export default function LandingPage() {
               {FAQS.map(({ q, a }, i) => (
                 <div
                   key={q}
-                  className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm"
+                  data-reveal
+                  className="bg-white border border-slate-200 hover:border-[hsl(45,90%,50%)]/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all"
                 >
+
                   <button
                     type="button"
                     className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
@@ -625,7 +657,7 @@ export default function LandingPage() {
             SECTION 8 — FINAL CTA
         ══════════════════════════════════════ */}
         <section className="max-w-2xl mx-auto px-5 pt-20 pb-24">
-          <div className="bg-white/[0.07] border border-white/[0.12] rounded-3xl p-10 md:p-14 text-center">
+          <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-[hsl(var(--reward-gold))]/40 rounded-3xl p-10 md:p-14 text-center">
             <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-4">
               Starte noch heute
             </p>
@@ -639,15 +671,15 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 onClick={() => handleCta(null)}
-                className="h-14 px-10 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/30 gap-2"
+                className="lp-btn-shine h-14 px-10 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/30 gap-2"
               >
-                Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
+                Jetzt kostenlos starten <ArrowRight className="w-5 h-5 lp-icon-pop" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 onClick={() => handleCta(PRO_CHECKOUT_URL)}
-                className="h-14 px-8 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
+                className="lp-btn-shine h-14 px-8 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
               >
                 Direkt PRO freischalten
               </Button>
@@ -655,6 +687,7 @@ export default function LandingPage() {
             <p className="text-white/35 text-xs mt-4">
               Keine Kreditkarte für Free · 30 Tage Geld-zurück auf PRO · Jederzeit kündbar
             </p>
+
 
             {/* Final App Badges */}
             <div className="flex items-center justify-center gap-3 mt-7 flex-wrap">
