@@ -229,7 +229,7 @@ export function CinematicHero({
   metricLabel = "Mitspielvideos",
   metricSub = "in 24+ Levels",
   screenshotSrc,
-  ctaHeading = "Starte heute mit Trompete.",
+  ctaHeading = "Starte heute\nmit Trompete.",
   ctaDescription = "Jederzeit kündbar.\n30 Tage Geld-zurück-Garantie. Spielerisch von der ersten Minute an.",
   primaryCtaLabel = "Jetzt kostenlos starten",
   secondaryCtaLabel = "Pro ansehen",
@@ -493,7 +493,7 @@ export function CinematicHero({
       {/* FINAL CTA */}
       <div className="cta-wrapper absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none">
         <div className="pointer-events-auto w-full max-w-4xl mx-auto">
-          <h2 className="text-3d-matte text-4xl md:text-6xl font-black leading-tight mb-4 md:whitespace-nowrap">
+          <h2 className="text-3d-matte text-4xl md:text-6xl font-black leading-tight mb-4 whitespace-pre-line">
             {ctaHeading}
           </h2>
           <p className="text-white/70 text-base md:text-lg mb-8 whitespace-pre-line">
