@@ -418,22 +418,22 @@ export function CinematicHero({
               </div>
 
               {/* Floating badges — anchored to iPad corners, slightly outside */}
-              <div className="floating-badge floating-ui-badge absolute -top-3 -left-3 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute top-2 left-2 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Star className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">4,9 ★</span>
                 <span className="text-white/50 hidden sm:inline">Bewertung</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -top-3 -right-3 md:-top-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute top-2 right-2 md:-top-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Users className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">500+</span>
                 <span className="text-white/50 hidden sm:inline">Schüler:innen</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -bottom-3 -left-3 md:-bottom-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute bottom-2 left-2 md:-bottom-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">30 Tage</span>
                 <span className="text-white/50 hidden sm:inline">Geld-zurück</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -bottom-3 -right-3 md:-bottom-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge mobile-hide-badge absolute bottom-2 right-2 md:-bottom-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Smartphone className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white/80">iOS · Android · Web</span>
               </div>
