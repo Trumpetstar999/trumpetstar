@@ -400,6 +400,57 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════
+            SECTION 1.5 — WAS DICH ERWARTET (Screenshots)
+        ══════════════════════════════════════ */}
+        <section className="max-w-6xl mx-auto px-5 py-16 border-t border-white/10">
+          <div className="text-center mb-12">
+            <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-3">Was dich erwartet</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Ein Blick in die App</h2>
+            <p className="text-white/60 text-sm max-w-xl mx-auto">
+              Keine Marketing-Mockups – echte Screenshots aus Trumpetstar, so wie du sie nach dem Login siehst.
+            </p>
+          </div>
+
+          {/* Hero screenshot — Levels */}
+          <div className="mb-6 rounded-2xl overflow-hidden border border-white/15 shadow-2xl shadow-black/40 bg-[hsl(218,88%,46%)]">
+            <img
+              src={SCREENSHOTS[0].src}
+              alt={SCREENSHOTS[0].title}
+              loading="lazy"
+              decoding="async"
+              width={1280}
+              className="w-full h-auto block"
+            />
+          </div>
+          <div className="text-center mb-12">
+            <h3 className="text-white font-bold text-lg mb-1">{SCREENSHOTS[0].title}</h3>
+            <p className="text-white/55 text-sm max-w-lg mx-auto">{SCREENSHOTS[0].desc}</p>
+          </div>
+
+          {/* Grid – the rest */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {SCREENSHOTS.slice(1).map(s => (
+              <div key={s.title} className="bg-white/[0.06] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col">
+                <div className="aspect-video overflow-hidden bg-[hsl(222,86%,29%)]">
+                  <img
+                    src={s.src}
+                    alt={s.title}
+                    loading="lazy"
+                    decoding="async"
+                    width={1280}
+                    className="w-full h-full object-cover object-top"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-white font-bold text-sm mb-1.5">{s.title}</h3>
+                  <p className="text-white/55 text-xs leading-relaxed">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════
             SECTION 2 — SO FUNKTIONIERT'S
         ══════════════════════════════════════ */}
         <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
