@@ -13,6 +13,7 @@ import {
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import bekanntAus from '@/assets/bekannt-aus.png';
 import appPreview from '@/assets/app-preview.jpg';
 import shotLevels from '@/assets/screenshots/levels.webp';
 import shotNoten from '@/assets/screenshots/noten.webp';
@@ -701,6 +702,18 @@ export default function LandingPage() {
                 <span className="text-white/60 text-xs">Bekannt aus 2 Min 2 Mio</span>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Bekannt aus – Press Logos */}
+        <section className="py-12 px-6" data-reveal>
+          <div className="max-w-5xl mx-auto bg-white rounded-2xl p-6 md:p-8 shadow-xl">
+            <img
+              src={bekanntAus}
+              alt="Bekannt aus: ServusTV, 2 Minuten 2 Millionen (PULS 4), PULS 4, Austrian Startups, Kronen Zeitung"
+              className="w-full h-auto object-contain"
+              loading="lazy"
+            />
           </div>
         </section>
 
