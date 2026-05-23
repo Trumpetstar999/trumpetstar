@@ -381,8 +381,9 @@ export function CinematicHero({
       <div
         ref={mainCardRef}
         className="main-card premium-depth-card absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-        style={{ width: "85vw", height: "70vh", borderRadius: "40px" }}
+        style={{ width: "100vw", height: "100vh", borderRadius: "0px" }}
       >
+
         <div className="card-sheen" />
 
         {/* Card content grid */}
