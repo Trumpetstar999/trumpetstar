@@ -167,10 +167,6 @@ const FAQS = [
     a: 'Ja, 30 Tage Geld-zurück-Garantie. Wenn du nicht überzeugt bist, erhältst du dein Geld zurück – ohne Wenn und Aber, ohne Fragen.',
   },
   {
-    q: 'Kann ich jederzeit kündigen?',
-    a: 'Ja. Das Abo ist monatlich kündbar – per E-Mail bis 48h vor dem Folgemonat. Kein Vertrag, keine versteckten Kosten, kein Mindestabo.',
-  },
-  {
     q: 'Welche Trompete brauche ich?',
     a: 'Jede Standardtrompete in Bb reicht aus. Für Kinder bis ca. 9 Jahre empfehlen wir ein Kornett – leichter zu halten, gleiche Technik. Eine teure Profitrompete ist zum Starten nicht nötig.',
   },
