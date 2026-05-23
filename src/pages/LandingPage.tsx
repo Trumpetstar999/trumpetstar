@@ -424,55 +424,70 @@ export default function LandingPage() {
 
 
         {/* ══════════════════════════════════════
-            SECTION 1.5 — WAS DICH ERWARTET (Screenshots)
+            SECTION 1.5 — WAS DICH ERWARTET (Screenshots) – WHITE
         ══════════════════════════════════════ */}
-        <section className="max-w-6xl mx-auto px-5 py-16 border-t border-white/10">
-          <div className="text-center mb-12">
-            <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-3">Was dich erwartet</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Ein Blick in die App</h2>
-            <p className="text-white/60 text-sm max-w-xl mx-auto">
-              Keine Marketing-Mockups – echte Screenshots aus Trumpetstar, so wie du sie nach dem Login siehst.
-            </p>
-          </div>
+        <section className="bg-gradient-to-b from-slate-50 to-white text-slate-900">
+          <div className="max-w-6xl mx-auto px-5 py-20">
+            <div className="text-center mb-12">
+              <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-3">Was dich erwartet</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Ein Blick in die App</h2>
+              <p className="text-slate-600 text-base max-w-xl mx-auto">
+                Keine Mockups – echte Screenshots aus Trumpetstar, so wie du sie nach dem Login siehst.
+              </p>
+            </div>
 
-          {/* Hero screenshot — Levels */}
-          <div className="mb-6 rounded-2xl overflow-hidden border border-white/15 shadow-2xl shadow-black/40 bg-[hsl(218,88%,46%)]">
-            <img
-              src={SCREENSHOTS[0].src}
-              alt={SCREENSHOTS[0].title}
-              loading="lazy"
-              decoding="async"
-              width={1280}
-              className="w-full h-auto block"
-            />
-          </div>
-          <div className="text-center mb-12">
-            <h3 className="text-white font-bold text-lg mb-1">{SCREENSHOTS[0].title}</h3>
-            <p className="text-white/55 text-sm max-w-lg mx-auto">{SCREENSHOTS[0].desc}</p>
-          </div>
+            {/* Hero screenshot — Levels */}
+            <div className="mb-4 rounded-2xl overflow-hidden border border-slate-200 shadow-xl shadow-slate-900/10 bg-[hsl(218,88%,46%)]">
+              <img
+                src={SCREENSHOTS[0].src}
+                alt={SCREENSHOTS[0].title}
+                loading="lazy"
+                decoding="async"
+                width={1280}
+                className="w-full h-auto block"
+              />
+            </div>
+            <div className="text-center mb-14">
+              <h3 className="text-slate-900 font-bold text-lg mb-1">{SCREENSHOTS[0].title}</h3>
+              <p className="text-slate-600 text-sm max-w-lg mx-auto">{SCREENSHOTS[0].desc}</p>
+            </div>
 
-          {/* Grid – the rest */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {SCREENSHOTS.slice(1).map(s => (
-              <div key={s.title} className="bg-white/[0.06] border border-white/[0.12] rounded-2xl overflow-hidden flex flex-col">
-                <div className="aspect-video overflow-hidden bg-[hsl(222,86%,29%)]">
-                  <img
-                    src={s.src}
-                    alt={s.title}
-                    loading="lazy"
-                    decoding="async"
-                    width={1280}
-                    className="w-full h-full object-cover object-top"
-                  />
+            {/* Grid – the rest */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {SCREENSHOTS.slice(1).map(s => (
+                <div key={s.title} className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="aspect-video overflow-hidden bg-[hsl(222,86%,29%)]">
+                    <img
+                      src={s.src}
+                      alt={s.title}
+                      loading="lazy"
+                      decoding="async"
+                      width={1280}
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-slate-900 font-bold text-sm mb-1.5">{s.title}</h3>
+                    <p className="text-slate-600 text-xs leading-relaxed">{s.desc}</p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-white font-bold text-sm mb-1.5">{s.title}</h3>
-                  <p className="text-white/55 text-xs leading-relaxed">{s.desc}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="text-center mt-12">
+              <Button
+                size="lg"
+                onClick={() => handleCta(null)}
+                className="h-13 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-lg shadow-yellow-500/30 gap-2"
+              >
+                Jetzt in der App anmelden <ArrowRight className="w-5 h-5" />
+              </Button>
+              <p className="text-slate-500 text-xs mt-3">Kostenlos starten · Keine Kreditkarte nötig</p>
+            </div>
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 2 — SO FUNKTIONIERT'S
