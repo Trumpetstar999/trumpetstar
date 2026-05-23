@@ -24,6 +24,7 @@ import shotAudios from '@/assets/screenshots/audios.webp';
 import shotProfil from '@/assets/screenshots/profil.webp';
 import testimonialsImg from '@/assets/testimonials-real.png';
 import { useLanguage } from '@/hooks/useLanguage';
+import { CinematicHero } from '@/components/landing/CinematicHero';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
@@ -291,7 +292,18 @@ export default function LandingPage() {
     >
       <FAQSchema faqs={landingFaqs} />
 
+      {/* ══════════════════════════════════════
+          CINEMATIC HERO (GSAP scroll-pinned)
+      ══════════════════════════════════════ */}
+      <CinematicHero
+        logoSrc={trumpetstarLogo}
+        screenshotSrc={shotLevels}
+        onPrimaryCta={() => handleCta(null)}
+        onSecondaryCta={() => navigate('/pricing')}
+      />
+
       <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen">
+
 
         {/* ══════════════════════════════════════
             SECTION 1 — HERO
