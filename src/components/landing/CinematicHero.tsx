@@ -11,6 +11,43 @@ if (typeof window !== "undefined") {
 const INJECTED_STYLES = `
   .cinematic-hero .gsap-reveal { visibility: hidden; }
 
+  @media (max-width: 767px) {
+    .cinematic-hero .hero-card-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.85rem;
+      padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1rem, env(safe-area-inset-bottom, 0px));
+    }
+    .cinematic-hero .main-card {
+      width: 94vw !important;
+      height: 86dvh !important;
+      border-radius: 28px !important;
+    }
+    .cinematic-hero .card-left-text { gap: 0.6rem; }
+    .cinematic-hero .card-left-text h2 {
+      font-size: clamp(1.35rem, 6.4vw, 1.75rem);
+      line-height: 1.08;
+    }
+    .cinematic-hero .card-left-text p { line-height: 1.38; }
+    .cinematic-hero .ipad-stage { width: min(100%, 340px) !important; }
+    .cinematic-hero .ipad-bezel-mobile { border-radius: 20px !important; }
+    .cinematic-hero .ipad-screen-mobile { inset: 10px !important; border-radius: 13px !important; }
+    .cinematic-hero .floating-badge {
+      font-size: 11px;
+      gap: 0.35rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 0.8rem;
+    }
+    .cinematic-hero .phone-widget { display: none; }
+    .cinematic-hero .mobile-hide-badge { display: none; }
+  }
+
+  @media (max-width: 374px), (max-height: 720px) {
+    .cinematic-hero .ipad-stage { width: min(100%, 305px) !important; }
+    .cinematic-hero .optional-feedback-copy { display: none; }
+  }
+
   .cinematic-hero .bg-grid-theme {
     background-size: 60px 60px;
     background-image:
