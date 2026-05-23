@@ -26,7 +26,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
-  { src: shotLevels,     title: '449 Lernvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
+  { src: shotLevels,     title: '440+ Mitspielvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
   { src: shotNoten,      title: 'Noten mitlesen & üben',                desc: 'Synchrone Noten zum Mitspielen – mit Tempo-Regler, A–B-Loop und Grifftabelle direkt im Bild.' },
   { src: shotCoach,      title: 'Toni, dein KI-Trompeten-Coach',        desc: 'Fragen zu Griffen, Ansatz oder Technik? Toni antwortet in Echtzeit – mit Verlinkung zur passenden Übung.' },
   { src: shotGame,       title: 'NoteRunner – Notenlesen als Spiel',    desc: 'Spiele die richtige Note auf deiner Trompete – das Mikrofon erkennt jeden Ton in Echtzeit.' },
@@ -49,7 +49,7 @@ const AUDIENCE_CONTENT = {
     cta: 'Kurs für mein Kind ansehen',
     ctaHref: KIDS_COURSE_URL,
     stats: [
-      { value: '101', label: 'Lernvideos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '55', label: 'Kinderlieder' },
       { value: '11', label: 'Levels' },
       { value: '5+', label: 'Jahre' },
@@ -62,7 +62,7 @@ const AUDIENCE_CONTENT = {
     cta: 'Erwachsenenkurs ansehen',
     ctaHref: ADULT_COURSE_URL,
     stats: [
-      { value: '300+', label: 'Videos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '0', label: 'Vorkenntnisse nötig' },
       { value: '100%', label: 'Online & flexibel' },
       { value: '30 Tage', label: 'Geld-zurück-Garantie' },
@@ -71,11 +71,11 @@ const AUDIENCE_CONTENT = {
   default: {
     badge: '🎺 Für Anfänger, Kinder & Erwachsene',
     headline: 'Trompete lernen? Kinderleicht – auch für Erwachsene!',
-    sub: '440+ Lernvideos mit optionalem Feedback von ausgebildeten Trompetenlehrern.',
+    sub: '440+ Mitspielvideos mit optionalem Feedback von ausgebildeten Trompetenlehrern.',
     cta: 'Jetzt starten',
     ctaHref: null,
     stats: [
-      { value: '300+', label: 'Lernvideos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '500+', label: 'Schüler:innen' },
       { value: '4,9★', label: 'Bewertung' },
       { value: '30 Tage', label: 'Geld-zurück-Garantie' },
@@ -85,7 +85,7 @@ const AUDIENCE_CONTENT = {
 
 /* ─── Features nach Zielgruppe ─── */
 const FEATURES_CHILD = [
-  { icon: Video,     title: '101 Lernvideos vom ersten Ton an',   desc: 'Professionell produziert, klar erklärt – damit Kinder ab der ersten Stunde mitspielen können.' },
+  { icon: Video,     title: '440+ Mitspielvideos vom ersten Ton an',   desc: 'Professionell produziert, klar erklärt – damit Kinder ab der ersten Stunde mitspielen können.' },
   { icon: Music2,    title: '55 bekannte Kinderlieder',            desc: 'Von Alle meine Entchen bis Bruder Jakob – Lieder, die Kinder kennen und lieben.' },
   { icon: Trophy,    title: 'Starmethode & Gamification',          desc: 'Sterne sammeln, Sticker kleben, Level aufsteigen – Kinder üben freiwillig und mit Begeisterung.' },
   { icon: Users,     title: '10 echte Trompeter:innen aufgenommen', desc: 'Virtuelle Ensemble-Erfahrung: Dein Kind spielt mit echten Profi-Mitspielern zusammen.' },
@@ -94,7 +94,7 @@ const FEATURES_CHILD = [
 ];
 
 const FEATURES_ADULT = [
-  { icon: Video,     title: '300+ Lern- & Mitspielvideos',         desc: 'Schritt-für-Schritt erklärt von Mario Schulter & Klemens Kollmann – klar, praxisnah, motivierend.' },
+  { icon: Video,     title: '440+ Mitspielvideos',         desc: 'Schritt-für-Schritt erklärt von Mario Schulter & Klemens Kollmann – klar, praxisnah, motivierend.' },
   { icon: Sparkles,  title: 'KI-Coach Tim',                        desc: 'Dein persönlicher KI-Assistent beantwortet Fragen, gibt Tipps und begleitet deinen Fortschritt.' },
   { icon: Mic2,      title: 'Persönliches Feedback',               desc: 'Kein anonymes System – echte Rückmeldung vom Lehrer-Team, direkt und menschlich.' },
   { icon: Clock,     title: '100% flexibel – kein fixer Termin',   desc: 'Lerne wann und wo du willst. Pause einlegen? Kein Problem. Dein Tempo, deine Regeln.' },
@@ -103,7 +103,7 @@ const FEATURES_ADULT = [
 ];
 
 const FEATURES_DEFAULT = [
-  { icon: Video,     title: '300+ professionelle Lernvideos',      desc: 'Klar erklärt, praxisnah aufgebaut. Kinder- und Erwachsenenpfad vollständig enthalten.' },
+  { icon: Video,     title: '440+ professionelle Mitspielvideos',      desc: 'Klar erklärt, praxisnah aufgebaut. Kinder- und Erwachsenenpfad vollständig enthalten.' },
   { icon: Music2,    title: 'Echte Playbacks & Mitspieltracks',    desc: 'Du spielst – die Band spielt mit. Sofort motivierend, von der ersten Übung an.' },
   { icon: Sparkles,  title: 'KI-Coach Tim & Gamification',         desc: 'Sterne, Levels, Badges und ein KI-Assistent, der dich durch deinen Lernweg begleitet.' },
   { icon: Mic2,      title: 'Persönliches Feedback vom Team',      desc: 'Mario Schulter und sein Team helfen dir weiter – direkt, schnell und ehrlich.' },
@@ -121,7 +121,7 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  '300+ Lern- & Mitspielvideos',
+  '440+ Mitspielvideos',
   'Komplette Anfängerschule (Band 1)',
   '55 Kinderlieder + Playbacks',
   'KI-Coach Tim (DE/EN/ES)',
@@ -273,7 +273,7 @@ export default function LandingPage() {
   return (
     <SEOPageLayout
       title="Trompete lernen | Trumpetstar – Online Trompetenunterricht"
-      description="Trompete lernen für Kinder & Erwachsene: 300+ Videos, Playbacks, KI-Coach & echtes Feedback. Jetzt kostenlos starten."
+      description="Trompete lernen für Kinder & Erwachsene: 440+ Mitspielvideos, Playbacks, KI-Coach & echtes Feedback. Jetzt kostenlos starten."
       canonicalPath="/"
     >
       <FAQSchema faqs={landingFaqs} />
@@ -490,46 +490,87 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════
-            SECTION 3 — WAS DU BEKOMMST (dynamisch)
+            SECTION 3 — WAS IN TRUMPETSTAR STECKT (Zigzag mit Screenshots)
         ══════════════════════════════════════ */}
-        <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">
-            {audience === 'child' ? 'Was Kinder bekommen' : audience === 'adult' ? 'Was du bekommst' : 'Was in Trumpetstar steckt'}
-          </h2>
-          <p className="text-center text-white/55 text-sm mb-12">
-            {audience === 'child'
-              ? 'Alles was ein Kind braucht, um von Null an echte Fortschritte zu machen'
-              : audience === 'adult'
-              ? 'Alles für einen strukturierten Start – ohne Vorkenntnisse, ohne Extrakosten'
-              : 'Ein vollständiges Lernsystem für Kinder und Erwachsene'}
-          </p>
+        <section className="relative overflow-hidden border-t border-white/10">
+          {/* Subtiler Gold-Glow im Hintergrund zur Abgrenzung */}
+          <div className="absolute inset-0 pointer-events-none opacity-40"
+               style={{ background: 'radial-gradient(900px 400px at 80% 10%, hsl(45,100%,55%,0.18), transparent 60%), radial-gradient(700px 350px at 10% 90%, hsl(190,100%,50%,0.12), transparent 60%)' }} />
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-white/[0.08] border border-white/[0.12] rounded-2xl p-6 flex gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[hsl(var(--reward-gold))]/15 border border-[hsl(var(--reward-gold))]/25 flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon className="w-5 h-5 text-[hsl(var(--reward-gold))]" />
-                </div>
-                <div>
-                  <h3 className="text-white font-bold text-sm mb-1.5">{title}</h3>
-                  <p className="text-white/55 text-xs leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="relative max-w-6xl mx-auto px-5 py-20">
+            <div className="text-center mb-16">
+              <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-3">Dein komplettes Lernsystem</p>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                {audience === 'child' ? 'Was Kinder bekommen' : audience === 'adult' ? 'Was du bekommst' : 'Was in Trumpetstar steckt'}
+              </h2>
+              <p className="text-white/60 text-base max-w-2xl mx-auto">
+                {audience === 'child'
+                  ? 'Alles, was ein Kind braucht, um von Null an echte Fortschritte zu machen'
+                  : audience === 'adult'
+                  ? 'Alles für einen strukturierten Start – ohne Vorkenntnisse, ohne Extrakosten'
+                  : 'Sechs Bausteine, die Trumpetstar zur kompletten Trompetenschule machen'}
+              </p>
+            </div>
 
-          {/* Mid-page CTA */}
-          <div className="text-center mt-12">
-            <Button
-              size="lg"
-              onClick={() => handleCta(null)}
-              className="h-13 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
-            >
-              Kostenlos registrieren & direkt starten <ArrowRight className="w-5 h-5" />
-            </Button>
-            <p className="text-white/40 text-xs mt-3">Keine Kreditkarte nötig · Sofortiger Zugang</p>
+            {/* Zigzag-Rows: jede Feature mit echtem Screenshot */}
+            <div className="space-y-20 md:space-y-28">
+              {features.slice(0, 6).map(({ icon: Icon, title, desc }, i) => {
+                const shot = SCREENSHOTS[i % SCREENSHOTS.length];
+                const reverse = i % 2 === 1;
+                return (
+                  <div
+                    key={title}
+                    className={`flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-14`}
+                  >
+                    {/* Screenshot */}
+                    <div className="w-full md:w-1/2">
+                      <div className="relative group">
+                        <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative rounded-2xl overflow-hidden border border-white/15 shadow-2xl shadow-black/40 bg-[hsl(218,88%,46%)]">
+                          <img
+                            src={shot.src}
+                            alt={title}
+                            loading="lazy"
+                            decoding="async"
+                            width={1280}
+                            className="w-full h-auto object-cover object-top aspect-[16/10]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Text */}
+                    <div className="w-full md:w-1/2">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[hsl(var(--reward-gold))] flex items-center justify-center shadow-lg shadow-yellow-500/40">
+                          <Icon className="w-6 h-6 text-slate-900" />
+                        </div>
+                        <span className="text-white/35 font-mono text-sm tracking-widest">
+                          {String(i + 1).padStart(2, '0')} / {features.slice(0, 6).length.toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">{title}</h3>
+                      <p className="text-white/65 text-base leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Mid-page CTA */}
+            <div className="text-center mt-20">
+              <Button
+                size="lg"
+                onClick={() => handleCta(null)}
+                className="h-14 px-9 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
+              >
+                Kostenlos registrieren & direkt starten <ArrowRight className="w-5 h-5" />
+              </Button>
+              <p className="text-white/40 text-xs mt-3">Keine Kreditkarte nötig · Sofortiger Zugang</p>
+            </div>
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 4 — PRICING
