@@ -43,6 +43,32 @@ const INJECTED_STYLES = `
     .cinematic-hero .mobile-hide-badge { display: none; }
   }
 
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .cinematic-hero .hero-card-grid {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.35fr) !important;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 2rem clamp(1.5rem, 3vw, 2.5rem);
+    }
+    .cinematic-hero .card-left-text,
+    .cinematic-hero .mockup-scroll-wrapper {
+      grid-column: auto / span 1 !important;
+    }
+    .cinematic-hero .card-left-text h2 {
+      font-size: clamp(2rem, 4.1vw, 3rem);
+      line-height: 1.06;
+    }
+    .cinematic-hero .card-right-text,
+    .cinematic-hero .optional-feedback-copy {
+      display: none !important;
+    }
+    .cinematic-hero .ipad-stage { width: min(100%, 620px) !important; }
+  }
+
+  @media (min-width: 1200px) {
+    .cinematic-hero .ipad-stage { width: min(600px, 100%) !important; }
+  }
+
   @media (max-width: 374px), (max-height: 720px) {
     .cinematic-hero .hero-card-grid { gap: 0.65rem; padding: 0.75rem; }
     .cinematic-hero .main-card {
@@ -277,10 +303,10 @@ export function CinematicHero({
       scrollTl
         .to([".hero-text-wrapper", ".bg-grid-theme"], { scale: 1.15, filter: "blur(20px)", opacity: 0.2, ease: "power2.inOut", duration: 2 }, 0)
         .to(".main-card", { y: 0, ease: "power3.inOut", duration: 2 }, 0)
-        .to(".main-card", { width: isMobile ? "94vw" : "100%", height: isMobile ? "86dvh" : "100%", borderRadius: isMobile ? "28px" : "0px", ease: "power3.inOut", duration: 1.5 })
+        .to(".main-card", { width: isMobile ? "94vw" : "100%", height: isMobile ? "86dvh" : "100%", borderRadius: isMobile ? "28px" : "0px", ease: "power3.inOut", duration: 2 }, 0)
         .fromTo(".mockup-scroll-wrapper",
           { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
-          { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 2.5 }, "-=0.8"
+          { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 2.5 }, 1.65
         )
         .fromTo(".phone-widget", { y: 40, autoAlpha: 0, scale: 0.95 }, { y: 0, autoAlpha: 1, scale: 1, stagger: 0.15, ease: "back.out(1.2)", duration: 1.5 }, "-=1.5")
         .to(".progress-ring", { strokeDashoffset: 60, duration: 2, ease: "power3.inOut" }, "-=1.2")
