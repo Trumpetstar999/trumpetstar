@@ -197,10 +197,7 @@ export function CinematicHero({
   taglineHighlight = "kinderleicht.",
   cardHeading = "440+ Mitspielvideos. 24+ Levels.",
   cardDescription = (
-    <>
-      Vom ersten Ton bis zum Konzertstück – mit Mario Schulter, KI-Coach Tim und der
-      gamifizierten Starmethode. Üben wird zum Spiel.
-    </>
+    <>Vom ersten Ton bis zum Konzertstück. Üben wird zum Spiel.</>
   ),
   metricValue = 440,
   metricLabel = "Mitspielvideos",
@@ -369,14 +366,14 @@ export function CinematicHero({
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
               <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
-            <h2 className="text-card-silver-matte text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
+            <h2 className="text-card-silver-matte text-xl md:text-3xl lg:text-4xl font-bold leading-tight">
               {cardHeading}
             </h2>
             <p className="text-white/65 text-sm md:text-base leading-relaxed">
               {cardDescription}
             </p>
-            <p className="optional-feedback-copy text-white/55 text-xs md:text-sm leading-relaxed">
-              Optional auch mit persönlichem Feedback von ausgebildeten Trompetenlehrern.
+            <p className="optional-feedback-copy hidden md:block text-white/55 text-xs md:text-sm leading-relaxed">
+              Optional mit Feedback von ausgebildeten Trompetenlehrern.
             </p>
           </div>
 
@@ -450,7 +447,7 @@ export function CinematicHero({
           </div>
 
           {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
-          <div className="card-right-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
+          <div className="card-right-text hidden md:flex md:col-span-3 min-w-0 flex-col justify-center space-y-3 md:space-y-4">
             <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
             <ul className="space-y-2 text-xs md:text-sm text-white/80">
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Strukturiert in 24+ Levels</span></li>
