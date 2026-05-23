@@ -316,13 +316,14 @@ export function CinematicHero({
         <div className="card-sheen" />
 
         {/* Card content grid */}
-        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-6 p-6 md:p-12">
+        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
           {/* LEFT TEXT */}
-          <div className="card-left-text md:col-span-3 flex flex-col justify-center space-y-4">
+          <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
+
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
               <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
-            <h2 className="text-card-silver-matte text-3xl md:text-4xl font-bold leading-tight">
+            <h2 className="text-card-silver-matte text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               {cardHeading}
             </h2>
             <p className="text-white/65 text-sm md:text-base leading-relaxed">
@@ -334,17 +335,18 @@ export function CinematicHero({
           </div>
 
           {/* iPAD LANDSCAPE MOCKUP */}
-          <div className="mockup-scroll-wrapper md:col-span-6 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
+          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
             <div
               ref={mockupRef}
               className="iphone-bezel relative"
               style={{
-                width: "min(640px, 95%)",
+                width: "min(540px, 100%)",
                 aspectRatio: "4 / 3",
-                borderRadius: "28px",
+                borderRadius: "26px",
                 transformStyle: "preserve-3d",
               }}
             >
+
               {/* Camera dot */}
               <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
               {/* Screen */}
@@ -379,38 +381,39 @@ export function CinematicHero({
             </div>
 
             {/* Floating badges */}
-            <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:top-2 md:left-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Star className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">4,9 ★</span>
               <span className="text-white/50">Bewertung</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:right-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Users className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">500+</span>
               <span className="text-white/50">Schüler:innen</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:-bottom-4 md:-left-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:bottom-2 md:left-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white font-semibold">30 Tage</span>
               <span className="text-white/50">Geld-zurück</span>
             </div>
-            <div className="floating-badge floating-ui-badge absolute -bottom-2 right-2 md:-bottom-4 md:-right-8 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
+            <div className="floating-badge floating-ui-badge absolute -bottom-2 right-2 md:-bottom-4 md:right-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
               <Smartphone className="w-4 h-4 text-[#FFCC00]" />
               <span className="text-white/80">iOS · Android · Web</span>
             </div>
           </div>
 
           {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
-          <div className="card-right-text md:col-span-3 flex flex-col justify-center space-y-4">
+          <div className="card-right-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
             <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
-            <ul className="space-y-2.5 text-sm md:text-base text-white/80">
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Strukturiert in 24+ Levels</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Playbacks für Bb, C, Horn F/Es</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> KI-Coach Tim & NoteRunner-Spiel</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> 8 Notenhefte inklusive</li>
-              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5">●</span> Optional: Feedback vom Trompetenlehrer</li>
+            <ul className="space-y-2 text-xs md:text-sm text-white/80">
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Strukturiert in 24+ Levels</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Playbacks für Bb, C, Horn F/Es</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>KI-Coach Tim & NoteRunner-Spiel</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>8 Notenhefte inklusive</span></li>
+              <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Optional: Feedback vom Trompetenlehrer</span></li>
             </ul>
           </div>
+
         </div>
       </div>
 
