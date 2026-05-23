@@ -671,40 +671,43 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════
             SECTION 7 — FAQ
         ══════════════════════════════════════ */}
-        <section className="max-w-2xl mx-auto px-5 py-16 border-t border-white/10">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">Häufige Fragen</h2>
-          <p className="text-center text-white/55 text-sm mb-10">Alles Wichtige auf einen Blick</p>
-          <div className="space-y-3">
-            {FAQS.map(({ q, a }, i) => (
-              <div
-                key={q}
-                className="bg-white/[0.08] border border-white/[0.12] rounded-xl overflow-hidden"
-              >
-                <button
-                  type="button"
-                  className="w-full flex items-center justify-between px-6 py-4 text-left"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <span className="text-white font-semibold text-sm pr-4">{q}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-white/50 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
-                  />
-                </button>
+        <section className="bg-gradient-to-b from-white to-slate-50">
+          <div className="max-w-2xl mx-auto px-5 py-20">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 text-center mb-3">Häufige Fragen</h2>
+            <p className="text-center text-slate-500 text-sm mb-10">Alles Wichtige auf einen Blick</p>
+            <div className="space-y-3">
+              {FAQS.map(({ q, a }, i) => (
                 <div
-                  style={{
-                    maxHeight: openFaq === i ? '300px' : '0px',
-                    overflow: 'hidden',
-                    transition: 'max-height 0.25s ease',
-                  }}
+                  key={q}
+                  className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm"
                 >
-                  <div className="px-6 pb-5 text-white/65 text-sm leading-relaxed">
-                    {a}
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  >
+                    <span className="text-slate-900 font-semibold text-sm pr-4">{q}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  <div
+                    style={{
+                      maxHeight: openFaq === i ? '300px' : '0px',
+                      overflow: 'hidden',
+                      transition: 'max-height 0.25s ease',
+                    }}
+                  >
+                    <div className="px-6 pb-5 text-slate-600 text-sm leading-relaxed">
+                      {a}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 8 — FINAL CTA
