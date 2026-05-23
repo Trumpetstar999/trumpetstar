@@ -543,3 +543,32 @@ input[type="range"]:focus {
 .lp-icon-pop { transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
 .lp-hover-lift:hover .lp-icon-pop,
 .group:hover .lp-icon-pop { transform: scale(1.12) rotate(-4deg); }
+
+/* Premium frame for landing-page screenshots — dezent, kein Mouse-Tilt */
+.lp-premium-frame {
+  position: relative;
+  padding: 6px;
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, #162C6D 0%, #0A101D 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 30px 70px -20px rgba(0, 0, 0, 0.55),
+    0 12px 28px -14px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.18),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55);
+  isolation: isolate;
+}
+.lp-premium-frame > * {
+  border-radius: calc(1.25rem - 6px);
+  overflow: hidden;
+}
+.lp-premium-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(600px circle at 20% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 45%);
+  mix-blend-mode: screen;
+  z-index: 2;
+}
