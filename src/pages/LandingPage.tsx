@@ -712,7 +712,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════
             SECTION 8 — FINAL CTA
         ══════════════════════════════════════ */}
-        <section className="max-w-2xl mx-auto px-5 pb-24">
+        <section className="max-w-2xl mx-auto px-5 pt-20 pb-24">
           <div className="bg-white/[0.07] border border-white/[0.12] rounded-3xl p-10 md:p-14 text-center">
             <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-4">
               Starte noch heute
