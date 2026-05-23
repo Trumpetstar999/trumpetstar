@@ -158,7 +158,11 @@ export function SEOPageLayout({ children, title, description, canonicalPath, art
                 <Link to="/app">{t('auth.toApp')}</Link>
               </Button>
             ) : (
-              <Button size="sm" className="bg-white/15 hover:bg-white/25 text-white border border-white/20" asChild>
+              <Button
+                size="sm"
+                asChild
+                className="lp-login-gold relative overflow-hidden font-bold text-slate-900 border-0 bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,50%)] shadow-lg shadow-yellow-500/40 hover:shadow-yellow-400/60 transition-all hover:-translate-y-0.5"
+              >
                 <Link to="/login">{t('auth.login')}</Link>
               </Button>
             )}

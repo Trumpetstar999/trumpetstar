@@ -572,3 +572,27 @@ input[type="range"]:focus {
   mix-blend-mode: screen;
   z-index: 2;
 }
+
+/* Animated gold login button in header */
+@keyframes lp-gold-pulse {
+  0%, 100% { box-shadow: 0 6px 18px -2px rgba(234,179,8,0.55), 0 0 0 0 rgba(234,179,8,0.55); }
+  50%      { box-shadow: 0 10px 24px -2px rgba(234,179,8,0.75), 0 0 0 8px rgba(234,179,8,0); }
+}
+.lp-login-gold {
+  animation: lp-gold-pulse 2.4s ease-in-out infinite;
+  position: relative;
+}
+.lp-login-gold::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 60%; height: 100%;
+  background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  animation: lp-gold-shine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes lp-gold-shine {
+  0%, 60% { left: -120%; }
+  80%, 100% { left: 130%; }
+}
