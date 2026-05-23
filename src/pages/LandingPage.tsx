@@ -21,6 +21,7 @@ import shotGame from '@/assets/screenshots/game.webp';
 import shotCoach from '@/assets/screenshots/coach.webp';
 import shotAudios from '@/assets/screenshots/audios.webp';
 import shotProfil from '@/assets/screenshots/profil.webp';
+import testimonialsImg from '@/assets/testimonials-real.png';
 import { useLanguage } from '@/hooks/useLanguage';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
@@ -70,7 +71,7 @@ const AUDIENCE_CONTENT = {
   default: {
     badge: '🎺 Für Anfänger, Kinder & Erwachsene',
     headline: 'Trompete lernen? Kinderleicht – auch für Erwachsene!',
-    sub: 'Mit 300+ Lernvideos, echten Playbacks und dem KI-Coach Toni lernst du strukturiert von zuhause aus – mit optionalem, persönlichem Feedback von Mario Schulter.',
+    sub: '440+ Lernvideos mit optionalem Feedback von ausgebildeten Trompetenlehrern.',
     cta: 'Jetzt starten',
     ctaHref: null,
     stats: [
@@ -289,29 +290,6 @@ export default function LandingPage() {
             <img src={trumpetstarLogo} alt="Trumpetstar" className="h-14 w-auto drop-shadow-lg" />
           </div>
 
-          {/* Audience toggle */}
-          <div className="flex justify-center gap-2 mb-8">
-            <button
-              onClick={() => setAudience(audience === 'child' ? null : 'child')}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
-                audience === 'child'
-                  ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-md'
-                  : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
-              }`}
-            >
-              👨‍👧 Für mein Kind
-            </button>
-            <button
-              onClick={() => setAudience(audience === 'adult' ? null : 'adult')}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all ${
-                audience === 'adult'
-                  ? 'bg-[hsl(var(--reward-gold))] text-slate-900 border-transparent shadow-md'
-                  : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20'
-              }`}
-            >
-              🎺 Für mich selbst
-            </button>
-          </div>
 
           {/* Two-column hero */}
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
@@ -402,20 +380,21 @@ export default function LandingPage() {
                     </p>
                   </div>
                 </div>
+              </div>
 
-                <div className="absolute top-3 right-3 flex gap-1.5">
-                  {SCREENSHOTS.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      aria-label={`Screen ${i + 1}`}
-                      onClick={(e) => { e.stopPropagation(); setSlideIdx(i); }}
-                      className={`h-1.5 rounded-full transition-all ${
-                        i === slideIdx ? 'w-5 bg-[hsl(var(--reward-gold))]' : 'w-1.5 bg-white/40 hover:bg-white/70'
-                      }`}
-                    />
-                  ))}
-                </div>
+              {/* Dots BELOW the image */}
+              <div className="flex justify-center gap-2 mt-4">
+                {SCREENSHOTS.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Screen ${i + 1}`}
+                    onClick={() => setSlideIdx(i)}
+                    className={`h-2 rounded-full transition-all ${
+                      i === slideIdx ? 'w-6 bg-[hsl(var(--reward-gold))]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
 
@@ -623,32 +602,27 @@ export default function LandingPage() {
         </section>
 
         {/* ══════════════════════════════════════
-            SECTION 5 — TESTIMONIALS
+            SECTION 5 — TESTIMONIALS (echte Amazon-Rezensionen & Junior-Stars)
         ══════════════════════════════════════ */}
-        <section className="max-w-5xl mx-auto px-5 py-16 border-t border-white/10">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">Was unsere Schüler:innen sagen</h2>
-          <div className="flex items-center justify-center gap-1 mb-10">
-            {[1,2,3,4,5].map(i => (
-              <Star key={i} className="w-4 h-4 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
-            ))}
-            <span className="text-white/50 text-sm ml-2">4,9 von 5 · 500+ Schüler:innen</span>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {TESTIMONIALS.map(({ quote, name, role, stars }) => (
-              <div key={name} className="bg-white/[0.08] border border-white/[0.12] rounded-2xl p-6 flex flex-col gap-4">
-                <div className="flex gap-0.5">
-                  {Array.from({ length: stars }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
-                  ))}
-                </div>
-                <p className="text-white/80 text-sm leading-relaxed flex-1">„{quote}"</p>
-                <div className="border-t border-white/10 pt-3">
-                  <p className="text-white font-semibold text-sm">{name}</p>
-                  <p className="text-white/45 text-xs">{role}</p>
-                </div>
+        <section className="bg-white">
+          <div className="max-w-7xl mx-auto px-5 py-20">
+            <div className="text-center mb-10">
+              <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-3">Echte Stimmen</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Was Schüler:innen & Eltern sagen</h2>
+              <div className="flex items-center justify-center gap-1">
+                {[1,2,3,4,5].map(i => (
+                  <Star key={i} className="w-4 h-4 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
+                ))}
+                <span className="text-slate-500 text-sm ml-2">4,9 von 5 · 500+ Schüler:innen</span>
               </div>
-            ))}
+            </div>
+            <img
+              src={testimonialsImg}
+              alt="Echte Amazon-Rezensionen und Junior-Stars aus der Trumpetstar-Community"
+              loading="lazy"
+              decoding="async"
+              className="w-full h-auto rounded-2xl shadow-xl shadow-slate-900/10 border border-slate-200"
+            />
           </div>
         </section>
 
