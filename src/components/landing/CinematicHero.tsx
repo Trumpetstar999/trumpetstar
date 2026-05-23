@@ -335,17 +335,18 @@ export function CinematicHero({
           </div>
 
           {/* iPAD LANDSCAPE MOCKUP */}
-          <div className="mockup-scroll-wrapper md:col-span-6 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
+          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
             <div
               ref={mockupRef}
               className="iphone-bezel relative"
               style={{
-                width: "min(640px, 95%)",
+                width: "min(540px, 100%)",
                 aspectRatio: "4 / 3",
-                borderRadius: "28px",
+                borderRadius: "26px",
                 transformStyle: "preserve-3d",
               }}
             >
+
               {/* Camera dot */}
               <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
               {/* Screen */}
