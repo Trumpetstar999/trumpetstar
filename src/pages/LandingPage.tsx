@@ -302,18 +302,8 @@ export default function LandingPage() {
     >
       <FAQSchema faqs={landingFaqs} />
 
-      {/* ══════════════════════════════════════
-          CINEMATIC HERO (GSAP scroll-pinned)
-          Nur Safari Desktop — alle anderen Browser/Geräte ausblenden
-      ══════════════════════════════════════ */}
-      {isSafariDesktop() && (
-        <CinematicHero
-          logoSrc={trumpetstarLogo}
-          screenshotSrc={shotLevels}
-          onPrimaryCta={() => handleCta(null)}
-          onSecondaryCta={() => navigate('/pricing')}
-        />
-      )}
+      {/* Animierter Cinematic-Hero wurde global deaktiviert */}
+
 
 
       <div style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }} className="min-h-screen">
