@@ -442,14 +442,8 @@ export default function LandingPage() {
 
                     {/* Text */}
                     <div className="w-full md:w-1/2">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[hsl(var(--reward-gold))] flex items-center justify-center shadow-lg shadow-yellow-500/40">
-                          <span className="text-slate-900 font-extrabold text-lg">{String(i + 1).padStart(2, '0')}</span>
-                        </div>
-                        <span className="text-slate-400 font-mono text-sm tracking-widest">
-                          {String(i + 1).padStart(2, '0')} / {SCREENSHOTS.length.toString().padStart(2, '0')}
-                        </span>
-                      </div>
+                      <div className="w-12 h-1 rounded-full bg-[hsl(var(--reward-gold))] mb-5" />
+
                       <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3 leading-tight">{s.title}</h3>
                       <p className="text-slate-600 text-base leading-relaxed">{s.desc}</p>
                     </div>
