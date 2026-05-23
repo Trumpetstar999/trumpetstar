@@ -197,10 +197,7 @@ export function CinematicHero({
   taglineHighlight = "kinderleicht.",
   cardHeading = "440+ Mitspielvideos. 24+ Levels.",
   cardDescription = (
-    <>
-      Vom ersten Ton bis zum Konzertstück – mit Mario Schulter, KI-Coach Tim und der
-      gamifizierten Starmethode. Üben wird zum Spiel.
-    </>
+    <>Vom ersten Ton bis zum Konzertstück. Üben wird zum Spiel.</>
   ),
   metricValue = 440,
   metricLabel = "Mitspielvideos",
