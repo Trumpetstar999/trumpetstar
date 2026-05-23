@@ -447,7 +447,7 @@ export function CinematicHero({
           </div>
 
           {/* RIGHT TEXT — USP-Liste (kein Duplikat) */}
-          <div className="card-right-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
+          <div className="card-right-text hidden md:flex md:col-span-3 min-w-0 flex-col justify-center space-y-3 md:space-y-4">
             <p className="text-white/60 text-xs uppercase tracking-widest">Was drinsteckt</p>
             <ul className="space-y-2 text-xs md:text-sm text-white/80">
               <li className="flex items-start gap-2"><span className="text-[#FFCC00] mt-0.5 shrink-0">●</span> <span>Strukturiert in 24+ Levels</span></li>
