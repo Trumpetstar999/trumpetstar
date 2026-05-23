@@ -1,47 +1,46 @@
 ## Ziel
 
-Den Cinematic Hero (GSAP scroll-pinned Animation mit iPad-Mockup) ganz oben auf der Landingpage integrieren — mit echten Trumpetstar-Inhalten, Logo und Screenshots aus dem Projekt. Bestehende Sections bleiben unverändert darunter.
+Die Hintergrundfarben des neuen `CinematicHero` von dunkel (#06080F / #0A101D / #162C6D) auf die offiziellen Trumpetstar-Brand-Farben umstellen, damit der Hero nahtlos in die restliche Landingpage passt.
 
-## Inhalte (Trumpetstar-spezifisch)
+## Trumpetstar Brand-Farben (aus `src/index.css`)
 
-- **Brand**: Trumpetstar (Logo aus `@/assets/trumpetstar-logo.png`)
-- **Tagline oben**: "Trompete lernen," / "kinderleicht."
-- **Card-Headline**: "440+ Mitspielvideos. 24+ Levels."
-- **Card-Beschreibung**: "Vom ersten Ton bis zum Konzertstück – mit Mario Schulter, KI-Coach Tim und der gamifizierten Starmethode."
-- **Metric**: `440` mit Label "Mitspielvideos"
-- **Floating Badges** rund ums iPhone-Mockup (echte USPs):
-  - "4,9 ★ Bewertung"
-  - "500+ Schüler:innen"
-  - "30 Tage Geld-zurück"
-  - "iOS · Android · Web"
-- **iPhone-Screen** zeigt `shotLevels.webp` (statt generischem Mockup) mit overlay-Widget "Wochenfortschritt"
-- **CTA-Ende**: "Starte heute mit Trompete." → Button "Jetzt kostenlos starten" (→ `/auth`) + "Pro ansehen" (→ `/pricing`)
+- `--brand-blue-start`: `#1E86FF` (oben)
+- `--brand-blue-mid`: `#0F5EDB` (mitte)
+- `--brand-blue-end`: `#0B2E8A` (unten/tief)
+- `--reward-gold`: `#FFCC00` (Akzent, bleibt)
 
-## Technische Umsetzung
+## Änderungen in `src/components/landing/CinematicHero.tsx`
 
-1. **Install**: `bun add gsap` (ScrollTrigger ist Teil des Pakets)
-2. **Neue Datei**: `src/components/landing/CinematicHero.tsx`
-  - Übernimmt das Template, bereinigt die im Snippet kaputten JSX-Stellen (Description-String, JSX-Return-Body fehlt im Snippet)
-  - Baut vollständigen JSX-Tree: `containerRef` Wrapper (h-screen, sticky), `.hero-text-wrapper` mit `tagline1 / tagline2 / text-days`, `.main-card` Wrapper mit linkem Textblock, mittigem iPhone-Mockup (`.iphone-bezel` + `.screen-glare` + Bild + `.phone-widget` mit `progress-ring` SVG + `counter-val`), rechtem Textblock, `.floating-badge` Elementen absolut positioniert, `.cta-wrapper` als Endzustand
-  - Mouse-parallax + GSAP Timeline exakt wie im Snippet (pin, scrub, 7000px scroll length)
-  - Inject-Styles via `<style>{INJECTED_STYLES}</style>` im Root
-  - Verwendet semantische Tokens wo möglich, behält Hardcoded-Werte nur in der `.premium-depth-card`/`.iphone-bezel` (Skeuomorphismus erfordert es)
-3. **Integration in `src/pages/LandingPage.tsx**`:
-  - Import `CinematicHero` und einbinden ganz oben, **vor** der bisherigen Hero-Section
-  - Props: `brandName`, `tagline1`, `tagline2`, `cardHeading`, `cardDescription`, `metricValue={440}`, `metricLabel`, `ctaHeading`, `ctaDescription`, plus neue `screenshotSrc` (für iPhone) und `onPrimaryCta` / `onSecondaryCta` Handler die zu `/auth` bzw. `/pricing` navigieren
-  - Bestehender Hero-Slider/Sections bleiben unverändert darunter
-4. **Performance**: Lazy-load Screenshots; ScrollTrigger cleanup via `ctx.revert()` (bereits im Snippet)
-5. **Responsiveness**: Snippet hat bereits `isMobile` Branching; iPad-first beachten (>768px = Desktop-Layout)
+1. **Outer Container Background**
+   - Von: `bg-[#06080F]`
+   - Nach: vertikaler Gradient `linear-gradient(180deg, #1E86FF 0%, #0F5EDB 40%, #0B2E8A 100%)` (identisch zur Landingpage-Section darunter → fließender Übergang)
 
-## Hinweise
+2. **`.premium-depth-card` Hintergrund**
+   - Von: `linear-gradient(145deg, #162C6D 0%, #0A101D 100%)`
+   - Nach: `linear-gradient(145deg, #0F5EDB 0%, #0B2E8A 100%)` (Brand-Blau Mid → End)
+   - Shadows/insets bleiben für 3D-Tiefe erhalten
 
-- Das Snippet im Prompt enthält Truncierungen (z.B. abgebrochene `cardDescription`-Default, leerer Return-Block, `@/components/ui/cinematic-landing-hero";` Fragment). Ich rekonstruiere den vollständigen, lauffähigen JSX-Baum gemäß GSAP-Timeline-Selektoren (`.text-track`, `.text-days`, `.main-card`, `.mockup-scroll-wrapper`, `.phone-widget`, `.floating-badge`, `.card-left-text`, `.card-right-text`, `.cta-wrapper`, `.counter-val`, `.progress-ring`).
-- GSAP ist gratis (Standard-Plugins inkl. ScrollTrigger). Kein zusätzlicher Lizenz-/Secret-Bedarf.
-- Dark Glassmorphism + Gold passt zur bestehenden Brand; die Hardcoded Card-Dunkelheit ist mit der Trumpetstar-Optik kompatibel.
+3. **iPhone-Screen Innenraum**
+   - Von: `bg-[#0A101D]`
+   - Nach: `bg-[#0B2E8A]` (Brand-Blau End) — falls Screenshot lädt, kaum sichtbar, sonst markenkonform
 
-## Was sich ändert
+4. **Widget-Depth (Progress-Ring Overlay)**
+   - Von: `rgba(20,30,60,...)` → `rgba(10,15,30,...)`
+   - Nach: passend zum Brand-Blue End: `rgba(11,46,138,0.85) → rgba(15,94,219,0.85)`
 
-- ✅ Neu: `src/components/landing/CinematicHero.tsx`
-- ✅ Edit: `src/pages/LandingPage.tsx` (Hero ganz oben einbinden)
-- ✅ Dep: `gsap` hinzugefügt
-- ❌ Keine Änderung an bestehenden Sections, Routing, Backend
+5. **Akzent-Gold** in `text-gold-matte`, Floating-Badge-Icons, CTA-Button und Bullet-Points
+   - Von: `#C9A24C` / `#FFE9A8`
+   - Nach: `#FFCC00` (reward-gold) bzw. Gradient `#FFE066 → #FFCC00` für den Light-Button — passt exakt zur Trumpetstar Gold-Belohnungsfarbe
+
+6. **`.bg-grid-theme`** Grid-Linien: heller machen, da Hintergrund jetzt blau (`rgba(255,255,255,0.10)` statt `0.06`)
+
+## Was unverändert bleibt
+
+- GSAP-Animationen, Timeline, Layout, Inhalte
+- iPhone-Bezel (`#111` / `#52525B`) — Hardware soll realistisch dunkel bleiben
+- Skeuomorphismus-Schatten und Inset-Highlights
+
+## Dateien
+
+- ✅ Edit: `src/components/landing/CinematicHero.tsx` (nur CSS-Werte im `INJECTED_STYLES`-Block + 2 inline Tailwind-Klassen)
+- ❌ Keine Änderung an `LandingPage.tsx`, Tokens oder anderen Komponenten
