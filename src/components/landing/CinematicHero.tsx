@@ -44,8 +44,17 @@ const INJECTED_STYLES = `
   }
 
   @media (max-width: 374px), (max-height: 720px) {
-    .cinematic-hero .ipad-stage { width: min(100%, 305px) !important; }
+    .cinematic-hero .hero-card-grid { gap: 0.65rem; padding: 0.75rem; }
+    .cinematic-hero .main-card {
+      top: calc(50% + 26px) !important;
+      height: 82dvh !important;
+    }
+    .cinematic-hero .card-left-text h2 { font-size: 1.28rem; }
+    .cinematic-hero .card-left-text p { font-size: 0.78rem; }
+    .cinematic-hero .ipad-stage { width: min(100%, 285px) !important; }
     .cinematic-hero .optional-feedback-copy { display: none; }
+    .cinematic-hero .card-right-text ul { gap: 0.35rem; }
+    .cinematic-hero .card-right-text li:nth-child(n+4) { display: none; }
   }
 
   .cinematic-hero .bg-grid-theme {
