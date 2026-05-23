@@ -13,6 +13,7 @@ import {
 import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
 import { FAQSchema } from '@/components/SEO';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import bekanntAus from '@/assets/bekannt-aus.png';
 import appPreview from '@/assets/app-preview.jpg';
 import shotLevels from '@/assets/screenshots/levels.webp';
 import shotNoten from '@/assets/screenshots/noten.webp';
