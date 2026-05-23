@@ -88,7 +88,7 @@ export function PricingPage() {
               <CardContent className="p-6">
                 <Quote className="w-6 h-6 text-primary/60 mb-3" />
                 <p className="text-white/80 text-sm italic mb-4">
-                  „Mein Sohn hat in 3 Monaten mehr gelernt als in einem Jahr Musikschule. Die Videos sind super erklärt und das Übungsspiel motiviert enorm!"
+                  „Mein Sohn spielt mit Trumpetstar jetzt wieder viel motivierter Trompete. Die Videos sind super und die Tempoänderungsfunktion hilft toll beim Üben."
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold">SK</div>
