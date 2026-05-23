@@ -332,23 +332,14 @@ export default function LandingPage() {
                 {ac.sub}
               </p>
 
-              {/* Stats row */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
-                {ac.stats.map(({ value, label }) => (
-                  <div key={label} className="text-center">
-                    <div className="text-2xl font-extrabold text-[hsl(var(--reward-gold))]">{value}</div>
-                    <div className="text-white/55 text-xs">{label}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
                 <Button
                   size="lg"
                   onClick={() => handleCta(null)}
                   className="h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2"
                 >
-                  Jetzt kostenlos starten <ArrowRight className="w-5 h-5" />
+                  Jetzt anmelden <ArrowRight className="w-5 h-5" />
                 </Button>
                 {audience && ac.ctaHref && (
                   <Button
@@ -362,51 +353,75 @@ export default function LandingPage() {
                 )}
               </div>
 
-              {/* Trust bar */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-2 mt-5">
-                {[
-                  { icon: Trophy,      label: 'Bekannt aus „2 Minuten 2 Millionen"', color: 'text-[hsl(var(--reward-gold))]' },
-                  { icon: Star,        label: '4,9 / 5 Bewertung',                   color: 'text-[hsl(var(--reward-gold))]' },
-                  { icon: Shield,      label: '30 Tage Garantie',                     color: 'text-emerald-400' },
-                  { icon: CheckCircle, label: '500+ Schüler:innen',                  color: 'text-emerald-400' },
-                ].map(({ icon: Icon, label, color }) => (
-                  <span
-                    key={label}
-                    className="inline-flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/90 text-xs font-medium px-3 py-1.5 rounded-full"
-                  >
-                    <Icon className={`w-3.5 h-3.5 shrink-0 ${color}`} />
-                    {label}
-                  </span>
-                ))}
+              {/* Slim trust line */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-white/70 text-xs">
+                <span className="inline-flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))] fill-[hsl(var(--reward-gold))]" />
+                  4,9 / 5 · 500+ Schüler:innen
+                </span>
+                <span className="hidden sm:inline text-white/25">·</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                  30 Tage Geld-zurück
+                </span>
+                <span className="hidden sm:inline text-white/25">·</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-[hsl(var(--reward-gold))]" />
+                  Bekannt aus „2 Min 2 Mio"
+                </span>
               </div>
 
             </div>
 
-            {/* RIGHT – App preview (visible on all screens) */}
-            <div className="w-full max-w-xs mx-auto md:max-w-md lg:flex-1 lg:max-w-none">
+            {/* RIGHT – Slideshow of real app screens */}
+            <div className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
               <div
                 onClick={() => handleCta(null)}
-                className="relative cursor-pointer group"
+                className="relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)]"
                 aria-label="App starten"
+                role="button"
               >
-                <img
-                  src={appPreview}
-                  alt="Trumpetstar App – Vorschau"
-                  className="w-full rounded-2xl transition-transform duration-300 group-hover:scale-[1.02] drop-shadow-2xl"
-                />
-                <div className="absolute inset-0 flex-col items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 backdrop-blur-sm gap-3 hidden md:flex">
-                  <Button
-                    size="lg"
-                    className="h-12 px-8 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl gap-2 pointer-events-none"
-                  >
-                    Jetzt anmelden <ArrowRight className="w-5 h-5" />
-                  </Button>
+                <div className="relative aspect-[16/9] w-full">
+                  {SCREENSHOTS.map((s, i) => (
+                    <img
+                      key={s.title}
+                      src={s.src}
+                      alt={s.title}
+                      loading={i === 0 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      width={1280}
+                      className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-700 ${
+                        i === slideIdx ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
+
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/40 to-transparent p-4 sm:p-5">
+                    <p className="text-white font-semibold text-sm sm:text-base drop-shadow">
+                      {SCREENSHOTS[slideIdx].title}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="absolute top-3 right-3 flex gap-1.5">
+                  {SCREENSHOTS.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`Screen ${i + 1}`}
+                      onClick={(e) => { e.stopPropagation(); setSlideIdx(i); }}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === slideIdx ? 'w-5 bg-[hsl(var(--reward-gold))]' : 'w-1.5 bg-white/40 hover:bg-white/70'
+                      }`}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
 
           </div>
         </section>
+
 
         {/* ══════════════════════════════════════
             SECTION 1.5 — WAS DICH ERWARTET (Screenshots)
