@@ -24,6 +24,7 @@ import shotAudios from '@/assets/screenshots/audios.webp';
 import shotProfil from '@/assets/screenshots/profil.webp';
 import testimonialsImg from '@/assets/testimonials-real.png';
 import { useLanguage } from '@/hooks/useLanguage';
+import { CinematicHero } from '@/components/landing/CinematicHero';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
