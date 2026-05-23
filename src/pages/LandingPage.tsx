@@ -594,15 +594,28 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════
             SECTION 6 — TV BADGE + TEAM
         ══════════════════════════════════════ */}
-        <section className="max-w-3xl mx-auto px-5 py-10">
-          <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-[hsl(var(--reward-gold))]/40 rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <div className="text-5xl shrink-0 lp-icon-pop">📺</div>
-            <div>
-              <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-1">Bekannt aus dem TV</p>
-              <p className="text-white text-lg font-bold mb-1">„2 Minuten 2 Millionen" – die österreichische Startup-Show</p>
-              <p className="text-white/55 text-sm">
-                Trumpetstar wurde vor der Jury vorgestellt und überzeugte mit seinem innovativen Ansatz: Strukturierter Trompetenunterricht, der wirklich für zuhause funktioniert.
-              </p>
+        <section className="max-w-5xl mx-auto px-5 py-10">
+          <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-[hsl(var(--reward-gold))]/40 rounded-2xl p-7 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+              <div className="text-5xl shrink-0 lp-icon-pop">📺</div>
+              <div>
+                <p className="text-[hsl(var(--reward-gold))] font-bold text-xs uppercase tracking-widest mb-1">Bekannt aus dem TV</p>
+                <p className="text-white text-lg font-bold mb-1">„2 Minuten 2 Millionen" – die österreichische Startup-Show</p>
+                <p className="text-white/55 text-sm">
+                  Trumpetstar wurde vor der Jury vorgestellt und überzeugte mit seinem innovativen Ansatz: Strukturierter Trompetenunterricht, der wirklich für zuhause funktioniert.
+                </p>
+              </div>
+            </div>
+            <div className="relative w-full rounded-xl overflow-hidden border border-white/10 shadow-xl" style={{ aspectRatio: '16 / 9' }}>
+              <iframe
+                src="https://player.vimeo.com/video/737651716?title=0&byline=0&portrait=0"
+                title="Trumpetstar bei 2 Minuten 2 Millionen"
+                className="absolute inset-0 w-full h-full"
+                frameBorder={0}
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
             </div>
           </div>
         </section>
