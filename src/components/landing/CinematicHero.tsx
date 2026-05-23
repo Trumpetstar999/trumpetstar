@@ -387,7 +387,7 @@ export function CinematicHero({
         <div className="card-sheen" />
 
         {/* Card content grid */}
-        <div className="hero-card-grid relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
+        <div className="hero-card-grid relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10 text-center">
           {/* LEFT TEXT */}
           <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
 
