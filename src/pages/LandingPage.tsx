@@ -26,7 +26,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
-  { src: shotLevels,     title: '440+ Mitspielvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
+  { src: shotLevels,     title: '440+ Mitspielvideos in 24+ Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
   { src: shotNoten,      title: 'Noten mitlesen & üben',                desc: 'Synchrone Noten zum Mitspielen – mit Tempo-Regler, A–B-Loop und Grifftabelle direkt im Bild.' },
   { src: shotCoach,      title: 'Toni, dein KI-Trompeten-Coach',        desc: 'Fragen zu Griffen, Ansatz oder Technik? Toni antwortet in Echtzeit – mit Verlinkung zur passenden Übung.' },
   { src: shotGame,       title: 'NoteRunner – Notenlesen als Spiel',    desc: 'Spiele die richtige Note auf deiner Trompete – das Mikrofon erkennt jeden Ton in Echtzeit.' },
@@ -51,7 +51,7 @@ const AUDIENCE_CONTENT = {
     stats: [
       { value: '440+', label: 'Mitspielvideos' },
       { value: '55', label: 'Kinderlieder' },
-      { value: '11', label: 'Levels' },
+      { value: '24+', label: 'Levels' },
       { value: '5+', label: 'Jahre' },
     ],
   },
@@ -89,7 +89,7 @@ const FEATURES_CHILD = [
   { icon: Music2,    title: '55 bekannte Kinderlieder',            desc: 'Von Alle meine Entchen bis Bruder Jakob – Lieder, die Kinder kennen und lieben.' },
   { icon: Trophy,    title: 'Starmethode & Gamification',          desc: 'Sterne sammeln, Sticker kleben, Level aufsteigen – Kinder üben freiwillig und mit Begeisterung.' },
   { icon: Users,     title: '10 echte Trompeter:innen aufgenommen', desc: 'Virtuelle Ensemble-Erfahrung: Dein Kind spielt mit echten Profi-Mitspielern zusammen.' },
-  { icon: Target,    title: '11 Levels & 11 Musikstile',           desc: 'Von Pop bis Klassik – strukturierter Aufbau mit klar sichtbarem Fortschritt.' },
+  { icon: Target,    title: '24+ Levels & 11 Musikstile',           desc: 'Von Pop bis Klassik – strukturierter Aufbau mit klar sichtbarem Fortschritt.' },
   { icon: Smartphone,title: 'iOS & Android App inkl.',             desc: 'Auf Handy, Tablet und Browser – überall dabei, auch offline.' },
 ];
 
