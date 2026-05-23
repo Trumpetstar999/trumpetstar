@@ -122,10 +122,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   '440+ Mitspielvideos',
-  'Komplette Anfängerschule (Band 1)',
-  '55 Kinderlieder + Playbacks',
   'KI-Coach Tim (DE/EN/ES)',
-  'Persönliches Feedback vom Lehrer',
   'Fortschritt, Kalender & Erfolge',
   'Alle Levels & Übungen freigeschaltet',
   '30 Tage Geld-zurück-Garantie',
@@ -407,8 +404,8 @@ export default function LandingPage() {
                     type="button"
                     aria-label={`Screen ${i + 1}`}
                     onClick={() => setSlideIdx(i)}
-                    className={`h-2 rounded-full transition-all ${
-                      i === slideIdx ? 'w-6 bg-[hsl(var(--reward-gold))]' : 'w-2 bg-white/40 hover:bg-white/70'
+                    className={`h-2 w-2 rounded-full transition-all ${
+                      i === slideIdx ? 'bg-[hsl(var(--reward-gold))] scale-125' : 'bg-white/40 hover:bg-white/70'
                     }`}
                   />
                 ))}
