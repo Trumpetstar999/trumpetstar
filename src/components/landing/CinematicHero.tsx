@@ -11,6 +11,52 @@ if (typeof window !== "undefined") {
 const INJECTED_STYLES = `
   .cinematic-hero .gsap-reveal { visibility: hidden; }
 
+  @media (max-width: 767px) {
+    .cinematic-hero .hero-card-grid {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.85rem;
+      padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1rem, env(safe-area-inset-bottom, 0px));
+    }
+    .cinematic-hero .main-card {
+      width: 94vw !important;
+      height: 86dvh !important;
+      border-radius: 28px !important;
+    }
+    .cinematic-hero .card-left-text { gap: 0.6rem; }
+    .cinematic-hero .card-left-text h2 {
+      font-size: clamp(1.35rem, 6.4vw, 1.75rem);
+      line-height: 1.08;
+    }
+    .cinematic-hero .card-left-text p { line-height: 1.38; }
+    .cinematic-hero .ipad-stage { width: min(100%, 340px) !important; }
+    .cinematic-hero .ipad-bezel-mobile { border-radius: 20px !important; }
+    .cinematic-hero .ipad-screen-mobile { inset: 10px !important; border-radius: 13px !important; }
+    .cinematic-hero .floating-badge {
+      font-size: 11px;
+      gap: 0.35rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 0.8rem;
+    }
+    .cinematic-hero .phone-widget { display: none; }
+    .cinematic-hero .mobile-hide-badge { display: none; }
+  }
+
+  @media (max-width: 374px), (max-height: 720px) {
+    .cinematic-hero .hero-card-grid { gap: 0.65rem; padding: 0.75rem; }
+    .cinematic-hero .main-card {
+      top: calc(50% + 26px) !important;
+      height: 78dvh !important;
+    }
+    .cinematic-hero .card-left-text h2 { font-size: 1.28rem; }
+    .cinematic-hero .card-left-text p { font-size: 0.78rem; }
+    .cinematic-hero .mockup-scroll-wrapper { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .cinematic-hero .ipad-stage { width: min(100%, 285px) !important; }
+    .cinematic-hero .optional-feedback-copy { display: none; }
+    .cinematic-hero .card-right-text { display: none; }
+  }
+
   .cinematic-hero .bg-grid-theme {
     background-size: 60px 60px;
     background-image:
@@ -234,7 +280,7 @@ export function CinematicHero({
       scrollTl
         .to([".hero-text-wrapper", ".bg-grid-theme"], { scale: 1.15, filter: "blur(20px)", opacity: 0.2, ease: "power2.inOut", duration: 2 }, 0)
         .to(".main-card", { y: 0, ease: "power3.inOut", duration: 2 }, 0)
-        .to(".main-card", { width: "100%", height: "100%", borderRadius: "0px", ease: "power3.inOut", duration: 1.5 })
+        .to(".main-card", { width: isMobile ? "94vw" : "100%", height: isMobile ? "86dvh" : "100%", borderRadius: isMobile ? "28px" : "0px", ease: "power3.inOut", duration: 1.5 })
         .fromTo(".mockup-scroll-wrapper",
           { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
           { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 2.5 }, "-=0.8"
@@ -316,7 +362,7 @@ export function CinematicHero({
         <div className="card-sheen" />
 
         {/* Card content grid */}
-        <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
+        <div className="hero-card-grid relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 p-5 md:p-8 lg:p-10">
           {/* LEFT TEXT */}
           <div className="card-left-text md:col-span-3 min-w-0 flex flex-col justify-center space-y-3 md:space-y-4">
 
@@ -329,18 +375,18 @@ export function CinematicHero({
             <p className="text-white/65 text-sm md:text-base leading-relaxed">
               {cardDescription}
             </p>
-            <p className="text-white/55 text-xs md:text-sm leading-relaxed">
+            <p className="optional-feedback-copy text-white/55 text-xs md:text-sm leading-relaxed">
               Optional auch mit persönlichem Feedback von ausgebildeten Trompetenlehrern.
             </p>
           </div>
 
           {/* iPAD LANDSCAPE MOCKUP */}
-          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
+          <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative py-4 md:py-0" style={{ perspective: "1500px" }}>
             {/* iPad + badges share this relative wrapper so badges anchor to the iPad corners */}
-            <div className="relative" style={{ width: "min(540px, 100%)" }}>
+            <div className="ipad-stage relative" style={{ width: "min(540px, 100%)" }}>
               <div
                 ref={mockupRef}
-                className="iphone-bezel relative w-full"
+                className="iphone-bezel ipad-bezel-mobile relative w-full"
                 style={{
                   aspectRatio: "4 / 3",
                   borderRadius: "26px",
@@ -350,7 +396,7 @@ export function CinematicHero({
                 {/* Camera dot */}
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
                 {/* Screen */}
-                <div className="absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
+                <div className="ipad-screen-mobile absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
                   {screenshotSrc && (
                     <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover object-top" />
                   )}
@@ -381,22 +427,22 @@ export function CinematicHero({
               </div>
 
               {/* Floating badges — anchored to iPad corners, slightly outside */}
-              <div className="floating-badge floating-ui-badge absolute -top-3 -left-3 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute top-2 left-2 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Star className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">4,9 ★</span>
                 <span className="text-white/50 hidden sm:inline">Bewertung</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -top-3 -right-3 md:-top-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute top-2 right-2 md:-top-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Users className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">500+</span>
                 <span className="text-white/50 hidden sm:inline">Schüler:innen</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -bottom-3 -left-3 md:-bottom-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge absolute bottom-2 left-2 md:-bottom-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white font-semibold">30 Tage</span>
                 <span className="text-white/50 hidden sm:inline">Geld-zurück</span>
               </div>
-              <div className="floating-badge floating-ui-badge absolute -bottom-3 -right-3 md:-bottom-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+              <div className="floating-badge floating-ui-badge mobile-hide-badge absolute bottom-2 right-2 md:-bottom-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
                 <Smartphone className="w-4 h-4 text-[#FFCC00]" />
                 <span className="text-white/80">iOS · Android · Web</span>
               </div>
