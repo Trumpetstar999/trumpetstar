@@ -303,7 +303,8 @@ export function CinematicHero({
       scrollTl
         .to([".hero-text-wrapper", ".bg-grid-theme"], { scale: 1.15, filter: "blur(20px)", opacity: 0.2, ease: "power2.inOut", duration: 2 }, 0)
         .to(".main-card", { y: 0, ease: "power3.inOut", duration: 2 }, 0)
-        .to(".main-card", { width: isMobile ? "94vw" : "100%", height: isMobile ? "86dvh" : "100%", borderRadius: isMobile ? "28px" : "0px", ease: "power3.inOut", duration: 2 }, 0)
+        .to(".main-card", { width: isMobile ? "94vw" : "100vw", height: isMobile ? "86dvh" : "100vh", borderRadius: isMobile ? "28px" : "0px", ease: "power3.inOut", duration: 2 }, 0)
+
         .fromTo(".mockup-scroll-wrapper",
           { y: 300, z: -500, rotationX: 50, rotationY: -30, autoAlpha: 0, scale: 0.6 },
           { y: 0, z: 0, rotationX: 0, rotationY: 0, autoAlpha: 1, scale: 1, ease: "expo.out", duration: 2.5 }, 1.65
@@ -380,8 +381,9 @@ export function CinematicHero({
       <div
         ref={mainCardRef}
         className="main-card premium-depth-card absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-        style={{ width: "85vw", height: "70vh", borderRadius: "40px" }}
+        style={{ width: "100vw", height: "100vh", borderRadius: "0px" }}
       >
+
         <div className="card-sheen" />
 
         {/* Card content grid */}
