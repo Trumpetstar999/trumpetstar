@@ -492,8 +492,8 @@ export function CinematicHero({
 
       {/* FINAL CTA */}
       <div className="cta-wrapper absolute inset-0 flex flex-col items-center justify-center text-center px-6 z-20 pointer-events-none">
-        <div className="pointer-events-auto max-w-2xl">
-          <h2 className="text-3d-matte text-4xl md:text-6xl font-black leading-tight mb-4">
+        <div className="pointer-events-auto w-full max-w-4xl mx-auto">
+          <h2 className="text-3d-matte text-4xl md:text-6xl font-black leading-tight mb-4 md:whitespace-nowrap">
             {ctaHeading}
           </h2>
           <p className="text-white/70 text-base md:text-lg mb-8 whitespace-pre-line">
