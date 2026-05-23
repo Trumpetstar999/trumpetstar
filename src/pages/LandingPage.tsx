@@ -49,7 +49,7 @@ const AUDIENCE_CONTENT = {
     cta: 'Kurs für mein Kind ansehen',
     ctaHref: KIDS_COURSE_URL,
     stats: [
-      { value: '101', label: 'Lernvideos' },
+      { value: '440+', label: 'Mitspielvideos' },
       { value: '55', label: 'Kinderlieder' },
       { value: '11', label: 'Levels' },
       { value: '5+', label: 'Jahre' },
