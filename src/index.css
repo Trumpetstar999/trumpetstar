@@ -519,8 +519,10 @@ input[type="range"]:focus {
   will-change: transform;
 }
 .lp-img-zoom:hover img {
-  transform: scale(1.06);
+  transform: scale(1.02);
+  filter: brightness(1.03);
 }
+
 
 .lp-btn-shine {
   position: relative;
