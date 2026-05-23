@@ -230,7 +230,7 @@ export function CinematicHero({
   metricSub = "in 24+ Levels",
   screenshotSrc,
   ctaHeading = "Starte heute mit Trompete.",
-  ctaDescription = "Jederzeit kündbar. 30 Tage Geld-zurück-Garantie. Spielerisch von der ersten Minute an.",
+  ctaDescription = "Jederzeit kündbar.\n30 Tage Geld-zurück-Garantie. Spielerisch von der ersten Minute an.",
   primaryCtaLabel = "Jetzt kostenlos starten",
   secondaryCtaLabel = "Pro ansehen",
   onPrimaryCta,
@@ -496,7 +496,7 @@ export function CinematicHero({
           <h2 className="text-3d-matte text-4xl md:text-6xl font-black leading-tight mb-4">
             {ctaHeading}
           </h2>
-          <p className="text-white/70 text-base md:text-lg mb-8">
+          <p className="text-white/70 text-base md:text-lg mb-8 whitespace-pre-line">
             {ctaDescription}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
