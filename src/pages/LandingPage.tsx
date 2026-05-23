@@ -26,7 +26,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 
 /* ─── Screenshots: was dich in der App erwartet ─── */
 const SCREENSHOTS = [
-  { src: shotLevels,     title: '449 Lernvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
+  { src: shotLevels,     title: '440+ Mitspielvideos in 11 Levels',          desc: 'Vom ersten Ton bis zum Konzertstück – strukturiert aufgebaut und jederzeit durchsuchbar.' },
   { src: shotNoten,      title: 'Noten mitlesen & üben',                desc: 'Synchrone Noten zum Mitspielen – mit Tempo-Regler, A–B-Loop und Grifftabelle direkt im Bild.' },
   { src: shotCoach,      title: 'Toni, dein KI-Trompeten-Coach',        desc: 'Fragen zu Griffen, Ansatz oder Technik? Toni antwortet in Echtzeit – mit Verlinkung zur passenden Übung.' },
   { src: shotGame,       title: 'NoteRunner – Notenlesen als Spiel',    desc: 'Spiele die richtige Note auf deiner Trompete – das Mikrofon erkennt jeden Ton in Echtzeit.' },
@@ -85,7 +85,7 @@ const AUDIENCE_CONTENT = {
 
 /* ─── Features nach Zielgruppe ─── */
 const FEATURES_CHILD = [
-  { icon: Video,     title: '101 Lernvideos vom ersten Ton an',   desc: 'Professionell produziert, klar erklärt – damit Kinder ab der ersten Stunde mitspielen können.' },
+  { icon: Video,     title: '440+ Mitspielvideos vom ersten Ton an',   desc: 'Professionell produziert, klar erklärt – damit Kinder ab der ersten Stunde mitspielen können.' },
   { icon: Music2,    title: '55 bekannte Kinderlieder',            desc: 'Von Alle meine Entchen bis Bruder Jakob – Lieder, die Kinder kennen und lieben.' },
   { icon: Trophy,    title: 'Starmethode & Gamification',          desc: 'Sterne sammeln, Sticker kleben, Level aufsteigen – Kinder üben freiwillig und mit Begeisterung.' },
   { icon: Users,     title: '10 echte Trompeter:innen aufgenommen', desc: 'Virtuelle Ensemble-Erfahrung: Dein Kind spielt mit echten Profi-Mitspielern zusammen.' },
@@ -94,7 +94,7 @@ const FEATURES_CHILD = [
 ];
 
 const FEATURES_ADULT = [
-  { icon: Video,     title: '300+ Lern- & Mitspielvideos',         desc: 'Schritt-für-Schritt erklärt von Mario Schulter & Klemens Kollmann – klar, praxisnah, motivierend.' },
+  { icon: Video,     title: '440+ Mitspielvideos',         desc: 'Schritt-für-Schritt erklärt von Mario Schulter & Klemens Kollmann – klar, praxisnah, motivierend.' },
   { icon: Sparkles,  title: 'KI-Coach Tim',                        desc: 'Dein persönlicher KI-Assistent beantwortet Fragen, gibt Tipps und begleitet deinen Fortschritt.' },
   { icon: Mic2,      title: 'Persönliches Feedback',               desc: 'Kein anonymes System – echte Rückmeldung vom Lehrer-Team, direkt und menschlich.' },
   { icon: Clock,     title: '100% flexibel – kein fixer Termin',   desc: 'Lerne wann und wo du willst. Pause einlegen? Kein Problem. Dein Tempo, deine Regeln.' },
@@ -103,7 +103,7 @@ const FEATURES_ADULT = [
 ];
 
 const FEATURES_DEFAULT = [
-  { icon: Video,     title: '300+ professionelle Lernvideos',      desc: 'Klar erklärt, praxisnah aufgebaut. Kinder- und Erwachsenenpfad vollständig enthalten.' },
+  { icon: Video,     title: '440+ professionelle Mitspielvideos',      desc: 'Klar erklärt, praxisnah aufgebaut. Kinder- und Erwachsenenpfad vollständig enthalten.' },
   { icon: Music2,    title: 'Echte Playbacks & Mitspieltracks',    desc: 'Du spielst – die Band spielt mit. Sofort motivierend, von der ersten Übung an.' },
   { icon: Sparkles,  title: 'KI-Coach Tim & Gamification',         desc: 'Sterne, Levels, Badges und ein KI-Assistent, der dich durch deinen Lernweg begleitet.' },
   { icon: Mic2,      title: 'Persönliches Feedback vom Team',      desc: 'Mario Schulter und sein Team helfen dir weiter – direkt, schnell und ehrlich.' },
@@ -121,7 +121,7 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  '300+ Lern- & Mitspielvideos',
+  '440+ Mitspielvideos',
   'Komplette Anfängerschule (Band 1)',
   '55 Kinderlieder + Playbacks',
   'KI-Coach Tim (DE/EN/ES)',
@@ -273,7 +273,7 @@ export default function LandingPage() {
   return (
     <SEOPageLayout
       title="Trompete lernen | Trumpetstar – Online Trompetenunterricht"
-      description="Trompete lernen für Kinder & Erwachsene: 300+ Videos, Playbacks, KI-Coach & echtes Feedback. Jetzt kostenlos starten."
+      description="Trompete lernen für Kinder & Erwachsene: 440+ Mitspielvideos, Playbacks, KI-Coach & echtes Feedback. Jetzt kostenlos starten."
       canonicalPath="/"
     >
       <FAQSchema faqs={landingFaqs} />
