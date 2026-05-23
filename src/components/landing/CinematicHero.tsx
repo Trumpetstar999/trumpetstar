@@ -284,7 +284,8 @@ export function CinematicHero({
   return (
     <div
       ref={containerRef}
-      className={cn("cinematic-hero relative w-full h-screen overflow-hidden bg-[#0B2E8A] text-white", className)}
+      className={cn("cinematic-hero relative w-full h-screen overflow-hidden text-white", className)}
+      style={{ background: 'linear-gradient(180deg, hsl(212,100%,56%) 0%, hsl(218,88%,46%) 40%, hsl(222,86%,29%) 100%)' }}
       {...props}
     >
       <style>{INJECTED_STYLES}</style>
