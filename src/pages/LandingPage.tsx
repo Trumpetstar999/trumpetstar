@@ -205,7 +205,16 @@ export default function LandingPage() {
   const [checking, setChecking] = useState(true);
   const [audience, setAudience] = useState<'child' | 'adult' | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [slideIdx, setSlideIdx] = useState(0);
   const { t } = useLanguage();
+
+  // Auto-rotate hero slideshow
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSlideIdx(i => (i + 1) % SCREENSHOTS.length);
+    }, 3500);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
