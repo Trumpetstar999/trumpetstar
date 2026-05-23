@@ -336,69 +336,70 @@ export function CinematicHero({
 
           {/* iPAD LANDSCAPE MOCKUP */}
           <div className="mockup-scroll-wrapper md:col-span-6 min-w-0 flex items-center justify-center relative" style={{ perspective: "1500px" }}>
-            <div
-              ref={mockupRef}
-              className="iphone-bezel relative"
-              style={{
-                width: "min(540px, 100%)",
-                aspectRatio: "4 / 3",
-                borderRadius: "26px",
-                transformStyle: "preserve-3d",
-              }}
-            >
+            {/* iPad + badges share this relative wrapper so badges anchor to the iPad corners */}
+            <div className="relative" style={{ width: "min(540px, 100%)" }}>
+              <div
+                ref={mockupRef}
+                className="iphone-bezel relative w-full"
+                style={{
+                  aspectRatio: "4 / 3",
+                  borderRadius: "26px",
+                  transformStyle: "preserve-3d",
+                }}
+              >
+                {/* Camera dot */}
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
+                {/* Screen */}
+                <div className="absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
+                  {screenshotSrc && (
+                    <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover object-top" />
+                  )}
+                  {/* Glare */}
+                  <div className="screen-glare absolute inset-0 z-10 pointer-events-none" />
 
-              {/* Camera dot */}
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white/30 z-20" />
-              {/* Screen */}
-              <div className="absolute inset-[14px] rounded-[18px] overflow-hidden bg-[#0B2E8A]">
-                {screenshotSrc && (
-                  <img src={screenshotSrc} alt="App Screenshot" className="w-full h-full object-cover object-top" />
-                )}
-                {/* Glare */}
-                <div className="screen-glare absolute inset-0 z-10 pointer-events-none" />
-
-                {/* Overlay widget: progress ring */}
-                <div className="phone-widget widget-depth absolute right-3 bottom-3 rounded-2xl p-3 z-30 flex items-center gap-3 max-w-[60%]">
-                  <div className="relative w-14 h-14 shrink-0">
-                    <svg viewBox="0 0 144 144" className="w-full h-full">
-                      <circle cx="72" cy="72" r="64" stroke="rgba(255,255,255,0.08)" strokeWidth="10" fill="none" />
-                      <circle
-                        className="progress-ring"
-                        cx="72" cy="72" r="64"
-                        stroke="#FFCC00" strokeWidth="10" fill="none"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="counter-val text-white font-bold text-sm">0</span>
+                  {/* Overlay widget: progress ring */}
+                  <div className="phone-widget widget-depth absolute right-3 bottom-3 rounded-2xl p-3 z-30 flex items-center gap-3 max-w-[60%]">
+                    <div className="relative w-14 h-14 shrink-0">
+                      <svg viewBox="0 0 144 144" className="w-full h-full">
+                        <circle cx="72" cy="72" r="64" stroke="rgba(255,255,255,0.08)" strokeWidth="10" fill="none" />
+                        <circle
+                          className="progress-ring"
+                          cx="72" cy="72" r="64"
+                          stroke="#FFCC00" strokeWidth="10" fill="none"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="counter-val text-white font-bold text-sm">0</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-white text-xs font-semibold truncate">{metricLabel}</p>
-                    <p className="text-white/50 text-[10px]">{metricSub}</p>
+                    <div className="min-w-0">
+                      <p className="text-white text-xs font-semibold truncate">{metricLabel}</p>
+                      <p className="text-white/50 text-[10px]">{metricSub}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Floating badges */}
-            <div className="floating-badge floating-ui-badge absolute -top-2 -left-2 md:top-2 md:left-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Star className="w-4 h-4 text-[#FFCC00]" />
-              <span className="text-white font-semibold">4,9 ★</span>
-              <span className="text-white/50">Bewertung</span>
-            </div>
-            <div className="floating-badge floating-ui-badge absolute top-1/3 -right-2 md:right-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Users className="w-4 h-4 text-[#FFCC00]" />
-              <span className="text-white font-semibold">500+</span>
-              <span className="text-white/50">Schüler:innen</span>
-            </div>
-            <div className="floating-badge floating-ui-badge absolute -bottom-2 left-2 md:bottom-2 md:left-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
-              <span className="text-white font-semibold">30 Tage</span>
-              <span className="text-white/50">Geld-zurück</span>
-            </div>
-            <div className="floating-badge floating-ui-badge absolute -bottom-2 right-2 md:-bottom-4 md:right-2 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs">
-              <Smartphone className="w-4 h-4 text-[#FFCC00]" />
-              <span className="text-white/80">iOS · Android · Web</span>
+              {/* Floating badges — anchored to iPad corners, slightly outside */}
+              <div className="floating-badge floating-ui-badge absolute -top-3 -left-3 md:-top-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+                <Star className="w-4 h-4 text-[#FFCC00]" />
+                <span className="text-white font-semibold">4,9 ★</span>
+                <span className="text-white/50 hidden sm:inline">Bewertung</span>
+              </div>
+              <div className="floating-badge floating-ui-badge absolute -top-3 -right-3 md:-top-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+                <Users className="w-4 h-4 text-[#FFCC00]" />
+                <span className="text-white font-semibold">500+</span>
+                <span className="text-white/50 hidden sm:inline">Schüler:innen</span>
+              </div>
+              <div className="floating-badge floating-ui-badge absolute -bottom-3 -left-3 md:-bottom-4 md:-left-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+                <ShieldCheck className="w-4 h-4 text-[#FFCC00]" />
+                <span className="text-white font-semibold">30 Tage</span>
+                <span className="text-white/50 hidden sm:inline">Geld-zurück</span>
+              </div>
+              <div className="floating-badge floating-ui-badge absolute -bottom-3 -right-3 md:-bottom-4 md:-right-6 rounded-2xl px-3 py-2 flex items-center gap-2 text-xs whitespace-nowrap z-40">
+                <Smartphone className="w-4 h-4 text-[#FFCC00]" />
+                <span className="text-white/80">iOS · Android · Web</span>
+              </div>
             </div>
           </div>
 
