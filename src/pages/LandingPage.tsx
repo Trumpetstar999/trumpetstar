@@ -317,34 +317,35 @@ export default function LandingPage() {
                 {ac.badge}
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
+              <h1 data-reveal className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight mb-5">
                 {ac.headline}
               </h1>
 
-              <p className="text-lg text-white/75 leading-relaxed mb-7">
+              <p data-reveal data-reveal-delay="1" className="text-lg text-white/75 leading-relaxed mb-7">
                 {ac.sub}
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
+              <div data-reveal data-reveal-delay="2" className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-6">
                 <Button
                   size="lg"
                   onClick={() => handleCta(null)}
-                  className="h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2"
+                  className="lp-btn-shine h-14 px-9 text-lg font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-2xl shadow-yellow-500/40 gap-2"
                 >
-                  Jetzt anmelden <ArrowRight className="w-5 h-5" />
+                  Jetzt anmelden <ArrowRight className="w-5 h-5 lp-icon-pop" />
                 </Button>
                 {audience && ac.ctaHref && (
                   <Button
                     size="lg"
                     variant="outline"
                     onClick={() => handleCta(ac.ctaHref)}
-                    className="h-14 px-7 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
+                    className="lp-btn-shine h-14 px-7 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
                   >
-                    {ac.cta} <ArrowRight className="w-4 h-4" />
+                    {ac.cta} <ArrowRight className="w-4 h-4 lp-icon-pop" />
                   </Button>
                 )}
               </div>
+
 
               {/* Slim trust line */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-white/70 text-xs">
@@ -367,10 +368,10 @@ export default function LandingPage() {
             </div>
 
             {/* RIGHT – Slideshow of real app screens */}
-            <div className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
+            <div data-reveal data-reveal-delay="2" className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
               <div
                 onClick={() => handleCta(null)}
-                className="relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)]"
+                className="group lp-img-zoom relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-yellow-500/20"
                 aria-label="App starten"
                 role="button"
               >
@@ -396,6 +397,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
+
 
               {/* Dots BELOW the image */}
               <div className="flex justify-center gap-2 mt-4">
@@ -441,13 +443,14 @@ export default function LandingPage() {
                 return (
                   <div
                     key={s.title}
+                    data-reveal
                     className={`flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-14`}
                   >
                     {/* Screenshot */}
                     <div className="w-full md:w-1/2">
-                      <div className="relative group">
-                        <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity" />
-                        <div className="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/15 bg-[hsl(218,88%,46%)]">
+                      <div className="relative group lp-hover-lift">
+                        <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
+                        <div className="lp-img-zoom relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/15 bg-[hsl(218,88%,46%)]">
                           <img
                             src={s.src}
                             alt={s.title}
@@ -469,20 +472,22 @@ export default function LandingPage() {
                     </div>
                   </div>
                 );
+
               })}
             </div>
 
             {/* CTA */}
-            <div className="text-center mt-20">
+            <div data-reveal className="text-center mt-20">
               <Button
                 size="lg"
                 onClick={() => handleCta(null)}
-                className="h-14 px-9 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
+                className="lp-btn-shine h-14 px-9 text-base font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
               >
-                Jetzt in der App anmelden <ArrowRight className="w-5 h-5" />
+                Jetzt in der App anmelden <ArrowRight className="w-5 h-5 lp-icon-pop" />
               </Button>
               <p className="text-slate-500 text-xs mt-3">Kostenlos starten · Keine Kreditkarte nötig</p>
             </div>
+
           </div>
         </section>
 
