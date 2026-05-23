@@ -381,7 +381,7 @@ export default function LandingPage() {
             <div data-reveal data-reveal-delay="2" className="w-full max-w-md mx-auto lg:flex-1 lg:max-w-none">
               <div
                 onClick={() => handleCta(null)}
-                className="group lp-img-zoom relative cursor-pointer rounded-2xl overflow-hidden border border-white/20 shadow-2xl shadow-black/50 bg-[hsl(218,88%,46%)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-yellow-500/20"
+                className="group lp-img-zoom lp-premium-frame relative cursor-pointer bg-[hsl(218,88%,46%)] transition-transform duration-500 hover:-translate-y-1"
                 aria-label="App starten"
                 role="button"
               >
@@ -460,7 +460,7 @@ export default function LandingPage() {
                     <div className="w-full md:w-1/2">
                       <div className="relative group lp-hover-lift">
                         <div className="absolute -inset-3 bg-gradient-to-br from-[hsl(var(--reward-gold))]/30 to-transparent rounded-3xl blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
-                        <div className="lp-img-zoom relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-900/15 bg-[hsl(218,88%,46%)]">
+                        <div className="lp-img-zoom lp-premium-frame relative bg-[hsl(218,88%,46%)]">
                           <img
                             src={s.src}
                             alt={s.title}
