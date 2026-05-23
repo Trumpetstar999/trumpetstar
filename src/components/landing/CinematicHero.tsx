@@ -323,7 +323,7 @@ export function CinematicHero({
             <span className="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-white/60">
               <Star className="w-3 h-3 text-[#FFCC00]" /> Trumpetstar App
             </span>
-            <h2 className="text-card-silver-matte text-3xl md:text-4xl font-bold leading-tight">
+            <h2 className="text-card-silver-matte text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               {cardHeading}
             </h2>
             <p className="text-white/65 text-sm md:text-base leading-relaxed">
