@@ -230,7 +230,7 @@ export function CinematicHero({
   metricSub = "in 24+ Levels",
   screenshotSrc,
   ctaHeading = "Starte heute mit Trompete.",
-  ctaDescription = "Jederzeit kündbar. 30 Tage Geld-zurück-Garantie. Spielerisch von der ersten Minute an.",
+  ctaDescription = "Jederzeit kündbar.\n30 Tage Geld-zurück-Garantie. Spielerisch von der ersten Minute an.",
   primaryCtaLabel = "Jetzt kostenlos starten",
   secondaryCtaLabel = "Pro ansehen",
   onPrimaryCta,
