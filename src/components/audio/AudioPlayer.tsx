@@ -385,13 +385,13 @@ export function AudioPlayer() {
               </div>
               <input
                 type="range"
-                min={50}
+                min={40}
                 max={150}
                 value={player.tempo}
                 onChange={e => player.setTempo(Number(e.target.value))}
                 className="w-full h-1.5 rounded-full appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, hsl(212 100% 56%) ${(player.tempo - 50) / 100 * 100}%, rgba(255,255,255,0.15) ${(player.tempo - 50) / 100 * 100}%)`,
+                  background: `linear-gradient(to right, hsl(212 100% 56%) ${(player.tempo - 40) / 110 * 100}%, rgba(255,255,255,0.15) ${(player.tempo - 40) / 110 * 100}%)`,
                 }}
               />
             </div>
