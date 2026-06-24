@@ -362,10 +362,11 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
 
   const handleCreateLevel = async () => {
     if (!newLevelName.trim()) return;
-    const { error } = await supabase.from('audio_levels').insert({ name: newLevelName.trim() });
+    const { error } = await supabase.from('audio_levels').insert({ name: newLevelName.trim(), sort_order: levels.length });
     if (error) toast.error('Fehler beim Erstellen: ' + error.message);
     else { toast.success('Level erstellt'); setNewLevelName(''); fetchLevels(); onRefresh(); }
   };
+
 
   const handleRenameLevel = async (id: string) => {
     if (!editingLevelName.trim()) return;
