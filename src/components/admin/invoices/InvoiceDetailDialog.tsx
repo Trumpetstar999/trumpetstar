@@ -127,6 +127,10 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
 
   async function handleFinalizeClick() {
     if (!invoice) return;
+    if (!invoice.items || invoice.items.length === 0) {
+      toast.error('Diese Rechnung hat keine Positionen. Bitte zuerst bearbeiten und Positionen hinzufügen.');
+      return;
+    }
     const email = invoice.customer?.email?.trim();
     if (email) {
       // Email exists — finalize & send directly
@@ -137,6 +141,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
       setFinalizeStep('prompt-email');
     }
   }
+
 
   async function handleFinalizeWithoutEmail() {
     if (!invoice) return;

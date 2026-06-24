@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'sonner';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,8 +36,10 @@ interface FormValues {
     unit: string;
     unit_price_gross: number;
     discount_percent: number;
+    price_type: 'dealer' | 'retail';
   }[];
 }
+
 
 export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
@@ -67,15 +71,23 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
       country: invoice.country as 'AT' | 'DE',
       notes: invoice.notes || '',
       paid_amount: invoice.paid_amount,
-      items: (invoice.items || []).map((item) => ({
-        id: item.id,
-        product_id: item.product_id || '',
-        description: item.description,
-        quantity: item.quantity,
-        unit: item.unit,
-        unit_price_gross: item.unit_price_gross,
-        discount_percent: item.discount_percent,
-      })),
+      items: (invoice.items || []).map((item) => {
+        const dealerPrice = Number((item.product as any)?.dealer_price_gross) || 0;
+        const retailPrice = Number((item.product as any)?.price_gross) || 0;
+        const isDealer = dealerPrice > 0 && Math.abs(Number(item.unit_price_gross) - dealerPrice) < 0.01;
+        const isRetail = retailPrice > 0 && Math.abs(Number(item.unit_price_gross) - retailPrice) < 0.01;
+        return {
+          id: item.id,
+          product_id: item.product_id || '',
+          description: item.description,
+          quantity: item.quantity,
+          unit: item.unit,
+          unit_price_gross: item.unit_price_gross,
+          discount_percent: item.discount_percent,
+          price_type: isDealer && !isRetail ? 'dealer' as const : 'retail' as const,
+        };
+      }),
+
     });
   }, [invoice, reset]);
 
@@ -97,10 +109,27 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
   function handleProductSelect(index: number, productId: string) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
+    const priceType = watchItems[index]?.price_type ?? 'retail';
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
     setValue(`items.${index}.product_id`, productId);
     setValue(`items.${index}.description`, product.name);
-    setValue(`items.${index}.unit_price_gross`, product.price_gross);
+    setValue(`items.${index}.unit_price_gross`, price);
   }
+
+  function handlePriceTypeChange(index: number, priceType: 'dealer' | 'retail') {
+    setValue(`items.${index}.price_type`, priceType);
+    const productId = watchItems[index]?.product_id;
+    if (!productId) return;
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
+    setValue(`items.${index}.unit_price_gross`, price);
+  }
+
 
   async function onSubmit(values: FormValues) {
     if (!invoiceId || !invoice) return;
@@ -165,7 +194,12 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
   return (
     <Dialog open={!!invoiceId} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto bg-white border border-gray-200 shadow-xl p-0 rounded-xl [&>button:last-child]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Rechnung bearbeiten {invoice?.invoice_number ?? ''}</DialogTitle>
+          <DialogDescription>Positionen, Preise und Status der Rechnung anpassen.</DialogDescription>
+        </VisuallyHidden>
         {/* Header */}
+
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 z-10 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
             Rechnung bearbeiten — {invoice?.invoice_number}
@@ -236,7 +270,7 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
                     <div className="grid grid-cols-12 gap-2 items-end">
                       <div className="col-span-3">
                         <Label className="text-xs font-medium text-gray-500">Produkt</Label>
-                        <Select onValueChange={(v) => handleProductSelect(index, v)}>
+                        <Select value={watchItems[index]?.product_id || undefined} onValueChange={(v) => handleProductSelect(index, v)}>
                           <SelectTrigger className="mt-1 h-8 border-gray-200 bg-white text-gray-900 text-xs">
                             <SelectValue placeholder="Wählen..." />
                           </SelectTrigger>
@@ -301,11 +335,37 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
                         </button>
                       </div>
                     </div>
+                    <div className="mt-2 flex items-center gap-2 text-xs">
+                      <span className="text-gray-500">Preis:</span>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'retail')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          (watchItems[index]?.price_type ?? 'retail') === 'retail'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Endkunde (UVP)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'dealer')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          watchItems[index]?.price_type === 'dealer'
+                            ? 'bg-amber-500 text-white border-amber-500'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Händlerrabatt
+                      </button>
+                    </div>
                   </div>
+
                 ))}
                 <button
                   type="button"
-                  onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0 })}
+                  onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0, price_type: 'retail' })}
                   className="w-full h-9 border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 rounded-lg text-xs font-medium text-gray-400 hover:text-blue-600 flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
