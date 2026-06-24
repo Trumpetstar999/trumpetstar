@@ -104,9 +104,25 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
   function handleProductSelect(index: number, productId: string) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
+    const priceType = watchItems[index]?.price_type ?? 'retail';
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
     setValue(`items.${index}.product_id`, productId);
     setValue(`items.${index}.description`, product.name);
-    setValue(`items.${index}.unit_price_gross`, product.price_gross);
+    setValue(`items.${index}.unit_price_gross`, price);
+  }
+
+  function handlePriceTypeChange(index: number, priceType: 'dealer' | 'retail') {
+    setValue(`items.${index}.price_type`, priceType);
+    const productId = watchItems[index]?.product_id;
+    if (!productId) return;
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
+    setValue(`items.${index}.unit_price_gross`, price);
   }
 
   async function onSubmit(values: FormValues) {
