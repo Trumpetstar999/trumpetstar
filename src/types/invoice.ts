@@ -20,6 +20,7 @@ export interface Product {
   name: string;
   description?: string;
   price_gross: number;
+  dealer_price_gross: number;
   vat_rate_at: number;
   vat_rate_de: number;
   is_active: boolean;

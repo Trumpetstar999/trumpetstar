@@ -31,6 +31,7 @@ interface FormValues {
     unit: string;
     unit_price_gross: number;
     discount_percent: number;
+    price_type: 'dealer' | 'retail';
   }[];
   new_customer_name: string;
   new_customer_company: string;
@@ -57,7 +58,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
       country: 'AT',
       invoice_date: today,
       notes: '',
-      items: [{ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0 }],
+      items: [{ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0, price_type: 'retail' }],
       new_customer_name: '',
       new_customer_company: '',
       new_customer_street: '',
@@ -103,9 +104,25 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
   function handleProductSelect(index: number, productId: string) {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
+    const priceType = watchItems[index]?.price_type ?? 'retail';
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
     setValue(`items.${index}.product_id`, productId);
     setValue(`items.${index}.description`, product.name);
-    setValue(`items.${index}.unit_price_gross`, product.price_gross);
+    setValue(`items.${index}.unit_price_gross`, price);
+  }
+
+  function handlePriceTypeChange(index: number, priceType: 'dealer' | 'retail') {
+    setValue(`items.${index}.price_type`, priceType);
+    const productId = watchItems[index]?.product_id;
+    if (!productId) return;
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+    const price = priceType === 'dealer'
+      ? Number((product as any).dealer_price_gross) || 0
+      : Number(product.price_gross) || 0;
+    setValue(`items.${index}.unit_price_gross`, price);
   }
 
   async function onSubmit(values: FormValues) {
@@ -394,12 +411,39 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
                       </button>
                     </div>
                   </div>
+                  {watchItems[index]?.product_id && (
+                    <div className="mt-2 flex items-center gap-2 text-xs">
+                      <span className="text-gray-500">Preis:</span>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'retail')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          (watchItems[index]?.price_type ?? 'retail') === 'retail'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Endkunde (UVP)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'dealer')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          watchItems[index]?.price_type === 'dealer'
+                            ? 'bg-amber-500 text-white border-amber-500'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Händlerrabatt
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
 
               <button
                 type="button"
-                onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0 })}
+                onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0, price_type: 'retail' })}
                 className="w-full h-9 border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 rounded-lg text-xs font-medium text-gray-400 hover:text-blue-600 flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />

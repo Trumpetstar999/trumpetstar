@@ -79,8 +79,73 @@ export function useInvoiceProducts() {
         .eq('is_active', true)
         .order('name');
       if (error) throw error;
+      return data as unknown as import('@/types/invoice').Product[];
+    },
+  });
+}
+
+export function useAllProducts() {
+  return useQuery({
+    queryKey: ['all-products'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data as unknown as import('@/types/invoice').Product[];
+    },
+  });
+}
+
+type ProductInput = Omit<import('@/types/invoice').Product, 'id'>;
+
+export function useCreateProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (product: ProductInput) => {
+      const { data, error } = await supabase.from('products').insert(product as any).select().single();
+      if (error) throw error;
       return data;
     },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['all-products'] });
+      qc.invalidateQueries({ queryKey: ['invoice-products'] });
+      toast.success('Produkt angelegt');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useUpdateProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...data }: Partial<ProductInput> & { id: string }) => {
+      const { error } = await supabase.from('products').update(data as any).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['all-products'] });
+      qc.invalidateQueries({ queryKey: ['invoice-products'] });
+      toast.success('Produkt aktualisiert');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useDeleteProduct() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['all-products'] });
+      qc.invalidateQueries({ queryKey: ['invoice-products'] });
+      toast.success('Produkt gelöscht');
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 }
 
