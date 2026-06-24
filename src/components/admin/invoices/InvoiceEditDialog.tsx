@@ -334,7 +334,7 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
                 ))}
                 <button
                   type="button"
-                  onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0 })}
+                  onClick={() => append({ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0, price_type: 'retail' })}
                   className="w-full h-9 border border-dashed border-gray-300 hover:border-blue-400 hover:bg-blue-50/50 rounded-lg text-xs font-medium text-gray-400 hover:text-blue-600 flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
