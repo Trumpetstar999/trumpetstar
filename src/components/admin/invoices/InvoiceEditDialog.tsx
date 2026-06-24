@@ -71,15 +71,23 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
       country: invoice.country as 'AT' | 'DE',
       notes: invoice.notes || '',
       paid_amount: invoice.paid_amount,
-      items: (invoice.items || []).map((item) => ({
-        id: item.id,
-        product_id: item.product_id || '',
-        description: item.description,
-        quantity: item.quantity,
-        unit: item.unit,
-        unit_price_gross: item.unit_price_gross,
-        discount_percent: item.discount_percent,
-      })),
+      items: (invoice.items || []).map((item) => {
+        const dealerPrice = Number((item.product as any)?.dealer_price_gross) || 0;
+        const retailPrice = Number((item.product as any)?.price_gross) || 0;
+        const isDealer = dealerPrice > 0 && Math.abs(Number(item.unit_price_gross) - dealerPrice) < 0.01;
+        const isRetail = retailPrice > 0 && Math.abs(Number(item.unit_price_gross) - retailPrice) < 0.01;
+        return {
+          id: item.id,
+          product_id: item.product_id || '',
+          description: item.description,
+          quantity: item.quantity,
+          unit: item.unit,
+          unit_price_gross: item.unit_price_gross,
+          discount_percent: item.discount_percent,
+          price_type: isDealer && !isRetail ? 'dealer' as const : 'retail' as const,
+        };
+      }),
+
     });
   }, [invoice, reset]);
 
