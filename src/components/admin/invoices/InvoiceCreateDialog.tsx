@@ -411,6 +411,33 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
                       </button>
                     </div>
                   </div>
+                  {watchItems[index]?.product_id && (
+                    <div className="mt-2 flex items-center gap-2 text-xs">
+                      <span className="text-gray-500">Preis:</span>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'retail')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          (watchItems[index]?.price_type ?? 'retail') === 'retail'
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Endkunde (UVP)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePriceTypeChange(index, 'dealer')}
+                        className={`px-2.5 py-1 rounded-full border transition-colors ${
+                          watchItems[index]?.price_type === 'dealer'
+                            ? 'bg-amber-500 text-white border-amber-500'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        Händlerrabatt
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
 
