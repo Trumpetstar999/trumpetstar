@@ -164,15 +164,8 @@ export function useGamePitchDetection(
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
-  const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
-  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const startedRef = useRef(false);
-
-  // iOS ring-buffer for ScriptProcessor frame collection
-  const ringBufferRef = useRef<Float32Array | null>(null);
-  const ringWriteRef = useRef<number>(0);
-  const ringTargetRef = useRef<number>(0);
 
   // Stability tracking
   const stableNoteRef = useRef<number | null>(null);
@@ -180,12 +173,9 @@ export function useGamePitchDetection(
 
   // Debug counters
   const frameCountRef = useRef<number>(0);
-  const scriptFireCountRef = useRef<number>(0);
   const lastRmsRef = useRef<number>(0);
   const lastFreqRef = useRef<number>(0);
-  const maxAmplitudeRef = useRef<number>(0);
   const iosPathRef = useRef<string>('N/A');
-  const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const effectiveThreshold = confidenceThreshold * CONFIDENCE_FACTOR;
 
@@ -217,8 +207,8 @@ export function useGamePitchDetection(
         frequency: lastFreqRef.current,
         frameCount: frameCountRef.current,
         iosPath: iosPathRef.current,
-        scriptFireCount: scriptFireCountRef.current,
-        maxAmplitude: maxAmplitudeRef.current,
+        scriptFireCount: 0,
+        maxAmplitude: 0,
       });
     }
 
@@ -309,8 +299,6 @@ export function useGamePitchDetection(
       setError(null);
       stableNoteRef.current = null;
       frameCountRef.current = 0;
-      scriptFireCountRef.current = 0;
-      maxAmplitudeRef.current = 0;
       iosPathRef.current = 'N/A';
 
       console.log('[PitchDetect] Starting...', { IOS, ua: navigator.userAgent.substring(0, 80) });
@@ -326,7 +314,6 @@ export function useGamePitchDetection(
       silentSrc.buffer = silentBuf;
       silentSrc.connect(ctx.destination);
       silentSrc.start(0);
-      console.log('[PitchDetect] Silent buffer played');
 
       // STEP 3: Resume AudioContext
       if (ctx.state !== 'running') {
@@ -353,11 +340,9 @@ export function useGamePitchDetection(
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-        console.log('[PitchDetect] getUserMedia OK with constraints');
       } catch (e) {
         console.warn('[PitchDetect] getUserMedia with constraints failed, trying basic', e);
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('[PitchDetect] getUserMedia OK with basic audio');
       }
       mediaStreamRef.current = stream;
 
@@ -368,165 +353,11 @@ export function useGamePitchDetection(
       }
       console.log('[PitchDetect] Track settings:', JSON.stringify(track.getSettings()));
 
-      // STEP 6: Create source
+      // STEP 6: Create source → AnalyserNode (same proven path as Tuner, works on iPad)
       const source = ctx.createMediaStreamSource(stream);
       sourceNodeRef.current = source;
 
-      if (IOS) {
-        // ---- iOS: Try AudioWorklet first, fall back to ScriptProcessor ----
-        let iosStarted = false;
-
-        // FIX 1: AudioWorklet attempt
-        try {
-          if (ctx.audioWorklet) {
-            const workletCode = `
-class PitchProcessor extends AudioWorkletProcessor {
-  constructor() {
-    super();
-    this.buffer = [];
-    this.targetSamples = Math.ceil(sampleRate * 0.2);
-  }
-  process(inputs) {
-    const input = inputs[0][0];
-    if (!input) return true;
-    let maxAmp = 0;
-    for (let i = 0; i < input.length; i++) {
-      this.buffer.push(input[i]);
-      const abs = Math.abs(input[i]);
-      if (abs > maxAmp) maxAmp = abs;
-    }
-    if (this.buffer.length >= this.targetSamples) {
-      this.port.postMessage({ samples: new Float32Array(this.buffer), maxAmp });
-      this.buffer = [];
-    }
-    return true;
-  }
-}
-registerProcessor('pitch-processor', PitchProcessor);
-`;
-            const blob = new Blob([workletCode], { type: 'application/javascript' });
-            const workletUrl = URL.createObjectURL(blob);
-            await ctx.audioWorklet.addModule(workletUrl);
-            URL.revokeObjectURL(workletUrl);
-
-            const workletNode = new AudioWorkletNode(ctx, 'pitch-processor');
-            source.connect(workletNode);
-            workletNode.connect(ctx.destination); // must connect to destination on iOS
-
-            workletNode.port.onmessage = (e: MessageEvent) => {
-              const { samples, maxAmp } = e.data;
-              if (maxAmp > maxAmplitudeRef.current) maxAmplitudeRef.current = maxAmp;
-              scriptFireCountRef.current++;
-              const { frequency, rms } = autoCorrelate(samples, ctx.sampleRate);
-              processPitchRef.current(frequency, rms, ctx.sampleRate);
-            };
-
-            workletNodeRef.current = workletNode;
-            iosPathRef.current = 'Worklet';
-            iosStarted = true;
-
-            console.log('[PitchDetect] iOS AudioWorklet started', {
-              sampleRate: ctx.sampleRate,
-            });
-          }
-        } catch (workletErr) {
-          console.warn('[PitchDetect] AudioWorklet failed, falling back to ScriptProcessor', workletErr);
-        }
-
-        // ScriptProcessor fallback
-        if (!iosStarted) {
-          const scriptNode = ctx.createScriptProcessor(IOS_SCRIPT_BUFFER, 1, 1);
-          const samplesPerFrame = Math.ceil((ctx.sampleRate * IOS_FRAME_MS) / 1000);
-
-          const ring = new Float32Array(samplesPerFrame + IOS_SCRIPT_BUFFER);
-          ringBufferRef.current = ring;
-          ringWriteRef.current = 0;
-          ringTargetRef.current = samplesPerFrame;
-
-          scriptNode.onaudioprocess = (event: AudioProcessingEvent) => {
-            const input = event.inputBuffer.getChannelData(0);
-            const len = input.length;
-            scriptFireCountRef.current++;
-
-            if (scriptFireCountRef.current <= 5) {
-              let maxVal = 0;
-              for (let i = 0; i < len; i++) {
-                const abs = Math.abs(input[i]);
-                if (abs > maxVal) maxVal = abs;
-              }
-              if (maxVal > maxAmplitudeRef.current) maxAmplitudeRef.current = maxVal;
-              console.log(`[PitchDetect:iOS] scriptFire=${scriptFireCountRef.current} inputLen=${len} maxAbs=${maxVal.toFixed(6)}`);
-            }
-
-            for (let i = 0; i < len; i++) {
-              const abs = Math.abs(input[i]);
-              if (abs > maxAmplitudeRef.current) maxAmplitudeRef.current = abs;
-
-              ring[ringWriteRef.current] = input[i];
-              ringWriteRef.current++;
-
-              if (ringWriteRef.current >= samplesPerFrame) {
-                const frame = ring.slice(0, ringWriteRef.current);
-                const { frequency, rms } = autoCorrelate(frame, ctx.sampleRate);
-                processPitchRef.current(frequency, rms, ctx.sampleRate);
-                ringWriteRef.current = 0;
-              }
-            }
-
-            // Output silence
-            const output = event.outputBuffer.getChannelData(0);
-            for (let i = 0; i < output.length; i++) output[i] = 0;
-          };
-
-          source.connect(scriptNode);
-          scriptNode.connect(ctx.destination);
-          scriptNodeRef.current = scriptNode;
-          iosPathRef.current = 'ScriptProcessor';
-
-          console.log('[PitchDetect] iOS ScriptProcessor started', {
-            sampleRate: ctx.sampleRate,
-            bufferSize: IOS_SCRIPT_BUFFER,
-            frameSamples: samplesPerFrame,
-          });
-        }
-
-        // FIX 3: Watchdog — fall back to AnalyserNode if no frames after 3s
-        watchdogTimerRef.current = setTimeout(() => {
-          if (frameCountRef.current === 0 && audioContextRef.current?.state === 'running') {
-            console.warn('[PitchDetect] iOS path produced no frames after 3s — falling back to AnalyserNode');
-
-            // Disconnect current iOS nodes
-            if (workletNodeRef.current) {
-              try { workletNodeRef.current.disconnect(); } catch (_) {}
-              workletNodeRef.current = null;
-            }
-            if (scriptNodeRef.current) {
-              try { scriptNodeRef.current.disconnect(); } catch (_) {}
-              scriptNodeRef.current = null;
-            }
-
-            // Re-connect source to AnalyserNode path
-            const src = sourceNodeRef.current;
-            const context = audioContextRef.current;
-            if (src && context) {
-              setupAnalyserPath(context, src, 'AnalyserFallback');
-            }
-          }
-        }, 3000);
-
-      } else {
-        // ---- Desktop: source → analyser ONLY ----
-        iosPathRef.current = 'N/A';
-        setupAnalyserPath(ctx, source, 'N/A');
-      }
-
-      // STEP 7: Verify data is flowing (desktop)
-      if (!IOS && analyserRef.current) {
-        const testBuf = new Float32Array(analyserRef.current.fftSize);
-        analyserRef.current.getFloatTimeDomainData(testBuf);
-        const hasSignal = testBuf.some(v => v !== 0);
-        console.log('[PitchDetect] Signal check:', hasSignal, 'Sample rate:', ctx.sampleRate);
-      }
+      setupAnalyserPath(ctx, source, IOS ? 'AnalyserNode' : 'N/A');
 
       setIsListening(true);
     } catch (err: any) {
@@ -534,27 +365,15 @@ registerProcessor('pitch-processor', PitchProcessor);
       setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff.');
       startedRef.current = false;
     }
-  }, [analyzeWithAnalyser, setupAnalyserPath]);
+  }, [setupAnalyserPath]);
 
   // -----------------------------------------------------------------------
   // Stop listening
   // -----------------------------------------------------------------------
   const stopListening = useCallback(() => {
-    if (watchdogTimerRef.current) {
-      clearTimeout(watchdogTimerRef.current);
-      watchdogTimerRef.current = null;
-    }
     if (rafIdRef.current) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
-    }
-    if (workletNodeRef.current) {
-      try { workletNodeRef.current.disconnect(); } catch (_) {}
-      workletNodeRef.current = null;
-    }
-    if (scriptNodeRef.current) {
-      scriptNodeRef.current.disconnect();
-      scriptNodeRef.current = null;
     }
     if (sourceNodeRef.current) {
       sourceNodeRef.current.disconnect();
@@ -570,8 +389,6 @@ registerProcessor('pitch-processor', PitchProcessor);
     }
     analyserRef.current = null;
     bufferRef.current = null;
-    ringBufferRef.current = null;
-    ringWriteRef.current = 0;
     stableNoteRef.current = null;
     startedRef.current = false;
     setIsListening(false);
