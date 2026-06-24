@@ -548,9 +548,10 @@ export function AudioPlayerManager() {
   const [levels, setLevels] = useState<AudioLevel[]>([]);
 
   const fetchLevels = async () => {
-    const { data } = await supabase.from('audio_levels').select('id, name').order('created_at', { ascending: true });
+    const { data } = await supabase.from('audio_levels').select('id, name').order('sort_order', { ascending: true });
     if (data) setLevels(data.map(l => ({ ...l, items: [] })));
   };
+
 
   useEffect(() => { fetchLevels(); }, [refreshTrigger]);
 
