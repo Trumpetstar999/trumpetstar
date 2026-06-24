@@ -31,6 +31,7 @@ interface FormValues {
     unit: string;
     unit_price_gross: number;
     discount_percent: number;
+    price_type: 'dealer' | 'retail';
   }[];
   new_customer_name: string;
   new_customer_company: string;
