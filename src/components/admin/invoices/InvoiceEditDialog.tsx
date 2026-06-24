@@ -36,8 +36,10 @@ interface FormValues {
     unit: string;
     unit_price_gross: number;
     discount_percent: number;
+    price_type: 'dealer' | 'retail';
   }[];
 }
+
 
 export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
