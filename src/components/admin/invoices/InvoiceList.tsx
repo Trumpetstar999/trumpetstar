@@ -5,6 +5,8 @@ import { Eye, Printer, Trash2, Search, Plus, FileText, Download } from 'lucide-r
 import { useInvoices, useDeleteInvoice } from '@/hooks/useInvoices';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice, Customer } from '@/types/invoice';
+import { InvoiceThumbnailHover } from './InvoiceThumbnailHover';
+
 
 function exportSteuerberaterCSV(invoices: (Invoice & { customer: Customer })[]) {
   const SEP = ';';
@@ -191,9 +193,12 @@ export function InvoiceList({ onView, onCreate }: Props) {
               {filtered.map((inv) => (
                 <tr key={inv.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-mono text-xs font-medium">
-                    {inv.invoice_number ?? <span className="text-muted-foreground italic">Entwurf</span>}
+                    <InvoiceThumbnailHover invoiceId={inv.id!}>
+                      {inv.invoice_number ?? <span className="text-muted-foreground italic">Entwurf</span>}
+                    </InvoiceThumbnailHover>
                   </td>
                   <td className="px-4 py-3">
+
                     <p className="font-medium">{inv.customer?.company_name || inv.customer?.name}</p>
                     {inv.customer?.company_name && (
                       <p className="text-xs text-muted-foreground">{inv.customer.name}</p>
