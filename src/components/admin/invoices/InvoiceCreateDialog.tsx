@@ -374,7 +374,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
                   <div className="grid grid-cols-12 gap-2 items-end">
                     <div className="col-span-3">
                       <Label className="text-xs font-medium text-gray-500">Produkt</Label>
-                      <Select onValueChange={(v) => handleProductSelect(index, v)}>
+                      <Select value={watchItems[index]?.product_id || undefined} onValueChange={(v) => handleProductSelect(index, v)}>
                         <SelectTrigger className="mt-1 h-8 border-gray-200 bg-white text-gray-900 text-xs">
                           <SelectValue placeholder="Wählen..." />
                         </SelectTrigger>
