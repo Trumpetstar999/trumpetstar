@@ -371,21 +371,9 @@ export function useGamePitchDetection(
   // Stop listening
   // -----------------------------------------------------------------------
   const stopListening = useCallback(() => {
-    if (watchdogTimerRef.current) {
-      clearTimeout(watchdogTimerRef.current);
-      watchdogTimerRef.current = null;
-    }
     if (rafIdRef.current) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
-    }
-    if (workletNodeRef.current) {
-      try { workletNodeRef.current.disconnect(); } catch (_) {}
-      workletNodeRef.current = null;
-    }
-    if (scriptNodeRef.current) {
-      scriptNodeRef.current.disconnect();
-      scriptNodeRef.current = null;
     }
     if (sourceNodeRef.current) {
       sourceNodeRef.current.disconnect();
@@ -401,8 +389,6 @@ export function useGamePitchDetection(
     }
     analyserRef.current = null;
     bufferRef.current = null;
-    ringBufferRef.current = null;
-    ringWriteRef.current = 0;
     stableNoteRef.current = null;
     startedRef.current = false;
     setIsListening(false);
