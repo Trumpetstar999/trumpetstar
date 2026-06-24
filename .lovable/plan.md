@@ -1,36 +1,64 @@
-## Problem
+# NoteRunner: iPad-taugliche Tonerkennung (Port aus Tone-Force)
 
-Im NoteRunner-Spiel werden auf iPad keine Töne erkannt. Der Tuner (`TunerPopup` + `usePitchDetection`) funktioniert auf iPad einwandfrei — er verwendet einen einfachen, bewährten Pfad: AudioContext → MediaStreamSource → AnalyserNode → `requestAnimationFrame`-Schleife mit Autokorrelation.
+Im Schwesterprojekt **Tone-Force** funktioniert die Tonerkennung am iPad zuverlässig. Wir übernehmen exakt diesen Ansatz für NoteRunner – er ist deutlich einfacher und robuster als die aktuelle Implementierung.
 
-Der Game-Hook `useGamePitchDetection` geht auf iOS einen anderen Weg (AudioWorklet → Fallback ScriptProcessor → Watchdog → erst nach 3 s AnalyserFallback). Genau dieser iOS-Sonderpfad ist auf iPadOS die wahrscheinliche Fehlerquelle:
+## Was sich ändert
 
-- AudioWorklet-Inline-Blob lädt auf manchen iPadOS-Versionen nicht zuverlässig (CSP/Worklet-Init).
-- ScriptProcessor liefert auf neueren iPadOS-Versionen häufig nur Stille (`maxAbs ≈ 0`) im Input-Buffer, obwohl der Track „live" ist.
-- Wenn die Worklet-Initialisierung scheinbar erfolgreich ist, schlägt der 3-s-Watchdog nicht an, und es wird nie auf den funktionierenden AnalyserNode-Pfad gewechselt → keine Tonerkennung.
+Nur eine Datei wird angefasst: `src/hooks/useGamePitchDetection.tsx`. `GamePlayPage.tsx`, der Game-Loop, die HUD und die Settings bleiben unverändert. Die Public-API des Hooks (Rückgabewerte, Signaturen) bleibt 1:1 gleich.
 
-Da der Tuner auf demselben Gerät zuverlässig erkennt, ist der einfache AnalyserNode-Pfad nachweislich iPad-tauglich.
+## Übernahme aus Tone-Force
 
-## Lösung
+### 1. getUserMedia-Constraints (Apple-Mics liefern sonst zu leise)
+```ts
+audio: {
+  echoCancellation: false,
+  noiseSuppression: false,
+  autoGainControl: IOS,   // <-- neu: auf iOS aktiv, sonst aus
+  channelCount: 1,
+  sampleRate: 48000,
+}
+```
+Fallback auf `{ audio: true }` bleibt erhalten.
 
-Den iOS-Sonderpfad im Game-Hook entfernen und auf allen Plattformen den gleichen AnalyserNode + rAF-Pfad nutzen, den der Tuner bereits erfolgreich verwendet. Die spielspezifische Logik (Stabilitäts-Timer, transponierte MIDI-Note, Konfidenzschwelle, Debug-Info) bleibt vollständig erhalten.
+### 2. AudioContext-Setup vereinfachen
+- Kein „silent buffer unlock" mehr (wird auf iPadOS nicht gebraucht, der User-Gesture-Tap reicht).
+- `ctx.resume()` nur falls suspended.
+- `analyser.fftSize = 2048` (statt 8192 auf iOS) – schneller, stabiler auf Safari.
+- `analyser.smoothingTimeConstant = 0`.
 
-### Änderungen in `src/hooks/useGamePitchDetection.tsx`
+### 3. Pitch-Detector durch ACF2+ aus Tone-Force ersetzen
+- RMS-Gate: `0.003`.
+- Trimmen auf Threshold `0.2`.
+- Autokorrelation mit Schwellwerttest `maxval / c[0] ≥ 0.3` (verwirft schwache Korrelationen).
+- Parabolische Interpolation am Peak.
+- Liefert Frequenz in Hz oder `-1`.
 
-1. **iOS-Pfad entfernen**: `AudioWorklet`-Branch, `ScriptProcessor`-Fallback, Ring-Buffer und 3-s-Watchdog komplett raus. Refs `workletNodeRef`, `scriptNodeRef`, `ringBufferRef`, `ringWriteRef`, `ringTargetRef`, `watchdogTimerRef` und der zugehörige Cleanup-Code entfallen.
-2. **Einheitlicher Start**: Nach `getUserMedia` + `createMediaStreamSource` immer `setupAnalyserPath(...)` aufrufen — egal ob iOS oder Desktop. AnalyserNode wird **nicht** mit `ctx.destination` verbunden (sonst Feedback), genau wie im Tuner.
-3. **iOS-freundliche Konstanten beibehalten**: `FFT_SIZE`, `CORRELATION_THRESHOLD`, `RMS_SILENCE`, `STABILITY_MS`, `CONFIDENCE_FACTOR` für iOS bleiben unverändert — sie sind unabhängig vom Erfassungspfad und für das Spielgefühl auf iPad wichtig.
-4. **AudioContext-Unlock**: Der bestehende Silent-Buffer + `await ctx.resume()` + `onstatechange`-Resume-Loop bleibt. Das ist die gleiche Sequenz, die der Tuner nutzt.
-5. **Debug-Info anpassen**: `iosPath` wird auf iOS auf `'AnalyserNode'` gesetzt (statt `'Worklet'`/`'ScriptProcessor'`/`'AnalyserFallback'`). `scriptFireCount` / `maxAmplitude` bleiben im Interface, werden auf dem Analyser-Pfad nicht aktiv befüllt (bleiben 0) — kein Konsument außerhalb des Debug-Overlays.
-6. **Cleanup in `stopListening`**: Verweise auf entfernte Refs entfernen.
+Die plattform-spezifischen Konstanten (`FFT_SIZE`-Verzweigung, `CORRELATION_THRESHOLD`, `RMS_SILENCE`, `CONFIDENCE_FACTOR`, `STABILITY_MS`, der alte `autoCorrelate` mit AMDF) entfallen. Eine einheitliche `STABILITY_MS = 120` wird verwendet (Tone-Force nimmt 150 ms, NoteRunner nutzte vorher 120/100 ms – wir bleiben bei 120 ms für schnelles Spielgefühl).
 
-### Nicht geändert
+### 4. Aufräumen
+Die noch verbliebenen ungenutzten Felder/Refs aus dem alten iOS-Worklet-Pfad (`scriptFireCount`, `maxAmplitude`, `iosPath`) werden auf statische Werte gesetzt bzw. entfernt, soweit sie das DebugInfo-Interface nicht brechen. Das Debug-Overlay in `GamePlayPage` bleibt funktionsfähig.
 
-- `GamePlayPage.tsx` (Mic-Activation-Overlay, Touch/Click-Dual-Handler) bleibt unverändert — die User-Gesture-Logik ist korrekt.
-- Spiel-Logik, Settings, Game-Loop, HUD: unverändert.
-- Tuner-Code: unverändert.
+## Technische Details
+
+```text
+useGamePitchDetection
+├─ startListening()
+│   ├─ new AudioContext()  → resume() if suspended
+│   ├─ getUserMedia({ autoGainControl: IOS, channelCount:1, sampleRate:48000 })
+│   ├─ createMediaStreamSource → AnalyserNode (fftSize=2048, smoothing=0)
+│   └─ requestAnimationFrame loop
+│         getFloatTimeDomainData → detectPitchACF2Plus(buf, sampleRate)
+│         → processPitchRef.current(freq, rms, sr) // unverändert
+└─ stopListening()  // unverändert
+```
+
+`detectPitchACF2Plus` ist die Eins-zu-eins-Portierung von `src/lib/pitch.ts` aus Tone-Force – inklusive RMS-Berechnung, sodass wir nicht zweimal über den Buffer laufen müssen (`rms` wird zusätzlich zurückgegeben für `processPitch`).
 
 ## Verifikation
 
-- Build muss grün sein (Tsgo-Typecheck — Interface `GamePitchDebugInfo` unverändert).
-- Konsolen-Log nach Start im Spiel sollte auf iPad zeigen: `[PitchDetect] N/A AnalyserNode started` und kontinuierlich `frame=… rms=… freq=…` mit `rms > 0` sobald in die Trompete gespielt wird.
-- Debug-Overlay im Spiel zeigt steigenden `Frames`-Counter und `Freq`-Wert.
+- Build muss grün sein (tsgo).
+- Auf iPad in der Console erwartet:
+  `[PitchDetect] AnalyserNode started { sampleRate: 48000, fftSize: 2048 }`
+  gefolgt von Frames mit `rms > 0.003` und plausiblen Frequenzen beim Spielen.
+- Debug-Overlay zeigt steigenden Frame-Count und erkannte Frequenzen.
+- Desktop-Verhalten darf sich nicht spürbar verschlechtern (gleiche Detection-Engine wie Tone-Force, dort auf Desktop ebenfalls produktiv im Einsatz).
