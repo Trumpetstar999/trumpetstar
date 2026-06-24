@@ -322,12 +322,13 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
   const [editingLevelName, setEditingLevelName] = useState('');
   const [openLevelId, setOpenLevelId] = useState<string | null>(null);
   const [draggingItem, setDraggingItem] = useState<{ levelId: string; index: number } | null>(null);
+  const [draggingLevelIndex, setDraggingLevelIndex] = useState<number | null>(null);
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const fetchLevels = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase.from('audio_levels').select('id, name').order('created_at', { ascending: true });
+    const { data, error } = await supabase.from('audio_levels').select('id, name').order('sort_order', { ascending: true });
     if (error) { console.error(error); setIsLoading(false); return; }
     const withItems: AudioLevel[] = await Promise.all(
       (data || []).map(async (level) => {
@@ -345,6 +346,19 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
 
   useEffect(() => { fetchLevels(); }, [refreshTrigger]);
   useEffect(() => () => { audioRef.current?.pause(); }, []);
+
+  const handleReorderLevels = async (fromIndex: number, toIndex: number) => {
+    const newLevels = [...levels];
+    const [moved] = newLevels.splice(fromIndex, 1);
+    newLevels.splice(toIndex, 0, moved);
+    setLevels(newLevels);
+    for (const [i, l] of newLevels.entries()) {
+      await supabase.from('audio_levels').update({ sort_order: i }).eq('id', l.id);
+    }
+    onRefresh();
+  };
+
+
 
   const handleCreateLevel = async () => {
     if (!newLevelName.trim()) return;
