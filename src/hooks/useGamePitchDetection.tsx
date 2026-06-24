@@ -164,15 +164,8 @@ export function useGamePitchDetection(
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array<ArrayBuffer> | null>(null);
-  const scriptNodeRef = useRef<ScriptProcessorNode | null>(null);
-  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
   const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const startedRef = useRef(false);
-
-  // iOS ring-buffer for ScriptProcessor frame collection
-  const ringBufferRef = useRef<Float32Array | null>(null);
-  const ringWriteRef = useRef<number>(0);
-  const ringTargetRef = useRef<number>(0);
 
   // Stability tracking
   const stableNoteRef = useRef<number | null>(null);
@@ -180,12 +173,9 @@ export function useGamePitchDetection(
 
   // Debug counters
   const frameCountRef = useRef<number>(0);
-  const scriptFireCountRef = useRef<number>(0);
   const lastRmsRef = useRef<number>(0);
   const lastFreqRef = useRef<number>(0);
-  const maxAmplitudeRef = useRef<number>(0);
   const iosPathRef = useRef<string>('N/A');
-  const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const effectiveThreshold = confidenceThreshold * CONFIDENCE_FACTOR;
 

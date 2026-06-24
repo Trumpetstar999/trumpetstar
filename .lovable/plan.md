@@ -1,51 +1,36 @@
-## Ziel
-Im Adminbereich → Rechnungen eine neue Rubrik **„Produkte"** hinzufügen, in der Produkte angelegt und bearbeitet werden können. Jedes Produkt erhält **zwei Preise**: Händlerpreis und UVP (Endkundenpreis). Beim Erstellen einer Rechnung wird pro Position ausgewählt, welcher Preis gilt.
+## Problem
 
-Die 4 Produkte aus dem PDF werden automatisch angelegt.
+Im NoteRunner-Spiel werden auf iPad keine Töne erkannt. Der Tuner (`TunerPopup` + `usePitchDetection`) funktioniert auf iPad einwandfrei — er verwendet einen einfachen, bewährten Pfad: AudioContext → MediaStreamSource → AnalyserNode → `requestAnimationFrame`-Schleife mit Autokorrelation.
 
-## Änderungen
+Der Game-Hook `useGamePitchDetection` geht auf iOS einen anderen Weg (AudioWorklet → Fallback ScriptProcessor → Watchdog → erst nach 3 s AnalyserFallback). Genau dieser iOS-Sonderpfad ist auf iPadOS die wahrscheinliche Fehlerquelle:
 
-### 1. Datenbank-Migration
-- `products`-Tabelle erweitern:
-  - `dealer_price_gross numeric NOT NULL DEFAULT 0` (Händlerpreis)
-  - bestehendes `price_gross` = UVP / Endkundenpreis
-- 4 Produkte aus dem PDF anlegen (Insert via SQL):
+- AudioWorklet-Inline-Blob lädt auf manchen iPadOS-Versionen nicht zuverlässig (CSP/Worklet-Init).
+- ScriptProcessor liefert auf neueren iPadOS-Versionen häufig nur Stille (`maxAbs ≈ 0`) im Input-Buffer, obwohl der Track „live" ist.
+- Wenn die Worklet-Initialisierung scheinbar erfolgreich ist, schlägt der 3-s-Watchdog nicht an, und es wird nie auf den funktionierenden AnalyserNode-Pfad gewechselt → keine Tonerkennung.
 
-| SKU | Name | Händlerpreis | UVP |
-|---|---|---|---|
-| TS-BAND1 | Trumpetstar Band 1 | 25,00 | 35,00 |
-| TS-BAND2 | Trumpetstar Band 2 | 29,00 | 39,00 |
-| TS-XMAS | Trumpetstar X-Mas Special | 16,00 | 24,00 |
-| TS-BAND1-KLAV | Trumpetstar Band 1 – Klavierbegleitungen | 20,00 | 29,00 |
+Da der Tuner auf demselben Gerät zuverlässig erkennt, ist der einfache AnalyserNode-Pfad nachweislich iPad-tauglich.
 
-USt-Sätze bleiben Default (AT 10 %, DE 7 % — Bücher).
+## Lösung
 
-### 2. Neue Sub-Rubrik „Produkte"
-- `InvoicesPanel.tsx`: vierter Tab **Produkte** (Icon `Package2` o.ä.) — neben Rechnungen / Kunden / Lager.
-- Neue Komponente `ProductsPanel.tsx`:
-  - Tabelle mit allen Produkten (SKU, Name, Händlerpreis, UVP, aktiv).
-  - Buttons: **Neu**, **Bearbeiten**, **Aktiv/Inaktiv**, **Löschen**.
-- Dialog `ProductFormDialog.tsx`: SKU, Name, Beschreibung, Händlerpreis, UVP, USt AT/DE, aktiv.
+Den iOS-Sonderpfad im Game-Hook entfernen und auf allen Plattformen den gleichen AnalyserNode + rAF-Pfad nutzen, den der Tuner bereits erfolgreich verwendet. Die spielspezifische Logik (Stabilitäts-Timer, transponierte MIDI-Note, Konfidenzschwelle, Debug-Info) bleibt vollständig erhalten.
 
-### 3. Neue Hooks in `useInvoices.ts`
-- `useAllProducts` (inkl. inaktiv, für Admin-Liste).
-- `useCreateProduct`, `useUpdateProduct`, `useDeleteProduct`.
-- `useInvoiceProducts` (bestehend) liefert weiterhin nur aktive.
+### Änderungen in `src/hooks/useGamePitchDetection.tsx`
 
-### 4. Rechnungsdialog: Preisauswahl pro Position
-- `InvoiceCreateDialog.tsx`:
-  - In jeder Positionszeile nach der Produktauswahl ein kleiner Toggle/Select **„Händlerrabatt / Endkunde"** (Default: Endkunde / UVP).
-  - Beim Wechsel oder Produktwechsel wird `unit_price_gross` automatisch auf `dealer_price_gross` bzw. `price_gross` gesetzt.
-  - Manuelle Übersteuerung des Preisfelds bleibt möglich.
+1. **iOS-Pfad entfernen**: `AudioWorklet`-Branch, `ScriptProcessor`-Fallback, Ring-Buffer und 3-s-Watchdog komplett raus. Refs `workletNodeRef`, `scriptNodeRef`, `ringBufferRef`, `ringWriteRef`, `ringTargetRef`, `watchdogTimerRef` und der zugehörige Cleanup-Code entfallen.
+2. **Einheitlicher Start**: Nach `getUserMedia` + `createMediaStreamSource` immer `setupAnalyserPath(...)` aufrufen — egal ob iOS oder Desktop. AnalyserNode wird **nicht** mit `ctx.destination` verbunden (sonst Feedback), genau wie im Tuner.
+3. **iOS-freundliche Konstanten beibehalten**: `FFT_SIZE`, `CORRELATION_THRESHOLD`, `RMS_SILENCE`, `STABILITY_MS`, `CONFIDENCE_FACTOR` für iOS bleiben unverändert — sie sind unabhängig vom Erfassungspfad und für das Spielgefühl auf iPad wichtig.
+4. **AudioContext-Unlock**: Der bestehende Silent-Buffer + `await ctx.resume()` + `onstatechange`-Resume-Loop bleibt. Das ist die gleiche Sequenz, die der Tuner nutzt.
+5. **Debug-Info anpassen**: `iosPath` wird auf iOS auf `'AnalyserNode'` gesetzt (statt `'Worklet'`/`'ScriptProcessor'`/`'AnalyserFallback'`). `scriptFireCount` / `maxAmplitude` bleiben im Interface, werden auf dem Analyser-Pfad nicht aktiv befüllt (bleiben 0) — kein Konsument außerhalb des Debug-Overlays.
+6. **Cleanup in `stopListening`**: Verweise auf entfernte Refs entfernen.
 
-### 5. TypeScript-Typ
-- `src/types/invoice.ts`: `Product` erhält `dealer_price_gross: number`.
+### Nicht geändert
 
-## Nicht geändert
-- Bestehende Rechnungen, Kunden- und Lager-Logik.
-- VAT-Berechnung, Finalisierung, PDF-Druck.
-- Andere Adminbereiche.
+- `GamePlayPage.tsx` (Mic-Activation-Overlay, Touch/Click-Dual-Handler) bleibt unverändert — die User-Gesture-Logik ist korrekt.
+- Spiel-Logik, Settings, Game-Loop, HUD: unverändert.
+- Tuner-Code: unverändert.
 
-## Technische Details
-- Migration fügt Spalte mit Default 0 hinzu (keine NOT-NULL-Verletzung bei Bestand), danach Seed-Insert mit `ON CONFLICT (sku) DO UPDATE` für Idempotenz.
-- Pro Rechnungsposition wird der gewählte Preistyp **nicht** in der DB persistiert — nur der finale `unit_price_gross` zählt (entspricht aktueller Datenstruktur).
+## Verifikation
+
+- Build muss grün sein (Tsgo-Typecheck — Interface `GamePitchDebugInfo` unverändert).
+- Konsolen-Log nach Start im Spiel sollte auf iPad zeigen: `[PitchDetect] N/A AnalyserNode started` und kontinuierlich `frame=… rms=… freq=…` mit `rms > 0` sobald in die Trompete gespielt wird.
+- Debug-Overlay im Spiel zeigt steigenden `Frames`-Counter und `Freq`-Wert.
