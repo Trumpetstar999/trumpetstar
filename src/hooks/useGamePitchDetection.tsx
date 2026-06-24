@@ -207,8 +207,8 @@ export function useGamePitchDetection(
         frequency: lastFreqRef.current,
         frameCount: frameCountRef.current,
         iosPath: iosPathRef.current,
-        scriptFireCount: scriptFireCountRef.current,
-        maxAmplitude: maxAmplitudeRef.current,
+        scriptFireCount: 0,
+        maxAmplitude: 0,
       });
     }
 
