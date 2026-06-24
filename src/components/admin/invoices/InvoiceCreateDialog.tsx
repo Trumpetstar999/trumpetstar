@@ -58,7 +58,7 @@ export function InvoiceCreateDialog({ open, onClose }: Props) {
       country: 'AT',
       invoice_date: today,
       notes: '',
-      items: [{ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0 }],
+      items: [{ product_id: '', description: '', quantity: 1, unit: 'Stück', unit_price_gross: 0, discount_percent: 0, price_type: 'retail' }],
       new_customer_name: '',
       new_customer_company: '',
       new_customer_street: '',
