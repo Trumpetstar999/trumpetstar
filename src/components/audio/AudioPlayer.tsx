@@ -56,7 +56,7 @@ export function AudioPlayer() {
   useEffect(() => {
     const fetchLevels = async () => {
       setIsLoadingLevels(true);
-      const { data } = await supabase.from('audio_levels').select('id, name').order('created_at', { ascending: true });
+      const { data } = await supabase.from('audio_levels').select('id, name').order('sort_order', { ascending: true });
       setLevels(data || []);
       if (data && data.length > 0) setSelectedLevelId(data[0].id);
       setIsLoadingLevels(false);
