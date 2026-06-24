@@ -322,12 +322,13 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
   const [editingLevelName, setEditingLevelName] = useState('');
   const [openLevelId, setOpenLevelId] = useState<string | null>(null);
   const [draggingItem, setDraggingItem] = useState<{ levelId: string; index: number } | null>(null);
+  const [draggingLevelIndex, setDraggingLevelIndex] = useState<number | null>(null);
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const fetchLevels = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase.from('audio_levels').select('id, name').order('created_at', { ascending: true });
+    const { data, error } = await supabase.from('audio_levels').select('id, name').order('sort_order', { ascending: true });
     if (error) { console.error(error); setIsLoading(false); return; }
     const withItems: AudioLevel[] = await Promise.all(
       (data || []).map(async (level) => {
@@ -346,12 +347,26 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
   useEffect(() => { fetchLevels(); }, [refreshTrigger]);
   useEffect(() => () => { audioRef.current?.pause(); }, []);
 
+  const handleReorderLevels = async (fromIndex: number, toIndex: number) => {
+    const newLevels = [...levels];
+    const [moved] = newLevels.splice(fromIndex, 1);
+    newLevels.splice(toIndex, 0, moved);
+    setLevels(newLevels);
+    for (const [i, l] of newLevels.entries()) {
+      await supabase.from('audio_levels').update({ sort_order: i }).eq('id', l.id);
+    }
+    onRefresh();
+  };
+
+
+
   const handleCreateLevel = async () => {
     if (!newLevelName.trim()) return;
-    const { error } = await supabase.from('audio_levels').insert({ name: newLevelName.trim() });
+    const { error } = await supabase.from('audio_levels').insert({ name: newLevelName.trim(), sort_order: levels.length });
     if (error) toast.error('Fehler beim Erstellen: ' + error.message);
     else { toast.success('Level erstellt'); setNewLevelName(''); fetchLevels(); onRefresh(); }
   };
+
 
   const handleRenameLevel = async (id: string) => {
     if (!editingLevelName.trim()) return;
@@ -416,14 +431,32 @@ function AudioLevelManager({ refreshTrigger, onRefresh }: { refreshTrigger: numb
         </div>
       ) : (
         <div className="space-y-3">
-          {levels.map(level => {
+          {levels.map((level, levelIdx) => {
             const isEditing = editingLevelId === level.id;
             const isOpen = openLevelId === level.id;
             return (
               <Collapsible key={level.id} open={isOpen} onOpenChange={(open) => setOpenLevelId(open ? level.id : null)}>
-                <div className="bg-muted rounded-lg overflow-hidden">
+                <div
+                  className={`bg-muted rounded-lg overflow-hidden ${draggingLevelIndex === levelIdx ? 'opacity-50' : ''}`}
+                  onDragOver={(e) => {
+                    if (draggingLevelIndex === null || draggingLevelIndex === levelIdx) return;
+                    e.preventDefault();
+                    handleReorderLevels(draggingLevelIndex, levelIdx);
+                    setDraggingLevelIndex(levelIdx);
+                  }}
+                >
                   <div className="flex items-center gap-3 p-3">
+                    <button
+                      draggable
+                      onDragStart={() => setDraggingLevelIndex(levelIdx)}
+                      onDragEnd={() => setDraggingLevelIndex(null)}
+                      className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground touch-none shrink-0"
+                      title="Ziehen, um Reihenfolge zu ändern"
+                    >
+                      <GripVertical className="w-5 h-5" />
+                    </button>
                     <Layers className="w-5 h-5 text-primary shrink-0" />
+
                     <div className="flex-1 min-w-0">
                       {isEditing ? (
                         <div className="flex items-center gap-2">
@@ -515,9 +548,10 @@ export function AudioPlayerManager() {
   const [levels, setLevels] = useState<AudioLevel[]>([]);
 
   const fetchLevels = async () => {
-    const { data } = await supabase.from('audio_levels').select('id, name').order('created_at', { ascending: true });
+    const { data } = await supabase.from('audio_levels').select('id, name').order('sort_order', { ascending: true });
     if (data) setLevels(data.map(l => ({ ...l, items: [] })));
   };
+
 
   useEffect(() => { fetchLevels(); }, [refreshTrigger]);
 
