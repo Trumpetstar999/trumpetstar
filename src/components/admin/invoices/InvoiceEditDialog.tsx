@@ -194,7 +194,12 @@ export function InvoiceEditDialog({ invoiceId, onClose }: Props) {
   return (
     <Dialog open={!!invoiceId} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto bg-white border border-gray-200 shadow-xl p-0 rounded-xl [&>button:last-child]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Rechnung bearbeiten {invoice?.invoice_number ?? ''}</DialogTitle>
+          <DialogDescription>Positionen, Preise und Status der Rechnung anpassen.</DialogDescription>
+        </VisuallyHidden>
         {/* Header */}
+
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 z-10 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
             Rechnung bearbeiten — {invoice?.invoice_number}
