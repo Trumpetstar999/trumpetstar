@@ -189,42 +189,40 @@ export function GameHighscores() {
               <div
                 key={s.id}
                 className={cn(
-                  'glass rounded-xl p-3 flex items-center gap-3',
+                  'glass rounded-lg px-2.5 py-1.5 flex items-center gap-2',
                   isMe && tab === 'global' ? 'ring-1 ring-white/20' : ''
                 )}
               >
                 <div className={cn(
-                  'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
+                  'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
                   i === 0 ? 'bg-[hsl(var(--reward-gold))]/20 text-[hsl(var(--reward-gold))]' :
                   i === 1 ? 'bg-white/10 text-white/70' :
                   i === 2 ? 'bg-orange-500/20 text-orange-400' :
                   'bg-white/5 text-white/40'
                 )}>
-                  #{i + 1}
+                  {i + 1}
                 </div>
-                <Avatar className="w-7 h-7 shrink-0">
+                <Avatar className="w-6 h-6 shrink-0">
                   <AvatarImage src={ep.avatarUrl ?? undefined} />
-                  <AvatarFallback className="bg-white/10 text-white text-[10px] font-bold">
+                  <AvatarFallback className="bg-white/10 text-white text-[9px] font-bold">
                     {ep.initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-white font-bold text-sm">{s.score} pts</span>
-                    <span className="text-white/50 text-[11px] truncate">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-white font-bold text-xs">{s.score}</span>
+                    <span className="text-white/50 text-[10px] truncate">
                       {ep.name}{isMe && tab === 'global' ? ' (Du)' : ''}
                     </span>
                   </div>
-                  <div className="text-white/40 text-[10px] flex items-center gap-2">
-                    <span className="flex items-center gap-0.5"><Flame className="w-3 h-3" />{s.best_streak}</span>
+                  <div className="text-white/40 text-[9px] flex items-center gap-1.5">
+                    <span className="flex items-center gap-0.5"><Flame className="w-2.5 h-2.5" />{s.best_streak}</span>
                     <span>Lv.{s.level_reached}</span>
                     <span>{s.accuracy}%</span>
-                    <span>{s.scale_key} {s.scale_type}</span>
                   </div>
                 </div>
-                <div className="text-white/30 text-[10px] flex items-center gap-1 shrink-0">
-                  <Calendar className="w-3 h-3" />
-                  {new Date(s.created_at).toLocaleDateString('de-DE')}
+                <div className="text-white/30 text-[9px] shrink-0">
+                  {new Date(s.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}
                 </div>
               </div>
             );
