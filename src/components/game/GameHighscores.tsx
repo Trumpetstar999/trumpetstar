@@ -110,7 +110,7 @@ export function GameHighscores() {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-3 space-y-3 max-w-md mx-auto text-sm">
       <div className="flex items-center gap-2 mb-2">
         <Trophy className="w-5 h-5 text-[hsl(var(--reward-gold))]" />
         <h2 className="text-lg font-bold text-white">Highscores</h2>
