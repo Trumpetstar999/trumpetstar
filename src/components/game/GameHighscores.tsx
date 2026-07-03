@@ -28,7 +28,7 @@ interface HighscoreEntry {
 
 export function GameHighscores() {
   const { user } = useAuth();
-  const [tab, setTab] = useState<ScoreTab>('mine');
+  const [tab, setTab] = useState<ScoreTab>('global');
   const [filter, setFilter] = useState<FilterPeriod>('all');
   const [scores, setScores] = useState<HighscoreEntry[]>([]);
   const [loading, setLoading] = useState(true);
