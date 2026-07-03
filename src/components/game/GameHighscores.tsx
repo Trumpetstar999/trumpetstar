@@ -70,14 +70,14 @@ export function GameHighscores() {
           .select('*')
           .eq('user_id', user.id)
           .order('score', { ascending: false })
-          .limit(20);
+          .limit(200);
         if (sinceIso) query = query.gte('created_at', sinceIso);
         const { data } = await query;
         setScores((data as HighscoreEntry[]) || []);
       } else {
         const { data } = await supabase.rpc('get_global_top_highscores', {
           p_since: sinceIso,
-          p_limit: 20,
+          p_limit: 200,
         });
         const rows = (data as (HighscoreEntry & { display_name: string | null; avatar_url: string | null })[]) || [];
         setScores(rows);
