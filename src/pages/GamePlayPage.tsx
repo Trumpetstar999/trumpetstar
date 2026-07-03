@@ -41,38 +41,34 @@ export default function GamePlayPage() {
     }
   }, [pitchData, gameState.isRunning, checkHit]);
 
-  // Save highscore on game over
-  useEffect(() => {
-    if (gameState.isGameOver && user) {
-      const accuracy =
-        gameState.totalCount > 0
-          ? Math.round((gameState.correctCount / gameState.totalCount) * 100)
-          : 0;
+  // Save highscore triggered from the GameOver overlay (after name entry)
+  const handleSaveScore = useCallback(async (playerName: string) => {
+    if (!user) return;
+    const accuracy =
+      gameState.totalCount > 0
+        ? Math.round((gameState.correctCount / gameState.totalCount) * 100)
+        : 0;
 
-      supabase
-        .from('game_highscores')
-        .insert({
-          user_id: user.id,
-          score: gameState.score,
-          best_streak: gameState.bestStreak,
-          level_reached: gameState.level,
-          accuracy,
-          notes_correct: gameState.correctCount,
-          notes_total: gameState.totalCount,
-          scale_key: settings.key,
-          scale_type: settings.scaleType,
-          accidental_mode: settings.accidentalMode,
-          range_min: settings.rangeMin,
-          range_max: settings.rangeMax,
-        })
-        .then(() => {});
+    await supabase.from('game_highscores').insert({
+      user_id: user.id,
+      score: gameState.score,
+      best_streak: gameState.bestStreak,
+      level_reached: gameState.level,
+      accuracy,
+      notes_correct: gameState.correctCount,
+      notes_total: gameState.totalCount,
+      scale_key: settings.key,
+      scale_type: settings.scaleType,
+      accidental_mode: settings.accidentalMode,
+      range_min: settings.rangeMin,
+      range_max: settings.rangeMax,
+      player_name: playerName || null,
+    });
 
-      supabase
-        .from('video_completions')
-        .insert({ user_id: user.id, video_id: null, playback_speed: 1 })
-        .then(() => {});
-    }
-  }, [gameState.isGameOver, user, gameState, settings]);
+    await supabase
+      .from('video_completions')
+      .insert({ user_id: user.id, video_id: null, playback_speed: 1 });
+  }, [user, gameState, settings]);
 
   // -----------------------------------------------------------------------
   // Mic activation handler
