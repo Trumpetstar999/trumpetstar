@@ -208,7 +208,7 @@ export default function GamePlayPage() {
         onClose={() => setSettingsOpen(false)}
       />
 
-      <GameOverOverlay gameState={gameState} onRestart={handleRestart} onBack={handleBack} />
+      <GameOverOverlay gameState={gameState} onRestart={handleRestart} onBack={handleBack} onSaveScore={handleSaveScore} />
     </div>
   );
 }
