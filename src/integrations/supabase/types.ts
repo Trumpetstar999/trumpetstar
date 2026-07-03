@@ -3886,6 +3886,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_global_top_highscores: {
+        Args: { p_limit?: number; p_since?: string }
+        Returns: {
+          accuracy: number
+          avatar_url: string
+          best_streak: number
+          created_at: string
+          display_name: string
+          id: string
+          level_reached: number
+          scale_key: string
+          scale_type: string
+          score: number
+          user_id: string
+        }[]
+      }
       get_public_star_ranking: {
         Args: never
         Returns: {
