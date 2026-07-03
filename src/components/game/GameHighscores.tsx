@@ -24,6 +24,7 @@ interface HighscoreEntry {
   scale_type: string;
   created_at: string;
   user_id: string;
+  player_name?: string | null;
 }
 
 export function GameHighscores() {
@@ -103,10 +104,15 @@ export function GameHighscores() {
   const myInitials = myDisplayName.slice(0, 2).toUpperCase();
 
   const getEntryProfile = (entry: HighscoreEntry) => {
-    if (tab === 'mine') return { name: myDisplayName, initials: myInitials, avatarUrl: profile?.avatar_url };
+    const custom = entry.player_name?.trim();
+    if (tab === 'mine') {
+      const name = custom || myDisplayName;
+      return { name, initials: name.slice(0, 2).toUpperCase(), avatarUrl: profile?.avatar_url };
+    }
     const p = profileMap[entry.user_id];
-    const name = p?.display_name || 'Spieler';
-    return { name, initials: name.slice(0, 2).toUpperCase(), avatarUrl: p?.avatar_url };
+    const baseName = p?.display_name || 'Spieler';
+    const name = custom ? `${custom} (${baseName})` : baseName;
+    return { name, initials: (custom || baseName).slice(0, 2).toUpperCase(), avatarUrl: p?.avatar_url };
   };
 
   return (

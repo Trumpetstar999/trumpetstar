@@ -1304,6 +1304,7 @@ export type Database = {
           level_reached: number
           notes_correct: number
           notes_total: number
+          player_name: string | null
           range_max: string
           range_min: string
           scale_key: string
@@ -1320,6 +1321,7 @@ export type Database = {
           level_reached?: number
           notes_correct?: number
           notes_total?: number
+          player_name?: string | null
           range_max?: string
           range_min?: string
           scale_key?: string
@@ -1336,6 +1338,7 @@ export type Database = {
           level_reached?: number
           notes_correct?: number
           notes_total?: number
+          player_name?: string | null
           range_max?: string
           range_min?: string
           scale_key?: string
@@ -3896,6 +3899,7 @@ export type Database = {
           display_name: string
           id: string
           level_reached: number
+          player_name: string
           scale_key: string
           scale_type: string
           score: number
