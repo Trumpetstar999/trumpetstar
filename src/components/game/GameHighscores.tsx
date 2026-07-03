@@ -24,6 +24,7 @@ interface HighscoreEntry {
   scale_type: string;
   created_at: string;
   user_id: string;
+  player_name?: string | null;
 }
 
 export function GameHighscores() {
