@@ -53,44 +53,37 @@ export function GameHighscores() {
     const fetchScores = async () => {
       setLoading(true);
 
-      let query = supabase
-        .from('game_highscores')
-        .select('*')
-        .order('score', { ascending: false })
-        .limit(20);
-
-      if (tab === 'mine') {
-        query = query.eq('user_id', user.id);
-      }
-
+      let sinceIso: string | null = null;
       if (filter === 'today') {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        query = query.gte('created_at', today.toISOString());
+        sinceIso = today.toISOString();
       } else if (filter === 'week') {
         const week = new Date();
         week.setDate(week.getDate() - 7);
-        query = query.gte('created_at', week.toISOString());
+        sinceIso = week.toISOString();
       }
 
-      const { data } = await query;
-      const entries = (data as HighscoreEntry[]) || [];
-      setScores(entries);
-
-      // For global tab: fetch all unique user profiles
-      if (tab === 'global' && entries.length > 0) {
-        const userIds = [...new Set(entries.map(e => e.user_id))];
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('id, display_name, avatar_url')
-          .in('id', userIds);
-
-        if (profileData) {
-          const map: Record<string, UserProfile> = {};
-          (profileData as Array<{ id: string; display_name: string | null; avatar_url: string | null }>)
-            .forEach(p => { map[p.id] = { display_name: p.display_name, avatar_url: p.avatar_url }; });
-          setProfileMap(map);
-        }
+      if (tab === 'mine') {
+        let query = supabase
+          .from('game_highscores')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('score', { ascending: false })
+          .limit(20);
+        if (sinceIso) query = query.gte('created_at', sinceIso);
+        const { data } = await query;
+        setScores((data as HighscoreEntry[]) || []);
+      } else {
+        const { data } = await supabase.rpc('get_global_top_highscores', {
+          p_since: sinceIso,
+          p_limit: 20,
+        });
+        const rows = (data as (HighscoreEntry & { display_name: string | null; avatar_url: string | null })[]) || [];
+        setScores(rows);
+        const map: Record<string, UserProfile> = {};
+        rows.forEach(r => { map[r.user_id] = { display_name: r.display_name, avatar_url: r.avatar_url }; });
+        setProfileMap(map);
       }
 
       setLoading(false);
@@ -98,6 +91,7 @@ export function GameHighscores() {
 
     fetchScores();
   }, [user, filter, tab]);
+
 
   const filterButtons: { key: FilterPeriod; label: string }[] = [
     { key: 'today', label: 'Heute' },
