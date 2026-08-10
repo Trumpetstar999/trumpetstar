@@ -265,6 +265,10 @@ export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: nu
   return wb;
 }
 
+export function workbookToBase64(wb: XLSX.WorkBook): string {
+  return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' }) as string;
+}
+
 export interface ExportProgress {
   current: number;
   total: number;
