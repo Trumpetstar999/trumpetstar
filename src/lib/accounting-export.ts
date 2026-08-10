@@ -52,11 +52,12 @@ export async function fetchQuarterInvoices(
 }
 
 /** Render one invoice to a real PDF blob using an off-screen container. */
-async function invoiceToPdfBlob(
+export async function invoiceToPdfBlob(
   invoice: FullInvoice,
-  logoDataUrl: string | undefined,
-  html2pdf: typeof import('html2pdf.js').default
+  logoDataUrl?: string,
+  html2pdfImpl?: typeof import('html2pdf.js').default
 ): Promise<Blob> {
+  const html2pdf = html2pdfImpl ?? (await import('html2pdf.js')).default;
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
   const parsed = new DOMParser().parseFromString(html, 'text/html');
 
