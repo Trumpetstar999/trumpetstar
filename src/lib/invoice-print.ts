@@ -39,7 +39,7 @@ async function generateEpcQrCode(invoice: Invoice): Promise<string> {
 }
 
 /** Build a safe filename: e.g. "2026-001_Jennifer_Ederer" */
-function buildInvoiceFilename(invoice: Invoice & { customer: Customer }): string {
+export function buildInvoiceFilename(invoice: Invoice & { customer: Customer }): string {
   const customerLabel = (invoice.customer.company_name || invoice.customer.name)
     .replace(/[^a-zA-Z0-9äöüÄÖÜß\-_. ]/g, '')
     .replace(/\s+/g, '_')
@@ -301,7 +301,7 @@ ${invoice.notes ? `<p style="margin-top:6px;font-size:8.5pt;"><strong>Anmerkung:
 }
 
 // Convert local image to base64 data URL for embedding
-async function getLogoDataUrl(): Promise<string | undefined> {
+export async function getLogoDataUrl(): Promise<string | undefined> {
   try {
     const logoModule = await import('@/assets/trumpetstar-logo.png');
     const logoUrl = logoModule.default;
