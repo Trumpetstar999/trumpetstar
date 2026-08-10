@@ -51,7 +51,11 @@ export async function fetchQuarterInvoices(
   }));
 }
 
-/** Render one invoice to a real PDF blob using an off-screen container. */
+/**
+ * Render one invoice to a real PDF blob.
+ * The invoice HTML is rendered inside an isolated off-screen iframe so its
+ * global CSS (e.g. `* { margin: 0 }`) cannot leak into the app document.
+ */
 export async function invoiceToPdfBlob(
   invoice: FullInvoice,
   logoDataUrl?: string,
@@ -59,33 +63,66 @@ export async function invoiceToPdfBlob(
 ): Promise<Blob> {
   const html2pdf = html2pdfImpl ?? (await import('html2pdf.js')).default;
   const html = await generateInvoiceHTML(invoice, logoDataUrl);
-  const parsed = new DOMParser().parseFromString(html, 'text/html');
 
-  const holder = document.createElement('div');
-  holder.style.cssText =
-    'position:fixed;left:-10000px;top:0;width:210mm;background:#ffffff;z-index:-1;';
-  holder.innerHTML = parsed.body.innerHTML;
-  // Carry over any <style> blocks from the generated document
-  parsed.head.querySelectorAll('style').forEach((styleEl) => {
-    holder.appendChild(styleEl.cloneNode(true));
-  });
-  document.body.appendChild(holder);
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.style.cssText =
+    'position:fixed;left:-10000px;top:0;width:210mm;height:400mm;border:none;background:#ffffff;';
+  document.body.appendChild(iframe);
 
   try {
+    const doc = iframe.contentDocument;
+    if (!doc) throw new Error('PDF-Rendering fehlgeschlagen (kein Dokument).');
+
+    await new Promise<void>((resolve) => {
+      iframe.onload = () => resolve();
+      doc.open();
+      doc.write(html);
+      doc.close();
+      // Fallback in case onload already fired
+      setTimeout(resolve, 800);
+    });
+
+    const body = doc.body;
+    // Mirror the print margins (@media print) for the rendered PDF
+    body.style.width = '210mm';
+    body.style.padding = '18mm 20mm 20mm 25mm';
+    body.style.background = '#ffffff';
+
+    // Wait for images (logo, QR code) to finish decoding
+    await Promise.all(
+      Array.from(doc.images).map((img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            })
+      )
+    );
+
     const blob = (await html2pdf()
       .set({
         margin: 0,
         image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          windowWidth: body.scrollWidth,
+          windowHeight: body.scrollHeight,
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] },
       })
-      .from(holder)
+      .from(body)
       .output('blob')) as Blob;
     return blob;
   } finally {
-    holder.remove();
+    iframe.remove();
   }
 }
+
 
 function buildWorkbook(invoices: FullInvoice[], year: number, quarter: number) {
   const headers = [
