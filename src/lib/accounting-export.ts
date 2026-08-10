@@ -128,7 +128,7 @@ export async function invoiceToPdfBlob(
 }
 
 
-function buildWorkbook(invoices: FullInvoice[], year: number, quarter: number) {
+export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: number) {
   const headers = [
     'Rechnungsnummer',
     'Rechnungsdatum',
