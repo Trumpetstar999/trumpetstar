@@ -84,6 +84,11 @@ export async function invoiceToPdfBlob(
     });
 
     const body = doc.body;
+    // html2canvas clones only the given element, so the <head> styles must live
+    // inside the cloned subtree — otherwise all class-based CSS is lost.
+    doc.head.querySelectorAll('style').forEach((styleEl) => {
+      body.appendChild(styleEl.cloneNode(true));
+    });
     // Mirror the print margins (@media print) for the rendered PDF
     body.style.width = '210mm';
     body.style.padding = '18mm 20mm 20mm 25mm';
