@@ -113,7 +113,6 @@ export async function invoiceToPdfBlob(
           windowHeight: body.scrollHeight,
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
       })
       .from(body)
       .output('blob')) as Blob;
