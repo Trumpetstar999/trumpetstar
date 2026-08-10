@@ -81,28 +81,49 @@ export function QuarterExportDialog({ open, onOpenChange }: Props) {
 
   const busy = progress !== null;
 
+  const selectCls =
+    'mt-1 w-full h-9 px-3 rounded-md border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition disabled:opacity-60';
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!busy) onOpenChange(v); }}>
-      <DialogContent className="max-w-lg bg-white">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-foreground">
-            <FileArchive className="w-5 h-5 text-blue-600" />
-            Quartals-Export für die Buchhaltung
-          </DialogTitle>
-          <DialogDescription>
-            Alle Rechnungen des Quartals als ZIP mit Belegen (PDF) und Excel-Übersicht.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-lg bg-white border border-gray-200 shadow-xl p-0 rounded-xl [&>button:last-child]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Quartals-Export für die Buchhaltung</DialogTitle>
+          <DialogDescription>Alle Rechnungen des Quartals als ZIP mit Belegen und Excel-Übersicht.</DialogDescription>
+        </VisuallyHidden>
 
-        <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-100">
+          <div className="flex items-start gap-3">
+            <span className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <FileArchive className="w-4 h-4 text-blue-600" />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Quartals-Export</h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                ZIP mit Belegen (PDF) und Excel-Übersicht für die Buchhaltung.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => !busy && onOpenChange(false)}
+            disabled={busy}
+            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-5">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Jahr</label>
+              <label className="block text-xs font-medium text-gray-600">Jahr</label>
               <select
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
                 disabled={busy}
-                className="w-full h-9 px-3 rounded-md border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                className={selectCls}
               >
                 {years.map((y) => (
                   <option key={y} value={y}>{y}</option>
@@ -110,12 +131,12 @@ export function QuarterExportDialog({ open, onOpenChange }: Props) {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Quartal</label>
+              <label className="block text-xs font-medium text-gray-600">Quartal</label>
               <select
                 value={quarter}
                 onChange={(e) => setQuarter(Number(e.target.value))}
                 disabled={busy}
-                className="w-full h-9 px-3 rounded-md border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                className={selectCls}
               >
                 {[1, 2, 3, 4].map((q) => (
                   <option key={q} value={q}>Q{q}</option>
@@ -124,42 +145,46 @@ export function QuarterExportDialog({ open, onOpenChange }: Props) {
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            Zeitraum: {range.from} bis {range.to}
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-gray-500">
+              Zeitraum: <span className="font-medium text-gray-700">{range.from}</span> bis{' '}
+              <span className="font-medium text-gray-700">{range.to}</span>
+            </p>
+            <label className="flex items-center gap-2 text-xs text-gray-600 whitespace-nowrap">
+              <input
+                type="checkbox"
+                checked={includeDrafts}
+                onChange={(e) => setIncludeDrafts(e.target.checked)}
+                disabled={busy}
+                className="w-4 h-4 accent-blue-600"
+              />
+              Entwürfe einbeziehen
+            </label>
+          </div>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={includeDrafts}
-              onChange={(e) => setIncludeDrafts(e.target.checked)}
-              disabled={busy}
-              className="w-4 h-4 accent-blue-600"
-            />
-            Entwürfe mit einbeziehen
-          </label>
-
-          <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
             {loadingPreview ? (
-              <span className="flex items-center gap-2 text-muted-foreground">
+              <span className="flex items-center gap-2 text-sm text-gray-500">
                 <Loader2 className="w-4 h-4 animate-spin" /> Lade Rechnungen…
               </span>
             ) : (
               <>
-                <p className="font-medium">{preview?.length ?? 0} Rechnungen im Zeitraum</p>
-                <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-                  <div>
-                    <p className="text-muted-foreground">Netto</p>
-                    <p className="font-semibold">EUR {formatCurrency(totals.net)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">USt</p>
-                    <p className="font-semibold">EUR {formatCurrency(totals.vat)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Brutto</p>
-                    <p className="font-semibold">EUR {formatCurrency(totals.gross)}</p>
-                  </div>
+                <p className="text-sm font-semibold text-gray-900">
+                  {preview?.length ?? 0} Rechnungen im Zeitraum
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-3">
+                  {[
+                    { label: 'Netto', value: totals.net },
+                    { label: 'USt', value: totals.vat },
+                    { label: 'Brutto', value: totals.gross },
+                  ].map((row) => (
+                    <div key={row.label} className="rounded-md bg-white border border-gray-200 px-3 py-2">
+                      <p className="text-[11px] uppercase tracking-wide text-gray-500">{row.label}</p>
+                      <p className="text-sm font-semibold text-gray-900 tabular-nums">
+                        EUR {formatCurrency(row.value)}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
@@ -171,18 +196,25 @@ export function QuarterExportDialog({ open, onOpenChange }: Props) {
             </p>
           )}
 
-          <div className="flex justify-end gap-2 pt-1">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
+          {/* Footer */}
+          <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={busy}
+              className="px-4 h-9 rounded-md border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition disabled:opacity-50"
+            >
               Abbrechen
-            </Button>
-            <Button
+            </button>
+            <button
+              type="button"
               onClick={handleExport}
               disabled={busy || loadingPreview || (preview?.length ?? 0) === 0}
-              className="gap-1.5"
+              className="px-4 h-9 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium inline-flex items-center gap-1.5 transition disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
               ZIP herunterladen
-            </Button>
+            </button>
           </div>
         </div>
       </DialogContent>
