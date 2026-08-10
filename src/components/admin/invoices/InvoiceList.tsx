@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Eye, Printer, Trash2, Search, Plus, FileText, Download } from 'lucide-react';
+import { Eye, Printer, Trash2, Search, Plus, FileText, Download, FileArchive } from 'lucide-react';
 import { useInvoices, useDeleteInvoice } from '@/hooks/useInvoices';
 import { formatCurrency, formatDate } from '@/lib/vat';
 import type { Invoice, Customer } from '@/types/invoice';
 import { InvoiceThumbnailHover } from './InvoiceThumbnailHover';
+import { QuarterExportDialog } from './QuarterExportDialog';
 
 
 function exportSteuerberaterCSV(invoices: (Invoice & { customer: Customer })[]) {
@@ -103,6 +104,7 @@ export function InvoiceList({ onView, onCreate }: Props) {
   const { data: invoices = [], isLoading } = useInvoices();
   const deleteInvoice = useDeleteInvoice();
   const [search, setSearch] = useState('');
+  const [quarterExportOpen, setQuarterExportOpen] = useState(false);
 
   const filtered = invoices.filter((inv) => {
     const q = search.toLowerCase();
@@ -160,6 +162,16 @@ export function InvoiceList({ onView, onCreate }: Props) {
         >
           <Download className="w-4 h-4" />
           Steuerberater Export
+        </Button>
+        <Button
+          onClick={() => setQuarterExportOpen(true)}
+          size="sm"
+          variant="outline"
+          className="gap-1.5"
+          title="Alle Rechnungen eines Quartals als ZIP mit Belegen + Excel-Übersicht"
+        >
+          <FileArchive className="w-4 h-4" />
+          Quartals-Export
         </Button>
         <Button onClick={onCreate} size="sm" className="gap-1.5">
           <Plus className="w-4 h-4" />
@@ -250,6 +262,8 @@ export function InvoiceList({ onView, onCreate }: Props) {
           </table>
         )}
       </div>
+
+      <QuarterExportDialog open={quarterExportOpen} onOpenChange={setQuarterExportOpen} />
     </div>
   );
 }
