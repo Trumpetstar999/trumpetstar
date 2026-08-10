@@ -1,64 +1,45 @@
-# NoteRunner: iPad-taugliche Tonerkennung (Port aus Tone-Force)
+# Quartals-Export für die Buchhaltung
 
-Im Schwesterprojekt **Tone-Force** funktioniert die Tonerkennung am iPad zuverlässig. Wir übernehmen exakt diesen Ansatz für NoteRunner – er ist deutlich einfacher und robuster als die aktuelle Implementierung.
+Neuer Bereich im Adminbereich → Rechnungen: ein Quartals-Export, der alle Rechnungen eines Quartals als ZIP-Datei bereitstellt — fertig zum Weitergeben an die Steuerberaterin.
 
-## Was sich ändert
+## Was der Nutzer sieht
 
-Nur eine Datei wird angefasst: `src/hooks/useGamePitchDetection.tsx`. `GamePlayPage.tsx`, der Game-Loop, die HUD und die Settings bleiben unverändert. Die Public-API des Hooks (Rückgabewerte, Signaturen) bleibt 1:1 gleich.
+Im Tab „Rechnungen" ein neuer Button **„Quartals-Export"**. Er öffnet einen kleinen Dialog:
 
-## Übernahme aus Tone-Force
+- Auswahl Jahr (z. B. 2026) und Quartal (Q1–Q4)
+- Anzeige, wie viele Rechnungen im Zeitraum liegen und die Summe (Netto / USt / Brutto)
+- Option: nur finalisierte Rechnungen (Standard) oder inkl. Entwürfe
+- Button „ZIP herunterladen" mit Fortschrittsanzeige (z. B. „Rechnung 4 von 17")
 
-### 1. getUserMedia-Constraints (Apple-Mics liefern sonst zu leise)
-```ts
-audio: {
-  echoCancellation: false,
-  noiseSuppression: false,
-  autoGainControl: IOS,   // <-- neu: auf iOS aktiv, sonst aus
-  channelCount: 1,
-  sampleRate: 48000,
-}
-```
-Fallback auf `{ audio: true }` bleibt erhalten.
-
-### 2. AudioContext-Setup vereinfachen
-- Kein „silent buffer unlock" mehr (wird auf iPadOS nicht gebraucht, der User-Gesture-Tap reicht).
-- `ctx.resume()` nur falls suspended.
-- `analyser.fftSize = 2048` (statt 8192 auf iOS) – schneller, stabiler auf Safari.
-- `analyser.smoothingTimeConstant = 0`.
-
-### 3. Pitch-Detector durch ACF2+ aus Tone-Force ersetzen
-- RMS-Gate: `0.003`.
-- Trimmen auf Threshold `0.2`.
-- Autokorrelation mit Schwellwerttest `maxval / c[0] ≥ 0.3` (verwirft schwache Korrelationen).
-- Parabolische Interpolation am Peak.
-- Liefert Frequenz in Hz oder `-1`.
-
-Die plattform-spezifischen Konstanten (`FFT_SIZE`-Verzweigung, `CORRELATION_THRESHOLD`, `RMS_SILENCE`, `CONFIDENCE_FACTOR`, `STABILITY_MS`, der alte `autoCorrelate` mit AMDF) entfallen. Eine einheitliche `STABILITY_MS = 120` wird verwendet (Tone-Force nimmt 150 ms, NoteRunner nutzte vorher 120/100 ms – wir bleiben bei 120 ms für schnelles Spielgefühl).
-
-### 4. Aufräumen
-Die noch verbliebenen ungenutzten Felder/Refs aus dem alten iOS-Worklet-Pfad (`scriptFireCount`, `maxAmplitude`, `iosPath`) werden auf statische Werte gesetzt bzw. entfernt, soweit sie das DebugInfo-Interface nicht brechen. Das Debug-Overlay in `GamePlayPage` bleibt funktionsfähig.
-
-## Technische Details
+Ergebnis: `Buchhaltung_2026_Q1.zip`
 
 ```text
-useGamePitchDetection
-├─ startListening()
-│   ├─ new AudioContext()  → resume() if suspended
-│   ├─ getUserMedia({ autoGainControl: IOS, channelCount:1, sampleRate:48000 })
-│   ├─ createMediaStreamSource → AnalyserNode (fftSize=2048, smoothing=0)
-│   └─ requestAnimationFrame loop
-│         getFloatTimeDomainData → detectPitchACF2Plus(buf, sampleRate)
-│         → processPitchRef.current(freq, rms, sr) // unverändert
-└─ stopListening()  // unverändert
+Buchhaltung_2026_Q1.zip
+├── Uebersicht_2026_Q1.xlsx
+└── Belege/
+    ├── 2026-001_Musterkunde.pdf
+    ├── 2026-002_Musik-Instrumentenhaus.pdf
+    └── ...
 ```
 
-`detectPitchACF2Plus` ist die Eins-zu-eins-Portierung von `src/lib/pitch.ts` aus Tone-Force – inklusive RMS-Berechnung, sodass wir nicht zweimal über den Buffer laufen müssen (`rms` wird zusätzlich zurückgegeben für `processPitch`).
+## Excel-Übersicht
+
+Ein Blatt „Rechnungen" mit einer Zeile pro Rechnung:
+Rechnungsnummer, Rechnungsdatum, Fälligkeitsdatum, Kunde, Firma, Land, UID, USt-Satz, Netto, USt-Betrag, Brutto, bezahlt, offen, Status, Dateiname des Belegs.
+
+Darunter eine Summenzeile mit Excel-Formeln (SUMME über die Spalten Netto/USt/Brutto), damit die Steuerberaterin nachrechnen kann. Zusätzlich ein Blatt „USt-Zusammenfassung": Summen je USt-Satz (10 % AT, 7 % DE B2C, 0 % Reverse Charge) mit Hinweistext für steuerfreie innergemeinschaftliche Lieferungen.
+
+Formatierung: Arial, Kopfzeile fett mit dezenter Füllung, Beträge als `#,##0.00`, Datum als `TT.MM.JJJJ`, Spaltenbreiten gesetzt, Kopfzeile fixiert.
+
+## Technische Umsetzung
+
+- Neue Abhängigkeiten: `jszip` und `html2pdf.js` (Typdeklaration für html2pdf existiert bereits im Projekt). `xlsx` ist bereits installiert — für Zellformatierung und Formeln nutze ich `xlsx` mit expliziten Cell-Objekten (`t`, `f`, `z`).
+- Datenabruf: eine Query auf Rechnungen im Zeitraum `invoice_date >= Quartalsstart` und `<= Quartalsende`, inklusive Kunde und Positionen (gleiche Select-Struktur wie im bestehenden Detail-Dialog), sortiert nach Rechnungsnummer.
+- PDF-Erzeugung: das bestehende `generateInvoiceHTML` aus `src/lib/invoice-print.ts` wird wiederverwendet. Das HTML wird in einen versteckten Off-Screen-Container gerendert und über `html2pdf.js` als A4-PDF-Blob (`output('blob')`) erzeugt — also echte PDF-Dateien im ZIP, kein Druckdialog pro Rechnung.
+- Neue Datei `src/lib/accounting-export.ts` mit `buildQuarterExport(year, quarter, options, onProgress)`: lädt Daten, erzeugt PDFs sequenziell (verhindert Speicherspitzen), baut die XLSX-Datei, packt alles per JSZip und löst den Download aus.
+- Neue Komponente `src/components/admin/invoices/QuarterExportDialog.tsx`, eingebunden über einen Button in `InvoiceList` (neben „Neue Rechnung"), im bestehenden Admin-Design (`admin.css`).
+- Keine Datenbank- oder Schemaänderungen nötig.
 
 ## Verifikation
 
-- Build muss grün sein (tsgo).
-- Auf iPad in der Console erwartet:
-  `[PitchDetect] AnalyserNode started { sampleRate: 48000, fftSize: 2048 }`
-  gefolgt von Frames mit `rms > 0.003` und plausiblen Frequenzen beim Spielen.
-- Debug-Overlay zeigt steigenden Frame-Count und erkannte Frequenzen.
-- Desktop-Verhalten darf sich nicht spürbar verschlechtern (gleiche Detection-Engine wie Tone-Force, dort auf Desktop ebenfalls produktiv im Einsatz).
+Nach der Umsetzung erzeuge ich einen Test-Export für das Quartal mit vorhandenen Rechnungen, entpacke die ZIP, prüfe die PDFs seitenweise als Bild auf korrekte Darstellung (Positionen, Summen, Logo) und öffne die XLSX zur Kontrolle von Werten, Formeln und Formatierung.
