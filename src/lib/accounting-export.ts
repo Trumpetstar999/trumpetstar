@@ -19,6 +19,13 @@ const STATUS_DE: Record<string, string> = {
   cancelled: 'Storniert',
 };
 
+/** ISO date -> TT.MM.JJJJ (empty string stays empty) */
+function deDate(value?: string | null): string {
+  if (!value) return '';
+  const [y, m, d] = value.slice(0, 10).split('-');
+  return y && m && d ? `${d}.${m}.${y}` : value;
+}
+
 export function quarterRange(year: number, quarter: number) {
   const startMonth = (quarter - 1) * 3;
   const from = new Date(Date.UTC(year, startMonth, 1));
@@ -152,8 +159,8 @@ export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: nu
     const paid = Number(inv.paid_amount) || 0;
     return [
       inv.invoice_number ?? 'Entwurf',
-      inv.invoice_date ?? '',
-      inv.due_date ?? '',
+      deDate(inv.invoice_date),
+      deDate(inv.due_date),
       inv.customer?.name ?? '',
       inv.customer?.company_name ?? '',
       inv.customer?.country ?? '',
@@ -201,7 +208,7 @@ export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: nu
     { wch: 7 }, { wch: 15 }, { wch: 11 }, { wch: 13 }, { wch: 12 },
     { wch: 13 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 36 },
   ];
-  ws['!freeze'] = { xSplit: '0', ySplit: '1' };
+  ws['!freeze'] = 'A2';
 
   // ── VAT summary sheet ──
   const byRate = new Map<number, { net: number; vat: number; gross: number; count: number }>();
@@ -263,10 +270,6 @@ export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: nu
   XLSX.utils.book_append_sheet(wb, ws, 'Rechnungen');
   XLSX.utils.book_append_sheet(wb, ws2, 'USt-Zusammenfassung');
   return wb;
-}
-
-export function workbookToBase64(wb: XLSX.WorkBook): string {
-  return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' }) as string;
 }
 
 export interface ExportProgress {
