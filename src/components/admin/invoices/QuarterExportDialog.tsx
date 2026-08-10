@@ -3,11 +3,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Loader2, Download, FileArchive } from 'lucide-react';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Loader2, Download, FileArchive, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/vat';
 import {
