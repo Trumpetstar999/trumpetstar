@@ -262,6 +262,8 @@ export function InvoiceList({ onView, onCreate }: Props) {
           </table>
         )}
       </div>
+
+      <QuarterExportDialog open={quarterExportOpen} onOpenChange={setQuarterExportOpen} />
     </div>
   );
 }
