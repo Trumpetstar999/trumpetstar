@@ -208,7 +208,6 @@ export function buildWorkbook(invoices: FullInvoice[], year: number, quarter: nu
     { wch: 7 }, { wch: 15 }, { wch: 11 }, { wch: 13 }, { wch: 12 },
     { wch: 13 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 36 },
   ];
-  ws['!freeze'] = 'A2';
 
   // ── VAT summary sheet ──
   const byRate = new Map<number, { net: number; vat: number; gross: number; count: number }>();
