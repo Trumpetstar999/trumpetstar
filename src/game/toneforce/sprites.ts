@@ -1,19 +1,19 @@
-import playerUrl from "@/assets/player_ship.png";
-import playerUrl2 from "@/assets/player_ship_2.png";
-import wrongNoteUrl from "@/assets/enemy_wrong_note.png";
-import wrongNoteUrl2 from "@/assets/enemy_wrong_note_2.png";
-import meteorUrl from "@/assets/enemy_meteor.png";
-import alienSpeakerUrl from "@/assets/enemy_alien_speaker.png";
-import alienSpeakerUrl2 from "@/assets/enemy_alien_speaker_2.png";
-import bossUrl from "@/assets/enemy_boss.png";
-import bossUrl2 from "@/assets/enemy_boss_2.png";
-import shieldUrl from "@/assets/powerup_shield.png";
-import shieldUrl2 from "@/assets/powerup_shield_2.png";
-import lifeUrl from "@/assets/powerup_life.png";
-import lifeUrl2 from "@/assets/powerup_life_2.png";
-import laserUrl from "@/assets/laser.png";
-import bgSpaceUrl from "@/assets/bg_space.jpg";
-import bgBossUrl from "@/assets/bg_boss.jpg";
+import playerUrl from "@/assets/toneforce/player_ship.png";
+import playerUrl2 from "@/assets/toneforce/player_ship_2.png";
+import wrongNoteUrl from "@/assets/toneforce/enemy_wrong_note.png";
+import wrongNoteUrl2 from "@/assets/toneforce/enemy_wrong_note_2.png";
+import meteorUrl from "@/assets/toneforce/enemy_meteor.png";
+import alienSpeakerUrl from "@/assets/toneforce/enemy_alien_speaker.png";
+import alienSpeakerUrl2 from "@/assets/toneforce/enemy_alien_speaker_2.png";
+import bossUrl from "@/assets/toneforce/enemy_boss.png";
+import bossUrl2 from "@/assets/toneforce/enemy_boss_2.png";
+import shieldUrl from "@/assets/toneforce/powerup_shield.png";
+import shieldUrl2 from "@/assets/toneforce/powerup_shield_2.png";
+import lifeUrl from "@/assets/toneforce/powerup_life.png";
+import lifeUrl2 from "@/assets/toneforce/powerup_life_2.png";
+import laserUrl from "@/assets/toneforce/laser.png";
+import bgSpaceUrl from "@/assets/toneforce/bg_space.jpg";
+import bgBossUrl from "@/assets/toneforce/bg_boss.jpg";
 
 function loadImage(src: string): HTMLImageElement {
   const ImageCtor = (globalThis as { Image?: new () => HTMLImageElement }).Image;

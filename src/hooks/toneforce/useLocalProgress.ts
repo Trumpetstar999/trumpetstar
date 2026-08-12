@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KEYS, load, save } from "@/lib/storage";
+import { KEYS, load, save } from "@/lib/toneforce/storage";
 
 export interface ScoreEntry { score: number; level: number; date: string; name?: string; }
 
@@ -17,8 +17,8 @@ export function useHighscores() {
   return { scores, add, clear };
 }
 
-import type { Difficulty } from "@/lib/difficulty";
-import { DIFFICULTY_KEYS } from "@/lib/difficulty";
+import type { Difficulty } from "@/lib/toneforce/difficulty";
+import { DIFFICULTY_KEYS } from "@/lib/toneforce/difficulty";
 
 export interface AppSettings { soundEnabled: boolean; musicEnabled: boolean; difficulty: Difficulty; instrument: "C" | "Bb" | "Eb" | "F"; }
 const DEFAULT_SETTINGS: AppSettings = { soundEnabled: true, musicEnabled: true, difficulty: "normal", instrument: "C" };

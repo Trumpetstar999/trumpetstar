@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { preloadAll, totalAssetCount, loadedAssetCount } from "@/game/sprites";
+import { preloadAll, totalAssetCount, loadedAssetCount } from "@/game/toneforce/sprites";
 
 export interface PreloadState {
   ready: boolean;

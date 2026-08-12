@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { detectPitch } from "@/lib/pitch";
-import { freqToNote } from "@/lib/notes";
+import { detectPitch } from "@/lib/toneforce/pitch";
+import { freqToNote } from "@/lib/toneforce/notes";
 
 export interface PitchInfo {
   freq: number;

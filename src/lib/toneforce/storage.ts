@@ -15,8 +15,8 @@ export function save<T>(key: string, value: T): void {
 }
 
 export const KEYS = {
-  chord: "ts.chord",
-  scores: "ts.scores",
-  settings: "ts.settings",
-  playerName: "ts.playerName",
+  chord: "tf.chord",
+  scores: "tf.scores",
+  settings: "tf.settings",
+  playerName: "tf.playerName",
 } as const;

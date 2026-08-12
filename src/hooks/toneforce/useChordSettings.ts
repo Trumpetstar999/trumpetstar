@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { CHORD_PRESETS } from "@/lib/notes";
-import { KEYS, load, save } from "@/lib/storage";
+import { CHORD_PRESETS } from "@/lib/toneforce/notes";
+import { KEYS, load, save } from "@/lib/toneforce/storage";
 
 export interface ChordSettings {
   left: string;
