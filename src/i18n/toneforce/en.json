@@ -1,0 +1,217 @@
+{
+  "common": {
+    "back": "← Back",
+    "menu": "← Menu",
+    "save": "Save",
+    "skip": "Skip",
+    "restart": "Restart",
+    "next": "Next",
+    "loading": "Loading…"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "desc": "The page you're looking for doesn't exist or has been moved.",
+    "home": "Go home"
+  },
+  "error": {
+    "title": "This page didn't load",
+    "desc": "Something went wrong on our end. Try again or head back home.",
+    "retry": "Try again",
+    "home": "Go home"
+  },
+  "lang": {
+    "de": "German",
+    "en": "English",
+    "es": "Spanish"
+  },
+  "menu": {
+    "title": "Main Menu",
+    "play": "Start game",
+    "playSub": "Launch mission",
+    "practice": "Practice",
+    "practiceSub": "Train your tones",
+    "chords": "Triad",
+    "chordsSub": "Choose control chord",
+    "highscores": "Highscores",
+    "highscoresSub": "Leaderboard",
+    "settings": "Settings",
+    "settingsSub": "Customize game",
+    "imprint": "Imprint",
+    "privacy": "Privacy"
+  },
+  "home": {
+    "logoAlt": "Tone Force Logo",
+    "shipAlt": "Tone Force spaceship",
+    "howTitle": "How it works",
+    "howBody": "Play <b1>{{left}}</b1> for left, <b2>{{fire}}</b2> to fire, <b3>{{right}}</b3> for right. No mic? Demo with ← Space →.",
+    "sponsorLabel": "Sponsored by",
+    "sponsorTagline": "The multimedia learning world for trumpet.",
+    "adPlaceholder": "Your ad here"
+  },
+  "calibration": {
+    "title": "Microphone calibration",
+    "currentChord": "Current triad:",
+    "activateMic": "🎤 Activate microphone",
+    "demoMode": "⌨️ Demo mode without microphone",
+    "waiting": "Waiting for microphone permission…",
+    "denied": "Microphone was denied. Please allow it in your browser settings or use demo mode.",
+    "error": "Error:",
+    "detectedTone": "Detected tone",
+    "noTone": "No tone",
+    "perfect": "Perfect",
+    "tooLow": "too low ({{cents}}¢)",
+    "tooHigh": "too high (+{{cents}}¢)",
+    "stability": "Stability",
+    "left": "LEFT",
+    "fire": "FIRE",
+    "right": "RIGHT",
+    "next": "Continue to game →",
+    "tip": "Tip: Hold the trumpet steady and play each note for about 1 second until the bar is full."
+  },
+  "chords": {
+    "title": "Set triad",
+    "preset": "Preset",
+    "quality": "Triad type",
+    "root": "Root note",
+    "major": "Major",
+    "minor": "Minor",
+    "current": "Current:",
+    "custom": "Custom assignment",
+    "left": "LEFT",
+    "fire": "FIRE",
+    "right": "RIGHT",
+    "assignment": "Assignment: {{left}} = left · {{fire}} = fire · {{right}} = right"
+  },
+  "practice": {
+    "title": "🎺 Practice mode",
+    "activateMic": "🎤 Activate microphone",
+    "playNow": "Play now",
+    "detected": "Detected:",
+    "stability": "Stability",
+    "perfect": "Perfect! ⭐",
+    "good": "Good!",
+    "hits": "Hits:"
+  },
+  "highscores": {
+    "title": "🏆 Highscores",
+    "empty": "No highscores yet. Go play!",
+    "anonymous": "Anonymous",
+    "level": "Lvl",
+    "clear": "Clear list",
+    "loading": "Loading highscores…",
+    "loadError": "Could not load highscores."
+  },
+  "settings": {
+    "title": "⚙️ Settings",
+    "sound": "Sound effects",
+    "music": "Background music",
+    "difficulty": "Difficulty",
+    "super_easy": "Super Easy",
+    "easy": "Easy",
+    "normal": "Normal",
+    "hard": "Hard",
+    "difficultyHint": "Hit tolerance: ±{{cents}} cents. Lower levels accept tones sooner and more loosely.",
+    "instrument": "Instrument (transposition)",
+    "instrumentHint": "Tones are converted to your instrument's written notation."
+  },
+  "game": {
+    "loadingSprites": "Loading sprites…",
+    "loadingImages": "{{loaded}} / {{total}} images",
+    "spritesMissing": "⚠ {{failed}} of {{total}} sprites missing",
+    "fallback": "Fallback: vector shapes will be drawn.",
+    "reload": "Reload",
+    "ready": "Ready?",
+    "chordLabel": "Triad:",
+    "activateMic": "🎤 Activate microphone",
+    "start": "▶ Start game",
+    "demoHint": "or play with ← Space → (demo)",
+    "levelComplete": "Level cleared! 🎉",
+    "score": "Score:",
+    "nextLevel": "Next level",
+    "won": "You won!",
+    "gameOver": "Game Over",
+    "level": "Level",
+    "nameLabel": "Name for the highscore list",
+    "namePlaceholder": "Your name",
+    "nameRequired": "Please enter your name.",
+    "nameInvalid": "Only letters, numbers, spaces and . _ - allowed.",
+    "save": "Save",
+    "skip": "Skip",
+    "restart": "Restart",
+    "highscores": "Highscores",
+    "demoStatus": "Demo (← Space →)",
+    "micActive": "🎤",
+    "noInput": "No input",
+    "tone": "Tone:"
+  },
+  "imprint": {
+    "title": "Imprint",
+    "legal": "Information obligation pursuant to §5 E-Commerce Act, §14 Austrian Commercial Code, §63 Trade Regulation Act and disclosure obligation pursuant to §25 Media Act.",
+    "product": "A product of Trumpetstar GmbH",
+    "uid": "VAT ID:",
+    "uidDe": "German VAT ID:",
+    "fb": "Company register no.:",
+    "euid": "EUID:",
+    "country": "Country of registration:",
+    "countryValue": "Austria",
+    "phone": "Phone:",
+    "web": "Web:",
+    "email": "Email:",
+    "publisher": "Book, art and music publisher",
+    "visitors": "Visitors",
+    "visitorsLoading": "…"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This privacy policy informs you about how personal data is processed when you use Tone Force (tone-force.lovable.app).",
+    "controller": {
+      "title": "Controller",
+      "body": "Trumpetstar GmbH\nMario Schulter, MA\n8382 Mogersdorf 253, Austria\nEmail: info@trumpetstar.com\nPhone: +43 677 / 628 053 57"
+    },
+    "mic": {
+      "title": "Microphone access",
+      "body": "Tone Force needs microphone access for tone-based controls. Audio is analyzed locally in your browser (pitch detection) only, to translate tones into game inputs. Nothing is recorded, transmitted to a server, or stored. You can revoke microphone access at any time in your browser settings, or use the demo mode without a microphone."
+    },
+    "storage": {
+      "title": "Local storage",
+      "body": "We store technically necessary preferences exclusively in your browser's localStorage: language preference, settings such as difficulty / volume / instrument, triad selection, highscore cache, and a marker indicating whether you have already been counted this session. This data does not leave your device and can be cleared at any time via your browser settings."
+    },
+    "visitors": {
+      "title": "Visitor counter",
+      "body": "We count page views on the home page anonymously for reach measurement. No IP address, no user agent, and no unique identifier is stored — only a numeric counter in our database is incremented. Identification of individual visitors is not possible."
+    },
+    "highscores": {
+      "title": "Highscores",
+      "body": "When you save a highscore entry after a game, the name you enter (freely chosen, a pseudonym is fine) is stored together with score and level reached in our database and shown in the public leaderboard. You don't have to provide a real name. You can request deletion at any time by emailing info@trumpetstar.com."
+    },
+    "hosting": {
+      "title": "Hosting & backend",
+      "body": "Tone Force is hosted on the Lovable platform (Lovable.dev). Backend functions (visitor counter, highscores) run on Lovable Cloud. When you visit the site, technically necessary connection data (IP address, HTTP request) is processed in server logs, kept only briefly for delivery and abuse prevention."
+    },
+    "tracking": {
+      "title": "No tracking, no advertising",
+      "body": "We do not set tracking cookies, do not use analytics tools (e.g. Google Analytics), no retargeting, and no advertising networks. Embedded third-party content is limited to the sponsor logo and a link to the partner site trumpetstar.com — that site is only loaded when you click."
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "You have the right to access, rectification, erasure, restriction of processing, data portability and objection under the GDPR. You may also lodge a complaint with the Austrian data protection authority (dsb.gv.at)."
+    },
+    "contact": {
+      "title": "Contact for privacy questions",
+      "body": "For any questions or to exercise your rights, please contact: info@trumpetstar.com"
+    },
+    "updated": "Last updated: June 2026"
+  },
+  "meta": {
+    "home": { "title": "Tone Force – Space Notes", "desc": "Musical space-shooter web game with trumpet control. C = left, E = fire, G = right." },
+    "calibration": { "title": "Calibration – Tone Force", "desc": "Activate your microphone and test the tone detection of your trumpet." },
+    "chords": { "title": "Set triad – Tone Force", "desc": "Choose triad type (major/minor) and root note, or set each tone yourself." },
+    "practice": { "title": "Practice mode – Tone Force", "desc": "Practice your triad with live feedback." },
+    "highscores": { "title": "Highscores – Tone Force", "desc": "Your best results in Tone Force – Space Notes." },
+    "settings": { "title": "Settings – Tone Force", "desc": "Sound, music and difficulty settings for Tone Force." },
+    "game": { "title": "Play – Tone Force", "desc": "Control your spaceship with real trumpet tones." },
+    "imprint": { "title": "Imprint – Tone Force", "desc": "Imprint and disclosure pursuant to §5 ECG, §14 UGB, §63 GewO and §25 Media Act." },
+    "privacy": { "title": "Privacy Policy – Tone Force", "desc": "How Tone Force handles microphone, localStorage, highscores and visitor counter." }
+  }
+}
+

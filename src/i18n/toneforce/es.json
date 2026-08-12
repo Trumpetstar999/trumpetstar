@@ -1,0 +1,217 @@
+{
+  "common": {
+    "back": "← Volver",
+    "menu": "← Menú",
+    "save": "Guardar",
+    "skip": "Omitir",
+    "restart": "Reiniciar",
+    "next": "Siguiente",
+    "loading": "Cargando…"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "desc": "Esta página no existe o ha sido movida.",
+    "home": "Ir al inicio"
+  },
+  "error": {
+    "title": "Esta página no se pudo cargar",
+    "desc": "Algo salió mal por nuestra parte. Intenta de nuevo o vuelve al inicio.",
+    "retry": "Reintentar",
+    "home": "Ir al inicio"
+  },
+  "lang": {
+    "de": "Alemán",
+    "en": "Inglés",
+    "es": "Español"
+  },
+  "menu": {
+    "title": "Menú principal",
+    "play": "Iniciar juego",
+    "playSub": "Comenzar misión",
+    "practice": "Practicar",
+    "practiceSub": "Entrena tus notas",
+    "chords": "Tríada",
+    "chordsSub": "Elegir acorde de control",
+    "highscores": "Puntuaciones",
+    "highscoresSub": "Clasificación",
+    "settings": "Ajustes",
+    "settingsSub": "Personalizar juego",
+    "imprint": "Aviso legal",
+    "privacy": "Privacidad"
+  },
+  "home": {
+    "logoAlt": "Logotipo de Tone Force",
+    "shipAlt": "Nave espacial de Tone Force",
+    "howTitle": "Cómo funciona",
+    "howBody": "Toca <b1>{{left}}</b1> para izquierda, <b2>{{fire}}</b2> para disparar, <b3>{{right}}</b3> para derecha. ¿Sin micro? Demo con ← Espacio →.",
+    "sponsorLabel": "Patrocinado por",
+    "sponsorTagline": "El mundo multimedia de aprendizaje para trompeta.",
+    "adPlaceholder": "Espacio para su publicidad"
+  },
+  "calibration": {
+    "title": "Calibración del micrófono",
+    "currentChord": "Tríada actual:",
+    "activateMic": "🎤 Activar micrófono",
+    "demoMode": "⌨️ Modo demo sin micrófono",
+    "waiting": "Esperando permiso del micrófono…",
+    "denied": "Se denegó el micrófono. Permítelo en los ajustes del navegador o usa el modo demo.",
+    "error": "Error:",
+    "detectedTone": "Tono detectado",
+    "noTone": "Sin tono",
+    "perfect": "Perfecto",
+    "tooLow": "demasiado bajo ({{cents}}¢)",
+    "tooHigh": "demasiado alto (+{{cents}}¢)",
+    "stability": "Estabilidad",
+    "left": "IZQUIERDA",
+    "fire": "DISPARO",
+    "right": "DERECHA",
+    "next": "Continuar al juego →",
+    "tip": "Consejo: mantén la trompeta firme y toca cada nota unos 1 segundo hasta llenar la barra."
+  },
+  "chords": {
+    "title": "Configurar tríada",
+    "preset": "Preajuste",
+    "quality": "Tipo de tríada",
+    "root": "Tónica",
+    "major": "Mayor",
+    "minor": "Menor",
+    "current": "Actual:",
+    "custom": "Asignación personalizada",
+    "left": "IZQUIERDA",
+    "fire": "DISPARO",
+    "right": "DERECHA",
+    "assignment": "Asignación: {{left}} = izquierda · {{fire}} = disparo · {{right}} = derecha"
+  },
+  "practice": {
+    "title": "🎺 Modo práctica",
+    "activateMic": "🎤 Activar micrófono",
+    "playNow": "Toca ahora",
+    "detected": "Detectado:",
+    "stability": "Estabilidad",
+    "perfect": "¡Perfecto! ⭐",
+    "good": "¡Bien!",
+    "hits": "Aciertos:"
+  },
+  "highscores": {
+    "title": "🏆 Puntuaciones",
+    "empty": "Aún no hay puntuaciones. ¡A jugar!",
+    "anonymous": "Anónimo",
+    "level": "Nv",
+    "clear": "Borrar lista",
+    "loading": "Cargando puntuaciones…",
+    "loadError": "No se pudieron cargar las puntuaciones."
+  },
+  "settings": {
+    "title": "⚙️ Ajustes",
+    "sound": "Efectos de sonido",
+    "music": "Música de fondo",
+    "difficulty": "Dificultad",
+    "super_easy": "Súper Fácil",
+    "easy": "Fácil",
+    "normal": "Normal",
+    "hard": "Difícil",
+    "difficultyHint": "Tolerancia: ±{{cents}} centésimas. Los niveles más bajos detectan los tonos antes y de forma más permisiva.",
+    "instrument": "Instrumento (transposición)",
+    "instrumentHint": "Las notas se convierten a la notación escrita de tu instrumento."
+  },
+  "game": {
+    "loadingSprites": "Cargando sprites…",
+    "loadingImages": "{{loaded}} / {{total}} imágenes",
+    "spritesMissing": "⚠ Faltan {{failed}} de {{total}} sprites",
+    "fallback": "Reserva: se dibujarán formas vectoriales.",
+    "reload": "Recargar",
+    "ready": "¿Listo?",
+    "chordLabel": "Tríada:",
+    "activateMic": "🎤 Activar micrófono",
+    "start": "▶ Iniciar juego",
+    "demoHint": "o juega con ← Espacio → (demo)",
+    "levelComplete": "¡Nivel superado! 🎉",
+    "score": "Puntuación:",
+    "nextLevel": "Siguiente nivel",
+    "won": "¡Has ganado!",
+    "gameOver": "Fin del juego",
+    "level": "Nivel",
+    "nameLabel": "Nombre para la lista de puntuaciones",
+    "namePlaceholder": "Tu nombre",
+    "nameRequired": "Introduce tu nombre.",
+    "nameInvalid": "Solo letras, números, espacios y . _ - permitidos.",
+    "save": "Guardar",
+    "skip": "Omitir",
+    "restart": "Reiniciar",
+    "highscores": "Puntuaciones",
+    "demoStatus": "Demo (← Espacio →)",
+    "micActive": "🎤",
+    "noInput": "Sin entrada",
+    "tone": "Tono:"
+  },
+  "imprint": {
+    "title": "Aviso legal",
+    "legal": "Información obligatoria según §5 de la Ley de Comercio Electrónico, §14 del Código Mercantil, §63 de la Ley de Comercio y §25 de la Ley de Medios.",
+    "product": "Un producto de Trumpetstar GmbH",
+    "uid": "NIF:",
+    "uidDe": "NIF alemán:",
+    "fb": "Nº de registro mercantil:",
+    "euid": "EUID:",
+    "country": "País de registro:",
+    "countryValue": "Austria",
+    "phone": "Teléfono:",
+    "web": "Web:",
+    "email": "Correo:",
+    "publisher": "Editorial de libros, arte y música",
+    "visitors": "Visitantes",
+    "visitorsLoading": "…"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "intro": "Esta política de privacidad le informa sobre el tratamiento de datos personales al utilizar Tone Force (tone-force.lovable.app).",
+    "controller": {
+      "title": "Responsable",
+      "body": "Trumpetstar GmbH\nMario Schulter, MA\n8382 Mogersdorf 253, Austria\nEmail: info@trumpetstar.com\nTeléfono: +43 677 / 628 053 57"
+    },
+    "mic": {
+      "title": "Acceso al micrófono",
+      "body": "Tone Force necesita acceso al micrófono para el control por tonos. El audio se analiza únicamente de forma local en su navegador (detección de tono) para convertir tonos en órdenes de juego. No se realiza grabación, transmisión a servidores ni almacenamiento. Puede revocar el acceso al micrófono en cualquier momento desde la configuración del navegador, o utilizar el modo demo sin micrófono."
+    },
+    "storage": {
+      "title": "Almacenamiento local",
+      "body": "Guardamos preferencias técnicamente necesarias exclusivamente en el localStorage de su navegador: idioma, ajustes como dificultad / volumen / instrumento, selección de tríada, caché de puntuaciones y un marcador para saber si ya se contabilizó su visita en esta sesión. Estos datos no salen de su dispositivo y pueden borrarse en cualquier momento desde la configuración del navegador."
+    },
+    "visitors": {
+      "title": "Contador de visitas",
+      "body": "Contamos las visitas a la página de inicio de forma anónima para medir el alcance. No se almacena dirección IP, ni user agent, ni identificador único — solo se incrementa un contador numérico en nuestra base de datos. No es posible identificar a visitantes concretos."
+    },
+    "highscores": {
+      "title": "Puntuaciones",
+      "body": "Cuando guarda una puntuación tras una partida, el nombre que introduce (libre, puede ser un seudónimo) se almacena junto con la puntuación y el nivel alcanzado en nuestra base de datos y se muestra en la clasificación pública. No es necesario indicar su nombre real. Puede solicitar la eliminación en cualquier momento escribiendo a info@trumpetstar.com."
+    },
+    "hosting": {
+      "title": "Hosting y backend",
+      "body": "Tone Force se aloja en la plataforma Lovable (Lovable.dev). Las funciones de backend (contador de visitas, puntuaciones) se ejecutan en Lovable Cloud. Al visitar el sitio se procesan en los logs del servidor los datos técnicamente necesarios de la conexión (dirección IP, petición HTTP), conservados solo brevemente para la entrega y la prevención de abuso."
+    },
+    "tracking": {
+      "title": "Sin tracking, sin publicidad",
+      "body": "No utilizamos cookies de seguimiento, ni herramientas de analítica (p. ej. Google Analytics), ni retargeting, ni redes publicitarias. El contenido externo se limita al logotipo del patrocinador y un enlace a la página asociada trumpetstar.com — esa página solo se carga al hacer clic."
+    },
+    "rights": {
+      "title": "Sus derechos",
+      "body": "Tiene derecho de acceso, rectificación, supresión, limitación del tratamiento, portabilidad de los datos y oposición conforme al RGPD. Asimismo puede presentar una reclamación ante la autoridad austriaca de protección de datos (dsb.gv.at)."
+    },
+    "contact": {
+      "title": "Contacto para cuestiones de privacidad",
+      "body": "Para cualquier pregunta o ejercicio de sus derechos, escriba a: info@trumpetstar.com"
+    },
+    "updated": "Última actualización: junio de 2026"
+  },
+  "meta": {
+    "home": { "title": "Tone Force – Space Notes", "desc": "Videojuego web de disparos espaciales con control por trompeta. C = izquierda, E = disparo, G = derecha." },
+    "calibration": { "title": "Calibración – Tone Force", "desc": "Activa tu micrófono y prueba la detección de tonos de tu trompeta." },
+    "chords": { "title": "Configurar tríada – Tone Force", "desc": "Elige el tipo de tríada (mayor/menor) y la tónica, o define cada nota." },
+    "practice": { "title": "Modo práctica – Tone Force", "desc": "Practica tu tríada con retroalimentación en vivo." },
+    "highscores": { "title": "Puntuaciones – Tone Force", "desc": "Tus mejores resultados en Tone Force – Space Notes." },
+    "settings": { "title": "Ajustes – Tone Force", "desc": "Ajustes de sonido, música y dificultad para Tone Force." },
+    "game": { "title": "Jugar – Tone Force", "desc": "Controla tu nave espacial con tonos reales de trompeta." },
+    "imprint": { "title": "Aviso legal – Tone Force", "desc": "Aviso legal y divulgación según §5 ECG, §14 UGB, §63 GewO y §25 Ley de Medios." },
+    "privacy": { "title": "Política de privacidad – Tone Force", "desc": "Cómo Tone Force gestiona el micrófono, el localStorage, las puntuaciones y el contador de visitas." }
+  }
+}
+
