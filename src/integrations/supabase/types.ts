@@ -3244,6 +3244,39 @@ export type Database = {
           },
         ]
       }
+      toneforce_highscores: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          id: string
+          instrument: string | null
+          level_reached: number
+          player_name: string | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          instrument?: string | null
+          level_reached?: number
+          player_name?: string | null
+          score?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          instrument?: string | null
+          level_reached?: number
+          player_name?: string | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_membership_cache: {
         Row: {
           active_product_ids: Json | null
@@ -3912,6 +3945,21 @@ export type Database = {
           avatar_url: string
           display_name: string
           star_count: number
+          user_id: string
+        }[]
+      }
+      get_toneforce_top_highscores: {
+        Args: { p_limit?: number }
+        Returns: {
+          avatar_url: string
+          created_at: string
+          difficulty: string
+          display_name: string
+          id: string
+          instrument: string
+          level_reached: number
+          player_name: string
+          score: number
           user_id: string
         }[]
       }
