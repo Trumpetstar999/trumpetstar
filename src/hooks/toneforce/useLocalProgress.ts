@@ -21,7 +21,7 @@ import type { Difficulty } from "@/lib/toneforce/difficulty";
 import { DIFFICULTY_KEYS } from "@/lib/toneforce/difficulty";
 
 export interface AppSettings { soundEnabled: boolean; musicEnabled: boolean; difficulty: Difficulty; instrument: "C" | "Bb" | "Eb" | "F"; }
-const DEFAULT_SETTINGS: AppSettings = { soundEnabled: true, musicEnabled: true, difficulty: "normal", instrument: "C" };
+const DEFAULT_SETTINGS: AppSettings = { soundEnabled: true, musicEnabled: true, difficulty: "normal", instrument: "Bb" };
 
 export function useAppSettings() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
