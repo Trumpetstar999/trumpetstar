@@ -1,6 +1,7 @@
-import { Gamepad2, Music, Rocket, ChevronRight } from 'lucide-react';
+import { Gamepad2, Rocket, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import shipImage from '@/assets/toneforce/player_ship.png';
+import noteRunnerPreview from '@/assets/noterunner-preview.png.asset.json';
+import toneForcePreview from '@/assets/toneforce-preview.png.asset.json';
 
 interface Props {
   onSelect: (game: 'noterunner' | 'toneforce') => void;
