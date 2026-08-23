@@ -1,0 +1,246 @@
+{
+  "_hinweis": [
+    "Trompete in B. Alles ist NOTIERT angegeben; die Trompete klingt eine",
+    "grosse Sekunde TIEFER als notiert (notiertes c1 klingt b0/233 Hz).",
+    "Bei der Blockfloete war es umgekehrt: die klang eine Oktave hoeher.",
+    "Der Klangbereich liegt dadurch eine ganze Oktave tiefer — das ist der",
+    "Grund, warum die Erkennung andere Parameter braucht (siehe 'erkennung').",
+    "",
+    "'griff.ventile' ist [Ventil1, Ventil2, Ventil3], 1 = gedrueckt.",
+    "'naturton' ist die Nummer des Naturtons auf der jeweiligen Rohrlaenge.",
+    "",
+    "WICHTIG: mehrere Toene teilen sich denselben Griff. Sie unterscheiden",
+    "sich nur durch die Lippenspannung (den Naturton):",
+    "   offen    c1  g1  c2",
+    "   1        f1  d2",
+    "   1+2      e1  a1",
+    "   2        h1",
+    "   1+3      d1",
+    "Das ist der haeufigste Anfaengerfehler und ersetzt in der Logik das",
+    "'Ueberblasen' der Blockfloete."
+  ],
+  "instrument": "trompete",
+  "stimmung": {
+    "a1Hz": 440.0,
+    "transposition": "B",
+    "klingtHalbtoeneTiefer": 2
+  },
+  "erkennung": {
+    "_hinweis": "Gemessen an trompetenaehnlichen Signalen (Grundton NICHT der staerkste Teilton). Mit den Blockfloeten-Parametern (Fenster 1024, fMin 420) versagt die Erkennung bei 6 von 9 Toenen. Mit diesen Werten: groesster Fehler 0,7 Cent, keine Oktavverwechslung, 2,4 % Rechenlast.",
+    "toleranzCent": 80,
+    "stabilMs": 500,
+    "kurzMs": 150,
+    "clarityMin": 0.72,
+    "wiederholungEinbruchDb": 6,
+    "zeitfensterAnteil": 0.15,
+    "fMinHz": 190,
+    "fMaxHz": 2600,
+    "hochpassHz": 130,
+    "fensterGroesse": 1536,
+    "tonhoeheJedenNtenHop": 6
+  },
+  "ventile": {
+    "_hinweis": "Drei Ventile, von der Spielerin aus gesehen von links nach rechts.",
+    "anzahl": 3
+  },
+  "toene": [
+    {
+      "id": "c1",
+      "notiertMidi": 60,
+      "klingendMidi": 58,
+      "frequenzHz": 233.08,
+      "stufe": -6,
+      "notenkopfLinie": true,
+      "farbe": "#E32219",
+      "farbeRand": "#7A0F0A",
+      "freischaltReihenfolge": 8,
+      "tier": "chamaeleon",
+      "tierName": "Chamäleon / Chameleon",
+      "griff": {
+        "ventile": [
+          0,
+          0,
+          0
+        ]
+      },
+      "naturton": 2,
+      "audio": "ton_c1"
+    },
+    {
+      "id": "d1",
+      "notiertMidi": 62,
+      "klingendMidi": 60,
+      "frequenzHz": 261.63,
+      "stufe": -5,
+      "notenkopfLinie": false,
+      "farbe": "#F07C11",
+      "farbeRand": "#8A3F02",
+      "freischaltReihenfolge": 6,
+      "tier": "delfin",
+      "tierName": "Delfin / Dolphin",
+      "griff": {
+        "ventile": [
+          1,
+          0,
+          1
+        ]
+      },
+      "naturton": 3,
+      "audio": "ton_d1"
+    },
+    {
+      "id": "e1",
+      "notiertMidi": 64,
+      "klingendMidi": 62,
+      "frequenzHz": 293.66,
+      "stufe": -4,
+      "notenkopfLinie": true,
+      "farbe": "#F5C400",
+      "farbeRand": "#8A6A00",
+      "freischaltReihenfolge": 5,
+      "tier": "elefant",
+      "tierName": "Elefant / Elephant",
+      "griff": {
+        "ventile": [
+          1,
+          1,
+          0
+        ]
+      },
+      "naturton": 3,
+      "audio": "ton_e1"
+    },
+    {
+      "id": "f1",
+      "notiertMidi": 65,
+      "klingendMidi": 63,
+      "frequenzHz": 311.13,
+      "stufe": -3,
+      "notenkopfLinie": false,
+      "farbe": "#3FA535",
+      "farbeRand": "#1B5A16",
+      "freischaltReihenfolge": 4,
+      "tier": "fisch",
+      "tierName": "Fisch / Fish",
+      "griff": {
+        "ventile": [
+          1,
+          0,
+          0
+        ]
+      },
+      "naturton": 3,
+      "audio": "ton_f1"
+    },
+    {
+      "id": "g1",
+      "notiertMidi": 67,
+      "klingendMidi": 65,
+      "frequenzHz": 349.23,
+      "stufe": -2,
+      "notenkopfLinie": true,
+      "farbe": "#1B9CD8",
+      "farbeRand": "#0B4E6E",
+      "freischaltReihenfolge": 0,
+      "tier": "gans",
+      "tierName": "Gans / Goose",
+      "griff": {
+        "ventile": [
+          0,
+          0,
+          0
+        ]
+      },
+      "naturton": 3,
+      "audio": "ton_g1"
+    },
+    {
+      "id": "a1",
+      "notiertMidi": 69,
+      "klingendMidi": 67,
+      "frequenzHz": 392.0,
+      "stufe": -1,
+      "notenkopfLinie": false,
+      "farbe": "#7C4DAB",
+      "farbeRand": "#3B2158",
+      "freischaltReihenfolge": 1,
+      "tier": "affe",
+      "tierName": "Affe / Ape",
+      "griff": {
+        "ventile": [
+          1,
+          1,
+          0
+        ]
+      },
+      "naturton": 4,
+      "audio": "ton_a1"
+    },
+    {
+      "id": "h1",
+      "notiertMidi": 71,
+      "klingendMidi": 69,
+      "frequenzHz": 440.0,
+      "stufe": 0,
+      "notenkopfLinie": true,
+      "farbe": "#D6197C",
+      "farbeRand": "#6B0A3C",
+      "freischaltReihenfolge": 2,
+      "tier": "hamster",
+      "tierName": "Hamster / Hamster",
+      "griff": {
+        "ventile": [
+          0,
+          1,
+          0
+        ]
+      },
+      "naturton": 4,
+      "audio": "ton_h1"
+    },
+    {
+      "id": "c2",
+      "notiertMidi": 72,
+      "klingendMidi": 70,
+      "frequenzHz": 466.16,
+      "stufe": 1,
+      "notenkopfLinie": false,
+      "farbe": "#E32219",
+      "farbeRand": "#7A0F0A",
+      "freischaltReihenfolge": 3,
+      "tier": "chamaeleon",
+      "tierName": "Chamäleon / Chameleon",
+      "griff": {
+        "ventile": [
+          0,
+          0,
+          0
+        ]
+      },
+      "naturton": 4,
+      "audio": "ton_c2"
+    },
+    {
+      "id": "d2",
+      "notiertMidi": 74,
+      "klingendMidi": 72,
+      "frequenzHz": 523.25,
+      "stufe": 2,
+      "notenkopfLinie": true,
+      "farbe": "#F07C11",
+      "farbeRand": "#8A3F02",
+      "freischaltReihenfolge": 7,
+      "tier": "delfin",
+      "tierName": "Delfin / Dolphin",
+      "griff": {
+        "ventile": [
+          1,
+          0,
+          0
+        ]
+      },
+      "naturton": 5,
+      "audio": "ton_d2"
+    }
+  ]
+}

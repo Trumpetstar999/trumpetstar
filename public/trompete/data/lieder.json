@@ -1,0 +1,206 @@
+{
+  "_hinweis": [
+    "Echte Kinderlieder. Sie werden bevorzugt vor gewuerfelten Uebungen",
+    "angeboten, sobald alle Toene aus 'braucht' im Tonvorrat sind.",
+    "",
+    "Diese Datei ist zum Erweitern von Hand gedacht — es muss keine Zeile",
+    "Code geaendert werden. Schema eines Eintrags:",
+    "",
+    "  id      eindeutige Zahl (dient auch als Seed fuer die Fortschrittsablage)",
+    "  name    nur fuer Menschen, erscheint nirgends auf dem Bildschirm",
+    "  stufe   '2a' (zwei Takte) oder '2b' (vier Takte)",
+    "  braucht Liste der Ton-IDs, die im Vorrat sein muessen",
+    "  takte   Liste von Takten, jeder Takt eine Liste von [tonId, notenwert].",
+    "          notenwert: 4 = Viertel, 2 = Halbe, 1 = Ganze.",
+    "          tonId null = Pause. Jeder Takt muss vier Schlaege ergeben.",
+    "",
+    "Alle Toene sind NOTIERT angegeben. Auf der B-Trompete klingen die",
+    "Lieder damit eine grosse Sekunde tiefer als geschrieben — das ist",
+    "normal und richtig so; jede Trompetenstimme ist so notiert."
+  ],
+  "lieder": [
+    {
+      "id": 900001,
+      "name": "Alle meine Entchen (Anfang)",
+      "stufe": "2a",
+      "braucht": [
+        "g1",
+        "a1",
+        "h1",
+        "c2",
+        "d2"
+      ],
+      "takte": [
+        [
+          [
+            "g1",
+            4
+          ],
+          [
+            "a1",
+            4
+          ],
+          [
+            "h1",
+            4
+          ],
+          [
+            "c2",
+            4
+          ]
+        ],
+        [
+          [
+            "d2",
+            2
+          ],
+          [
+            "d2",
+            2
+          ]
+        ]
+      ]
+    },
+    {
+      "id": 900002,
+      "name": "Haenschen klein (erste Phrase)",
+      "stufe": "2b",
+      "braucht": [
+        "g1",
+        "a1",
+        "h1",
+        "c2",
+        "d2"
+      ],
+      "takte": [
+        [
+          [
+            "d2",
+            4
+          ],
+          [
+            "h1",
+            4
+          ],
+          [
+            "h1",
+            2
+          ]
+        ],
+        [
+          [
+            "c2",
+            4
+          ],
+          [
+            "a1",
+            4
+          ],
+          [
+            "a1",
+            2
+          ]
+        ],
+        [
+          [
+            "g1",
+            4
+          ],
+          [
+            "a1",
+            4
+          ],
+          [
+            "h1",
+            4
+          ],
+          [
+            "c2",
+            4
+          ]
+        ],
+        [
+          [
+            "d2",
+            4
+          ],
+          [
+            "d2",
+            4
+          ],
+          [
+            "d2",
+            2
+          ]
+        ]
+      ]
+    },
+    {
+      "id": 900003,
+      "name": "Alle meine Entchen (vier Takte, in C)",
+      "stufe": "2b",
+      "braucht": [
+        "c1",
+        "d1",
+        "e1",
+        "f1",
+        "g1",
+        "a1"
+      ],
+      "takte": [
+        [
+          [
+            "c1",
+            4
+          ],
+          [
+            "d1",
+            4
+          ],
+          [
+            "e1",
+            4
+          ],
+          [
+            "f1",
+            4
+          ]
+        ],
+        [
+          [
+            "g1",
+            2
+          ],
+          [
+            "g1",
+            2
+          ]
+        ],
+        [
+          [
+            "a1",
+            4
+          ],
+          [
+            "a1",
+            4
+          ],
+          [
+            "a1",
+            4
+          ],
+          [
+            "a1",
+            4
+          ]
+        ],
+        [
+          [
+            "g1",
+            1
+          ]
+        ]
+      ]
+    }
+  ]
+}
