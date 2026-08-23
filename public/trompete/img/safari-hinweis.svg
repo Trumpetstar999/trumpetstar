@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 260" role="img" aria-label="Bitte in Safari öffnen">
+  <!-- iPad mit schlafendem Mikrofon -->
+  <rect x="18" y="30" width="150" height="200" rx="16" fill="#FFFFFF" stroke="#3A332B" stroke-width="6"/>
+  <rect x="32" y="46" width="122" height="168" rx="6" fill="#F3E9D6"/>
+  <g stroke="#3A332B" stroke-width="6" stroke-linecap="round" fill="none">
+    <rect x="80" y="86" width="26" height="46" rx="13" fill="#FFFFFF"/>
+    <path d="M68 124a25 25 0 0 0 50 0"/>
+    <path d="M93 149v18"/>
+    <path d="M60 66 126 172" stroke="#C62828" stroke-width="9"/>
+  </g>
+
+  <!-- Pfeil -->
+  <path d="M190 130h44" stroke="#3A332B" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <path d="M226 116l20 14-20 14" stroke="#3A332B" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Safari-Kompass -->
+  <circle cx="330" cy="130" r="66" fill="#FFFFFF" stroke="#3A332B" stroke-width="6"/>
+  <circle cx="330" cy="130" r="52" fill="#DCEBFA"/>
+  <path d="M362 98 344 146 296 164 314 116Z" fill="#C62828"/>
+  <path d="M330 130 344 146 362 98Z" fill="#FFFFFF" opacity=".55"/>
+  <g stroke="#3A332B" stroke-width="4" stroke-linecap="round">
+    <path d="M330 70v10"/><path d="M330 180v10"/>
+    <path d="M270 130h10"/><path d="M380 130h10"/>
+  </g>
+  <!-- gruenes Mikrofon: dort geht es -->
+  <circle cx="378" cy="184" r="26" fill="#6BBF3A" stroke="#3A332B" stroke-width="5"/>
+  <g stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" fill="none">
+    <rect x="371" y="172" width="14" height="20" rx="7" fill="#FFFFFF"/>
+    <path d="M366 188a12 12 0 0 0 24 0"/>
+    <path d="M378 200v6"/>
+  </g>
+</svg>
