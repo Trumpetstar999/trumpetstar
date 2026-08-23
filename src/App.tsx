@@ -36,6 +36,7 @@ const MusicXMLViewerPage = lazy(() => import("./pages/MusicXMLViewerPage").then(
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const GamePlayPage = lazy(() => import("./pages/GamePlayPage"));
 const ToneForcePlayPage = lazy(() => import("./pages/ToneForcePlayPage"));
+const HappyBeginnersPlayPage = lazy(() => import("./pages/HappyBeginnersPlayPage"));
 const SessionBuilderPage = lazy(() => import("./pages/SessionBuilderPage"));
 const PlaylistBuilderPage = lazy(() => import("./pages/PlaylistBuilderPage"));
 const SessionListPage = lazy(() => import("./pages/SessionListPage"));
