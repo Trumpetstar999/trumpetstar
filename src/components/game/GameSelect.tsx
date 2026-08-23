@@ -4,7 +4,7 @@ import noteRunnerPreview from '@/assets/noterunner-preview.png.asset.json';
 import toneForcePreview from '@/assets/toneforce-preview.png.asset.json';
 
 interface Props {
-  onSelect: (game: 'noterunner' | 'toneforce') => void;
+  onSelect: (game: 'noterunner' | 'toneforce' | 'happybeginners') => void;
 }
 
 const CARD =
@@ -60,6 +60,27 @@ export function GameSelect({ onSelect }: Props) {
             </h2>
             <p className="text-white/60 text-sm mb-4">
               Weltraum-Shooter: Steuere dein Raumschiff mit einem Dreiklang – links, feuern, rechts.
+            </p>
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--reward-gold))]">
+              Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </button>
+        </div>
+
+          <button className={CARD} onClick={() => onSelect('happybeginners')}>
+            <div className="h-40 mb-4 rounded-2xl bg-[#FDF8EE] overflow-hidden flex items-center justify-center">
+              <img
+                src="/trompete/img/vogel-froh.png"
+                alt="Happy Beginners Screenshot"
+                className="h-32 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
+                loading="lazy"
+              />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-1">
+              <span className="text-gold-gradient">Happy</span> Beginners
+            </h2>
+            <p className="text-white/60 text-sm mb-4">
+              Wortloses Übe-Spiel für Kinder: Töne blasen, Griffe sehen, Rhythmus mitspielen – das Mikrofon hört zu.
             </p>
             <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--reward-gold))]">
               Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
