@@ -65,7 +65,6 @@ export function GameSelect({ onSelect }: Props) {
               Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
           </button>
-        </div>
 
           <button className={CARD} onClick={() => onSelect('happybeginners')}>
             <div className="h-40 mb-4 rounded-2xl bg-[#FDF8EE] overflow-hidden flex items-center justify-center">
