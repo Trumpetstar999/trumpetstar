@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { GameLanding } from '@/components/game/GameLanding';
 import { GameSelect } from '@/components/game/GameSelect';
 import { ToneForceMenu, type ToneForceView } from '@/components/game/toneforce/ToneForceMenu';
@@ -8,6 +8,7 @@ type Selected = 'select' | 'noterunner' | 'toneforce';
 
 export function GamePage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const state = location.state as { game?: Selected; toneForceView?: ToneForceView } | null;
   const [selected, setSelected] = useState<Selected>(state?.game ?? 'select');
 
@@ -30,5 +31,15 @@ export function GamePage() {
     return <ToneForceMenu onBack={() => setSelected('select')} initialView={state?.toneForceView ?? 'menu'} />;
   }
 
-  return <GameSelect onSelect={setSelected} />;
+  return (
+    <GameSelect
+      onSelect={(game) => {
+        if (game === 'happybeginners') {
+          navigate('/app/game/happybeginners/play');
+          return;
+        }
+        setSelected(game);
+      }}
+    />
+  );
 }
