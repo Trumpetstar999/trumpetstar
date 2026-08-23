@@ -120,6 +120,7 @@ const App = () => (
                         <Route path="/app/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
                         <Route path="/app/game/play" element={<ProtectedRoute><GamePlayPage /></ProtectedRoute>} />
                         <Route path="/app/game/toneforce/play" element={<ProtectedRoute><ToneForcePlayPage /></ProtectedRoute>} />
+                        <Route path="/app/game/happybeginners/play" element={<ProtectedRoute><HappyBeginnersPlayPage /></ProtectedRoute>} />
                         <Route path="/app/practice/sessions" element={<ProtectedRoute><SessionListPage /></ProtectedRoute>} />
                         <Route path="/app/practice/sessions/new" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
                         <Route path="/app/practice/sessions/:id/edit" element={<ProtectedRoute><SessionBuilderPage /></ProtectedRoute>} />
