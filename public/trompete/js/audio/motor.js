@@ -319,6 +319,18 @@
 
     var q = this.ctx.createBufferSource();
     q.buffer = buf;
+    /* Halbe und ganze Noten sind laenger als das Sample. Damit sie
+     * wirklich so lange klingen, wie sie notiert sind, wird der
+     * ausgehaltene Mittelteil des Klangs geschleift — Anblasgeraeusch
+     * und Ausklang bleiben aussen vor. Ohne das enden lange Toene
+     * vorzeitig und der Rhythmus klingt falsch. */
+    if (dauer + 0.02 > buf.duration) {
+      var anfang = Math.min(0.28, buf.duration * 0.25);
+      var ende = Math.max(anfang + 0.12, buf.duration * 0.82);
+      q.loop = true;
+      q.loopStart = anfang;
+      q.loopEnd = ende;
+    }
     var g = this.ctx.createGain();
     var laut = o.lautstaerke != null ? o.lautstaerke : 1;
     g.gain.setValueAtTime(laut, wann);
@@ -328,6 +340,7 @@
     q.start(wann);
     q.stop(wann + dauer + 0.02);
     this._merken(q);
+
 
     this.spieltBis = Math.max(this.spieltBis, wann + dauer + 0.25);
     return wann;
