@@ -33,11 +33,12 @@
     "clarityMin": 0.72,
     "wiederholungEinbruchDb": 6,
     "zeitfensterAnteil": 0.15,
-    "fMinHz": 190,
+    "fMinHz": 150,
     "fMaxHz": 2600,
-    "hochpassHz": 130,
+    "hochpassHz": 110,
     "fensterGroesse": 1536,
-    "tonhoeheJedenNtenHop": 6
+    "tonhoeheJedenNtenHop": 6,
+    "_hinweisHorn": "Beim Horn in F klingt alles sieben Halbtoene tiefer als notiert (notiertes c1 klingt F3/174,6 Hz). Deshalb reicht fMinHz bis 150 hinunter."
   },
   "ventile": {
     "_hinweis": "Drei Ventile, von der Spielerin aus gesehen von links nach rechts.",
@@ -64,7 +65,15 @@
         ]
       },
       "naturton": 2,
-      "audio": "ton_c1"
+      "audio": "ton_c1",
+      "griffHorn": {
+        "ventile": [
+          0,
+          0,
+          0
+        ],
+        "naturton": 4
+      }
     },
     {
       "id": "d1",
@@ -86,7 +95,15 @@
         ]
       },
       "naturton": 3,
-      "audio": "ton_d1"
+      "audio": "ton_d1",
+      "griffHorn": {
+        "ventile": [
+          1,
+          0,
+          0
+        ],
+        "naturton": 5
+      }
     },
     {
       "id": "e1",
@@ -108,7 +125,15 @@
         ]
       },
       "naturton": 3,
-      "audio": "ton_e1"
+      "audio": "ton_e1",
+      "griffHorn": {
+        "ventile": [
+          0,
+          0,
+          0
+        ],
+        "naturton": 5
+      }
     },
     {
       "id": "f1",
@@ -130,7 +155,15 @@
         ]
       },
       "naturton": 3,
-      "audio": "ton_f1"
+      "audio": "ton_f1",
+      "griffHorn": {
+        "ventile": [
+          1,
+          0,
+          0
+        ],
+        "naturton": 6
+      }
     },
     {
       "id": "g1",
@@ -152,7 +185,15 @@
         ]
       },
       "naturton": 3,
-      "audio": "ton_g1"
+      "audio": "ton_g1",
+      "griffHorn": {
+        "ventile": [
+          0,
+          0,
+          0
+        ],
+        "naturton": 6
+      }
     },
     {
       "id": "a1",
@@ -174,7 +215,15 @@
         ]
       },
       "naturton": 4,
-      "audio": "ton_a1"
+      "audio": "ton_a1",
+      "griffHorn": {
+        "ventile": [
+          1,
+          1,
+          0
+        ],
+        "naturton": 8
+      }
     },
     {
       "id": "h1",
@@ -196,7 +245,15 @@
         ]
       },
       "naturton": 4,
-      "audio": "ton_h1"
+      "audio": "ton_h1",
+      "griffHorn": {
+        "ventile": [
+          0,
+          1,
+          0
+        ],
+        "naturton": 8
+      }
     },
     {
       "id": "c2",
@@ -218,7 +275,15 @@
         ]
       },
       "naturton": 4,
-      "audio": "ton_c2"
+      "audio": "ton_c2",
+      "griffHorn": {
+        "ventile": [
+          0,
+          0,
+          0
+        ],
+        "naturton": 8
+      }
     },
     {
       "id": "d2",
@@ -240,7 +305,15 @@
         ]
       },
       "naturton": 5,
-      "audio": "ton_d2"
+      "audio": "ton_d2",
+      "griffHorn": {
+        "ventile": [
+          0,
+          0,
+          0
+        ],
+        "naturton": 9
+      }
     }
   ]
 }
