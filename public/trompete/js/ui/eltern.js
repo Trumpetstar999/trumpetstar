@@ -182,6 +182,14 @@
     });
   };
 
+  /** Haelt das Klangfarben-Menue am gewaehlten Klang. */
+  Eltern.prototype._klangZeigen = function () {
+    var farbe = document.getElementById('eltern-klang-farbe');
+    var motor = this.k.motor;
+    if (farbe && motor) { farbe.value = motor.klang || ''; }
+  };
+
+
   Eltern.prototype._starttonZeigen = function () {
     var jetzt = this.k.fortschritt.startton();
     var reihe = document.getElementById('eltern-startton');
