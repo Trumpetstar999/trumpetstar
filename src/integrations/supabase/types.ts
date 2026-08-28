@@ -285,6 +285,105 @@ export type Database = {
         }
         Relationships: []
       }
+      brevo_contact_state: {
+        Row: {
+          brevo_contact_id: number | null
+          email: string
+          id: string
+          last_error: string | null
+          last_synced_at: string
+          list_id: number | null
+          source: string | null
+          status: string
+        }
+        Insert: {
+          brevo_contact_id?: number | null
+          email: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string
+          list_id?: number | null
+          source?: string | null
+          status?: string
+        }
+        Update: {
+          brevo_contact_id?: number | null
+          email?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string
+          list_id?: number | null
+          source?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      brevo_settings: {
+        Row: {
+          auto_sync_enabled: boolean
+          created_at: string
+          id: string
+          list_id_de: number | null
+          list_id_en: number | null
+          list_id_es: number | null
+          list_id_sl: number | null
+          updated_at: string
+        }
+        Insert: {
+          auto_sync_enabled?: boolean
+          created_at?: string
+          id?: string
+          list_id_de?: number | null
+          list_id_en?: number | null
+          list_id_es?: number | null
+          list_id_sl?: number | null
+          updated_at?: string
+        }
+        Update: {
+          auto_sync_enabled?: boolean
+          created_at?: string
+          id?: string
+          list_id_de?: number | null
+          list_id_en?: number | null
+          list_id_es?: number | null
+          list_id_sl?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      brevo_sync_log: {
+        Row: {
+          error_count: number
+          finished_at: string | null
+          id: string
+          last_error: string | null
+          skipped_count: number
+          source: string
+          started_at: string
+          synced_count: number
+        }
+        Insert: {
+          error_count?: number
+          finished_at?: string | null
+          id?: string
+          last_error?: string | null
+          skipped_count?: number
+          source: string
+          started_at?: string
+          synced_count?: number
+        }
+        Update: {
+          error_count?: number
+          finished_at?: string | null
+          id?: string
+          last_error?: string | null
+          skipped_count?: number
+          source?: string
+          started_at?: string
+          synced_count?: number
+        }
+        Relationships: []
+      }
       classroom_participants: {
         Row: {
           classroom_id: string
