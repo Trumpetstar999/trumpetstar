@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
+import { notifyBrevo } from "../_shared/brevo-notify.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

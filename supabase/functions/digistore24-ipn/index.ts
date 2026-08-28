@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { notifyBrevo } from "../_shared/brevo-notify.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -466,6 +467,18 @@ async function processIpnEvent(
             first_purchase_at: new Date().toISOString(),
             last_purchase_at: new Date().toISOString(),
           });
+      }
+
+      // 7b. Push customer to Brevo (non-blocking)
+      if (['PURCHASE', 'RENEWAL'].includes(normalized.event_type)) {
+        await notifyBrevo({
+          email: normalized.email,
+          first_name: normalized.first_name || null,
+          language: null,
+          segment: 'customer',
+          source: 'digistore24',
+          is_customer: true,
+        });
       }
 
       // 8. Upsert into digistore24_transactions
