@@ -321,15 +321,16 @@ export default function HappyBeginnersPlayPage() {
 
           <h2>Klang</h2>
           <div id="eltern-klang" className="knopfreihe">
-            <select id="eltern-klang-farbe" aria-label="Klangfarbe der Trompete auswählen" />
-            <select id="eltern-klang-ton" aria-label="Trompetenton zum Anhören auswählen" />
+            <select id="eltern-klang-farbe" aria-label="Klangfarbe des Instruments auswählen" />
+            <select id="eltern-klang-ton" aria-label="Ton zum Anhören auswählen" />
             <button id="eltern-klang-hoeren">Ton anhören</button>
           </div>
           <p className="hinweis">
-            Die Klangfarbe (warm, brillant oder gedämpft) gilt für das ganze Spiel und bleibt
-            gespeichert. Daneben lassen sich alle Trompetentöne einzeln anhören — praktisch, um
-            Lautstärke und Klang zu prüfen oder dem Kind einen Ton vorzuspielen.
+            Die Klangfarbe (warm, brillant, gedämpft, Synthesizer-Trompete oder Waldhorn) gilt für
+            das ganze Spiel und bleibt gespeichert. Daneben lassen sich alle Töne einzeln anhören —
+            praktisch, um Lautstärke und Klang zu prüfen oder dem Kind einen Ton vorzuspielen.
           </p>
+
 
 
           <h2>Fortschritt</h2>
