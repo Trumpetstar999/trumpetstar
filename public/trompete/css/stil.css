@@ -388,7 +388,13 @@ img { display: block; max-width: 100%; max-height: 100%; }
   border: 2px solid #DCD0B8; background: #fff; font-size: .95rem;
 }
 .knopfreihe button.an { border-color: #6B563C; background: #F3E9D6; font-weight: 600; }
+#eltern-klang-ton {
+  padding: .55rem .9rem; border-radius: .6rem;
+  border: 2px solid #DCD0B8; background: #fff;
+  font-size: .95rem; color: #2C2620; min-width: 12rem;
+}
 .hinweis { font-size: .85rem; color: #7A6E5E; margin: .6rem 0 0; }
+
 .mikro-zeile { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px solid #EDE3D0; font-size: .95rem; }
 .mikro-zeile b { font-variant-numeric: tabular-nums; }
 #mikro-balken { margin-top: .8rem; height: .9rem; background: #EDE3D0; border-radius: .45rem; overflow: hidden; }
