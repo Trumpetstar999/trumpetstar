@@ -83,6 +83,27 @@
   /* Klaenge laden                                                     */
   /* ---------------------------------------------------------------- */
 
+  /* Klangfarben: Unterordner in audio/. Leerer Name = Grundklang. */
+  Motor.KLANGFARBEN = [
+    { id: '', name: 'Warm (Standard)' },
+    { id: 'brillant', name: 'Brillant' },
+    { id: 'gedaempft', name: 'Gedämpft' }
+  ];
+
+  Motor.prototype.klangOrdner = function () {
+    return this.klang ? this.klang + '/' : '';
+  };
+
+  /** Waehlt die Klangfarbe und laedt die passenden Klaenge nach. */
+  Motor.prototype.klangWaehlen = function (id) {
+    var gueltig = Motor.KLANGFARBEN.some(function (k) { return k.id === id; });
+    if (!gueltig) { id = ''; }
+    this.klang = id;
+    try { localStorage.setItem('hb-klangfarbe', id); } catch (e) { /* Privatmodus */ }
+    if (!this.ctx) { return Promise.resolve(); }
+    return this._klaengeLaden();
+  };
+
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
     var namen = ['lob'];
@@ -90,13 +111,15 @@
       for (var v = 1; v <= 3; v++) { namen.push(t.audio + '_' + v); }
     });
     return Promise.all(namen.map(function (n) {
+      if (selbst.puffer[selbst.klangOrdner() + n]) { return null; }
       return selbst._laden(n).catch(function () { return null; });
     }));
   };
 
   Motor.prototype._laden = function (name) {
     var selbst = this;
-    var url = this.basis + 'audio/' + name + '.m4a';
+    var schluessel = this.klangOrdner() + name;
+    var url = this.basis + 'audio/' + schluessel + '.m4a';
     return new Promise(function (aufl, ab) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', url, true);
@@ -105,16 +128,17 @@
         if (xhr.status !== 200 && xhr.status !== 0) { ab(new Error(url + ' ' + xhr.status)); return; }
         // Alte Safari-Versionen kennen nur die Callback-Form
         var ergebnis = selbst.ctx.decodeAudioData(xhr.response, function (b) {
-          selbst.puffer[name] = b; aufl(b);
+          selbst.puffer[schluessel] = b; aufl(b);
         }, function (e) { ab(e || new Error('decode ' + name)); });
         if (ergebnis && ergebnis.then) {
-          ergebnis.then(function (b) { selbst.puffer[name] = b; aufl(b); }, ab);
+          ergebnis.then(function (b) { selbst.puffer[schluessel] = b; aufl(b); }, ab);
         }
       };
       xhr.onerror = function () { ab(new Error('netz ' + url)); };
       xhr.send();
     });
   };
+
 
   /* ---------------------------------------------------------------- */
   /* Wiedergabe                                                        */
