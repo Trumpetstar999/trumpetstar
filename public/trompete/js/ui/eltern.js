@@ -107,6 +107,29 @@
       wahl.appendChild(o);
     });
 
+    /* Klangfarbe: gilt fuer das ganze Spiel und wird gespeichert. */
+    var farbe = document.getElementById('eltern-klang-farbe');
+    var motor0 = this.k.motor;
+    var farben = (root.Motor && root.Motor.KLANGFARBEN) || [{ id: '', name: 'Warm (Standard)' }];
+    if (farbe) {
+      farbe.innerHTML = '';
+      farben.forEach(function (f) {
+        var o = document.createElement('option');
+        o.value = f.id;
+        o.textContent = f.name;
+        if (motor0 && motor0.klang === f.id) { o.selected = true; }
+        farbe.appendChild(o);
+      });
+      farbe.addEventListener('change', function () {
+        var motor = selbst.k.motor;
+        if (!motor || !motor.klangWaehlen) { return; }
+        farbe.disabled = true;
+        var fertig = function () { farbe.disabled = false; hoeren(); };
+        var p = motor.klangWaehlen(farbe.value);
+        if (p && p.then) { p.then(fertig, fertig); } else { fertig(); }
+      });
+    }
+
     function hoeren() {
       var motor = selbst.k.motor;
       if (!motor) { return; }
@@ -122,6 +145,7 @@
     knopf.addEventListener('click', hoeren);
     wahl.addEventListener('change', hoeren);
   };
+
 
 
   Eltern.prototype.oeffnen = function () {

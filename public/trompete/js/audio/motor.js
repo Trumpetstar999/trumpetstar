@@ -203,7 +203,7 @@
   };
 
   Motor.prototype.spieleLob = function () {
-    var buf = this.puffer.lob;
+    var buf = this.puffer[this.klangOrdner() + 'lob'] || this.puffer.lob;
     if (!buf || !this.ctx) { return 0; }
     var wann = this.ctx.currentTime + 0.03;
     var q = this.ctx.createBufferSource();
