@@ -62,12 +62,23 @@ export default function HappyBeginnersPlayPage() {
 
   return (
     <div id="app" style={{ position: 'fixed', inset: 0, zIndex: 60, background: '#FDF8EE' }}>
+      <style>{`
+        #hb-zurueck {
+          position: absolute; top: 8px; left: 10px; z-index: 100;
+          font-size: 12px; line-height: 1; color: #3A332B; opacity: 0.55;
+          padding: 6px 10px; border-radius: 999px;
+          background: rgba(255,255,255,0.72);
+        }
+        #hb-zurueck:active { opacity: 0.85; }
+        #app:has(#uebung:not([hidden])) #hb-zurueck { display: none; }
+      `}</style>
       <button
+        id="hb-zurueck"
         onClick={() => navigate('/app', { state: { activeTab: 'game', game: 'happybeginners' } })}
-        style={{ position: 'absolute', top: 10, left: 12, zIndex: 100, fontSize: 13, color: '#3A332B', opacity: 0.6 }}
       >
         ← Spielauswahl
       </button>
+
       {/* ============ Bildschirm 1: Level-Auswahl ============ */}
       <section id="auswahl" className="bildschirm" hidden>
         <button id="elternknopf" aria-label="Einstellungen für Eltern">
