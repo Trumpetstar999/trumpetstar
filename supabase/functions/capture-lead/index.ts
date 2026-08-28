@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import nodemailer from "npm:nodemailer";
+import { notifyBrevo } from "../_shared/brevo-notify.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -145,6 +146,17 @@ Deno.serve(async (req) => {
     if (leadError) {
       console.error("Lead capture error:", leadError);
     }
+
+    // 4b) Push contact to Brevo (non-blocking)
+    await notifyBrevo({
+      email: cleanEmail,
+      first_name: cleanName,
+      language: lang,
+      segment: cleanSegment,
+      source: sanitize(source) ?? "landing",
+    });
+
+
 
     // 5) Send magic link email via SMTP
     try {

@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { GitBranch, Mail, List, Clock, Users, Send } from 'lucide-react';
+import { GitBranch, Mail, List, Clock, Users, Send, Contact } from 'lucide-react';
 import { FlowsTab } from './marketing/FlowsTab';
 import { SegmentsTab } from './marketing/SegmentsTab';
 import { SequencesTab } from './marketing/SequencesTab';
 import { TemplatesMarketingTab } from './marketing/TemplatesMarketingTab';
 import { EmailLogTab } from './marketing/EmailLogTab';
 import { QueueTab } from './marketing/QueueTab';
+import { BrevoTab } from './marketing/BrevoTab';
 
-type SubTab = 'flows' | 'sequences' | 'templates' | 'log' | 'queue' | 'segments';
+type SubTab = 'flows' | 'sequences' | 'templates' | 'log' | 'queue' | 'segments' | 'brevo';
 
 const TABS: { id: SubTab; label: string; icon: any }[] = [
   { id: 'flows', label: 'Flows', icon: GitBranch },
@@ -16,6 +17,7 @@ const TABS: { id: SubTab; label: string; icon: any }[] = [
   { id: 'log', label: 'E-Mail Log', icon: Send },
   { id: 'queue', label: 'Warteschlange', icon: Clock },
   { id: 'segments', label: 'Segmente', icon: Users },
+  { id: 'brevo', label: 'Brevo', icon: Contact },
 ];
 
 export function EmailAutomationsPanel() {
@@ -42,6 +44,7 @@ export function EmailAutomationsPanel() {
       {activeTab === 'log' && <EmailLogTab />}
       {activeTab === 'queue' && <QueueTab />}
       {activeTab === 'segments' && <SegmentsTab />}
+      {activeTab === 'brevo' && <BrevoTab />}
     </div>
   );
 }

@@ -104,6 +104,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     loadUserPreferences();
   }, [user]);
 
+
+// Push the signed-in user to the Brevo mailing list (fire-and-forget)
+function syncBrevoContact(email: string | undefined, lang: string, name?: string | null, segment?: string | null) {
+  if (!email) return;
+  supabase.functions
+    .invoke('brevo-sync-contact', {
+      body: { email, language: lang, first_name: name ?? null, segment: segment ?? null, source: 'app_user' },
+    })
+    .catch((e) => console.warn('[brevo] contact sync failed', e));
+}
+
   const setLanguage = useCallback(async (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('trumpetstar_language', lang);
@@ -115,6 +126,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           .upsert({ user_id: user.id, language: lang }, { onConflict: 'user_id' });
         // Mark setup as complete after saving
         setHasCompletedLanguageSetup(true);
+        syncBrevoContact(user.email, lang, user.user_metadata?.display_name as string | undefined);
       } catch (error) {
         console.error('[useLanguage] Error saving language preference:', error);
       }
@@ -138,6 +150,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
           }, { onConflict: 'user_id' });
         // Mark onboarding complete but keep welcome slideshow pending
         setHasCompletedLanguageSetup(true);
+        syncBrevoContact(user.email, lang, user.user_metadata?.display_name as string | undefined);
         // hasSeenWelcome stays false → WelcomeSlideshow will show next
       } catch (error) {
         console.error('[useLanguage] Error completing onboarding:', error);
