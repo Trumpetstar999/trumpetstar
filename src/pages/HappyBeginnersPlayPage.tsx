@@ -1,5 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 
 const SKRIPTE = [
   "js/audio/dsp.js",
@@ -21,6 +22,10 @@ const SKRIPTE = [
 
 export default function HappyBeginnersPlayPage() {
   const navigate = useNavigate();
+  const [ladeSchritte, setLadeSchritte] = useState(0);
+  const [fertig, setFertig] = useState(false);
+  const anteil = Math.round((ladeSchritte / SKRIPTE.length) * 100);
+
   useEffect(() => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -49,10 +54,15 @@ export default function HappyBeginnersPlayPage() {
       for (const pfad of SKRIPTE) {
         if (abgebrochen) return;
         await laden(pfad);
+        if (!abgebrochen) setLadeSchritte((n) => n + 1);
       }
       const start = (window as unknown as { TrompeteStart?: () => void }).TrompeteStart;
       if (!abgebrochen && start) start();
-    })().catch(() => {});
+      if (!abgebrochen) {
+        // kurz auf 100 % stehen lassen, damit der Balken nicht zuckt
+        window.setTimeout(() => { if (!abgebrochen) setFertig(true); }, 350);
+      }
+    })().catch(() => { if (!abgebrochen) setFertig(true); });
 
     return () => {
       abgebrochen = true;
@@ -71,13 +81,54 @@ export default function HappyBeginnersPlayPage() {
         }
         #hb-zurueck:active { opacity: 0.85; }
         #app:has(#uebung:not([hidden])) #hb-zurueck { display: none; }
+
+        #hb-laden {
+          position: absolute; inset: 0; z-index: 200;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
+          gap: 22px; background: #FDF8EE;
+          transition: opacity .35s ease;
+        }
+        #hb-laden[data-weg="ja"] { opacity: 0; pointer-events: none; }
+        #hb-laden .hb-vogel {
+          width: 22vh; max-width: 180px; height: auto;
+          animation: hb-huepf 1.1s ease-in-out infinite;
+        }
+        @keyframes hb-huepf {
+          0%, 100% { transform: translateY(0) rotate(-2deg); }
+          50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        #hb-laden .hb-bahn {
+          width: min(46vw, 340px); height: 16px; border-radius: 999px;
+          background: #F0E3CC; overflow: hidden;
+          box-shadow: inset 0 2px 0 rgba(0,0,0,.05);
+        }
+        #hb-laden .hb-spur {
+          height: 100%; border-radius: 999px; background: #FF8A3D;
+          transition: width .25s ease;
+        }
+        #hb-laden .hb-text {
+          font-size: 15px; color: #3A332B; opacity: .6; letter-spacing: .02em;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          #hb-laden .hb-vogel { animation: none; }
+        }
       `}</style>
+
+      <div id="hb-laden" data-weg={fertig ? 'ja' : 'nein'} aria-live="polite" aria-busy={!fertig}>
+        <img className="hb-vogel" src="/trompete/img/vogel-froh.png" alt="" aria-hidden="true" />
+        <div className="hb-bahn" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={anteil} aria-label="Spiel wird geladen">
+          <div className="hb-spur" style={{ width: `${anteil}%` }} />
+        </div>
+        <div className="hb-text">{anteil}%</div>
+      </div>
+
       <button
         id="hb-zurueck"
         onClick={() => navigate('/app', { state: { activeTab: 'game', game: 'happybeginners' } })}
       >
         ← Spielauswahl
       </button>
+
 
       {/* ============ Bildschirm 1: Level-Auswahl ============ */}
       <section id="auswahl" className="bildschirm" hidden>
