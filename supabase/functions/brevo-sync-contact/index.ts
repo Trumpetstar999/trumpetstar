@@ -1,5 +1,5 @@
 import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
-import { adminClient, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
+import { adminClient, getCaller, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
 
 interface Payload {
   email?: string;

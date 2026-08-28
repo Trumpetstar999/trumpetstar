@@ -35,3 +35,14 @@ export async function requireAdmin(req: Request): Promise<{ userId: string } | n
 
   return role ? { userId: data.user.id } : null;
 }
+
+/** Returns the signed-in caller (any role) or null. */
+export async function getCaller(req: Request): Promise<{ id: string; email?: string } | null> {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) return null;
+  const token = authHeader.replace('Bearer ', '').trim();
+  if (!token || token === SERVICE_ROLE_KEY) return null;
+  const { data, error } = await adminClient().auth.getUser(token);
+  if (error || !data.user) return null;
+  return { id: data.user.id, email: data.user.email ?? undefined };
+}
