@@ -81,12 +81,48 @@
       });
     }
 
+    this._klangprobe();
+
     document.getElementById('eltern-zu').addEventListener('click', function () { selbst.schliessen(); });
     document.getElementById('eltern-reset').addEventListener('click', function () {
       selbst.k.fortschritt.zuruecksetzen();
       selbst._fuellen();
     });
   };
+
+  /** Klangprobe: alle Trompetentoene einzeln zum Anhoeren. */
+  Eltern.prototype._klangprobe = function () {
+    var selbst = this;
+    var wahl = document.getElementById('eltern-klang-ton');
+    var knopf = document.getElementById('eltern-klang-hoeren');
+    if (!wahl || !knopf) { return; }
+
+    var toene = this.k.toene || [];
+    wahl.innerHTML = '';
+    toene.forEach(function (t) {
+      var o = document.createElement('option');
+      o.value = t.id;
+      var tier = (t.tierName || '').split('/')[0].trim();
+      o.textContent = t.id + (tier ? ' — ' + tier : '');
+      wahl.appendChild(o);
+    });
+
+    function hoeren() {
+      var motor = selbst.k.motor;
+      if (!motor) { return; }
+      var spielen = function () { motor.spieleTon(wahl.value, { dauer: 1.6 }); };
+      if (motor.aufwecken) {
+        var p = motor.aufwecken();
+        if (p && p.then) { p.then(spielen, spielen); } else { spielen(); }
+      } else {
+        spielen();
+      }
+    }
+
+    knopf.addEventListener('click', hoeren);
+    wahl.addEventListener('change', hoeren);
+  };
+
 
   Eltern.prototype.oeffnen = function () {
     this._abbrechen();
