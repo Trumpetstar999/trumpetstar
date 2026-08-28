@@ -204,6 +204,8 @@
     var selbst = this;
     this._stimmungZeigen();
     this._starttonZeigen();
+    this._klangZeigen();
+
 
     var koerper = document.querySelector('#eltern-quoten tbody');
     koerper.innerHTML = '';
