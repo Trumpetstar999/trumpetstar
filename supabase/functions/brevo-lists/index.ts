@@ -9,8 +9,8 @@ Deno.serve(async (req) => {
     if (!admin) return json({ error: 'Unauthorized: Admin access required' }, 401);
 
     if (req.method === 'GET') {
-      const account = await brevoFetch('/v3/account');
-      const lists = await brevoFetch('/v3/contacts/lists?limit=50&offset=0');
+      const account = await brevoFetch('/account');
+      const lists = await brevoFetch('/contacts/lists?limit=50&offset=0');
       if (!lists.ok) {
         return json({ error: 'Brevo request failed', status: lists.status, details: lists.text }, lists.status);
       }
@@ -28,12 +28,12 @@ Deno.serve(async (req) => {
 
       let folderId = typeof body?.folderId === 'number' ? body.folderId : null;
       if (!folderId) {
-        const folders = await brevoFetch('/v3/contacts/folders?limit=10&offset=0');
+        const folders = await brevoFetch('/contacts/folders?limit=10&offset=0');
         const first = (folders.data as { folders?: { id: number }[] })?.folders?.[0];
         if (first) {
           folderId = first.id;
         } else {
-          const created = await brevoFetch('/v3/contacts/folders', {
+          const created = await brevoFetch('/contacts/folders', {
             method: 'POST',
             body: { name: 'Trumpetstar' },
           });
@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      const created = await brevoFetch('/v3/contacts/lists', {
+      const created = await brevoFetch('/contacts/lists', {
         method: 'POST',
         body: { name, folderId },
       });

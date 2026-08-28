@@ -79,10 +79,10 @@ export async function upsertContact(c: {
     },
   };
 
-  let res = await brevoFetch('/v3/contacts', { method: 'POST', body: full });
+  let res = await brevoFetch('/contacts', { method: 'POST', body: full });
   if (!res.ok && res.status === 400) {
     // Custom attributes may not exist in this Brevo account - retry with standard fields only.
-    res = await brevoFetch('/v3/contacts', {
+    res = await brevoFetch('/contacts', {
       method: 'POST',
       body: {
         email: c.email,
