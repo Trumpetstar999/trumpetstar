@@ -25,6 +25,12 @@
     this.variante = {};         // letzte gespielte Variante je Ton
     this.fehler = null;
     this.meister = null;        // Summenlautstaerke
+    this.klang = '';            // gewaehlte Klangfarbe (Unterordner in audio/)
+    try {
+      var gespeichert = localStorage.getItem('hb-klangfarbe');
+      if (gespeichert) { this.klang = gespeichert; }
+    } catch (e) { /* Privatmodus */ }
+
   }
 
   /* ---------------------------------------------------------------- */
