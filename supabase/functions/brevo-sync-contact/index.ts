@@ -1,4 +1,4 @@
-import { brevoFetch, corsHeaders, json, normalizeLang } from '../_shared/brevo.ts';
+import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
 import { adminClient, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
 
 interface Payload {
@@ -75,41 +75,3 @@ Deno.serve(async (req) => {
     return json({ error: String(e) }, 500);
   }
 });
-
-export async function upsertContact(c: {
-  email: string;
-  firstName: string;
-  lang: string;
-  segment: string;
-  source: string;
-  isCustomer: boolean;
-  listId: number;
-}): Promise<{ ok: boolean; status: number; error?: string }> {
-  const full = {
-    email: c.email,
-    updateEnabled: true,
-    listIds: [c.listId],
-    attributes: {
-      FIRSTNAME: c.firstName || undefined,
-      LANGUAGE: c.lang,
-      SEGMENT: c.segment || undefined,
-      SOURCE: c.source || undefined,
-      IS_CUSTOMER: c.isCustomer ? 'yes' : 'no',
-    },
-  };
-
-  let res = await brevoFetch('/v3/contacts', { method: 'POST', body: full });
-  if (!res.ok && res.status === 400) {
-    // Custom attributes may not exist in this Brevo account — retry with standard fields only.
-    res = await brevoFetch('/v3/contacts', {
-      method: 'POST',
-      body: {
-        email: c.email,
-        updateEnabled: true,
-        listIds: [c.listId],
-        attributes: c.firstName ? { FIRSTNAME: c.firstName } : {},
-      },
-    });
-  }
-  return res.ok ? { ok: true, status: res.status } : { ok: false, status: res.status, error: res.text };
-}

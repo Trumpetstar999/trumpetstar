@@ -1,6 +1,5 @@
-import { corsHeaders, json, normalizeLang } from '../_shared/brevo.ts';
+import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
 import { adminClient, requireAdmin } from '../_shared/brevo-auth.ts';
-import { upsertContact } from '../brevo-sync-contact/index.ts';
 
 type Source = 'leads' | 'users' | 'customers';
 
