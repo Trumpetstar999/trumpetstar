@@ -223,7 +223,7 @@
       // Hebelarm
       g.appendChild(el('line', {
         x1: HX[i], y1: 104, x2: HX[i], y2: y,
-        stroke: messing, stroke_width: null, 'stroke-width': 4, 'stroke-linecap': 'round'
+        stroke: messing, 'stroke-width': 4, 'stroke-linecap': 'round'
       }));
       // Fingerplatte
       g.appendChild(el('rect', {
