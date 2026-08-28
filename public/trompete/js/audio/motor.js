@@ -90,16 +90,22 @@
   /* ---------------------------------------------------------------- */
 
   /* Klangfarben: Unterordner in audio/. Leerer Name = Grundklang.
-   * 'synth' ist kein Ordner — die Klaenge werden gerechnet. */
+   * 'synth' und 'synthhorn' sind keine Ordner — die Klaenge werden
+   * gerechnet. 'synthhorn' ist das weiche Waldhorn (Horn in F). */
   Motor.KLANGFARBEN = [
     { id: '', name: 'Warm (Standard)' },
     { id: 'brillant', name: 'Brillant' },
     { id: 'gedaempft', name: 'Gedämpft' },
-    { id: 'synth', name: 'Synthesizer' }
+    { id: 'synth', name: 'Synthesizer (Trompete)' },
+    { id: 'synthhorn', name: 'Waldhorn (Synthesizer)' }
   ];
 
   Motor.prototype.klangOrdner = function () {
     return this.klang ? this.klang + '/' : '';
+  };
+
+  Motor.prototype._istSynth = function (id) {
+    return id === 'synth' || id === 'synthhorn';
   };
 
   /** Waehlt die Klangfarbe und laedt die passenden Klaenge nach. */
@@ -112,9 +118,25 @@
     return this._klaengeLaden();
   };
 
+  /** Nach einem Stimmungswechsel (B, C, Horn in F) muessen die
+   *  gerechneten Klaenge neu gebaut werden — ihre Tonhoehen haengen an
+   *  ton.frequenzHz. Gesampelte Klaenge bleiben, wie sie sind. */
+  Motor.prototype.neuStimmen = function () {
+    if (!this.ctx || !this._istSynth(this.klang)) { return Promise.resolve(); }
+    this._synthFertig = null;
+    var praefix = this.klang + '/';
+    for (var s in this.puffer) {
+      if (s.indexOf(praefix) === 0) { delete this.puffer[s]; }
+    }
+    return Promise.resolve(this._synthBauen());
+  };
+
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
-    if (this.klang === 'synth') { return Promise.resolve(this._synthBauen()); }
+    if (this._istSynth(this.klang)) {
+      if (this._synthFertig !== this.klang) { this._synthFertig = null; }
+      return Promise.resolve(this._synthBauen());
+    }
     var namen = ['lob'];
     this.toene.forEach(function (t) {
       for (var v = 1; v <= 3; v++) { namen.push(t.audio + '_' + v); }
@@ -124,6 +146,7 @@
       return selbst._laden(n).catch(function () { return null; });
     }));
   };
+
 
   /* ---------------------------------------------------------------- */
   /* Synthesizer-Trompete                                              */
