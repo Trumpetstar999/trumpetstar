@@ -94,10 +94,16 @@
 
     if (instrument === 'horn') {
       var gh = ton.griffHorn || ton.griff;
-      zeichneHorn(g, gh.ventile || [0, 0, 0], farbe, rand, linie);
+      /* Das Horn wird gezeichnet, nicht fotografiert — deshalb wird es
+       * hier auf die Groesse der Trompetenzeichnung heruntergerechnet,
+       * damit es das Bild nicht erschlaegt. */
+      var gHorn = el('g', { transform: 'translate(26 28) scale(0.6)' });
+      g.appendChild(gHorn);
+      zeichneHorn(gHorn, gh.ventile || [0, 0, 0], farbe, rand, linie);
       leiter(g, gh.naturton || ton.naturton, 4, 9, farbe, rand, linie);
       return svg;
     }
+
 
     /* ---- Die Trompete als fertige Zeichnung --------------------- */
     var bild = el('image', {
