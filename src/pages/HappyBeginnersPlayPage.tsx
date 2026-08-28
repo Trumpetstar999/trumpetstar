@@ -274,17 +274,19 @@ export default function HappyBeginnersPlayPage() {
           </div>
           <p className="hinweis" id="eltern-vorrat-hinweis" />
 
-          <h2>Stimmung der Trompete</h2>
+          <h2>Instrument &amp; Stimmung</h2>
           <div id="eltern-stimmung" className="knopfreihe">
             <button data-art="B">B-Trompete</button>
             <button data-art="C">C-Trompete</button>
+            <button data-art="F">Horn in F</button>
           </div>
           <p className="hinweis">
             Die B-Trompete klingt eine große Sekunde tiefer als notiert, die C-Trompete klingt wie
-            notiert. Die Griffe und das Notenbild bleiben in beiden Fällen gleich — nur die
-            Frequenzen, auf die das Mikrofon hört, verschieben sich. Falsche Einstellung heißt: es
-            wird nichts erkannt.
+            notiert, das Horn in F eine Quinte tiefer. Das Notenbild bleibt in allen Fällen gleich —
+            beim Horn in F zeigt das Griffbild automatisch die Drehventile und die Horngriffe, und
+            der Klang wechselt auf das Waldhorn. Falsche Einstellung heißt: es wird nichts erkannt.
           </p>
+
 
           <h2>Mikrofon</h2>
           <div id="eltern-mikro">
@@ -319,15 +321,16 @@ export default function HappyBeginnersPlayPage() {
 
           <h2>Klang</h2>
           <div id="eltern-klang" className="knopfreihe">
-            <select id="eltern-klang-farbe" aria-label="Klangfarbe der Trompete auswählen" />
-            <select id="eltern-klang-ton" aria-label="Trompetenton zum Anhören auswählen" />
+            <select id="eltern-klang-farbe" aria-label="Klangfarbe des Instruments auswählen" />
+            <select id="eltern-klang-ton" aria-label="Ton zum Anhören auswählen" />
             <button id="eltern-klang-hoeren">Ton anhören</button>
           </div>
           <p className="hinweis">
-            Die Klangfarbe (warm, brillant oder gedämpft) gilt für das ganze Spiel und bleibt
-            gespeichert. Daneben lassen sich alle Trompetentöne einzeln anhören — praktisch, um
-            Lautstärke und Klang zu prüfen oder dem Kind einen Ton vorzuspielen.
+            Die Klangfarbe (warm, brillant, gedämpft, Synthesizer-Trompete oder Waldhorn) gilt für
+            das ganze Spiel und bleibt gespeichert. Daneben lassen sich alle Töne einzeln anhören —
+            praktisch, um Lautstärke und Klang zu prüfen oder dem Kind einen Ton vorzuspielen.
           </p>
+
 
 
           <h2>Fortschritt</h2>

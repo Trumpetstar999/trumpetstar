@@ -89,7 +89,7 @@
       s.tempo = typeof s.tempo === 'number' ? s.tempo : 45;
       // Aeltere Staende kannten 60 als Untergrenze
       if (s.tempo < 45) { s.tempo = 45; }
-      if (s.stimmung !== 'C') { s.stimmung = 'B'; }
+      if (s.stimmung !== 'C' && s.stimmung !== 'F') { s.stimmung = 'B'; }
       if (s.modus !== 'solo') { s.modus = 'mit'; }
       if (!STARTTOENE[s.startton]) { s.startton = 'c1'; }
 
@@ -233,12 +233,17 @@
   Fortschritt.prototype.setzeTempo = function (bpm) {
     this.stand.tempo = bpm; this._sichern();
   };
-  /* B- oder C-Trompete. Verschiebt die Frequenzen, auf die das Mikrofon
-   * hoert, um zwei Halbtoene — Griffe und Notenbild bleiben gleich. */
+  /* B-Trompete, C-Trompete oder Horn in F. Verschiebt die Frequenzen,
+   * auf die das Mikrofon hoert (B: -2, C: 0, F: -7 Halbtoene). Das
+   * Notenbild bleibt gleich; beim Horn aendern sich die Griffe. */
   Fortschritt.prototype.stimmung = function () { return this.stand.stimmung || 'B'; };
   Fortschritt.prototype.setzeStimmung = function (art) {
-    this.stand.stimmung = (art === 'C') ? 'C' : 'B';
+    this.stand.stimmung = (art === 'C' || art === 'F') ? art : 'B';
     this._sichern();
+  };
+  /** 'horn' bei Horn in F, sonst 'trompete'. */
+  Fortschritt.prototype.instrument = function () {
+    return this.stimmung() === 'F' ? 'horn' : 'trompete';
   };
 
   /* Mitspielen oder solo. */

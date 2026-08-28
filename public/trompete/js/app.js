@@ -60,15 +60,24 @@
 
     /* Die Frequenzen haengen an der Stimmung des Instruments: die
      * B-Trompete klingt zwei Halbtoene tiefer als notiert, die
-     * C-Trompete wie notiert. Notenbild und Griffe bleiben gleich. */
+     * C-Trompete wie notiert, das Horn in F sieben Halbtoene tiefer.
+     * Das Notenbild bleibt gleich, beim Horn aendern sich die Griffe. */
+    var VERSATZ = { C: 0, B: -2, F: -7 };
     k.stimmungAnwenden = function () {
-      var halbtoene = (k.fortschritt.stimmung() === 'C') ? 0 : -2;
+      var art = k.fortschritt.stimmung();
+      var halbtoene = VERSATZ[art] != null ? VERSATZ[art] : -2;
       k.toene.forEach(function (t) {
         t.klingendMidi = t.notiertMidi + halbtoene;
         t.frequenzHz = Math.round(440 * Math.pow(2, (t.klingendMidi - 69) / 12) * 100) / 100;
       });
+      if (root.Griff && root.Griff.setzeInstrument) {
+        root.Griff.setzeInstrument(k.fortschritt.instrument());
+      }
       if (k.tracker) { k.tracker.toleranzTabelle = k.tracker._toleranzenBerechnen(); }
+      // Gerechnete Klaenge (Synth) haengen an den Frequenzen
+      if (k.motor && k.motor.neuStimmen) { k.motor.neuStimmen(); }
     };
+
 
     k.motor = new root.Motor({ basis: BASIS, toene: k.toene, erkennung: k.erkennung });
     k.tracker = new root.Tracker({ toene: k.toene, erkennung: k.erkennung, logSekunden: 34 });
