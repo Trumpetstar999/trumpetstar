@@ -317,16 +317,18 @@ export default function HappyBeginnersPlayPage() {
             </div>
           </div>
 
-          <h2>Klangprobe</h2>
+          <h2>Klang</h2>
           <div id="eltern-klang" className="knopfreihe">
+            <select id="eltern-klang-farbe" aria-label="Klangfarbe der Trompete auswählen" />
             <select id="eltern-klang-ton" aria-label="Trompetenton zum Anhören auswählen" />
             <button id="eltern-klang-hoeren">Ton anhören</button>
           </div>
           <p className="hinweis">
-            Hier lassen sich alle Trompetentöne einzeln anhören — praktisch, um Lautstärke und
-            Klang zu prüfen oder dem Kind einen Ton vorzuspielen. Der Ton kommt aus dem Lautsprecher
-            des Geräts; die Auswahl verändert nichts am Übungsprogramm.
+            Die Klangfarbe (warm, brillant oder gedämpft) gilt für das ganze Spiel und bleibt
+            gespeichert. Daneben lassen sich alle Trompetentöne einzeln anhören — praktisch, um
+            Lautstärke und Klang zu prüfen oder dem Kind einen Ton vorzuspielen.
           </p>
+
 
           <h2>Fortschritt</h2>
 
