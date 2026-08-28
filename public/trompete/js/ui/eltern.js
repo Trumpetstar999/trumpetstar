@@ -66,11 +66,22 @@
     var reihe = document.getElementById('eltern-stimmung');
     [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
       b.addEventListener('click', function () {
-        selbst.k.fortschritt.setzeStimmung(b.getAttribute('data-art'));
+        var art = b.getAttribute('data-art');
+        var vorher = selbst.k.fortschritt.stimmung();
+        selbst.k.fortschritt.setzeStimmung(art);
         selbst.k.stimmungAnwenden();
+        /* Instrumentwechsel zieht den passenden Klang mit: das Horn
+         * klingt nicht wie eine Trompete. Umgekehrt genauso. */
+        var motor = selbst.k.motor;
+        if (motor && motor.klangWaehlen && art !== vorher) {
+          if (art === 'F' && motor.klang !== 'synthhorn') { motor.klangWaehlen('synthhorn'); }
+          else if (art !== 'F' && motor.klang === 'synthhorn') { motor.klangWaehlen(''); }
+        }
         selbst._stimmungZeigen();
+        selbst._klangZeigen();
       });
     });
+
     var start = document.getElementById('eltern-startton');
     if (start) {
       [].slice.call(start.querySelectorAll('button')).forEach(function (b) {
