@@ -62,3 +62,6 @@ verify_jwt = false
 
 [functions.track]
 verify_jwt = false
+
+[functions.brevo-sync-contact]
+verify_jwt = false
