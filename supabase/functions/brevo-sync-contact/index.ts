@@ -18,14 +18,22 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   try {
-    const internal = isInternalCall(req);
-    if (!internal && !(await requireAdmin(req))) {
-      return json({ error: 'Unauthorized' }, 401);
-    }
-
     const body = (await req.json().catch(() => null)) as Payload | null;
     const email = typeof body?.email === 'string' ? body.email.toLowerCase().trim() : '';
     if (!email || !EMAIL_RE.test(email)) return json({ error: 'Valid email is required' }, 400);
+
+    // Allowed callers: internal edge functions, admins, or a signed-in user syncing their own address
+    const internal = isInternalCall(req);
+    if (!internal) {
+      const isAdmin = !!(await requireAdmin(req));
+      if (!isAdmin) {
+        const caller = await getCaller(req);
+        if (!caller || caller.email?.toLowerCase() !== email) {
+          return json({ error: 'Unauthorized' }, 401);
+        }
+      }
+    }
+
 
     const supabase = adminClient();
     const { data: settings } = await supabase
