@@ -274,17 +274,19 @@ export default function HappyBeginnersPlayPage() {
           </div>
           <p className="hinweis" id="eltern-vorrat-hinweis" />
 
-          <h2>Stimmung der Trompete</h2>
+          <h2>Instrument &amp; Stimmung</h2>
           <div id="eltern-stimmung" className="knopfreihe">
             <button data-art="B">B-Trompete</button>
             <button data-art="C">C-Trompete</button>
+            <button data-art="F">Horn in F</button>
           </div>
           <p className="hinweis">
             Die B-Trompete klingt eine große Sekunde tiefer als notiert, die C-Trompete klingt wie
-            notiert. Die Griffe und das Notenbild bleiben in beiden Fällen gleich — nur die
-            Frequenzen, auf die das Mikrofon hört, verschieben sich. Falsche Einstellung heißt: es
-            wird nichts erkannt.
+            notiert, das Horn in F eine Quinte tiefer. Das Notenbild bleibt in allen Fällen gleich —
+            beim Horn in F zeigt das Griffbild automatisch die Drehventile und die Horngriffe, und
+            der Klang wechselt auf das Waldhorn. Falsche Einstellung heißt: es wird nichts erkannt.
           </p>
+
 
           <h2>Mikrofon</h2>
           <div id="eltern-mikro">
