@@ -159,7 +159,10 @@
     if (v === this.variante[tonId]) { v = (v % 3) + 1; }
     this.variante[tonId] = v;
 
-    var buf = this.puffer[ton.audio + '_' + v] || this.puffer[ton.audio + '_1'];
+    var o1 = this.klangOrdner();
+    var buf = this.puffer[o1 + ton.audio + '_' + v] || this.puffer[o1 + ton.audio + '_1']
+      || this.puffer[ton.audio + '_' + v] || this.puffer[ton.audio + '_1'];
+
     if (!buf) { return 0; }
 
     var wann = o.wann != null ? o.wann : this.ctx.currentTime + 0.03;
