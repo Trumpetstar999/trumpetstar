@@ -149,39 +149,55 @@
 
 
   /* ---------------------------------------------------------------- */
-  /* Synthesizer-Trompete                                              */
+  /* Synthesizer: Trompete und Waldhorn                                */
   /* ---------------------------------------------------------------- */
 
-  /** Rechnet alle Toene als Blechklang aus. Additive Synthese mit
-   *  ansteigender Helligkeit im Ansatz (das macht das "Blech"), ganz
-   *  leichtem Vibrato und einer kurzen Anblas-Unschaerfe. */
+  /* Zwei gerechnete Klangbilder. Die Trompete faechert im Ansatz hell
+   * auf (Blech, Grundton nicht der lauteste). Das Waldhorn ist das
+   * Gegenteil: Grundton traegt, hohe Teiltoene sind stark gedaempft,
+   * der Ansatz ist deutlich weicher — daher der runde, ferne Klang. */
+  Motor.SYNTHBILD = {
+    synth: {
+      stufen: [0.55, 1.0, 0.85, 0.6, 0.42, 0.3, 0.2, 0.13, 0.08, 0.05],
+      anblas: 0.055, glanzEnde: 9000, glanzKurve: 0.9,
+      vibTiefe: 0.0022, geraeusch: 0.06
+    },
+    synthhorn: {
+      stufen: [1.0, 0.78, 0.42, 0.22, 0.12, 0.06, 0.03, 0.015],
+      anblas: 0.115, glanzEnde: 5200, glanzKurve: 1.3,
+      vibTiefe: 0.0014, geraeusch: 0.035
+    }
+  };
+
+  /** Rechnet alle Toene der gewaehlten Synth-Klangfarbe aus. */
   Motor.prototype._synthBauen = function () {
     var selbst = this;
-    if (this._synthFertig) { return; }
+    var art = this.klang;
+    if (!Motor.SYNTHBILD[art]) { art = 'synth'; }
+    if (this._synthFertig === art) { return; }
     this.toene.forEach(function (t) {
       for (var v = 1; v <= 3; v++) {
-        selbst.puffer['synth/' + t.audio + '_' + v] =
-          selbst._synthTon(t.frequenzHz, v);
+        selbst.puffer[art + '/' + t.audio + '_' + v] =
+          selbst._synthTon(t.frequenzHz, v, null, art);
       }
     });
     // Kleine Fanfare als Belohnung: g1 – c2 – e1 – g1 aufsteigend.
-    selbst.puffer['synth/lob'] = selbst._synthFanfare();
-    this._synthFertig = true;
+    selbst.puffer[art + '/lob'] = selbst._synthFanfare(art);
+    this._synthFertig = art;
   };
 
-  Motor.prototype._synthTon = function (f0, variante, dauerSek) {
+  Motor.prototype._synthTon = function (f0, variante, dauerSek, art) {
+    var bild = Motor.SYNTHBILD[art || this.klang] || Motor.SYNTHBILD.synth;
     var sr = this.ctx.sampleRate;
     var dauer = dauerSek || 1.35;
     var n = Math.round(sr * dauer);
     var buf = this.ctx.createBuffer(1, n, sr);
     var d = buf.getChannelData(0);
 
-    // Teiltonstaerken einer Trompete im Mezzoforte: der Grundton ist
-    // NICHT der lauteste, 2. und 3. Teilton tragen den Klang.
-    var stufen = [0.55, 1.0, 0.85, 0.6, 0.42, 0.3, 0.2, 0.13, 0.08, 0.05];
+    var stufen = bild.stufen;
     var detune = (variante === 2 ? 1.0018 : variante === 3 ? 0.9985 : 1);
     var f = f0 * detune;
-    var anblas = 0.055 + (variante === 3 ? 0.012 : 0);
+    var anblas = bild.anblas + (variante === 3 ? 0.012 : 0);
     var vibHz = 4.6 + variante * 0.25;
     var phase = new Float32Array(stufen.length);
     var spitze = 0;
@@ -198,17 +214,19 @@
       }
       // Helligkeit waechst im Ansatz -> typisches Blech-Auffaechern
       var glanz = Math.min(1, 0.35 + t / (anblas * 2.4));
-      var vib = 1 + 0.0022 * Math.sin(2 * Math.PI * vibHz * t) * Math.min(1, t * 3);
+      var vib = 1 + bild.vibTiefe * Math.sin(2 * Math.PI * vibHz * t) * Math.min(1, t * 3);
       var s = 0;
       for (var h = 0; h < stufen.length; h++) {
-        var amp = stufen[h] * Math.pow(glanz, h * 0.9);
-        // hohe Teiltoene ueber 9 kHz weglassen (klingt sonst scharf)
-        if (f * (h + 1) > 9000) { break; }
+        var amp = stufen[h] * Math.pow(glanz, h * bild.glanzKurve);
+        // hohe Teiltoene weglassen (klingt sonst scharf)
+        if (f * (h + 1) > bild.glanzEnde) { break; }
         phase[h] += 2 * Math.PI * f * (h + 1) * vib / sr;
         s += amp * Math.sin(phase[h]);
       }
       // ganz wenig Anblasgeraeusch nur im Ansatz
-      if (t < anblas * 1.6) { s += (Math.random() * 2 - 1) * 0.06 * (1 - t / (anblas * 1.6)); }
+      if (t < anblas * 1.6) {
+        s += (Math.random() * 2 - 1) * bild.geraeusch * (1 - t / (anblas * 1.6));
+      }
       var wert = s * env;
       d[i] = wert;
       var a = wert < 0 ? -wert : wert;
@@ -221,19 +239,26 @@
     return buf;
   };
 
-  Motor.prototype._synthFanfare = function () {
+  Motor.prototype._synthFanfare = function (art) {
     var sr = this.ctx.sampleRate;
+    var selbst = this;
+    /* Die Fanfare folgt der aktuellen Stimmung: sie wird aus den
+     * Frequenzen der wirklich gestimmten Toene gebaut. */
+    function hz(id, ersatz) {
+      var t = selbst._ton(id);
+      return t && t.frequenzHz ? t.frequenzHz : ersatz;
+    }
     var muster = [
-      { f: 349.23, ab: 0.00, dauer: 0.26 },
-      { f: 466.16, ab: 0.22, dauer: 0.26 },
-      { f: 392.00, ab: 0.44, dauer: 0.26 },
-      { f: 523.25, ab: 0.66, dauer: 0.75 }
+      { f: hz('g1', 349.23), ab: 0.00, dauer: 0.26 },
+      { f: hz('c2', 466.16), ab: 0.22, dauer: 0.26 },
+      { f: hz('a1', 392.00), ab: 0.44, dauer: 0.26 },
+      { f: hz('d2', 523.25), ab: 0.66, dauer: 0.75 }
     ];
     var gesamt = 1.6;
     var buf = this.ctx.createBuffer(1, Math.round(sr * gesamt), sr);
     var ziel = buf.getChannelData(0);
     for (var k = 0; k < muster.length; k++) {
-      var teil = this._synthTon(muster[k].f, 1, muster[k].dauer).getChannelData(0);
+      var teil = this._synthTon(muster[k].f, 1, muster[k].dauer, art).getChannelData(0);
       var start = Math.round(muster[k].ab * sr);
       for (var i = 0; i < teil.length && start + i < ziel.length; i++) {
         ziel[start + i] += teil[i] * 0.7;
@@ -242,6 +267,7 @@
     for (var j = 0; j < ziel.length; j++) { ziel[j] = Math.tanh(ziel[j] * 1.1) * 0.85; }
     return buf;
   };
+
 
 
   Motor.prototype._laden = function (name) {
