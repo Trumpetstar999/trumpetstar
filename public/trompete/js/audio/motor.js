@@ -89,11 +89,13 @@
   /* Klaenge laden                                                     */
   /* ---------------------------------------------------------------- */
 
-  /* Klangfarben: Unterordner in audio/. Leerer Name = Grundklang. */
+  /* Klangfarben: Unterordner in audio/. Leerer Name = Grundklang.
+   * 'synth' ist kein Ordner — die Klaenge werden gerechnet. */
   Motor.KLANGFARBEN = [
     { id: '', name: 'Warm (Standard)' },
     { id: 'brillant', name: 'Brillant' },
-    { id: 'gedaempft', name: 'Gedämpft' }
+    { id: 'gedaempft', name: 'Gedämpft' },
+    { id: 'synth', name: 'Synthesizer' }
   ];
 
   Motor.prototype.klangOrdner = function () {
@@ -112,6 +114,7 @@
 
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
+    if (this.klang === 'synth') { return Promise.resolve(this._synthBauen()); }
     var namen = ['lob'];
     this.toene.forEach(function (t) {
       for (var v = 1; v <= 3; v++) { namen.push(t.audio + '_' + v); }
@@ -121,6 +124,102 @@
       return selbst._laden(n).catch(function () { return null; });
     }));
   };
+
+  /* ---------------------------------------------------------------- */
+  /* Synthesizer-Trompete                                              */
+  /* ---------------------------------------------------------------- */
+
+  /** Rechnet alle Toene als Blechklang aus. Additive Synthese mit
+   *  ansteigender Helligkeit im Ansatz (das macht das "Blech"), ganz
+   *  leichtem Vibrato und einer kurzen Anblas-Unschaerfe. */
+  Motor.prototype._synthBauen = function () {
+    var selbst = this;
+    if (this._synthFertig) { return; }
+    this.toene.forEach(function (t) {
+      for (var v = 1; v <= 3; v++) {
+        selbst.puffer['synth/' + t.audio + '_' + v] =
+          selbst._synthTon(t.frequenzHz, v);
+      }
+    });
+    // Kleine Fanfare als Belohnung: g1 – c2 – e1 – g1 aufsteigend.
+    selbst.puffer['synth/lob'] = selbst._synthFanfare();
+    this._synthFertig = true;
+  };
+
+  Motor.prototype._synthTon = function (f0, variante, dauerSek) {
+    var sr = this.ctx.sampleRate;
+    var dauer = dauerSek || 1.35;
+    var n = Math.round(sr * dauer);
+    var buf = this.ctx.createBuffer(1, n, sr);
+    var d = buf.getChannelData(0);
+
+    // Teiltonstaerken einer Trompete im Mezzoforte: der Grundton ist
+    // NICHT der lauteste, 2. und 3. Teilton tragen den Klang.
+    var stufen = [0.55, 1.0, 0.85, 0.6, 0.42, 0.3, 0.2, 0.13, 0.08, 0.05];
+    var detune = (variante === 2 ? 1.0018 : variante === 3 ? 0.9985 : 1);
+    var f = f0 * detune;
+    var anblas = 0.055 + (variante === 3 ? 0.012 : 0);
+    var vibHz = 4.6 + variante * 0.25;
+    var phase = new Float32Array(stufen.length);
+    var spitze = 0;
+
+    for (var i = 0; i < n; i++) {
+      var t = i / sr;
+      // Huellkurve: kurzer Ansatz, langes Halten, sanftes Ende
+      var env;
+      if (t < anblas) { env = t / anblas; }
+      else {
+        var rest = (dauer - t) / dauer;
+        env = 0.86 + 0.14 * Math.exp(-(t - anblas) * 6);
+        env *= Math.min(1, rest * 8);
+      }
+      // Helligkeit waechst im Ansatz -> typisches Blech-Auffaechern
+      var glanz = Math.min(1, 0.35 + t / (anblas * 2.4));
+      var vib = 1 + 0.0022 * Math.sin(2 * Math.PI * vibHz * t) * Math.min(1, t * 3);
+      var s = 0;
+      for (var h = 0; h < stufen.length; h++) {
+        var amp = stufen[h] * Math.pow(glanz, h * 0.9);
+        // hohe Teiltoene ueber 9 kHz weglassen (klingt sonst scharf)
+        if (f * (h + 1) > 9000) { break; }
+        phase[h] += 2 * Math.PI * f * (h + 1) * vib / sr;
+        s += amp * Math.sin(phase[h]);
+      }
+      // ganz wenig Anblasgeraeusch nur im Ansatz
+      if (t < anblas * 1.6) { s += (Math.random() * 2 - 1) * 0.06 * (1 - t / (anblas * 1.6)); }
+      var wert = s * env;
+      d[i] = wert;
+      var a = wert < 0 ? -wert : wert;
+      if (a > spitze) { spitze = a; }
+    }
+
+    // Normieren und weich saettigen — gibt Waerme statt Digitalkante
+    var g = spitze > 0 ? 0.82 / spitze : 1;
+    for (var j = 0; j < n; j++) { d[j] = Math.tanh(d[j] * g * 1.25) * 0.8; }
+    return buf;
+  };
+
+  Motor.prototype._synthFanfare = function () {
+    var sr = this.ctx.sampleRate;
+    var muster = [
+      { f: 349.23, ab: 0.00, dauer: 0.26 },
+      { f: 466.16, ab: 0.22, dauer: 0.26 },
+      { f: 392.00, ab: 0.44, dauer: 0.26 },
+      { f: 523.25, ab: 0.66, dauer: 0.75 }
+    ];
+    var gesamt = 1.6;
+    var buf = this.ctx.createBuffer(1, Math.round(sr * gesamt), sr);
+    var ziel = buf.getChannelData(0);
+    for (var k = 0; k < muster.length; k++) {
+      var teil = this._synthTon(muster[k].f, 1, muster[k].dauer).getChannelData(0);
+      var start = Math.round(muster[k].ab * sr);
+      for (var i = 0; i < teil.length && start + i < ziel.length; i++) {
+        ziel[start + i] += teil[i] * 0.7;
+      }
+    }
+    for (var j = 0; j < ziel.length; j++) { ziel[j] = Math.tanh(ziel[j] * 1.1) * 0.85; }
+    return buf;
+  };
+
 
   Motor.prototype._laden = function (name) {
     var selbst = this;
