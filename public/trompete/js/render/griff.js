@@ -107,7 +107,7 @@
 
     /* ---- Die Trompete als fertige Zeichnung --------------------- */
     var bild = el('image', {
-      x: BILD_X, y: BILD_Y - 12 * SKALA, width: BILD_W, height: BILD_H,
+      x: BILD_X, y: BILD_Y, width: BILD_W, height: BILD_H,
       preserveAspectRatio: 'xMidYMid meet'
     });
     bild.setAttributeNS(XLINK, 'xlink:href', BILD);
