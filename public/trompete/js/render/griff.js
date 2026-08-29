@@ -32,22 +32,22 @@
    * die volle Bildschirmbreite. Links die Trompete, rechts die
    * Naturton-Leiter. */
   var W = 460, H = 150;
-  var BILD = '/trompete/img/trompete-koerper.png';
+  var BILD = '/trompete/img/trompete-flach.png';
 
-  /* Die Zeichnung ist 1536 x 1024 gross und wird auf 300 Einheiten
-   * Breite gelegt. Daraus ergeben sich die Ventilpositionen. */
-  /* Massstab: die Trompete wird kleiner gezeichnet als frueher, damit
-   * sie im unteren Bildbereich nicht erschlaegt. Alle Ventilmasse
-   * haengen an SKALA, damit Bild und Knoepfe zusammenbleiben. */
-  var SKALA = 0.50;
-  var BILD_X = 40, BILD_Y = 34, BILD_W = 300 * SKALA, BILD_H = 200 * SKALA;
-  function bx_(x) { return BILD_X + x * SKALA; }
-  function by_(y) { return BILD_Y - 12 * SKALA + y * SKALA; }
-  var VENTIL_X = [bx_(118.8), bx_(136.7), bx_(156.2)];
-  var CASING_OBEN = by_(76);     // Oberkante der Ventilzuege im Bild
-  var VENTIL_OBEN = by_(54);     // Knopf nicht gedrueckt
-  var VENTIL_UNTEN = by_(68);    // Knopf gedrueckt: sichtbar tiefer
-  var VENTIL_R = 9.5 * SKALA;
+  /* Die flache Zeichnung ist 640 x 264 gross. Sie wird auf 250
+   * Einheiten Breite gelegt; alle Ventilmasse ergeben sich aus dem
+   * Bild, damit Knoepfe und Zeichnung zusammenbleiben. */
+  var BILD_X = 26, BILD_Y = 26, BILD_W = 250, BILD_H = 250 * 264 / 640;
+  var S_ = BILD_W / 640;                 // Bild-Pixel -> SVG-Einheiten
+  function bx_(x) { return BILD_X + x * S_; }
+  function by_(y) { return BILD_Y + y * S_; }
+  var SKALA = 0.85;                      // Massstab der gezeichneten Knoepfe
+  var VENTIL_X = [bx_(234), bx_(275.5), bx_(317)];
+  var CASING_OBEN = by_(90);     // Oberkante der Ventilzuege im Bild
+  var VENTIL_OBEN = by_(38);     // Knopf nicht gedrueckt
+  var VENTIL_UNTEN = by_(62);    // Knopf gedrueckt: sichtbar tiefer
+  var VENTIL_R = 6.5;
+
 
 
 
