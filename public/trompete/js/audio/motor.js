@@ -131,6 +131,26 @@
     return Promise.resolve(this._synthBauen());
   };
 
+  /* Schleifenpunkte der Samples. Sie stehen in audio/loops.json und sind
+   * beim Erzeugen der Toene exakt auf ganze Schwingungen gelegt worden.
+   * Nur so laesst sich der ausgehaltene Teil ohne Knack und ohne
+   * "Gurgeln" wiederholen. */
+  Motor.prototype._schleifenLaden = function () {
+    var selbst = this;
+    if (this._schleifen) { return Promise.resolve(this._schleifen); }
+    return new Promise(function (auf) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', selbst.basis + 'audio/loops.json', true);
+      xhr.onload = function () {
+        try { selbst._schleifen = JSON.parse(xhr.responseText); }
+        catch (e) { selbst._schleifen = {}; }
+        auf(selbst._schleifen);
+      };
+      xhr.onerror = function () { selbst._schleifen = {}; auf(selbst._schleifen); };
+      xhr.send();
+    });
+  };
+
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
     if (this._istSynth(this.klang)) {
@@ -141,11 +161,12 @@
     this.toene.forEach(function (t) {
       for (var v = 1; v <= 3; v++) { namen.push(t.audio + '_' + v); }
     });
-    return Promise.all(namen.map(function (n) {
+    return Promise.all([this._schleifenLaden()].concat(namen.map(function (n) {
       if (selbst.puffer[selbst.klangOrdner() + n]) { return null; }
       return selbst._laden(n).catch(function () { return null; });
-    }));
+    })));
   };
+
 
 
   /* ---------------------------------------------------------------- */
