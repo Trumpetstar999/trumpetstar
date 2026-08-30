@@ -464,17 +464,19 @@ img { display: block; max-width: 100%; max-height: 100%; }
    nicht die Hoehe der begrenzende Faktor, sondern die Breite. */
 #uebung.stufe2 {
   grid-template-columns: 1fr;
-  grid-template-rows: 13vh 1fr 22vh 11vh;
-  row-gap: 0.6vh;
+  grid-template-rows: 12vh 1fr 17vh 10vh;
+  row-gap: 1.4vh;
 }
 /* In Level 2 und 3 traegt der Kasten nur noch das Griffbild — es liegt
    quer und nutzt die volle Breite. */
 /* Vier Kinder, vier Zeilen — die Reihenfolge im HTML genuegt.
-   Etwas Luft nach unten, damit die Ventilzuege den Tempo-Regler nicht
-   beruehren. */
-#uebung.stufe2 #rechts { display: block; min-height: 0; padding-bottom: 1.6vh; }
+   Die Trompete bleibt bewusst kleiner als die Zeile: so beruehrt sie
+   weder die Noten darueber noch den Tempo-Regler darunter. */
+#uebung.stufe2 #rechts { display: block; min-height: 0; padding-bottom: 1vh; }
 #uebung.stufe2 #rechts #tierfeld { display: none; }
 #uebung.stufe2 #rechts #grifffeld { height: 100%; }
+#uebung.stufe2 #griff { max-height: 15.5vh; max-width: 62vh; margin: 0 auto; }
+
 
 
 /* Das Tier zum Ton: g wie Gans, h wie Hamster. Es steht nur in
