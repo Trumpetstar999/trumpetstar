@@ -329,8 +329,11 @@
     this.variante[tonId] = v;
 
     var o1 = this.klangOrdner();
-    var buf = this.puffer[o1 + ton.audio + '_' + v] || this.puffer[o1 + ton.audio + '_1']
-      || this.puffer[ton.audio + '_' + v] || this.puffer[ton.audio + '_1'];
+    var name = ton.audio + '_' + v;
+    var buf = this.puffer[o1 + name];
+    if (!buf) { name = ton.audio + '_1'; buf = this.puffer[o1 + name]; }
+    if (!buf) { buf = this.puffer[ton.audio + '_' + v]; name = ton.audio + '_' + v; }
+    if (!buf) { buf = this.puffer[ton.audio + '_1']; name = ton.audio + '_1'; }
 
     if (!buf) { return 0; }
 
@@ -340,18 +343,19 @@
 
     var q = this.ctx.createBufferSource();
     q.buffer = buf;
-    /* Halbe und ganze Noten sind laenger als das Sample. Damit sie
-     * wirklich so lange klingen, wie sie notiert sind, wird der
-     * ausgehaltene Mittelteil des Klangs geschleift — Anblasgeraeusch
-     * und Ausklang bleiben aussen vor. Ohne das enden lange Toene
-     * vorzeitig und der Rhythmus klingt falsch. */
-    if (dauer + 0.02 > buf.duration) {
-      var anfang = Math.min(0.28, buf.duration * 0.25);
-      var ende = Math.max(anfang + 0.12, buf.duration * 0.82);
+    /* Halbe und ganze Noten koennen laenger sein als das Sample. Damit
+     * sie so lange klingen, wie sie notiert sind, wird der ausgehaltene
+     * Teil geschleift. Die Punkte kommen aus audio/loops.json und
+     * liegen auf ganzen Schwingungen — dadurch bleibt der Ton ruhig.
+     * Ohne Manifest wird gar nicht geschleift (lieber kuerzer als
+     * unschoen). */
+    var sch = this._schleifen && this._schleifen[name];
+    if (dauer + 0.02 > buf.duration && sch && sch.end > sch.start + 0.05) {
       q.loop = true;
-      q.loopStart = anfang;
-      q.loopEnd = ende;
+      q.loopStart = sch.start;
+      q.loopEnd = Math.min(sch.end, buf.duration);
     }
+
     var g = this.ctx.createGain();
     var laut = o.lautstaerke != null ? o.lautstaerke : 1;
     g.gain.setValueAtTime(laut, wann);
