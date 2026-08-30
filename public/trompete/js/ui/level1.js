@@ -55,6 +55,7 @@
     this.hoert = false;
     if (this.uhr) { clearInterval(this.uhr); this.uhr = null; }
     if (this.nachspielUhr) { clearTimeout(this.nachspielUhr); this.nachspielUhr = null; }
+    this.k.motor.allesStoppen();
     this.k.knopfBereit(false);
   };
 
@@ -73,6 +74,8 @@
     this.spielt = false;
     this.hoert = false;
     if (this.nachspielUhr) { clearTimeout(this.nachspielUhr); this.nachspielUhr = null; }
+    this.k.motor.allesStoppen();
+    this.k.motor.erkennungZuruecksetzen();
     this.k.grifffeld.classList.remove('pulsiert');
     this.k.knopfBereit(false);
   };

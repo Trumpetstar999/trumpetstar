@@ -184,6 +184,10 @@
     if (!this.laeuft) { return; }
     this.marke++;                       // schneidet alle geplanten Rueckrufe ab
     if (this.rahmen) { cancelAnimationFrame(this.rahmen); this.rahmen = null; }
+    // Web Audio plant Klicks und Melodie im Voraus — ohne dies klingt
+    // beim Stop alles weiter.
+    this.k.motor.allesStoppen();
+    this.k.motor.erkennungZuruecksetzen();
     this.k.knopfBereit(false);
     this._punkteAus();
     this._neueUebung(true);
