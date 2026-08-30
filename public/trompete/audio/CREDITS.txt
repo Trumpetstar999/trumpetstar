@@ -1,11 +1,15 @@
 Trompeten-Samples (ton_*.m4a, lob.m4a)
 --------------------------------------
-Basis: "Trumpet single notes" — Music Technology Group (MTG),
-Universitat Pompeu Fabra, Barcelona (good-sounds.org Dataset),
-veröffentlicht auf Freesound: https://freesound.org/people/MTG/packs/20232/
-Lizenz: Creative Commons Attribution 3.0 (CC BY 3.0)
-https://creativecommons.org/licenses/by/3.0/
+Quelle: Eigene Trompeten-Aufnahme der Trumpetstar GmbH
+(Sample_Trompete, Logic Pro), alle neun notierten Töne c1–d2
+einzeln eingespielt. Alle Rechte bei der Trumpetstar GmbH.
 
-Bearbeitung durch Trumpetstar GmbH: Zuschnitt, Lautheits-Normalisierung,
-Feinstimmung auf a1 = 440 Hz, Erzeugung des Tons d2 (Transposition) und
-Montage des Belohnungsklangs (lob.m4a).
+Bearbeitung: Zuschnitt auf den Toneinsatz, drei Varianten je Ton
+(Anblasen plus verschiedene Ausschnitte des ausgehaltenen Tons),
+Feinstimmung auf a1 = 440 Hz, Lautheits-Normalisierung (EBU R128)
+und Montage des Belohnungsklangs (lob.m4a).
+
+Klangfarben:
+- Grundklang (Standard) = audio/
+- brillant/   = Höhenanhebung der Grundaufnahme
+- gedaempft/  = Dämpfer-Simulation (Tiefpass, Mittenanhebung)
