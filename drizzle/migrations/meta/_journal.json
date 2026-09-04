@@ -15,6 +15,13 @@
       "when": 1788508504607,
       "tag": "0001_security_fixes_plan_gating_and_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788508535021,
+      "tag": "0002_fix_increment_daily_usage_columns",
+      "breakpoints": true
     }
   ]
 }
