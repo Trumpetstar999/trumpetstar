@@ -4010,6 +4010,7 @@ export type Database = {
         Args: { p_product_id: string; p_quantity: number; p_reason?: string }
         Returns: undefined
       }
+      can_access_plan: { Args: { _plan: string }; Returns: boolean }
       can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
       finalize_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
       get_friends_star_ranking: {
@@ -4087,6 +4088,7 @@ export type Database = {
         Returns: boolean
       }
       next_invoice_number: { Args: { p_year: number }; Returns: string }
+      plan_rank_of: { Args: { _plan: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
