@@ -395,7 +395,15 @@ Deno.serve(async (req) => {
       });
 
       return new Response(
-        JSON.stringify({ success: true, total: purchases.length, granted, skipped, errors, results }),
+        JSON.stringify({
+          success: true,
+          total: purchases.length,
+          granted,
+          skipped,
+          errors,
+          results,
+          sample: dryRun ? purchases[0] ?? null : undefined,
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
