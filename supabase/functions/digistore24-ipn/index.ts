@@ -183,6 +183,36 @@ function validateSecret(payload: Record<string, any>, expectedSecret: string): b
   return providedSecret === expectedSecret;
 }
 
+// Look up an auth user by exact email. GoTrue ignores unknown filters, so never trust users[0].
+async function findUserByEmail(email: string, supabaseUrl: string, serviceKey: string) {
+  const target = (email || "").toLowerCase().trim();
+  if (!target) return null;
+  const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+
+  const res = await fetch(
+    `${supabaseUrl}/auth/v1/admin/users?filter=${encodeURIComponent(target)}&per_page=200`,
+    { headers },
+  );
+  if (res.ok) {
+    const body = await res.json();
+    const match = (body?.users ?? []).find((u: any) => (u.email || "").toLowerCase().trim() === target);
+    if (match) return match;
+  } else {
+    console.warn(`[IPN] user filter query failed [${res.status}]`);
+  }
+
+  for (let page = 1; page <= 40; page++) {
+    const pageRes = await fetch(`${supabaseUrl}/auth/v1/admin/users?page=${page}&per_page=200`, { headers });
+    if (!pageRes.ok) break;
+    const body = await pageRes.json();
+    const users = body?.users ?? [];
+    const match = users.find((u: any) => (u.email || "").toLowerCase().trim() === target);
+    if (match) return match;
+    if (users.length < 200) break;
+  }
+  return null;
+}
+
 // Process the IPN event (main business logic)
 async function processIpnEvent(
   supabase: any,
@@ -250,12 +280,7 @@ async function processIpnEvent(
     // Check if user exists via GoTrue REST API with email filter — O(1) statt O(n)
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const userSearchRes = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users?email=${encodeURIComponent(normalized.email)}`,
-      { headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}` } }
-    );
-    const { users: foundUsers } = await userSearchRes.json();
-    const existingUser = foundUsers?.[0];
+    const existingUser = await findUserByEmail(normalized.email, supabaseUrl, supabaseServiceKey);
     
     if (existingUser) {
       userId = existingUser.id;

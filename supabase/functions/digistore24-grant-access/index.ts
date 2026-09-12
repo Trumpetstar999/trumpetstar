@@ -32,15 +32,38 @@ interface GrantResult {
 }
 
 async function findUserByEmail(email: string) {
+  const target = email.toLowerCase().trim();
+
+  // GoTrue's admin list endpoint ignores unknown query params, so ALWAYS verify the
+  // returned address instead of trusting users[0].
   const res = await fetch(
-    `${SUPABASE_URL}/auth/v1/admin/users?email=${encodeURIComponent(email)}`,
+    `${SUPABASE_URL}/auth/v1/admin/users?filter=${encodeURIComponent(target)}&per_page=200`,
     { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
   );
-  if (!res.ok) {
-    throw new Error(`user lookup failed [${res.status}]: ${await res.text()}`);
+  if (res.ok) {
+    const body = await res.json();
+    const match = (body?.users ?? []).find(
+      (u: any) => (u.email || "").toLowerCase().trim() === target,
+    );
+    if (match) return match;
+  } else {
+    console.warn(`[user-lookup] filter query failed [${res.status}]: ${await res.text()}`);
   }
-  const body = await res.json();
-  return body?.users?.[0] ?? null;
+
+  // Fallback: page through the user list and match exactly.
+  for (let page = 1; page <= 40; page++) {
+    const pageRes = await fetch(
+      `${SUPABASE_URL}/auth/v1/admin/users?page=${page}&per_page=200`,
+      { headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` } },
+    );
+    if (!pageRes.ok) break;
+    const body = await pageRes.json();
+    const users = body?.users ?? [];
+    const match = users.find((u: any) => (u.email || "").toLowerCase().trim() === target);
+    if (match) return match;
+    if (users.length < 200) break;
+  }
+  return null;
 }
 
 /** Creates the account (if needed), sets the plan, writes entitlement + customer and sends the welcome mail. */
@@ -326,17 +349,21 @@ Deno.serve(async (req) => {
       const results: GrantResult[] = [];
 
       for (const p of purchases) {
-        const email = (p.email || p.buyer_email || p.buyer?.email || "").toLowerCase().trim();
-        const productId = String(p.product_id || p.product?.id || p.productId || "");
-        const payStatus = String(p.pay_status || p.payment_status || p.billing_status || "").toLowerCase();
-        const isRevoked = ["refunded", "chargeback", "cancelled", "canceled"].some((s) => payStatus.includes(s));
+        const email = (p.buyer?.email || p.email || p.buyer_email || "").toLowerCase().trim();
+        const productId = String(p.main_product_id || p.product_id || p.product?.id || "");
+        const payStatus = String(p.billing_status || p.pay_status || p.payment_status || "").toLowerCase();
+        const isRevoked = ["refund", "chargeback", "cancel", "unpaid", "failed"].some((s) => payStatus.includes(s));
 
         if (!email || !productId || isRevoked) {
-          results.push({ email: email || "?", status: "skipped", message: payStatus || "missing data" });
+          results.push({
+            email: email || "?",
+            status: "skipped",
+            message: !email ? "keine E-Mail" : !productId ? "kein Produkt" : payStatus,
+          });
           continue;
         }
         if (dryRun) {
-          results.push({ email, status: "skipped", message: "dry run" });
+          results.push({ email, status: "skipped", message: `Probelauf (${productId})` });
           continue;
         }
 
@@ -344,9 +371,9 @@ Deno.serve(async (req) => {
           const r = await grantAccess(admin, {
             email,
             product_id: productId,
-            first_name: p.first_name || p.buyer?.first_name || null,
-            last_name: p.last_name || p.buyer?.last_name || null,
-            order_id: p.order_id || p.id || null,
+            first_name: p.buyer?.first_name || p.first_name || null,
+            last_name: p.buyer?.last_name || p.last_name || null,
+            order_id: p.id || p.order_id || null,
             amount: p.amount ? parseFloat(p.amount) : null,
             currency: p.currency || "EUR",
             send_email: body.send_email !== false,
@@ -372,7 +399,14 @@ Deno.serve(async (req) => {
       });
 
       return new Response(
-        JSON.stringify({ success: true, total: purchases.length, granted, skipped, errors, results }),
+        JSON.stringify({
+          success: true,
+          total: purchases.length,
+          granted,
+          skipped,
+          errors,
+          results,
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
