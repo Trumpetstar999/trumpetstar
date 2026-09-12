@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
-import { Settings, Package, FileText, Download, Users, UploadCloud } from 'lucide-react';
+import { Settings, Package, FileText, Download, Users, UploadCloud, KeyRound } from 'lucide-react';
 import { Digistore24SettingsManager } from './Digistore24SettingsManager';
 import { Digistore24ProductsManager } from './Digistore24ProductsManager';
 import { Digistore24IPNLogs } from './Digistore24IPNLogs';
 import { Digistore24ImportPanel } from './Digistore24ImportPanel';
 import { Digistore24CustomersPanel } from './Digistore24CustomersPanel';
 import { Digistore24CSVImportPanel } from './Digistore24CSVImportPanel';
+import { Digistore24AccessPanel } from './Digistore24AccessPanel';
 
-type SubTab = 'settings' | 'products' | 'import' | 'csv-import' | 'customers' | 'logs';
+type SubTab = 'settings' | 'access' | 'products' | 'import' | 'csv-import' | 'customers' | 'logs';
 export function Digistore24Manager() {
   const [subTab, setSubTab] = useState<SubTab>('settings');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -26,6 +27,13 @@ export function Digistore24Manager() {
         >
           <Settings className="w-4 h-4" />
           Einstellungen
+        </button>
+        <button
+          onClick={() => setSubTab('access')}
+          className={`admin-tab ${subTab === 'access' ? 'admin-tab-active' : ''}`}
+        >
+          <KeyRound className="w-4 h-4" />
+          Zugänge
         </button>
         <button
           onClick={() => setSubTab('import')}
@@ -66,6 +74,7 @@ export function Digistore24Manager() {
 
       {/* Content */}
       {subTab === 'settings' && <Digistore24SettingsManager />}
+      {subTab === 'access' && <Digistore24AccessPanel />}
       {subTab === 'import' && <Digistore24ImportPanel onImportDone={handleImportDone} />}
       {subTab === 'products' && <Digistore24ProductsManager key={refreshKey} />}
       {subTab === 'csv-import' && <Digistore24CSVImportPanel onImportDone={handleImportDone} />}
