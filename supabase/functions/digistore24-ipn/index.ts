@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { notifyBrevo } from "../_shared/brevo-notify.ts";
+import { sendWelcomeMail } from "../_shared/welcome-mail.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,7 +32,24 @@ const EVENT_TYPE_MAP: Record<string, string> = {
   // Chargeback events
   'on_chargeback': 'CHARGEBACK',
   'chargeback': 'CHARGEBACK',
+  // Additional Digistore24 event names
+  'on_upgrade': 'PURCHASE',
+  'on_upgrade_complete': 'PURCHASE',
+  'on_affiliation': 'UNKNOWN',
+  'connection_test': 'UNKNOWN',
+  'on_payment_missed': 'UNKNOWN',
+  'last_paid_day': 'UNKNOWN',
 };
+
+// Payload looks like a completed payment even though the event name is unknown
+function looksLikePayment(raw: Record<string, any>): boolean {
+  const hasOrder = Boolean(raw.order_id || raw.orderId);
+  const hasProduct = Boolean(raw.product_id || raw.productId);
+  const hasMoney = raw.amount !== undefined || raw.amount_brutto !== undefined || raw.pay_sequence_no !== undefined || Boolean(raw.billing_type);
+  const payStatus = String(raw.pay_status || raw.payment_status || '').toLowerCase();
+  const notRevoked = !['refunded', 'chargeback', 'cancelled', 'canceled'].some((s) => payStatus.includes(s));
+  return hasOrder && hasProduct && hasMoney && notRevoked;
+}
 
 interface NormalizedPayload {
   event_type: string;
@@ -90,7 +108,13 @@ function normalizePayload(raw: Record<string, any>): NormalizedPayload {
     ''
   ).toLowerCase();
   
-  const eventType = EVENT_TYPE_MAP[eventName] || 'UNKNOWN';
+  let eventType = EVENT_TYPE_MAP[eventName] ?? 'UNKNOWN';
+
+  // Digistore24 occasionally sends event names we don't know yet — don't silently drop real payments
+  if (eventType === 'UNKNOWN' && eventName !== 'connection_test' && looksLikePayment(raw)) {
+    console.warn(`[IPN] Unknown event name "${eventName}" but payload looks like a payment — treating as PURCHASE`);
+    eventType = 'PURCHASE';
+  }
   
   return {
     event_type: eventType,
@@ -186,6 +210,27 @@ async function processIpnEvent(
     
     if (!product) {
       console.warn(`[IPN] Unknown product ID: ${normalized.product_id} — marking event as processed without plan assignment`);
+
+      // Still keep the buyer as a customer so nobody gets lost
+      if (normalized.email) {
+        const { data: knownCust } = await supabase
+          .from('digistore24_customers')
+          .select('id')
+          .eq('email', normalized.email)
+          .maybeSingle();
+        if (!knownCust) {
+          await supabase.from('digistore24_customers').insert({
+            email: normalized.email,
+            first_name: normalized.first_name || null,
+            last_name: normalized.last_name || null,
+            total_purchases: normalized.event_type === 'PURCHASE' ? 1 : 0,
+            total_revenue: normalized.amount || 0,
+            first_purchase_at: new Date().toISOString(),
+            last_purchase_at: new Date().toISOString(),
+          });
+        }
+      }
+
       await supabase
         .from('digistore24_ipn_events')
         .update({ 
@@ -392,7 +437,7 @@ async function processIpnEvent(
     
     if (shouldSendEmail) {
       try {
-        await sendWelcomeEmail(supabase, {
+        await sendWelcomeMail(supabase, {
           email: normalized.email,
           firstName: normalized.first_name,
           locale: userLocale || settings.defaultLocale,
@@ -631,164 +676,6 @@ async function processIpnEvent(
       .eq('id', eventId);
     
     throw error;
-  }
-}
-
-// Send welcome email with magic link
-async function sendWelcomeEmail(
-  supabase: any,
-  params: {
-    email: string;
-    firstName: string;
-    locale: string;
-    appBaseUrl: string;
-    productName: string;
-  }
-): Promise<void> {
-  const { email, firstName, locale, appBaseUrl, productName } = params;
-  
-  // Generate magic link
-  const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-    type: 'magiclink',
-    email: email,
-    options: {
-      redirectTo: `${appBaseUrl}/`,
-    },
-  });
-  
-  if (linkError) throw linkError;
-  
-  const magicLink = linkData.properties.action_link;
-  
-  // Email templates by locale
-  const templates: Record<string, { subject: string; body: string }> = {
-    de: {
-      subject: `🎺 Dein Zugang zu ${productName} ist freigeschaltet!`,
-      body: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1e293b;">Hallo ${firstName || 'Trompeter'}! 🎺</h1>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            Vielen Dank für deinen Kauf! Dein Zugang zu <strong>${productName}</strong> wurde freigeschaltet.
-          </p>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            Klicke auf den Button unten, um dich direkt einzuloggen:
-          </p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${magicLink}" 
-               style="background: linear-gradient(135deg, #f59e0b, #d97706); 
-                      color: white; 
-                      padding: 14px 28px; 
-                      text-decoration: none; 
-                      border-radius: 8px; 
-                      font-weight: 600;
-                      display: inline-block;">
-              Jetzt einloggen
-            </a>
-          </div>
-          <p style="color: #94a3b8; font-size: 14px;">
-            Der Link ist 24 Stunden gültig. Danach kannst du dich jederzeit mit deiner E-Mail-Adresse anmelden.
-          </p>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-          <p style="color: #94a3b8; font-size: 12px;">
-            Trumpet Star | Deine Online-Trompetenschule
-          </p>
-        </div>
-      `,
-    },
-    en: {
-      subject: `🎺 Your access to ${productName} is now active!`,
-      body: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1e293b;">Hello ${firstName || 'Trumpeter'}! 🎺</h1>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            Thank you for your purchase! Your access to <strong>${productName}</strong> has been activated.
-          </p>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            Click the button below to log in directly:
-          </p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${magicLink}" 
-               style="background: linear-gradient(135deg, #f59e0b, #d97706); 
-                      color: white; 
-                      padding: 14px 28px; 
-                      text-decoration: none; 
-                      border-radius: 8px; 
-                      font-weight: 600;
-                      display: inline-block;">
-              Log in now
-            </a>
-          </div>
-          <p style="color: #94a3b8; font-size: 14px;">
-            This link is valid for 24 hours. After that, you can always sign in with your email address.
-          </p>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-          <p style="color: #94a3b8; font-size: 12px;">
-            Trumpet Star | Your Online Trumpet School
-          </p>
-        </div>
-      `,
-    },
-    es: {
-      subject: `🎺 ¡Tu acceso a ${productName} está activado!`,
-      body: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1e293b;">¡Hola ${firstName || 'Trompetista'}! 🎺</h1>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            ¡Gracias por tu compra! Tu acceso a <strong>${productName}</strong> ha sido activado.
-          </p>
-          <p style="color: #475569; font-size: 16px; line-height: 1.6;">
-            Haz clic en el botón de abajo para iniciar sesión directamente:
-          </p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${magicLink}" 
-               style="background: linear-gradient(135deg, #f59e0b, #d97706); 
-                      color: white; 
-                      padding: 14px 28px; 
-                      text-decoration: none; 
-                      border-radius: 8px; 
-                      font-weight: 600;
-                      display: inline-block;">
-              Iniciar sesión
-            </a>
-          </div>
-          <p style="color: #94a3b8; font-size: 14px;">
-            Este enlace es válido por 24 horas. Después, puedes iniciar sesión con tu correo electrónico.
-          </p>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-          <p style="color: #94a3b8; font-size: 12px;">
-            Trumpet Star | Tu Escuela de Trompeta Online
-          </p>
-        </div>
-      `,
-    },
-  };
-  
-  const template = templates[locale] || templates.de;
-  
-  // Use Resend if configured, otherwise log
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
-  
-  if (resendApiKey) {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Trumpet Star <noreply@trumpetstar.com>',
-        to: [email],
-        subject: template.subject,
-        html: template.body,
-      }),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Resend API error: ${errorText}`);
-    }
-  } else {
-    console.log(`[EMAIL WOULD BE SENT] To: ${email}, Subject: ${template.subject}`);
   }
 }
 
