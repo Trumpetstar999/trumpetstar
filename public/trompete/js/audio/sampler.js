@@ -71,6 +71,23 @@
     return Object.prototype.hasOwnProperty.call(PROBEN, name);
   };
 
+  /** Welche der neun Aufnahmen liegt dieser Frequenz am naechsten?
+   *
+   *  Fuer Horn und Tenorhorn klingt derselbe notierte Ton tiefer als auf
+   *  der Trompete. Genommen wird dann die Aufnahme, die am wenigsten
+   *  verschoben werden muss — je kleiner die Verschiebung, desto mehr
+   *  bleibt vom Klang des Instruments uebrig. */
+  Sampler.prototype.besteProbe = function (frequenzHz) {
+    if (!frequenzHz) { return null; }
+    var beste = null, kleinste = Infinity;
+    for (var name in PROBEN) {
+      if (!Object.prototype.hasOwnProperty.call(PROBEN, name)) { continue; }
+      var abstand = Math.abs(Math.log(PROBEN[name].f0 / frequenzHz));
+      if (abstand < kleinste) { kleinste = abstand; beste = name; }
+    }
+    return beste;
+  };
+
   /* ---------------------------------------------------------------- */
   /* Laden                                                             */
   /* ---------------------------------------------------------------- */
