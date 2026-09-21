@@ -193,6 +193,7 @@
   Eltern.prototype._fuellen = function () {
     var selbst = this;
     this._spracheZeigen();
+    this._instrumentZeigen();
     this._strengeZeigen();
     this._notenfarbeZeigen();
     var koerper = document.querySelector('#eltern-quoten tbody');
