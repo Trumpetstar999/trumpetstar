@@ -157,6 +157,17 @@
     });
   };
 
+  Eltern.prototype._instrumentZeigen = function () {
+    var jetzt = root.Instrument.id();
+    var reihe = document.getElementById('eltern-instrument');
+    if (!reihe) { return; }
+    [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
+      var an = b.getAttribute('data-instrument') === jetzt;
+      b.className = an ? 'an' : '';
+      b.setAttribute('aria-pressed', an ? 'true' : 'false');
+    });
+  };
+
   Eltern.prototype._notenfarbeZeigen = function () {
     var f = this.k.fortschritt;
     [['eltern-notenfarbe', f.notenfarbe()], ['eltern-buchnotenfarbe', f.buchNotenfarbe()]].forEach(function (paar) {
