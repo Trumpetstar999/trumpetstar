@@ -55,9 +55,7 @@
     this.ausgang = this.ctx.createGain();
     this.ausgang.gain.value = 1;
     this.ausgang.connect(this.ctx.destination);
-    this.meister = this.ctx.createGain();
-    this.meister.gain.value = 1;
-    this.meister.connect(this.ausgang);
+    this._meisterBauen();
     this.laufende = [];
 
     // Auf iOS muss der Kontext aus der Geste heraus laufen; ein kurzer
