@@ -93,24 +93,53 @@
     'eltern.herkunft.hinweis': {
       en: 'The notes the app plays are real recordings of a Yamaha Périnet '
         + 'trumpet, played by Mario Schulter. Out of seven takes per note the '
-        + 'cleanest was chosen and all of them were matched in loudness.',
+        + 'cleanest was chosen and all of them were matched in loudness. For horn '
+        + 'and tenor horn the same recordings are moved down to the lower range and '
+        + 'softened — a horn has fewer overtones than a trumpet.',
       es: 'Las notas que reproduce la aplicación son grabaciones reales de una '
         + 'trompeta Yamaha Périnet, interpretadas por Mario Schulter. De siete '
-        + 'tomas por nota se eligió la más limpia y todas se igualaron en volumen.' },
+        + 'tomas por nota se eligió la más limpia y todas se igualaron en volumen. '
+        + 'Para la trompa y el bombardino se llevan las mismas grabaciones al '
+        + 'registro grave y se suavizan: una trompa tiene menos armónicos que una '
+        + 'trompeta.' },
 
     'eltern.stimmung':         { en: 'Why does it sound lower than it is written?',
                                  es: '¿Por qué suena más grave de lo que está escrito?' },
     'eltern.stimmung.hinweis': {
-      en: 'The trumpet is a <em>B flat instrument</em>: what is written as C sounds '
-        + 'as B flat — one whole step lower. The app plays at that sounding pitch '
-        + 'and listens at it too, so your child can play along without anything '
-        + 'being transposed. Next to a piano it will sound one step lower than the '
-        + 'same note there — that is correct, and true of every trumpet.',
-      es: 'La trompeta es un <em>instrumento en si bemol</em>: lo que está escrito '
-        + 'como do suena como si bemol, un tono más grave. La aplicación reproduce '
-        + 'en esa altura real y también escucha en ella, de modo que su hijo puede '
-        + 'tocar a la vez sin transponer nada. Junto a un piano sonará un tono más '
-        + 'grave que la misma nota allí: es correcto y ocurre con toda trompeta.' },
+      en: 'All four instruments are <em>transposing</em>: what is written as C sounds '
+        + 'lower — a whole step on the B flat trumpet, a fifth on the horn in F, a '
+        + 'sixth on the horn in E flat, a whole step plus an octave on the tenor '
+        + 'horn. The app plays at that sounding pitch and listens at it too, so your '
+        + 'child can play along without anything being transposed. Next to a piano it '
+        + 'will sound lower than the same note there — that is correct.',
+      es: 'Los cuatro instrumentos son <em>transpositores</em>: lo que está escrito '
+        + 'como do suena más grave: un tono en la trompeta en si bemol, una quinta en '
+        + 'la trompa en fa, una sexta en la trompa en mi bemol, un tono más una '
+        + 'octava en el bombardino. La aplicación reproduce en esa altura real y '
+        + 'también escucha en ella, de modo que su hijo puede tocar a la vez sin '
+        + 'transponer nada. Junto a un piano sonará más grave que la misma nota '
+        + 'allí: es correcto.' },
+
+    'eltern.instrument':       { en: 'Instrument',          es: 'Instrumento' },
+    'eltern.instrument.trompete': { en: 'Trumpet in B flat', es: 'Trompeta en si bemol' },
+    'eltern.instrument.hornF':    { en: 'Horn in F',         es: 'Trompa en fa' },
+    'eltern.instrument.hornEs':   { en: 'Horn in E flat',    es: 'Trompa en mi bemol' },
+    'eltern.instrument.tenorhorn': { en: 'Tenor horn',       es: 'Bombardino' },
+    'eltern.instrument.hinweis': {
+      en: 'The notes stay the same on all four, and so do the fingerings: written D '
+        + 'is 1 + 3 everywhere. The only difference is how low it sounds — that sets '
+        + 'what the app plays and what it expects through the microphone. The '
+        + 'fingering picture shows rotary valves on the horn and piston valves on '
+        + 'trumpet and tenor horn. The <em>tenor horn</em> is written and fingered '
+        + 'like a trumpet in B flat but sounds an octave lower. After switching, the '
+        + 'app restarts; the progress is kept.',
+      es: 'Las notas son las mismas en los cuatro, y también las digitaciones: re '
+        + 'escrito es 1 + 3 en todos. Lo único distinto es cuánto más grave suena, y '
+        + 'de eso dependen lo que reproduce la aplicación y lo que espera por el '
+        + 'micrófono. La imagen de digitación muestra válvulas rotativas en la trompa '
+        + 'y de pistón en trompeta y bombardino. El <em>bombardino</em> se escribe y '
+        + 'se digita como una trompeta en si bemol, pero suena una octava más grave. '
+        + 'Al cambiar, la aplicación se reinicia; el progreso se conserva.' },
 
     'eltern.zu':               { en: 'Back to the app',    es: 'Volver a la aplicación' },
 
