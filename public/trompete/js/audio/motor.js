@@ -126,18 +126,9 @@
    *  sagt getOutputTimestamp, was gerade am Ausgang ist. */
   Motor.prototype.hoerbarJetzt = function () {
     if (!this.ctx) { return 0; }
-    var c = this.ctx;
-    if (typeof c.outputLatency === 'number' && c.outputLatency > 0) {
-      return c.currentTime - this.ausgabeVerzug();
-    }
-    if (c.getOutputTimestamp && root.performance) {
-      var ts = c.getOutputTimestamp();
-      if (ts && ts.contextTime > 0 && ts.performanceTime > 0) {
-        return Math.min(c.currentTime,
-                        ts.contextTime + (root.performance.now() - ts.performanceTime) / 1000);
-      }
-    }
-    return c.currentTime - this.ausgabeVerzug();
+    /* Immer derselbe Rechenweg: eine Uhr, ein Abzug. Sonst springt der
+     * Marker um den Verzug hin und her. */
+    return this.ctx.currentTime - this.ausgabeVerzug();
   };
 
   /* ---------------------------------------------------------------- */
