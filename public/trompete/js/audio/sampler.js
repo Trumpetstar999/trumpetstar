@@ -173,7 +173,7 @@
      * vorbei, bevor der Ton steht. Deshalb wird spaeter in der Ansprache
      * eingesetzt, genau so weit, dass sie in ECHTER Zeit gleich lang
      * bleibt. Der Anstoss selbst bleibt dabei erhalten. */
-     var ab = s.start;
+    var ab = s.start;
     if (rate < 0.98) { ab = s.loopStart - (s.loopStart - s.start) * rate; }
 
     var g = this.ctx.createGain();
