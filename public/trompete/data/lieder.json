@@ -1,10 +1,10 @@
 {
   "_hinweis": [
-    "Echte Kinderlieder. Sie werden bevorzugt vor gewuerfelten Uebungen",
-    "angeboten, sobald alle Toene aus 'braucht' im Tonvorrat sind.",
+    "Echte Kinderlieder. Sie werden bevorzugt vor gewuerfelten Uebungen angeboten,",
+    "sobald alle Toene aus 'braucht' im Tonvorrat sind.",
     "",
-    "Diese Datei ist zum Erweitern von Hand gedacht — es muss keine Zeile",
-    "Code geaendert werden. Schema eines Eintrags:",
+    "Diese Datei ist zum Erweitern von Hand gedacht — es muss keine Zeile Code",
+    "geaendert werden. Schema eines Eintrags:",
     "",
     "  id      eindeutige Zahl (dient auch als Seed fuer die Fortschrittsablage)",
     "  name    nur fuer Menschen, erscheint nirgends auf dem Bildschirm",
@@ -14,9 +14,12 @@
     "          notenwert: 4 = Viertel, 2 = Halbe, 1 = Ganze.",
     "          tonId null = Pause. Jeder Takt muss vier Schlaege ergeben.",
     "",
-    "Alle Toene sind NOTIERT angegeben. Auf der B-Trompete klingen die",
-    "Lieder damit eine grosse Sekunde tiefer als geschrieben — das ist",
-    "normal und richtig so; jede Trompetenstimme ist so notiert."
+    "Die Melodien stehen in der Notation der B-Trompete: was hier c1 heisst,",
+    "klingt als B. 'Alle meine Entchen' und 'Haenschen klein' stehen in der",
+    "kurzen Fassung nach G-Dur transponiert, damit sie in den Tonvorrat",
+    "g1..d2 passen. Sobald der volle Umfang c1..d2 offen ist, kommt 'Alle",
+    "meine Entchen' zusaetzlich in der notierten Lage C-Dur dazu — die",
+    "klingt dann in B-Dur, wie bei jeder Trompete."
   ],
   "lieder": [
     {

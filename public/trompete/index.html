@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Happy Beginners — Pieps lernt Trompete</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FDF8EE">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/symbol-180.png">
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ Bildschirm 1: Level-Auswahl ============ -->
+  <section id="auswahl" class="bildschirm" hidden>
+    <button id="elternknopf" data-t-aria="eltern.knopf.aria" aria-label="Einstellungen für Eltern">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <g class="zaehne">
+          <rect x="44" y="4" width="12" height="20" rx="4"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(45 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(90 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(135 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(180 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(225 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(270 50 50)"/>
+          <rect x="44" y="4" width="12" height="20" rx="4" transform="rotate(315 50 50)"/>
+        </g>
+        <circle class="scheibe" cx="50" cy="50" r="27"/>
+        <circle class="loch" cx="50" cy="50" r="11"/>
+      </svg>
+    </button>
+
+    <div class="karten">
+      <button class="karte" data-level="1" aria-label="Einzelne Töne">
+        <span class="karte-punkte"></span>
+        <span class="karte-bild"><svg class="karte-noten" aria-hidden="true"></svg></span>
+        <span class="karte-tier"><img src="img/vogel-froh.png" alt="" aria-hidden="true"></span>
+      </button>
+      <button class="karte" data-level="2a" aria-label="Zwei Takte">
+        <span class="karte-punkte"></span>
+        <span class="karte-bild"><svg class="karte-noten" aria-hidden="true"></svg></span>
+        <span class="karte-tier"><img src="img/vogel-froh.png" alt="" aria-hidden="true"></span>
+      </button>
+      <button class="karte" data-level="2b" aria-label="Vier Takte">
+        <span class="karte-punkte"></span>
+        <span class="karte-bild"><svg class="karte-noten" aria-hidden="true"></svg></span>
+        <span class="karte-tier"><img src="img/vogel-froh.png" alt="" aria-hidden="true"></span>
+      </button>
+      <!-- Die vierte Karte ist das Buch selbst: das Kind erkennt den
+           Umschlag, der neben ihm auf dem Notenstaender liegt. -->
+      <button class="karte karte-buch" data-level="buch" data-t-aria="buch.karte.aria" aria-label="Die Lieder aus dem Buch">
+        <span class="karte-punkte"></span>
+        <span class="karte-bild"><img class="karte-umschlag" src="img/buch/umschlag.jpg" alt="" aria-hidden="true"></span>
+        <span class="karte-tier"><img src="img/vogel-froh.png" alt="" aria-hidden="true"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ Bildschirm 3: im Buch blaettern ============ -->
+  <section id="buch" class="bildschirm" hidden>
+    <div id="buch-reiter" role="tablist" data-t-aria="buch.welten.aria" aria-label="Welten"></div>
+    <div id="buch-seiten"></div>
+    <button id="buch-haus" data-t-aria="haus.aria" aria-label="Zurück">
+      <img src="img/haus.png" alt="" aria-hidden="true">
+    </button>
+
+    <!-- Eine Seite mit mehreren Liedern: das Kind tippt das Lied auf der
+         Seite an, genau wie im gedruckten Buch. -->
+    <div id="buch-lupe" hidden>
+      <div id="buch-lupe-blatt">
+        <img id="buch-lupe-bild" src="" alt="" aria-hidden="true">
+        <div id="buch-lupe-felder"></div>
+      </div>
+      <button id="buch-lupe-zu" data-t-aria="buch.zurueck.aria" aria-label="Zurück">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M62 22 34 50l28 28" fill="none" stroke="currentColor"
+                stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ Bildschirm 2: Übung ============ -->
+  <section id="uebung" class="bildschirm" hidden>
+
+    <div id="leiste">
+      <button id="haus" aria-label="Zurück">
+        <img src="img/haus.png" alt="" aria-hidden="true">
+      </button>
+
+      <button id="spielknopf" aria-label="Los">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <polygon class="ikon-play" points="37,25 79,50 37,75"/>
+          <rect class="ikon-stop" x="31" y="31" width="38" height="38" rx="6"/>
+        </svg>
+      </button>
+
+      <div id="modi" aria-hidden="true">
+        <button id="modus-mit" aria-label="Mitspielen">
+          <span class="modusbild">
+            <svg class="modus-trompete trompetenbild" aria-hidden="true"></svg>
+            <svg class="modus-laut" viewBox="0 0 60 60" aria-hidden="true">
+              <path d="M4 22h10l14-12v40L14 38H4z"/>
+              <path class="welle" d="M36 22a14 14 0 0 1 0 16"/>
+              <path class="welle" d="M45 15a24 24 0 0 1 0 30"/>
+            </svg>
+          </span>
+        </button>
+        <button id="modus-solo" aria-label="Alleine spielen">
+          <span class="modusbild">
+            <svg class="modus-trompete trompetenbild" aria-hidden="true"></svg>
+          </span>
+        </button>
+      </div>
+
+      <!-- Duett: welche Stimme spiele ich? Die beiden Sterne stehen so
+           auch im Buch neben den Systemen. Nur bei Duetten sichtbar. -->
+      <div id="stimmen" hidden>
+        <button class="stimmknopf" data-stimme="0" data-t-aria="buch.stimme1.aria" aria-label="Erste Stimme">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <path class="stern" d="M50 6 61 38h34L67 58l10 33-27-21-27 21 10-33L5 38h34z"/>
+            <text class="zahl" x="50" y="62" text-anchor="middle">1</text>
+          </svg>
+        </button>
+        <button class="stimmknopf" data-stimme="1" data-t-aria="buch.stimme2.aria" aria-label="Zweite Stimme">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <path class="stern" d="M50 6 61 38h34L67 58l10 33-27-21-27 21 10-33L5 38h34z"/>
+            <text class="zahl" x="50" y="62" text-anchor="middle">2</text>
+          </svg>
+        </button>
+      </div>
+
+      <div id="punkte" aria-hidden="true">
+        <span class="punkt"></span><span class="punkt"></span>
+        <span class="punkt"></span><span class="punkt"></span>
+      </div>
+    </div>
+
+    <!-- Die Ausschnitte eines Lieds: ein Feld je gedruckter Zeile, zuletzt
+         das ganze Lied. Zeigt, wie weit es gediehen ist, und waehlt aus,
+         was geuebt wird. Nur im Buch sichtbar. -->
+    <div id="zeilenband" role="group" data-t-aria="buch.band.aria" aria-label="Ausschnitte" hidden></div>
+
+    <div id="notenfeld">
+      <svg id="noten" aria-hidden="true"></svg>
+      <svg id="satz" aria-hidden="true" hidden></svg>
+    </div>
+
+    <div id="tierfeld" aria-hidden="true">
+      <img id="tierbild" src="" alt="">
+    </div>
+
+    <div id="grifffeld">
+      <svg id="griff" class="trompetenbild" aria-hidden="true"></svg>
+    </div>
+
+    <div id="tempofeld" aria-hidden="true">
+      <img class="tempo-tier" id="schildkroete" src="img/schildkroete.png" alt="">
+      <div id="tempobahn">
+        <div id="tempospur"></div>
+        <div id="tempogriff"></div>
+      </div>
+      <img class="tempo-tier" id="hase" src="img/hase.png" alt="">
+    </div>
+
+    <!-- Blaettern: rechts unten, wie am Notenstaender. Der Knopf legt
+         die naechste Uebung bereit. -->
+    <button id="zurueckblaettern" data-t-aria="blaettern.zurueck.aria" aria-label="Eine Seite zurück" hidden>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path class="blatt" d="M80 14H42L20 36v50h60z"/>
+        <path class="ecke" d="M42 14v22H20"/>
+        <path class="pfeil" d="M64 62H38m0 0 9-9m-9 9 9 9"/>
+      </svg>
+    </button>
+
+    <button id="umblaettern" data-t-aria="blaettern.vor.aria" aria-label="Umblättern" hidden>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path class="blatt" d="M20 14h38l22 22v50H20z"/>
+        <path class="ecke" d="M58 14v22h22"/>
+        <path class="pfeil" d="M36 62h26m0 0-9-9m9 9-9 9"/>
+      </svg>
+    </button>
+
+    <div id="buehne" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ Eltern-Bereich (der einzige Ort mit Text) ============ -->
+  <section id="eltern" class="bildschirm" hidden>
+    <div class="eltern-blatt">
+      <div class="blatt-kopf">
+        <h1 data-t="eltern.titel">Eltern</h1>
+        <div id="sprachwahl" role="group" data-t-aria="sprachwahl.aria" aria-label="Sprache">
+          <button data-sprache="de" data-t-aria="sprache.de" aria-label="Deutsch">
+            <svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#141414"/><rect y="13.33" width="60" height="13.34" fill="#D00"/><rect y="26.67" width="60" height="13.33" fill="#FFCE00"/></svg>
+          </button>
+          <button data-sprache="en" data-t-aria="sprache.en" aria-label="Englisch">
+            <svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#012169"/><path d="M0 0 60 40M60 0 0 40" stroke="#fff" stroke-width="9"/><path d="M0 0 60 40M60 0 0 40" stroke="#C8102E" stroke-width="5"/><path d="M30 0V40M0 20H60" stroke="#fff" stroke-width="15"/><path d="M30 0V40M0 20H60" stroke="#C8102E" stroke-width="9"/></svg>
+          </button>
+          <button data-sprache="es" data-t-aria="sprache.es" aria-label="Spanisch">
+            <svg viewBox="0 0 60 40" aria-hidden="true"><rect width="60" height="40" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <h2 data-t="eltern.instrument">Instrument</h2>
+      <div id="eltern-instrument" class="knopfreihe">
+        <button data-instrument="b-trompete" data-t="eltern.instrument.trompete">Trompete in B</button>
+        <button data-instrument="horn-f" data-t="eltern.instrument.hornF">Horn in F</button>
+        <button data-instrument="horn-es" data-t="eltern.instrument.hornEs">Horn in Es</button>
+        <button data-instrument="tenorhorn" data-t="eltern.instrument.tenorhorn">Tenorhorn</button>
+      </div>
+      <p class="hinweis" data-t-html="eltern.instrument.hinweis">Die Noten bleiben bei allen vier gleich, und die Griffe
+         auch: notiert d1 ist überall 1 + 3. Unterschiedlich ist nur, wie tief es
+         klingt — danach richtet sich, was die App vorspielt und was sie durchs
+         Mikrofon erwartet. Das Griffbild zeigt Drehventile beim Horn und
+         Druckventile bei Trompete und Tenorhorn. Das <em>Tenorhorn</em> wird wie
+         eine Trompete in B notiert und gegriffen, klingt aber eine Oktave tiefer.
+         Nach dem Umschalten startet die App neu; der Fortschritt bleibt erhalten.</p>
+
+
+      <h2 data-t="eltern.quoten">Trefferquoten</h2>
+      <table id="eltern-quoten"><tbody></tbody></table>
+
+      <h2 data-t="eltern.tonumfang">Tonumfang</h2>
+      <p class="hinweis" data-t="eltern.tonumfang.hinweis">Jeder Ton lässt sich einzeln an- und abschalten. Solange
+         hier von Hand gewählt ist, schaltet die App keine Töne mehr selbst dazu.</p>
+      <div id="eltern-vorrat" class="tonwahl"></div>
+      <div class="knopfreihe">
+        <button id="eltern-automatik" data-t="eltern.automatik">Wieder automatisch</button>
+      </div>
+      <p class="hinweis" id="eltern-vorrat-hinweis"></p>
+
+      <h2 data-t="eltern.strenge">Wie streng zuhören?</h2>
+      <div id="eltern-schwierigkeit" class="knopfreihe">
+        <button data-art="superleicht" data-t="eltern.strenge.superleicht">Super leicht</button>
+        <button data-art="leicht" data-t="eltern.strenge.leicht">Leicht</button>
+        <button data-art="mittel" data-t="eltern.strenge.mittel">Mittel</button>
+        <button data-art="schwer" data-t="eltern.strenge.schwer">Schwer</button>
+      </div>
+      <p class="hinweis" data-t-html="eltern.strenge.hinweis">Das entscheidet, wann ein grünes Häkchen kommt: wie genau
+         der Ton getroffen sein muss, wie sauber er stehen soll und wie weit er
+         neben dem Schlag liegen darf. <em>Super leicht</em> ist die
+         Voreinstellung — am Anfang zählt, dass überhaupt etwas gelingt. Wenn die
+         Häkchen zu leicht kommen, eine Stufe weiter. <em>Mittel</em> entspricht
+         dem, was ein geübtes Kind trifft.</p>
+
+      <h2 data-t="eltern.notenbild">Notenbild</h2>
+      <div id="eltern-notenfarbe" class="knopfreihe">
+        <button data-art="bunt" data-t="eltern.notenbild.bunt">Bunte Noten</button>
+        <button data-art="schwarz" data-t="eltern.notenbild.schwarz">Schwarze Noten</button>
+      </div>
+      <p class="hinweis" data-t="eltern.notenbild.hinweis">Bunt hilft am Anfang: Notenkopf, Griffbild und Tier haben
+         dieselbe Farbe. Schwarz zeigt Noten und Griffbilder so, wie sie in jedem
+         anderen Notenheft gedruckt sind — für den Übergang zum normalen Notenlesen.</p>
+
+      <h3 data-t="eltern.notenbild.buch">Im Buch</h3>
+      <div id="eltern-buchnotenfarbe" class="knopfreihe">
+        <button data-art="bunt" data-t="eltern.notenbild.bunt">Bunte Noten</button>
+        <button data-art="schwarz" data-t="eltern.notenbild.schwarz">Schwarze Noten</button>
+      </div>
+      <p class="hinweis" data-t="eltern.notenbild.buch.hinweis">In den Liedern aus dem Buch stehen die Noten
+         von Haus aus schwarz — so, wie sie auf der gedruckten Seite neben dem iPad stehen.</p>
+
+      <h2 data-t="eltern.mikrofon">Mikrofon</h2>
+      <div id="eltern-mikro">
+        <div class="mikro-zeile"><span data-t="mikro.ton">Erkannter Ton</span><b id="mikro-ton">–</b></div>
+        <div class="mikro-zeile"><span data-t="mikro.hz">Frequenz</span><b id="mikro-hz">–</b></div>
+        <div class="mikro-zeile"><span data-t="mikro.cent">Abweichung</span><b id="mikro-cent">–</b></div>
+        <div class="mikro-zeile"><span data-t="mikro.db">Pegel</span><b id="mikro-db">–</b></div>
+        <div class="mikro-zeile"><span data-t="mikro.gate">Rauschschwelle</span><b id="mikro-gate">–</b></div>
+        <div class="mikro-zeile"><span data-t="mikro.weg">Analyseweg</span><b id="mikro-weg">–</b></div>
+        <div id="mikro-balken"><i></i></div>
+      </div>
+
+      <h2 data-t="eltern.fortschritt">Fortschritt</h2>
+      <button id="eltern-reset" class="warnknopf" data-t="eltern.reset">Fortschritt zurücksetzen</button>
+
+      <h2 data-t="eltern.herkunft">Herkunft der Aufnahmen</h2>
+      <p class="hinweis" data-t-html="eltern.herkunft.hinweis">Die Töne, die die App vorspielt, sind echte Aufnahmen einer
+         Yamaha-Périnet-Trompete, gespielt von Mario Schulter. Aus sieben Aufnahmen
+         je Ton wurde die sauberste ausgewählt und auf gleiche Lautstärke gebracht.
+         Für Horn und Tenorhorn werden dieselben Aufnahmen in die tiefere Lage
+         gebracht und weicher gemacht — ein Horn hat weniger Obertöne als eine
+         Trompete.</p>
+
+      <h2 data-t="eltern.stimmung">Warum klingt es tiefer, als es steht?</h2>
+      <p class="hinweis" data-t-html="eltern.stimmung.hinweis">Alle vier Instrumente sind <em>transponierend</em>: Was als c
+         notiert ist, klingt tiefer — auf der Trompete in B eine ganze Stufe, auf
+         dem Horn in F eine Quinte, auf dem Horn in Es eine Sexte, auf dem
+         Tenorhorn eine Stufe und eine Oktave. Die App spielt genau in dieser
+         klingenden Höhe vor und hört auch in ihr zu. Ihr Kind kann also
+         mitspielen, ohne dass irgendetwas umgerechnet werden muss. Neben einem
+         Klavier klingt es tiefer als dort dieselbe Note — das ist richtig so.</p>
+
+      <button id="eltern-zu" class="schliessen" data-t="eltern.zu">Zurück zur App</button>
+    </div>
+  </section>
+
+  <!-- ============ Startgeste / Mikrofonhinweis ============ -->
+  <section id="tor" class="bildschirm">
+    <button id="torknopf" aria-label="Los">
+      <img src="img/vogel-froh.png" alt="" aria-hidden="true">
+    </button>
+  </section>
+
+  <section id="safarihinweis" class="bildschirm" hidden>
+    <div class="hinweisbild">
+      <img src="img/safari-hinweis.svg" alt="" aria-hidden="true">
+    </div>
+  </section>
+
+  <!-- ============ Hochformat: wortlos ums Drehen bitten ============ -->
+  <div id="drehbitte" aria-hidden="true">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="62" y="18" width="76" height="164" rx="12"
+            fill="#FFFFFF" stroke="#3A332B" stroke-width="6"/>
+      <rect x="72" y="32" width="56" height="136" rx="4" fill="#F3E9D6"/>
+      <circle cx="100" cy="175" r="4" fill="#C8BBA4"/>
+      <path d="M150 70a58 58 0 0 1 0 60" fill="none" stroke="#FF8A3D"
+            stroke-width="8" stroke-linecap="round"/>
+      <path d="M141 122l10 12 12-9" fill="none" stroke="#FF8A3D"
+            stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+</div>
+
+<script src="js/instrument.js"></script>
+<script src="js/audio/dsp.js"></script>
+<script src="js/audio/sampler.js"></script>
+<script src="js/audio/tracker.js"></script>
+<script src="js/audio/motor.js"></script>
+<script src="js/generator.js"></script>
+<script src="js/bewertung.js"></script>
+<script src="js/sprachen.js"></script>
+<script src="js/fortschritt.js"></script>
+<script src="js/buchstueck.js"></script>
+<script src="js/render/noten.js"></script>
+<script src="js/render/griff.js"></script>
+<script src="js/render/satz.js"></script>
+<script src="js/ui/rueckmeldung.js"></script>
+<script src="js/ui/tempo.js"></script>
+<script src="js/ui/level1.js"></script>
+<script src="js/ui/level2.js"></script>
+<script src="js/ui/buch.js"></script>
+<script src="js/ui/auswahl.js"></script>
+<script src="js/ui/eltern.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

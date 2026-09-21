@@ -1,47 +1,147 @@
 {
-  "_hinweis": [
-    "Trompete in B. Alles ist NOTIERT angegeben; die Trompete klingt eine",
-    "grosse Sekunde TIEFER als notiert (notiertes c1 klingt b0/233 Hz).",
-    "Bei der Blockfloete war es umgekehrt: die klang eine Oktave hoeher.",
-    "Der Klangbereich liegt dadurch eine ganze Oktave tiefer — das ist der",
-    "Grund, warum die Erkennung andere Parameter braucht (siehe 'erkennung').",
-    "",
-    "'griff.ventile' ist [Ventil1, Ventil2, Ventil3], 1 = gedrueckt.",
-    "'naturton' ist die Nummer des Naturtons auf der jeweiligen Rohrlaenge.",
-    "",
-    "WICHTIG: mehrere Toene teilen sich denselben Griff. Sie unterscheiden",
-    "sich nur durch die Lippenspannung (den Naturton):",
-    "   offen    c1  g1  c2",
-    "   1        f1  d2",
-    "   1+2      e1  a1",
-    "   2        h1",
-    "   1+3      d1",
-    "Das ist der haeufigste Anfaengerfehler und ersetzt in der Logik das",
-    "'Ueberblasen' der Blockfloete."
-  ],
-  "instrument": "trompete",
+  "_hinweis": "Diese Datei ist die einzige Wahrheit ueber Toene, Frequenzen, Griffe und Farben. Sie darf von Hand korrigiert werden, ohne dass Code angefasst wird. Ventilgriffe gegen eine Grifftabelle fuer B-Trompete pruefen.",
+  "instrument": "b-trompete",
+  "klingtGrosseSekundeTiefer": true,
   "stimmung": {
-    "a1Hz": 440.0,
-    "transposition": "B",
-    "klingtHalbtoeneTiefer": 2
+    "a1Hz": 440.0
   },
+  "_instrumente": [
+    "Vier Instrumente, EIN Notenbild. Notiert steht immer c1 bis d2 im",
+    "Violinschluessel; wie tief das klingt, sagt 'halbtoeneTiefer'.",
+    "",
+    "  b-trompete   2 Halbtoene tiefer (notiert c1 klingt B, 233 Hz)",
+    "  horn-f       7 Halbtoene tiefer (klingt F, 175 Hz)",
+    "  horn-es      9 Halbtoene tiefer (klingt Es, 156 Hz)",
+    "  tenorhorn   14 Halbtoene tiefer (klingt B, 117 Hz — eine Oktave",
+    "               unter der Trompete; notiert und gegriffen wird es wie",
+    "               eine Trompete in B)",
+    "",
+    "Die Ventilgriffe in 'toene' gelten fuer alle vier: drei Ventile",
+    "senken die Naturtonreihe immer um dieselben Schritte, gleichgueltig",
+    "in welcher Stimmung das Instrument gebaut ist.",
+    "",
+    "'erkennung' verschiebt den Hoerbereich mit nach unten. Der Hochpass",
+    "bleibt dabei so hoch wie moeglich (dicht unter dem tiefsten Ton),",
+    "damit Netzbrummen die Einsatzerkennung nicht auslöst.",
+    "",
+    "'klangfilterHz' macht die Trompetenaufnahmen fuer die tieferen",
+    "Instrumente weicher — ein Horn hat weniger Obertoene als eine",
+    "Trompete. 0 heisst: unverändert, so wie eingespielt."
+  ],
+  "instrumente": [
+    {
+      "id": "b-trompete", "halbtoeneTiefer": 2, "griffbild": "trompete", "klangfilterHz": 0,
+      "erkennung": { "fMinHz": 200, "fMaxHz": 1250, "hochpassHz": 200 }
+    },
+    {
+      "id": "horn-f", "halbtoeneTiefer": 7, "griffbild": "horn", "klangfilterHz": 1500,
+      "erkennung": { "fMinHz": 150, "fMaxHz": 1000, "hochpassHz": 150 }
+    },
+    {
+      "id": "horn-es", "halbtoeneTiefer": 9, "griffbild": "horn", "klangfilterHz": 1350,
+      "erkennung": { "fMinHz": 132, "fMaxHz": 900, "hochpassHz": 135 }
+    },
+    {
+      "id": "tenorhorn", "halbtoeneTiefer": 14, "griffbild": "tenorhorn", "klangfilterHz": 1200,
+      "erkennung": { "fMinHz": 100, "fMaxHz": 760, "hochpassHz": 105 }
+    }
+  ],
+  "_transposition": [
+    "Die Trompete ist ein B-Instrument: notiert c1 klingt B (233 Hz).",
+    "",
+    "  notiertMidi   was auf dem Notenblatt steht (c1 = 60)",
+    "  klingendMidi  was das Mikrofon hoert (notiertMidi minus 2)",
+    "  frequenzHz    die KLINGENDE Frequenz — danach richtet sich die",
+    "                Erkennung, und in dieser Hoehe spielt die App auch vor.",
+    "",
+    "Das ist Absicht und keine Ungenauigkeit: das Kind soll zu dem Ton",
+    "mitspielen koennen, den es hoert. Die Aufnahmen von Mario Schulter",
+    "laufen dadurch unveraendert ab — genau so, wie sie eingespielt wurden."
+  ],
   "erkennung": {
-    "_hinweis": "Gemessen an trompetenaehnlichen Signalen (Grundton NICHT der staerkste Teilton). Mit den Blockfloeten-Parametern (Fenster 1024, fMin 420) versagt die Erkennung bei 6 von 9 Toenen. Mit diesen Werten: groesster Fehler 0,7 Cent, keine Oktavverwechslung, 2,4 % Rechenlast.",
     "toleranzCent": 80,
     "stabilMs": 500,
-    "kurzMs": 150,
     "clarityMin": 0.72,
+    "ueberblasenToleranzCent": 90,
     "wiederholungEinbruchDb": 6,
     "zeitfensterAnteil": 0.15,
-    "fMinHz": 150,
-    "fMaxHz": 2600,
-    "hochpassHz": 110,
-    "fensterGroesse": 1536,
-    "tonhoeheJedenNtenHop": 6,
-    "_hinweisHorn": "Beim Horn in F klingt alles sieben Halbtoene tiefer als notiert (notiertes c1 klingt F3/174,6 Hz). Deshalb reicht fMinHz bis 150 hinunter."
+    "fMinHz": 200,
+    "fMaxHz": 1250,
+    "hochpassHz": 200,
+    "fensterProben": 2048,
+    "tonhoeheJedeHops": 6,
+    "_hinweis": [
+      "Die Trompete klingt eine grosse Sekunde tiefer als notiert und",
+      "liegt damit fast eine Oktave unter der Blockfloete: der tiefste",
+      "Ton (notiert c1) klingt 233 Hz, 80 Cent zu tief geblasen 223 Hz.",
+      "Daher fMin 200 statt 420.",
+      "",
+      "Der Hochpass liegt bei 200 Hz und damit dicht unter dem tiefsten",
+      "Ton. Er wurde ausprobiert: bei 120 und 150 Hz kommt genug",
+      "Netzbrummen durch, dass die Einsatzerkennung im blossen",
+      "Zimmerrauschen zu feuern beginnt (test-erkennung, 'Stille und",
+      "Zimmergeraeusche'). Bei 200 Hz ist das weg; das klingende B wird",
+      "dabei um knapp 2 dB gedaempft, was nichts ausmacht, weil es alle",
+      "Toene gleichermassen trifft und das Rauschen mit.",
+      "",
+      "fMax fasst auch den naechsthoeheren Teilton des hoechsten Tons",
+      "(d2 klingt 523 Hz, ein Teilton darueber 628 Hz) mit Reserve.",
+      "",
+      "fensterProben 2048 statt 1024: YIN braucht mehrere Perioden im",
+      "Fenster. Bei 233 Hz sind 1024 Proben nur gut drei Perioden — zu",
+      "wenig fuer eine ruhige Messung. Weil das Fenster damit teurer zu",
+      "rechnen ist, laeuft die Tonhoehenmessung nur jeden sechsten Hop",
+      "(alle 16 ms). Die Einsatzerkennung laeuft davon unberuehrt bei",
+      "jedem Hop weiter — sie bestimmt das Timing, nicht die Tonhoehe."
+    ]
   },
-  "ventile": {
-    "_hinweis": "Drei Ventile, von der Spielerin aus gesehen von links nach rechts.",
+  "schwierigkeit": {
+    "standard": "superleicht",
+    "_hinweis": [
+      "Wie streng die App zuhoert. Das entscheidet, ob ein gruenes",
+      "Haekchen kommt — und war der Grund, warum am Anfang oft gar",
+      "keines kam: die Werte stammten aus der Blockfloeten-Fassung, und",
+      "ein Anfaenger auf der Trompete trifft weder die Tonhoehe so genau",
+      "noch den Schlag so puenktlich.",
+      "",
+      "  toleranzCent      wie weit die Tonhoehe danebenliegen darf. Der",
+      "                    Tracker klammert das ohnehin auf die halbe",
+      "                    Strecke zum Nachbarton — 120 Cent heisst also",
+      "                    nicht, dass e1 als f1 durchgeht.",
+      "  clarityMin        wie sauber der Ton stehen muss (0..1). Ein",
+      "                    wackliger Anfaengerton kommt kaum ueber 0.6.",
+      "  kurzMs            wie lange er dafuer stehen muss.",
+      "  stabilMs          dasselbe fuer Level 1, wo ein Ton gehalten wird.",
+      "  fensterVor/Nach   wie viele Schlaege zu frueh und zu spaet eine",
+      "                    Note noch als richtig gilt. Nach hinten ist es",
+      "                    immer grosszuegiger: ein Kind kommt eher zu",
+      "                    spaet als zu frueh.",
+      "  zeitfensterAnteil dasselbe fuer das Urteil am Ende des Durchgangs.",
+      "",
+      "'mittel' ist genau der Stand, mit dem die Blockfloete geprueft",
+      "wurde. Nach oben und unten wird davon abgewichen."
+    ],
+    "stufen": {
+      "superleicht": {
+        "toleranzCent": 120, "clarityMin": 0.5, "kurzMs": 80, "stabilMs": 300,
+        "fensterVor": 1.0, "fensterNach": 2.0, "zeitfensterAnteil": 0.45
+      },
+      "leicht": {
+        "toleranzCent": 100, "clarityMin": 0.6, "kurzMs": 110, "stabilMs": 400,
+        "fensterVor": 0.7, "fensterNach": 1.6, "zeitfensterAnteil": 0.28
+      },
+      "mittel": {
+        "toleranzCent": 80, "clarityMin": 0.72, "kurzMs": 150, "stabilMs": 500,
+        "fensterVor": 0.5, "fensterNach": 1.3, "zeitfensterAnteil": 0.15
+      },
+      "schwer": {
+        "toleranzCent": 55, "clarityMin": 0.8, "kurzMs": 180, "stabilMs": 600,
+        "fensterVor": 0.35, "fensterNach": 0.8, "zeitfensterAnteil": 0.1
+      }
+    }
+  },
+  "griffVentile": {
+    "_hinweis": "Drei Ventile, von vorne nach hinten gezaehlt — 1 liegt am naechsten zum Mundstueck. Gedrueckte Ventile werden in der Farbe des Tons gefuellt, offene bleiben leer.",
     "anzahl": 3
   },
   "toene": [
@@ -52,28 +152,16 @@
       "frequenzHz": 233.08,
       "stufe": -6,
       "notenkopfLinie": true,
-      "farbe": "#E32219",
-      "farbeRand": "#7A0F0A",
-      "freischaltReihenfolge": 8,
+      "farbe": "#C62828",
+      "farbeRand": "#6B0F0F",
+      "freischaltReihenfolge": 0,
       "tier": "chamaeleon",
       "tierName": "Chamäleon / Chameleon",
       "griff": {
-        "ventile": [
-          0,
-          0,
-          0
-        ]
+        "ventile": [0, 0, 0]
       },
-      "naturton": 2,
-      "audio": "ton_c1",
-      "griffHorn": {
-        "ventile": [
-          0,
-          0,
-          0
-        ],
-        "naturton": 4
-      }
+      "teilton": 2,
+      "audio": "c1"
     },
     {
       "id": "d1",
@@ -82,28 +170,16 @@
       "frequenzHz": 261.63,
       "stufe": -5,
       "notenkopfLinie": false,
-      "farbe": "#F07C11",
-      "farbeRand": "#8A3F02",
-      "freischaltReihenfolge": 6,
+      "farbe": "#5B2C8D",
+      "farbeRand": "#2C1049",
+      "freischaltReihenfolge": 1,
       "tier": "delfin",
       "tierName": "Delfin / Dolphin",
       "griff": {
-        "ventile": [
-          1,
-          0,
-          1
-        ]
+        "ventile": [1, 0, 1]
       },
-      "naturton": 3,
-      "audio": "ton_d1",
-      "griffHorn": {
-        "ventile": [
-          1,
-          0,
-          0
-        ],
-        "naturton": 5
-      }
+      "teilton": 3,
+      "audio": "d1"
     },
     {
       "id": "e1",
@@ -112,28 +188,16 @@
       "frequenzHz": 293.66,
       "stufe": -4,
       "notenkopfLinie": true,
-      "farbe": "#F5C400",
-      "farbeRand": "#8A6A00",
-      "freischaltReihenfolge": 5,
+      "farbe": "#D2761B",
+      "farbeRand": "#7A3F06",
+      "freischaltReihenfolge": 2,
       "tier": "elefant",
       "tierName": "Elefant / Elephant",
       "griff": {
-        "ventile": [
-          1,
-          1,
-          0
-        ]
+        "ventile": [1, 1, 0]
       },
-      "naturton": 3,
-      "audio": "ton_e1",
-      "griffHorn": {
-        "ventile": [
-          0,
-          0,
-          0
-        ],
-        "naturton": 5
-      }
+      "teilton": 3,
+      "audio": "e1"
     },
     {
       "id": "f1",
@@ -142,28 +206,16 @@
       "frequenzHz": 311.13,
       "stufe": -3,
       "notenkopfLinie": false,
-      "farbe": "#3FA535",
-      "farbeRand": "#1B5A16",
-      "freischaltReihenfolge": 4,
+      "farbe": "#0E6E77",
+      "farbeRand": "#063B41",
+      "freischaltReihenfolge": 3,
       "tier": "fisch",
       "tierName": "Fisch / Fish",
       "griff": {
-        "ventile": [
-          1,
-          0,
-          0
-        ]
+        "ventile": [1, 0, 0]
       },
-      "naturton": 3,
-      "audio": "ton_f1",
-      "griffHorn": {
-        "ventile": [
-          1,
-          0,
-          0
-        ],
-        "naturton": 6
-      }
+      "teilton": 3,
+      "audio": "f1"
     },
     {
       "id": "g1",
@@ -172,28 +224,16 @@
       "frequenzHz": 349.23,
       "stufe": -2,
       "notenkopfLinie": true,
-      "farbe": "#1B9CD8",
-      "farbeRand": "#0B4E6E",
-      "freischaltReihenfolge": 0,
+      "farbe": "#6BBF3A",
+      "farbeRand": "#2F6B12",
+      "freischaltReihenfolge": 4,
       "tier": "gans",
       "tierName": "Gans / Goose",
       "griff": {
-        "ventile": [
-          0,
-          0,
-          0
-        ]
+        "ventile": [0, 0, 0]
       },
-      "naturton": 3,
-      "audio": "ton_g1",
-      "griffHorn": {
-        "ventile": [
-          0,
-          0,
-          0
-        ],
-        "naturton": 6
-      }
+      "teilton": 3,
+      "audio": "g1"
     },
     {
       "id": "a1",
@@ -202,28 +242,16 @@
       "frequenzHz": 392.0,
       "stufe": -1,
       "notenkopfLinie": false,
-      "farbe": "#7C4DAB",
-      "farbeRand": "#3B2158",
-      "freischaltReihenfolge": 1,
+      "farbe": "#FFC94D",
+      "farbeRand": "#8A5B00",
+      "freischaltReihenfolge": 5,
       "tier": "affe",
       "tierName": "Affe / Ape",
       "griff": {
-        "ventile": [
-          1,
-          1,
-          0
-        ]
+        "ventile": [1, 1, 0]
       },
-      "naturton": 4,
-      "audio": "ton_a1",
-      "griffHorn": {
-        "ventile": [
-          1,
-          1,
-          0
-        ],
-        "naturton": 8
-      }
+      "teilton": 4,
+      "audio": "a1"
     },
     {
       "id": "h1",
@@ -232,28 +260,16 @@
       "frequenzHz": 440.0,
       "stufe": 0,
       "notenkopfLinie": true,
-      "farbe": "#D6197C",
-      "farbeRand": "#6B0A3C",
-      "freischaltReihenfolge": 2,
+      "farbe": "#3D93E8",
+      "farbeRand": "#134071",
+      "freischaltReihenfolge": 6,
       "tier": "hamster",
       "tierName": "Hamster / Hamster",
       "griff": {
-        "ventile": [
-          0,
-          1,
-          0
-        ]
+        "ventile": [0, 1, 0]
       },
-      "naturton": 4,
-      "audio": "ton_h1",
-      "griffHorn": {
-        "ventile": [
-          0,
-          1,
-          0
-        ],
-        "naturton": 8
-      }
+      "teilton": 4,
+      "audio": "h1"
     },
     {
       "id": "c2",
@@ -262,28 +278,16 @@
       "frequenzHz": 466.16,
       "stufe": 1,
       "notenkopfLinie": false,
-      "farbe": "#E32219",
-      "farbeRand": "#7A0F0A",
-      "freischaltReihenfolge": 3,
+      "farbe": "#C62828",
+      "farbeRand": "#6B0F0F",
+      "freischaltReihenfolge": 7,
       "tier": "chamaeleon",
       "tierName": "Chamäleon / Chameleon",
       "griff": {
-        "ventile": [
-          0,
-          0,
-          0
-        ]
+        "ventile": [0, 0, 0]
       },
-      "naturton": 4,
-      "audio": "ton_c2",
-      "griffHorn": {
-        "ventile": [
-          0,
-          0,
-          0
-        ],
-        "naturton": 8
-      }
+      "teilton": 4,
+      "audio": "c2"
     },
     {
       "id": "d2",
@@ -292,28 +296,90 @@
       "frequenzHz": 523.25,
       "stufe": 2,
       "notenkopfLinie": true,
-      "farbe": "#F07C11",
-      "farbeRand": "#8A3F02",
-      "freischaltReihenfolge": 7,
+      "farbe": "#5B2C8D",
+      "farbeRand": "#2C1049",
+      "freischaltReihenfolge": 8,
       "tier": "delfin",
       "tierName": "Delfin / Dolphin",
       "griff": {
-        "ventile": [
-          1,
-          0,
-          0
-        ]
+        "ventile": [1, 0, 0]
       },
-      "naturton": 5,
-      "audio": "ton_d2",
-      "griffHorn": {
-        "ventile": [
-          0,
-          0,
-          0
-        ],
-        "naturton": 9
-      }
+      "teilton": 5,
+      "audio": "d2"
     }
+  ],
+  "_buchToene": [
+    "Die Toene, die nur im Buch vorkommen. Sie stehen bewusst NICHT in",
+    "'toene': Level 1 bis 3 und ihre Freischaltung kennen weiter nur die",
+    "neun Toene von c1 bis d2, und der Tracker rechnet dort weiter mit",
+    "seinen grosszuegigen Toleranzen. Ein Buchstueck gibt dem Tracker",
+    "fuer die Dauer des Stuecks genau die Toene, die darin vorkommen.",
+    "",
+    "Farbe: die des Tonbuchstabens — fis1 wie f1, b1 wie h1. So bleibt",
+    "'gleicher Tonname, gleiche Farbe' auch mit Vorzeichen wahr.",
+    "",
+    "audio: die naechstgelegene Aufnahme. Der Sampler stimmt sie ueber",
+    "frequenzHz auf die richtige Hoehe; bei einem Halbton ist das nicht",
+    "zu hoeren, bei e2 und f2 (zwei, drei Halbtoene) ein wenig.",
+    "",
+    "Das tiefe a liegt klingend (196 Hz) unter fMinHz. Es wird gezeigt",
+    "und vorgespielt, aber nicht bewertet. Das tiefe b (208 Hz) liegt",
+    "knapp darueber und wird bewertet."
+  ],
+  "buchToene": [
+    { "id": "a",    "notiertMidi": 57, "klingendMidi": 55, "frequenzHz": 196.00, "stufe": -8, "farbe": "#FFC94D", "farbeRand": "#8A5B00", "griff": { "ventile": [1, 1, 0] }, "teilton": 2, "audio": "c1" },
+    { "id": "b",    "notiertMidi": 58, "klingendMidi": 56, "frequenzHz": 207.65, "stufe": -7, "farbe": "#3D93E8", "farbeRand": "#134071", "griff": { "ventile": [1, 0, 0] }, "teilton": 2, "audio": "c1" },
+    { "id": "h",    "notiertMidi": 59, "klingendMidi": 57, "frequenzHz": 220.00, "stufe": -7, "farbe": "#3D93E8", "farbeRand": "#134071", "griff": { "ventile": [0, 1, 0] }, "teilton": 2, "audio": "c1" },
+    { "id": "cis1", "notiertMidi": 61, "klingendMidi": 59, "frequenzHz": 246.94, "stufe": -6, "farbe": "#C62828", "farbeRand": "#6B0F0F", "griff": { "ventile": [1, 1, 1] }, "teilton": 3, "audio": "c1" },
+    { "id": "es1",  "notiertMidi": 63, "klingendMidi": 61, "frequenzHz": 277.18, "stufe": -4, "farbe": "#D2761B", "farbeRand": "#7A3F06", "griff": { "ventile": [0, 1, 1] }, "teilton": 3, "audio": "d1" },
+    { "id": "fis1", "notiertMidi": 66, "klingendMidi": 64, "frequenzHz": 329.63, "stufe": -3, "farbe": "#0E6E77", "farbeRand": "#063B41", "griff": { "ventile": [0, 1, 0] }, "teilton": 3, "audio": "f1" },
+    { "id": "gis1", "notiertMidi": 68, "klingendMidi": 66, "frequenzHz": 369.99, "stufe": -2, "farbe": "#6BBF3A", "farbeRand": "#2F6B12", "griff": { "ventile": [0, 1, 1] }, "teilton": 4, "audio": "g1" },
+    { "id": "b1",   "notiertMidi": 70, "klingendMidi": 68, "frequenzHz": 415.30, "stufe": 0,  "farbe": "#3D93E8", "farbeRand": "#134071", "griff": { "ventile": [1, 0, 0] }, "teilton": 4, "audio": "a1" },
+    { "id": "cis2", "notiertMidi": 73, "klingendMidi": 71, "frequenzHz": 493.88, "stufe": 1,  "farbe": "#C62828", "farbeRand": "#6B0F0F", "griff": { "ventile": [1, 1, 0] }, "teilton": 5, "audio": "c2" },
+    { "id": "es2",  "notiertMidi": 75, "klingendMidi": 73, "frequenzHz": 554.37, "stufe": 3,  "farbe": "#D2761B", "farbeRand": "#7A3F06", "griff": { "ventile": [0, 1, 0] }, "teilton": 5, "audio": "d2" },
+    { "id": "e2",   "notiertMidi": 76, "klingendMidi": 74, "frequenzHz": 587.33, "stufe": 3,  "farbe": "#D2761B", "farbeRand": "#7A3F06", "griff": { "ventile": [0, 0, 0] }, "teilton": 5, "audio": "d2" },
+    { "id": "f2",   "notiertMidi": 77, "klingendMidi": 75, "frequenzHz": 622.25, "stufe": 4,  "farbe": "#0E6E77", "farbeRand": "#063B41", "griff": { "ventile": [1, 0, 0] }, "teilton": 6, "audio": "d2" }
+  ],
+  "_griffe": [
+    "Ventilgriffe der B-Trompete, notierte Toene:",
+    "",
+    "  c1  offen      g1  offen      c2  offen",
+    "  d1  1 + 3      a1  1 + 2      d2  1",
+    "  e1  1 + 2      h1  2",
+    "  f1  1",
+    "",
+    "Ein Griff steht nie fuer genau einen Ton: c1, g1 und c2 haben alle",
+    "drei denselben (offenen) Griff und unterscheiden sich nur durch den",
+    "Teilton — also durch die Lippenspannung. Genau deshalb traegt jeder",
+    "Ton hier zusaetzlich seine Teiltonnummer."
+  ],
+  "_teilton": [
+    "'teilton' ist die Nummer des Naturtons, auf dem der Ton mit seinem",
+    "Griff liegt. Daraus rechnet der Tracker, welche Frequenzen derselbe",
+    "Griff bei falscher Lippenspannung sonst noch ergibt:",
+    "",
+    "  ein Teilton hoeher   frequenzHz * (n+1)/n",
+    "  ein Teilton tiefer   frequenzHz * (n-1)/n",
+    "",
+    "Beispiel c1 (2. Teilton, offen): eine Quinte hoeher liegt g1 — wer",
+    "nach c1 gefragt wird und g1 blaest, hat richtig gegriffen und falsch",
+    "gespannt. Das ist der haeufigste Anfangsfehler auf der Trompete und",
+    "wird deshalb wie das Ueberblasen der Blockfloete behandelt: es zaehlt",
+    "weder als Treffer noch als Fehler.",
+    "",
+    "Bei der Blockfloete stand hier fest die Oktave (Faktor 2). Auf der",
+    "Trompete haengt der Abstand vom Teilton ab — vom 2. zum 3. ist es",
+    "eine Quinte, vom 3. zum 4. eine Quarte, vom 4. zum 5. eine grosse",
+    "Terz."
+  ],
+  "_toene_hinweis": [
+    "Reihenfolge der Freischaltung ueber 'freischaltReihenfolge':",
+    "  c1  d1  e1  f1  g1  a1  h1  c2  d2",
+    "Es geht bei c1 los und Schritt fuer Schritt nach oben. Anders als",
+    "bei der Blockfloete ist der tiefste Ton auf der Trompete der",
+    "leichteste: wenig Lippenspannung, wenig Luftdruck.",
+    "",
+    "Gleicher Tonname heisst gleiche Farbe und gleiches Tier — c1 wie c2,",
+    "d1 wie d2. Die Lage im Notensystem unterscheidet sie."
   ]
 }

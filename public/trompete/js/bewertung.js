@@ -56,7 +56,7 @@
     }
 
     // 3) Urteil je Note
-    var tonFehler = 0, zeitFehler = 0, fehlend = 0, naturton = 0;
+    var tonFehler = 0, zeitFehler = 0, fehlend = 0, ueberblasen = 0;
     for (i = 0; i < ergebnisse.length; i++) {
       var r = ergebnisse[i];
       if (r.gespieltIdx < 0) { r.art = 'fehlt'; fehlend++; continue; }
@@ -67,7 +67,7 @@
 
       if (gp.oktave === 1) {
         // Ueberblasen ist ein eigener Fall, nie ein falscher Ton
-        r.art = 'naturton'; naturton++; continue;
+        r.art = 'ueberblasen'; ueberblasen++; continue;
       }
       var tonOk = gp.tonId === r.tonId;
       var zeitOk = r.verschmolzen || Math.abs(r.abweichung) <= fenster;
@@ -91,20 +91,20 @@
       zeitFehler: zeitFehler,
       fehlend: fehlend,
       zusatz: zusatz,
-      naturton: naturton,
+      ueberblasen: ueberblasen,
       fehler: gesamtFehler,
       nichtsGehoert: nichtsGehoert,
       zeitfenster: fenster,
-      urteil: urteile(tonFehler, zeitFehler, fehlend, zusatz, naturton, nichtsGehoert, ergebnisse)
+      urteil: urteile(tonFehler, zeitFehler, fehlend, zusatz, ueberblasen, nichtsGehoert, ergebnisse)
     };
   }
 
   /* Auftrag 12 — die Tabelle der Rueckmeldungen.
    * Es gibt darin keinen einzigen negativen Fall. */
-  function urteile(tonFehler, zeitFehler, fehlend, zusatz, naturton, nichtsGehoert, ergebnisse) {
+  function urteile(tonFehler, zeitFehler, fehlend, zusatz, ueberblasen, nichtsGehoert, ergebnisse) {
     if (nichtsGehoert) { return { fall: 'nichts' }; }
-    if (naturton > 0 && tonFehler === 0 && fehlend === 0) { return { fall: 'naturton' }; }
-    if (tonFehler === 0 && zeitFehler === 0 && fehlend === 0 && zusatz === 0 && naturton === 0) {
+    if (ueberblasen > 0 && tonFehler === 0 && fehlend === 0) { return { fall: 'ueberblasen' }; }
+    if (tonFehler === 0 && zeitFehler === 0 && fehlend === 0 && zusatz === 0 && ueberblasen === 0) {
       return { fall: 'sauber' };
     }
     if (tonFehler === 1 && zeitFehler === 0 && fehlend === 0 && zusatz === 0) {
@@ -115,7 +115,7 @@
       }
     }
     if (tonFehler === 0 && fehlend === 0) { return { fall: 'rhythmus' }; }
-    if (naturton > 0) { return { fall: 'naturton' }; }
+    if (ueberblasen > 0) { return { fall: 'ueberblasen' }; }
     return { fall: 'nochmal' };
   }
 

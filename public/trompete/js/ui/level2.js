@@ -23,9 +23,18 @@
   'use strict';
 
   var SAUBER_BIS_HASE = 3;      // nach drei sauberen Durchlaeufen winkt der Hase
-  var FENSTER_VOR = 0.5;        // Schlaege, die eine Note zu frueh kommen darf
-  var FENSTER_NACH = 1.3;       // ... und zu spaet
   var NACHLAUF = 1.2;           // Sekunden Zugabe am Schluss
+
+  /* Wieviele Schlaege eine Note zu frueh und zu spaet kommen darf,
+   * steht in der Schwierigkeitsstufe (toene.json) und nicht mehr hier:
+   * ein Anfaenger braucht ein anderes Fenster als ein Kind, das die
+   * Uebung schon kennt. Nach hinten ist es immer grosszuegiger — ein
+   * Kind kommt eher zu spaet als zu frueh. */
+  function fenster(k) {
+    var s = k.schwierigkeit();
+    return { vor: s.fensterVor != null ? s.fensterVor : 0.5,
+             nach: s.fensterNach != null ? s.fensterNach : 1.3 };
+  }
 
   function Level2(k) {
     this.k = k;
@@ -82,6 +91,25 @@
     this.k.grifffeld.classList.remove('pulsiert');
     this.k.knopfBereit(false);
     this._punkteAus();
+  };
+
+  /* Umblaettern: die laufende Uebung abbrechen und die naechste
+   * bereitlegen. Alles Geplante muss dabei verstummen — Web Audio
+   * plant Klaenge im Voraus, sonst spielt das Metronom der alten
+   * Uebung in die neue hinein. */
+  Level2.prototype.weiter = function () {
+    if (!this.laeuft) { return; }
+    this.marke++;
+    if (this.rahmen) { cancelAnimationFrame(this.rahmen); this.rahmen = null; }
+    this.k.rueckmeldung.abbrechen();
+    this.k.motor.allesStoppen();
+    this.k.tracker.reset();
+    this.k.motor.erkennungZuruecksetzen();
+    this.k.tempo.sperren(false);
+    this.k.grifffeld.classList.remove('pulsiert');
+    this.saubereInFolge = 0;
+    this.phase = 'aus';
+    this._neueUebung();
   };
 
   Level2.prototype.setzeModus = function (art) {
@@ -184,10 +212,14 @@
     if (!this.laeuft) { return; }
     this.marke++;                       // schneidet alle geplanten Rueckrufe ab
     if (this.rahmen) { cancelAnimationFrame(this.rahmen); this.rahmen = null; }
-    // Web Audio plant Klicks und Melodie im Voraus — ohne dies klingt
-    // beim Stop alles weiter.
+    /* Und den KLANG anhalten.
+     *
+     * Die Marke und der abgebrochene Bildrahmen halten nur an, was noch
+     * kommen soll. Web Audio plant Toene aber im Voraus: was bereits
+     * eingeplant ist, erklingt weiter, auch wenn hier laengst nichts
+     * mehr laeuft. Ohne diese Zeile bleibt beim Druck auf Stopp der
+     * Marker stehen und die Trompete spielt seelenruhig zu Ende. */
     this.k.motor.allesStoppen();
-    this.k.motor.erkennungZuruecksetzen();
     this.k.knopfBereit(false);
     this._punkteAus();
     this._neueUebung(true);
@@ -207,7 +239,9 @@
 
     function rahmen() {
       if (!selbst._nochAktuell(marke) || selbst.phase !== 'spielt') { return; }
-      var sj = (selbst.k.motor.jetzt() - selbst.startZeit) / schlag;
+      // Der Marker geht nach dem, was zu HOEREN ist, nicht nach dem, was
+      // der Browser gerade rechnet — sonst laeuft er dem Klang voraus.
+      var sj = (selbst.k.motor.hoerbarJetzt() - selbst.startZeit) / schlag;
       var index = -1, kIndex = -1, k = 0;
       for (var i = 0; i < selbst.melodie.noten.length; i++) {
         var n = selbst.melodie.noten[i];
@@ -253,13 +287,13 @@
     var kl = this.klingend();
     var schlag = 60 / this.k.tempo.bpm;
     var sj = (t - this.startZeit) / schlag;
+    var f = fenster(this.k);
 
-    /* Ein falscher Naturton bei richtigem Griff ist kein Fehler — er
-     * bringt nur kein Haekchen, weil er nun einmal nicht der erwartete
-     * Ton ist. Waehrend eines laufenden Durchgangs wird bewusst nichts
-     * eingeblendet: eine Animation mitten im Takt stoert mehr als sie
-     * hilft. Die Rueckmeldung kommt in Level 1, wo Zeit dafuer ist. */
-    void oktave;
+    // Ueberblasen ist kein Fehler — es bringt nur kein Haekchen.
+    // Waehrend eines laufenden Durchgangs wird deshalb bewusst nichts
+    // eingeblendet: eine Animation mitten im Takt wuerde mehr stoeren
+    // als helfen.
+    if (oktave === 1) { return; }
 
     /* Die erste noch offene Note, deren Zeitfenster den Klang enthaelt
      * und deren Tonhoehe stimmt. Das Fenster ist bewusst grosszuegig
@@ -267,8 +301,8 @@
     for (var i = 0; i < kl.length; i++) {
       if (this.haken.indexOf(i) >= 0) { continue; }
       var b = kl[i].schlag;
-      if (sj < b - FENSTER_VOR) { break; }        // noch nicht dran
-      if (sj > b + FENSTER_NACH) { continue; }    // diese Note ist vorbei
+      if (sj < b - f.vor) { break; }              // noch nicht dran
+      if (sj > b + f.nach) { continue; }          // diese Note ist vorbei
       if (kl[i].tonId !== tonId) { continue; }
       this.letzteAnnahme = t;
       this.letzterAkzeptLauf = laufNr;
@@ -379,7 +413,7 @@
         p.classList.remove('los');
         p.style.backgroundColor = '';
       }, istGo ? 420 : 190);
-    }, (wann - this.k.motor.jetzt()) * 1000);
+    }, (wann - this.k.motor.hoerbarJetzt()) * 1000);
   };
 
   Level2.prototype._punkteAus = function () {
@@ -399,7 +433,7 @@
     var marke = this.marke;
     function rahmen() {
       if (!selbst._nochAktuell(marke)) { return; }
-      var sj = (selbst.k.motor.jetzt() - start) / schlag;
+      var sj = (selbst.k.motor.hoerbarJetzt() - start) / schlag;
       var index = -1, k = 0, kIndex = -1;
       for (var i = 0; i < selbst.melodie.noten.length; i++) {
         var n = selbst.melodie.noten[i];

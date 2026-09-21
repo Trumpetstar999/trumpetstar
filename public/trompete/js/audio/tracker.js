@@ -1,34 +1,33 @@
 /* tracker.js — fuehrt die beiden DSP-Stroeme zu musikalischen Ereignissen
  * zusammen. Kennt keine Grafik und kein Web Audio; laeuft in Node.
  *
- * TROMPETE statt Blockfloete. Zwei Dinge sind hier anders:
- *
- * 1. Es gibt keine Oktave zum "Ueberblasen". An ihre Stelle tritt der
- *    NATURTON: mehrere Toene teilen sich denselben Griff und werden nur
- *    durch die Lippenspannung getrennt (offen = c1, g1, c2; Ventil 1 =
- *    f1, d2; Ventil 1+2 = e1, a1). Wer den richtigen Griff hat, aber den
- *    falschen Naturton trifft, hat NICHT den falschen Ton gegriffen —
- *    das ist ein Ansatzfehler und wird sanft zurueckgemeldet, nie als
- *    Fehler gezaehlt. Das ist der haeufigste Anfaengerfehler ueberhaupt.
- *
- * 2. Der Klangbereich liegt eine Oktave tiefer (233 bis 523 Hz).
- *
  * Wichtig zur Toleranz:
- * h1 und c2 liegen nur einen Halbton (100 Cent) auseinander. Eine starre
- * Toleranz von +/-80 Cent in beide Richtungen wuerde beide Toene
- * ueberlappen lassen — dann waere ein sauber gespieltes c2 gleichzeitig
- * ein gueltiges h1. Deshalb gilt die Toleranz RICHTUNGSABHAENGIG:
- * +/-80 Cent, aber nie ueber die Mitte zum Nachbarton hinaus.
+ * e1 und f1 liegen nur einen Halbton (100 Cent) auseinander, h1 und c2
+ * ebenso. Eine starre Toleranz von +/-80 Cent in beide Richtungen wuerde
+ * beide Toene ueberlappen lassen — dann waere ein sauber gespieltes f1
+ * gleichzeitig ein gueltiges e1. Deshalb gilt die Toleranz
+ * RICHTUNGSABHAENGIG: +/-80 Cent, aber nie ueber die Mitte zum
+ * Nachbarton hinaus.
  *
- *   g1  runter 80 / hoch 80     (Nachbar a1 ist 200 Cent entfernt)
- *   a1  runter 80 / hoch 80
+ *   d1  runter 80 / hoch 80     (Nachbar e1 ist 200 Cent entfernt)
+ *   e1  runter 80 / hoch 50     (f1 ist nur 100 Cent hoeher)
+ *   f1  runter 50 / hoch 80
  *   h1  runter 80 / hoch 50     (c2 ist nur 100 Cent hoeher)
  *   c2  runter 50 / hoch 80
- *   d2  runter 80 / hoch 80
  *
- * Das um 80 Cent zu tief geblasene h1 aus Auftrag 19 bleibt damit exakt
- * ein Treffer — und genau das ist auch die Richtung, in die eine kalte
- * Floete und ein zu schwacher Atem abweichen.
+ * Ein um 80 Cent zu tief geblasener Ton bleibt damit ein Treffer — und
+ * genau das ist die Richtung, in die eine kalte Trompete und ein noch
+ * unsicherer Ansatz abweichen.
+ *
+ * Wichtig zum falschen Naturton:
+ * Bei der Blockfloete war der typische Fehlgriff das Ueberblasen in die
+ * Oktave — ein fester Faktor 2. Auf der Trompete gehoert zu jedem Griff
+ * eine ganze Naturtonreihe: mit demselben Griff und etwas mehr
+ * Lippenspannung kommt der naechste Teilton. Wie weit der entfernt ist,
+ * haengt davon ab, auf welchem Teilton der Ton liegt — vom 2. zum 3. ist
+ * es eine Quinte, vom 3. zum 4. eine Quarte, vom 4. zum 5. eine grosse
+ * Terz. Deshalb steht in toene.json bei jedem Ton seine Teiltonnummer,
+ * und der Abstand wird daraus gerechnet statt fest verdrahtet.
  */
 (function (root, factory) {
   var T = factory(root.DSP || (typeof require === 'function' ? require('./dsp.js') : null));
@@ -46,6 +45,7 @@
     this.opt = config.erkennung;
     this.hopDauer = config.hopDauer || (128 / 48000);
     this.toleranzTabelle = this._toleranzenBerechnen();
+    this.teiltonTabelle = this._teiltoeneBerechnen();
 
     /* Ringpuffer klassifizierter Frames. Er muss eine ganze Uebung
      * fassen: vier Takte bei 60 BPM sind 16 Sekunden, dazu Vorzaehler
@@ -66,7 +66,39 @@
     this.kurzMs = this.opt.kurzMs != null ? this.opt.kurzMs : 150;
     this.letzterPegelT = -1;
     this.events = [];
+    if (config.schwierigkeit) { this.setzeSchwierigkeit(config.schwierigkeit); }
   }
+
+  /** Stellt ein, wie streng zugehoert wird.
+   *
+   *  `werte` ist eine der Stufen aus toene.json — die Felder, die dort
+   *  fehlen, bleiben unveraendert. Danach werden BEIDE Toleranztabellen
+   *  neu gerechnet: sie haengen an toleranzCent und stehen sonst noch
+   *  auf der alten Strenge, waehrend alles andere schon umgestellt ist.
+   *  Genau das ist der Fehler, den man hier einmal macht. */
+  Tracker.prototype.setzeSchwierigkeit = function (werte) {
+    if (!werte) { return; }
+    if (werte.toleranzCent != null) { this.opt.toleranzCent = werte.toleranzCent; }
+    if (werte.clarityMin != null) { this.opt.clarityMin = werte.clarityMin; }
+    if (werte.stabilMs != null) { this.opt.stabilMs = werte.stabilMs; }
+    if (werte.kurzMs != null) { this.kurzMs = werte.kurzMs; }
+    this.toleranzTabelle = this._toleranzenBerechnen();
+    this.teiltonTabelle = this._teiltoeneBerechnen();
+  };
+
+  /** Welche Toene erkannt werden.
+   *
+   *  Level 1 bis 3 kennen die neun Toene von c1 bis d2. Ein Stueck aus
+   *  dem Buch bringt dazu seine eigenen mit: fis1, b1, e2. Beide
+   *  Toleranztabellen haengen an den Nachbartoenen und werden deshalb
+   *  neu gerechnet — mit fis1 im Vorrat darf f1 nicht mehr bis zur Mitte
+   *  nach g1 reichen, sonst ginge ein vergessenes Kreuz als Treffer
+   *  durch. */
+  Tracker.prototype.setzeToene = function (toene) {
+    this.toene = toene;
+    this.toleranzTabelle = this._toleranzenBerechnen();
+    this.teiltonTabelle = this._teiltoeneBerechnen();
+  };
 
   /* --------------------------------------------------------------- */
   /* Tonzuordnung                                                     */
@@ -101,55 +133,107 @@
     return Math.abs(abweichungCent) <= grenze * (faktor || 1) + EPS;
   };
 
-  /** Naechstliegender bekannter Ton zu einer Frequenz.
+  /** Nachbarteilton je Ton: Frequenz und die Toleranz, die dort gilt.
    *
-   *  Anders als bei der Blockfloete gibt es hier keine Oktavvariante:
-   *  jeder Naturton ist ein eigener notierter Ton mit eigener Lage im
-   *  System. Das Feld oktave bleibt aus Kompatibilitaet erhalten und ist
-   *  immer 0. */
+   *  Die Toleranz muss geklammert werden, und zwar aus demselben Grund
+   *  wie bei den Toenen selbst: der Nachbarteilton liegt auf der
+   *  Trompete nicht mehr eine ganze Oktave von allem entfernt. Der
+   *  Nachbarteilton von a1 (490 Hz) liegt nur 86 Cent neben c2
+   *  (466 Hz). Mit den vollen 90 Cent Toleranz waere ein sauber
+   *  gespieltes c2 gleichzeitig ein verungluecktes a1 — und bekaeme in
+   *  Level 2 nie sein Haekchen.
+   *
+   *  Nicht mitgezaehlt werden dabei Toene, die MIT dem Nachbarteilton
+   *  zusammenfallen: der Nachbarteilton von c1 IST g1, weil beide
+   *  offen gegriffen werden. Genau dieser Fall soll ja als falscher
+   *  Teilton gelten, er darf sich die Toleranz nicht selbst wegnehmen. */
+  var GLEICH_CENT = 20;
+
+  Tracker.prototype._teiltoeneBerechnen = function () {
+    var max = this.opt.ueberblasenToleranzCent;
+    var tab = {};
+    for (var i = 0; i < this.toene.length; i++) {
+      var ton = this.toene[i];
+      var fp = this.teiltonHoeher(ton);
+      var grenze = max;
+      for (var j = 0; j < this.toene.length; j++) {
+        var d = Math.abs(cents(this.toene[j].frequenzHz, fp));
+        if (d <= GLEICH_CENT) { continue; }      // das IST der Nachbarteilton
+        if (d / 2 < grenze) { grenze = d / 2; }
+      }
+      tab[ton.id] = { freq: fp, toleranz: grenze };
+    }
+    return tab;
+  };
+
+  /** Passt `freq` zum Nachbarteilton von `tonId`? */
+  Tracker.prototype.imTeiltonFenster = function (tonId, freq) {
+    var e = this.teiltonTabelle[tonId];
+    if (!e) { return false; }
+    return Math.abs(cents(freq, e.freq)) <= e.toleranz + EPS;
+  };
+
+  /** Die Frequenz, die DERSELBE Griff einen Teilton hoeher ergibt.
+   *
+   *  Das ist auf der Trompete das Gegenstueck zum Ueberblasen der
+   *  Blockfloete: richtig gegriffen, zu viel Lippenspannung. Ohne
+   *  Teiltonangabe faellt die Rechnung auf die Oktave zurueck — dann
+   *  verhaelt sich der Tracker genau wie die Blockfloetenfassung.
+   *
+   *  Nach UNTEN wird bewusst nicht geprueft. Der zu tiefe Teilton fuehrt
+   *  zur selben Rueckmeldung wie ein falscher Ton — der richtige Ton
+   *  leuchtet auf und erklingt — und das ist dort auch die richtige
+   *  Hilfe. Die Feder, die "sanfter blasen" heisst, waere fuer einen zu
+   *  tiefen Ton schlicht der falsche Rat. */
+  Tracker.prototype.teiltonHoeher = function (ton) {
+    var n = ton.teilton;
+    if (!n || n < 1) { return ton.frequenzHz * 2; }
+    return ton.frequenzHz * (n + 1) / n;
+  };
+
+  /** Naechstliegender Ton zu einer Frequenz — fuer die Mikrofon-
+   *  Testansicht im Eltern-Bereich und fuer "welcher Ton war es denn?".
+   *
+   *  Der gegriffene Ton hat immer Vorrang vor dem falschen Teilton. Das
+   *  ist auf der Trompete zwingend: g1 klingt exakt wie ein c1, bei dem
+   *  der naechste Teilton angesprochen hat, c2 wie ein solches g1. Ohne
+   *  diesen Vorrang wuerde ein sauber gespieltes g1 als verfehltes c1
+   *  gelesen — und bekaeme in Level 2 nie sein Haekchen.
+   *
+   *  Der Nachbarteilton wird also nur dann in Betracht gezogen, wenn
+   *  ueberhaupt kein Ton des Vorrats passt. */
   Tracker.prototype.klassifiziere = function (freq) {
     if (!freq) { return null; }
-    var best = null;
-    for (var i = 0; i < this.toene.length; i++) {
-      var c = cents(freq, this.toene[i].frequenzHz);
+    var best = null, i, c;
+
+    for (i = 0; i < this.toene.length; i++) {
+      c = cents(freq, this.toene[i].frequenzHz);
       if (this.imFenster(this.toene[i].id, c) &&
           (!best || Math.abs(c) < Math.abs(best.cents))) {
         best = { tonId: this.toene[i].id, oktave: 0, cents: c, ton: this.toene[i] };
       }
     }
+    if (best) { return best; }
+
+    for (i = 0; i < this.toene.length; i++) {
+      c = cents(freq, this.teiltonTabelle[this.toene[i].id].freq);
+      if (this.imTeiltonFenster(this.toene[i].id, freq) &&
+          (!best || Math.abs(c) < Math.abs(best.cents))) {
+        best = { tonId: this.toene[i].id, oktave: 1, cents: c, ton: this.toene[i] };
+      }
+    }
     return best;
   };
 
-  /** Haben zwei Toene denselben Griff? */
-  Tracker.prototype.gleicherGriff = function (a, b) {
-    if (!a || !b || !a.griff || !b.griff) { return false; }
-    return a.griff.ventile.join('') === b.griff.ventile.join('');
-  };
-
-  /** Liegt die Frequenz auf einem Naturton derselben Rohrlaenge wie der
-   *  Zielton — also bei richtigem Griff, aber falscher Lippenspannung?
-   *  Auch dann, wenn dieser Naturton gar nicht im Tonvorrat steht. */
-  Tracker.prototype.istNaturtonVon = function (freq, ziel) {
-    if (!ziel || !ziel.naturton) { return 0; }
-    var grundton = ziel.frequenzHz / ziel.naturton;      // Rohrlaenge
-    for (var n = 2; n <= 6; n++) {
-      if (n === ziel.naturton) { continue; }
-      if (Math.abs(cents(freq, grundton * n)) <= this.opt.toleranzCent + EPS) { return n; }
-    }
-    return 0;
-  };
-
-  /** Zielbezogene Pruefung.
-   *  Liefert 'treffer' | 'naturton' | 'anderer' | 'nichts'.
+  /** Zielbezogene Pruefung. Liefert 'treffer' | 'ueberblasen' | 'anderer' | 'nichts'.
    *
-   *  Reihenfolge mit Bedacht:
-   *    1. Sitzt der Zielton?
-   *    2. Ist es ein anderer bekannter Ton MIT ANDEREM GRIFF? Dann wurde
-   *       wirklich falsch gegriffen.
-   *    3. Sonst: liegt es auf einem Naturton derselben Rohrlaenge? Dann
-   *       stimmt der Griff und nur die Lippen sind daneben. Das ist kein
-   *       Fehler, sondern ein Hinweis.
-   */
+   *  Hier gilt die umgekehrte Reihenfolge wie in klassifiziere(): passt
+   *  die Frequenz zum Nachbarteilton des ZIELTONS, wird das als
+   *  'ueberblasen' gewertet, auch wenn es zugleich ein anderer Ton des
+   *  Vorrats waere. Wer nach c1 gefragt wird und 349 Hz produziert, hat
+   *  mit grosser Wahrscheinlichkeit richtig gegriffen und zu fest
+   *  geblasen — und nicht spontan beschlossen, g1 zu spielen. Der
+   *  Griff ist ja derselbe. Das darf nie als Fehler zaehlen. */
   Tracker.prototype.pruefeZiel = function (freq, zielId) {
     if (!freq) { return { art: 'nichts' }; }
     var ziel = this.tonById(zielId);
@@ -158,20 +242,17 @@
     var c = cents(freq, ziel.frequenzHz);
     if (this.imFenster(zielId, c)) { return { art: 'treffer', cents: c }; }
 
-    var k = this.klassifiziere(freq);
-    if (k && k.tonId !== zielId) {
-      var anderer = this.tonById(k.tonId);
-      if (this.gleicherGriff(ziel, anderer)) {
-        return { art: 'naturton', tonId: k.tonId, cents: k.cents, imVorrat: true };
-      }
-      return { art: 'anderer', tonId: k.tonId, oktave: 0, cents: k.cents };
+    // Der falsche Teilton wird nie als falscher Ton gewertet — weder der
+    // des Zieltons noch der irgendeines anderen Tons.
+    if (this.imTeiltonFenster(zielId, freq)) {
+      return { art: 'ueberblasen', cents: cents(freq, this.teiltonTabelle[zielId].freq), tonId: zielId };
     }
 
-    var n = this.istNaturtonVon(freq, ziel);
-    if (n) { return { art: 'naturton', naturton: n, imVorrat: false }; }
-
-    var nah = this.naechsterTon(freq);
-    if (nah) { return { art: 'anderer', tonId: nah.tonId, oktave: 0, cents: nah.cents }; }
+    var k = this.klassifiziere(freq) || this.naechsterTon(freq);
+    if (k && k.oktave === 1) {
+      return { art: 'ueberblasen', cents: k.cents, tonId: k.tonId, fremderTon: k.tonId !== zielId };
+    }
+    if (k) { return { art: 'anderer', tonId: k.tonId, oktave: k.oktave, cents: k.cents }; }
     return { art: 'nichts' };
   };
 

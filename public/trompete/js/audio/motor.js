@@ -1,5 +1,10 @@
 /* motor.js — alles, was mit Web Audio zu tun hat.
  *
+ * Die Toene kommen aus EINER Datei: audio/trumpet-sprite.m4a, 49 kB, die
+ * echten Aufnahmen von Mario Schulter. Der eigentliche Sampler steht in
+ * sampler.js; hier haengt er nur am Summenweg und wird ueber Ton-IDs
+ * bedient.
+ *
  * iOS-Eigenheiten, die hier abgefangen werden:
  *   - AudioContext startet nur aus einer echten Nutzergeste heraus
  *   - decodeAudioData kennt auf aelteren Versionen nur die Callback-Form
@@ -15,22 +20,22 @@
     this.toene = opt.toene;
     this.erkennung = opt.erkennung;
     this.ctx = null;
-    this.puffer = {};           // 'ton_h1_1' -> AudioBuffer
+    this.sampler = null;
     this.stromQuelle = null;
     this.knoten = null;
     this.aufFrames = null;
     this.bereit = false;
     this.mikrofonLaeuft = false;
     this.spieltBis = 0;         // solange laeuft eigene Wiedergabe
-    this.variante = {};         // letzte gespielte Variante je Ton
     this.fehler = null;
     this.meister = null;        // Summenlautstaerke
-    this.klang = '';            // gewaehlte Klangfarbe (Unterordner in audio/)
-    try {
-      var gespeichert = localStorage.getItem('hb-klangfarbe');
-      if (gespeichert) { this.klang = gespeichert; }
-    } catch (e) { /* Privatmodus */ }
-
+    /* Horn und Tenorhorn klingen weicher als eine Trompete: weniger
+     * Obertoene. Ein Tiefpass ueber den vorgespielten Toenen kommt dem
+     * nahe genug, dass ein Kind sein eigenes Instrument wiedererkennt.
+     * 0 heisst: unveraendert, so wie eingespielt (Trompete). */
+    this.klangfilterHz = opt.klangfilterHz || 0;
+    this.klangZiel = null;      // hier haengen die vorgespielten Toene
+    this.eigeneStimmung = !!opt.eigeneStimmung;
   }
 
   /* ---------------------------------------------------------------- */
@@ -50,9 +55,7 @@
     this.ausgang = this.ctx.createGain();
     this.ausgang.gain.value = 1;
     this.ausgang.connect(this.ctx.destination);
-    this.meister = this.ctx.createGain();
-    this.meister.gain.value = 1;
-    this.meister.connect(this.ausgang);
+    this._meisterBauen();
     this.laufende = [];
 
     // Auf iOS muss der Kontext aus der Geste heraus laufen; ein kurzer
@@ -71,6 +74,27 @@
     });
   };
 
+  /** Baut den Summenweg: meister → ausgang, und darueber den Klangweg,
+   *  an dem die vorgespielten Toene haengen. Beim Not-Aus wird beides
+   *  weggeworfen und hier neu gebaut. Das Metronom haengt direkt am
+   *  meister — sein Klick soll nicht mitgefiltert werden. */
+  Motor.prototype._meisterBauen = function () {
+    this.meister = this.ctx.createGain();
+    this.meister.gain.value = 1;
+    this.meister.connect(this.ausgang);
+    if (this.klangfilterHz > 0) {
+      var f = this.ctx.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = this.klangfilterHz;
+      f.Q.value = 0.6;
+      f.connect(this.meister);
+      this.klangZiel = f;
+    } else {
+      this.klangZiel = this.meister;
+    }
+  };
+
+
   Motor.prototype._aufwecken = function () {
     var c = this.ctx;
     if (!c) { return Promise.resolve(); }
@@ -85,320 +109,145 @@
   Motor.prototype.aufwecken = function () { return this._aufwecken(); };
   Motor.prototype.jetzt = function () { return this.ctx ? this.ctx.currentTime : 0; };
 
+  /** Welcher Moment des Audiotakts ist JETZT zu hoeren?
+   *
+   *  currentTime ist die Zeit, die der Browser gerade ausrechnet. Aus
+   *  dem Lautsprecher kommt sie erst nach dem Ausgabeweg — ueber den
+   *  eingebauten Lautsprecher einige Dutzend Millisekunden, ueber
+   *  Bluetooth leicht eine Viertelsekunde. Alles, was das Kind SIEHT und
+   *  was zur Musik passen soll (Marker, Zaehlpunkte, Zeilenwechsel), geht
+   *  nach dieser Uhr. Geplant wird weiter nach currentTime.
+   *
+   *  Der Rechenweg bleibt je Browser immer derselbe. Gemessen: Chrome
+   *  meldet den Verzug des Ausgabewegs in outputLatency, rechnet ihn in
+   *  getOutputTimestamp aber nicht ein. Wechselte die Uhr zwischen beiden,
+   *  sprangen die Zaehlpunkte um genau diesen Verzug hin und her. Wo es
+   *  outputLatency gibt, gilt deshalb nur das; Safari kennt es nicht, dort
+   *  sagt getOutputTimestamp, was gerade am Ausgang ist. */
+  Motor.prototype.hoerbarJetzt = function () {
+    if (!this.ctx) { return 0; }
+    var c = this.ctx;
+    if (typeof c.outputLatency === 'number' && c.outputLatency > 0) {
+      return c.currentTime - this.ausgabeVerzug();
+    }
+    if (c.getOutputTimestamp && root.performance) {
+      var ts = c.getOutputTimestamp();
+      if (ts && ts.contextTime > 0 && ts.performanceTime > 0) {
+        return Math.min(c.currentTime,
+                        ts.contextTime + (root.performance.now() - ts.performanceTime) / 1000);
+      }
+    }
+    return c.currentTime - this.ausgabeVerzug();
+  };
+
   /* ---------------------------------------------------------------- */
   /* Klaenge laden                                                     */
   /* ---------------------------------------------------------------- */
 
-  /* Klangfarben: Unterordner in audio/. Leerer Name = Grundklang.
-   * 'synth' und 'synthhorn' sind keine Ordner — die Klaenge werden
-   * gerechnet. 'synthhorn' ist das weiche Waldhorn (Horn in F). */
-  Motor.KLANGFARBEN = [
-    { id: '', name: 'Warm (Standard)' },
-    { id: 'brillant', name: 'Brillant' },
-    { id: 'gedaempft', name: 'Gedämpft' },
-    { id: 'synth', name: 'Synthesizer (Trompete)' },
-    { id: 'synthhorn', name: 'Waldhorn (Synthesizer)' }
-  ];
-
-  Motor.prototype.klangOrdner = function () {
-    return this.klang ? this.klang + '/' : '';
-  };
-
-  Motor.prototype._istSynth = function (id) {
-    return id === 'synth' || id === 'synthhorn';
-  };
-
-  /** Waehlt die Klangfarbe und laedt die passenden Klaenge nach. */
-  Motor.prototype.klangWaehlen = function (id) {
-    var gueltig = Motor.KLANGFARBEN.some(function (k) { return k.id === id; });
-    if (!gueltig) { id = ''; }
-    this.klang = id;
-    try { localStorage.setItem('hb-klangfarbe', id); } catch (e) { /* Privatmodus */ }
-    if (!this.ctx) { return Promise.resolve(); }
-    return this._klaengeLaden();
-  };
-
-  /** Nach einem Stimmungswechsel (B, C, Horn in F) muessen die
-   *  gerechneten Klaenge neu gebaut werden — ihre Tonhoehen haengen an
-   *  ton.frequenzHz. Gesampelte Klaenge bleiben, wie sie sind. */
-  Motor.prototype.neuStimmen = function () {
-    if (!this.ctx || !this._istSynth(this.klang)) { return Promise.resolve(); }
-    this._synthFertig = null;
-    var praefix = this.klang + '/';
-    for (var s in this.puffer) {
-      if (s.indexOf(praefix) === 0) { delete this.puffer[s]; }
-    }
-    return Promise.resolve(this._synthBauen());
-  };
-
-  /* Schleifenpunkte der Samples. Sie stehen in audio/loops.json und sind
-   * beim Erzeugen der Toene exakt auf ganze Schwingungen gelegt worden.
-   * Nur so laesst sich der ausgehaltene Teil ohne Knack und ohne
-   * "Gurgeln" wiederholen. */
-  Motor.prototype._schleifenLaden = function () {
-    var selbst = this;
-    if (this._schleifen) { return Promise.resolve(this._schleifen); }
-    return new Promise(function (auf) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', selbst.basis + 'audio/loops.json', true);
-      xhr.onload = function () {
-        try { selbst._schleifen = JSON.parse(xhr.responseText); }
-        catch (e) { selbst._schleifen = {}; }
-        auf(selbst._schleifen);
-      };
-      xhr.onerror = function () { selbst._schleifen = {}; auf(selbst._schleifen); };
-      xhr.send();
-    });
-  };
-
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
-    if (this._istSynth(this.klang)) {
-      if (this._synthFertig !== this.klang) { this._synthFertig = null; }
-      return Promise.resolve(this._synthBauen());
-    }
-    var namen = ['lob'];
-    this.toene.forEach(function (t) {
-      for (var v = 1; v <= 3; v++) { namen.push(t.audio + '_' + v); }
+    if (!root.Sampler) { this.fehler = 'kein-sampler'; return Promise.resolve(null); }
+    this.sampler = new root.Sampler({
+      ctx: this.ctx, url: this.basis + 'audio/trumpet-sprite.m4a'
     });
-    return Promise.all([this._schleifenLaden()].concat(namen.map(function (n) {
-      if (selbst.puffer[selbst.klangOrdner() + n]) { return null; }
-      return selbst._laden(n).catch(function () { return null; });
-    })));
-  };
-
-
-
-  /* ---------------------------------------------------------------- */
-  /* Synthesizer: Trompete und Waldhorn                                */
-  /* ---------------------------------------------------------------- */
-
-  /* Zwei gerechnete Klangbilder. Die Trompete faechert im Ansatz hell
-   * auf (Blech, Grundton nicht der lauteste). Das Waldhorn ist das
-   * Gegenteil: Grundton traegt, hohe Teiltoene sind stark gedaempft,
-   * der Ansatz ist deutlich weicher — daher der runde, ferne Klang. */
-  Motor.SYNTHBILD = {
-    synth: {
-      stufen: [0.55, 1.0, 0.85, 0.6, 0.42, 0.3, 0.2, 0.13, 0.08, 0.05],
-      anblas: 0.055, glanzEnde: 9000, glanzKurve: 0.9,
-      vibTiefe: 0.0022, geraeusch: 0.06
-    },
-    synthhorn: {
-      stufen: [1.0, 0.78, 0.42, 0.22, 0.12, 0.06, 0.03, 0.015],
-      anblas: 0.115, glanzEnde: 5200, glanzKurve: 1.3,
-      vibTiefe: 0.0014, geraeusch: 0.035
-    }
-  };
-
-  /** Rechnet alle Toene der gewaehlten Synth-Klangfarbe aus. */
-  Motor.prototype._synthBauen = function () {
-    var selbst = this;
-    var art = this.klang;
-    if (!Motor.SYNTHBILD[art]) { art = 'synth'; }
-    if (this._synthFertig === art) { return; }
-    this.toene.forEach(function (t) {
-      for (var v = 1; v <= 3; v++) {
-        selbst.puffer[art + '/' + t.audio + '_' + v] =
-          selbst._synthTon(t.frequenzHz, v, null, art);
-      }
-    });
-    // Kleine Fanfare als Belohnung: g1 – c2 – e1 – g1 aufsteigend.
-    selbst.puffer[art + '/lob'] = selbst._synthFanfare(art);
-    this._synthFertig = art;
-  };
-
-  Motor.prototype._synthTon = function (f0, variante, dauerSek, art) {
-    var bild = Motor.SYNTHBILD[art || this.klang] || Motor.SYNTHBILD.synth;
-    var sr = this.ctx.sampleRate;
-    var dauer = dauerSek || 1.35;
-    var n = Math.round(sr * dauer);
-    var buf = this.ctx.createBuffer(1, n, sr);
-    var d = buf.getChannelData(0);
-
-    var stufen = bild.stufen;
-    var detune = (variante === 2 ? 1.0018 : variante === 3 ? 0.9985 : 1);
-    var f = f0 * detune;
-    var anblas = bild.anblas + (variante === 3 ? 0.012 : 0);
-    var vibHz = 4.6 + variante * 0.25;
-    var phase = new Float32Array(stufen.length);
-    var spitze = 0;
-
-    for (var i = 0; i < n; i++) {
-      var t = i / sr;
-      // Huellkurve: kurzer Ansatz, langes Halten, sanftes Ende
-      var env;
-      if (t < anblas) { env = t / anblas; }
-      else {
-        var rest = (dauer - t) / dauer;
-        env = 0.86 + 0.14 * Math.exp(-(t - anblas) * 6);
-        env *= Math.min(1, rest * 8);
-      }
-      // Helligkeit waechst im Ansatz -> typisches Blech-Auffaechern
-      var glanz = Math.min(1, 0.35 + t / (anblas * 2.4));
-      var vib = 1 + bild.vibTiefe * Math.sin(2 * Math.PI * vibHz * t) * Math.min(1, t * 3);
-      var s = 0;
-      for (var h = 0; h < stufen.length; h++) {
-        var amp = stufen[h] * Math.pow(glanz, h * bild.glanzKurve);
-        // hohe Teiltoene weglassen (klingt sonst scharf)
-        if (f * (h + 1) > bild.glanzEnde) { break; }
-        phase[h] += 2 * Math.PI * f * (h + 1) * vib / sr;
-        s += amp * Math.sin(phase[h]);
-      }
-      // ganz wenig Anblasgeraeusch nur im Ansatz
-      if (t < anblas * 1.6) {
-        s += (Math.random() * 2 - 1) * bild.geraeusch * (1 - t / (anblas * 1.6));
-      }
-      var wert = s * env;
-      d[i] = wert;
-      var a = wert < 0 ? -wert : wert;
-      if (a > spitze) { spitze = a; }
-    }
-
-    // Normieren und weich saettigen — gibt Waerme statt Digitalkante
-    var g = spitze > 0 ? 0.82 / spitze : 1;
-    for (var j = 0; j < n; j++) { d[j] = Math.tanh(d[j] * g * 1.25) * 0.8; }
-    return buf;
-  };
-
-  Motor.prototype._synthFanfare = function (art) {
-    var sr = this.ctx.sampleRate;
-    var selbst = this;
-    /* Die Fanfare folgt der aktuellen Stimmung: sie wird aus den
-     * Frequenzen der wirklich gestimmten Toene gebaut. */
-    function hz(id, ersatz) {
-      var t = selbst._ton(id);
-      return t && t.frequenzHz ? t.frequenzHz : ersatz;
-    }
-    var muster = [
-      { f: hz('g1', 349.23), ab: 0.00, dauer: 0.26 },
-      { f: hz('c2', 466.16), ab: 0.22, dauer: 0.26 },
-      { f: hz('a1', 392.00), ab: 0.44, dauer: 0.26 },
-      { f: hz('d2', 523.25), ab: 0.66, dauer: 0.75 }
-    ];
-    var gesamt = 1.6;
-    var buf = this.ctx.createBuffer(1, Math.round(sr * gesamt), sr);
-    var ziel = buf.getChannelData(0);
-    for (var k = 0; k < muster.length; k++) {
-      var teil = this._synthTon(muster[k].f, 1, muster[k].dauer, art).getChannelData(0);
-      var start = Math.round(muster[k].ab * sr);
-      for (var i = 0; i < teil.length && start + i < ziel.length; i++) {
-        ziel[start + i] += teil[i] * 0.7;
-      }
-    }
-    for (var j = 0; j < ziel.length; j++) { ziel[j] = Math.tanh(ziel[j] * 1.1) * 0.85; }
-    return buf;
-  };
-
-
-
-  Motor.prototype._laden = function (name) {
-    var selbst = this;
-    var schluessel = this.klangOrdner() + name;
-    var url = this.basis + 'audio/' + schluessel + '.m4a';
-    return new Promise(function (aufl, ab) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.responseType = 'arraybuffer';
-      xhr.onload = function () {
-        if (xhr.status !== 200 && xhr.status !== 0) { ab(new Error(url + ' ' + xhr.status)); return; }
-        // Alte Safari-Versionen kennen nur die Callback-Form
-        var ergebnis = selbst.ctx.decodeAudioData(xhr.response, function (b) {
-          selbst.puffer[schluessel] = b; aufl(b);
-        }, function (e) { ab(e || new Error('decode ' + name)); });
-        if (ergebnis && ergebnis.then) {
-          ergebnis.then(function (b) { selbst.puffer[schluessel] = b; aufl(b); }, ab);
-        }
-      };
-      xhr.onerror = function () { ab(new Error('netz ' + url)); };
-      xhr.send();
+    return this.sampler.laden().catch(function () {
+      selbst.fehler = 'klang-fehlt';
+      return null;
     });
   };
-
 
   /* ---------------------------------------------------------------- */
   /* Wiedergabe                                                        */
   /* ---------------------------------------------------------------- */
 
-  /** Spielt einen Ton. Waehlt zufaellig eine andere Variante als zuletzt. */
+  /** Spielt einen Ton.
+   *
+   * Immer dieselbe Aufnahme. Frueher lagen drei Varianten je Ton
+   * bereit und hier wurde gewuerfelt — das sollte lebendig wirken,
+   * klang aber, als wechsle jemand mitten im Ueben das Instrument.
+   * Ein Vorbildton, den das Kind nachspielen soll, muss jedes Mal
+   * gleich klingen. */
   Motor.prototype.spieleTon = function (tonId, o) {
     o = o || {};
     var ton = this._ton(tonId);
-    if (!ton || !this.ctx) { return 0; }
-    var v = 1 + Math.floor(Math.random() * 3);
-    if (v === this.variante[tonId]) { v = (v % 3) + 1; }
-    this.variante[tonId] = v;
-
-    var o1 = this.klangOrdner();
-    var name = ton.audio + '_' + v;
-    var buf = this.puffer[o1 + name];
-    if (!buf) { name = ton.audio + '_1'; buf = this.puffer[o1 + name]; }
-    if (!buf) { buf = this.puffer[ton.audio + '_' + v]; name = ton.audio + '_' + v; }
-    if (!buf) { buf = this.puffer[ton.audio + '_1']; name = ton.audio + '_1'; }
-
-    if (!buf) { return 0; }
+    if (!ton || !this.ctx || !this.sampler || !this.sampler.bereit()) { return 0; }
 
     var wann = o.wann != null ? o.wann : this.ctx.currentTime + 0.03;
     var dauer = o.dauer != null ? o.dauer : 1.25;
-    var ausklang = 0.14;
 
-    var q = this.ctx.createBufferSource();
-    q.buffer = buf;
-    /* Halbe und ganze Noten koennen laenger sein als das Sample. Damit
-     * sie so lange klingen, wie sie notiert sind, wird der ausgehaltene
-     * Teil geschleift. Die Punkte kommen aus audio/loops.json und
-     * liegen auf ganzen Schwingungen — dadurch bleibt der Ton ruhig.
-     * Ohne Manifest wird gar nicht geschleift (lieber kuerzer als
-     * unschoen). */
-    var sch = this._schleifen && this._schleifen[name];
-    if (dauer + 0.02 > buf.duration && sch && sch.end > sch.start + 0.05) {
-      q.loop = true;
-      q.loopStart = sch.start;
-      q.loopEnd = Math.min(sch.end, buf.duration);
+    /* frequenzHz ist die KLINGENDE Hoehe: notiert c1 klingt auf der
+     * Trompete B, auf dem Horn in F ein F. So hoert das Kind genau den
+     * Ton, den sein eigenes Instrument macht, und kann mitspielen.
+     *
+     * Bei Horn und Tenorhorn wird dafuer nicht die Aufnahme desselben
+     * Notennamens genommen, sondern die, die am wenigsten verschoben
+     * werden muss. */
+    var probe = ton.audio;
+    if (this.eigeneStimmung && this.sampler.besteProbe) {
+      probe = this.sampler.besteProbe(ton.frequenzHz) || probe;
     }
-
-    var g = this.ctx.createGain();
-    var laut = o.lautstaerke != null ? o.lautstaerke : 1;
-    g.gain.setValueAtTime(laut, wann);
-    g.gain.setValueAtTime(laut, wann + Math.max(0.05, dauer - ausklang));
-    g.gain.linearRampToValueAtTime(0.0001, wann + dauer);
-    q.connect(g); g.connect(this.meister);
-    q.start(wann);
-    q.stop(wann + dauer + 0.02);
+    var q = this.sampler.spiele(probe, {
+      frequenzHz: ton.frequenzHz,
+      wann: wann,
+      dauer: dauer,
+      lautstaerke: o.lautstaerke,
+      ziel: this.klangZiel || this.meister
+    });
+    if (!q) { return 0; }
     this._merken(q);
 
-
-    this.spieltBis = Math.max(this.spieltBis, wann + dauer + 0.25);
+    this.spieltBis = Math.max(this.spieltBis, wann + dauer + this.sampler.ausklang());
     return wann;
   };
 
-  /** Spielt eine ganze Uebung im gewuenschten Tempo. */
+  /** Spielt eine ganze Uebung im gewuenschten Tempo.
+   *
+   *  Noten aus dem Buch koennen gebunden sein: die Fortsetzung eines
+   *  Haltebogens erklingt nicht neu, der Kopf klingt dafuer so lange wie
+   *  beide zusammen (`klangDauer`). */
   Motor.prototype.spieleMelodie = function (melodie, bpm, o) {
     o = o || {};
     var schlag = 60 / bpm;
     var start = o.wann != null ? o.wann : this.ctx.currentTime + 0.12;
     var selbst = this;
     melodie.noten.forEach(function (n) {
-      if (n.pause) { return; }
+      if (n.pause || n.fortsetzung) { return; }
       selbst.spieleTon(n.tonId, {
         wann: start + n.schlag * schlag,
-        dauer: n.dauer * schlag * 0.92,
+        dauer: (n.klangDauer || n.dauer) * schlag * 0.92,
         lautstaerke: o.lautstaerke
       });
     });
     return { start: start, ende: start + melodie.schlaegeGesamt * schlag };
   };
 
+  /** Das Lobmotiv — ein kleines Signal, gespielt aus denselben
+   *  Aufnahmen wie alles andere. Sonst klaenge ausgerechnet das Lob
+   *  nach Maschine.
+   *
+   *  Bei der Blockfloete lag das Motiv als fertige Datei bereit. Der
+   *  Sampler kann es aus den vorhandenen Toenen selbst spielen — eine
+   *  Datei weniger, die geladen, zwischengespeichert und offline
+   *  vorgehalten werden muss. */
   Motor.prototype.spieleLob = function () {
-    var buf = this.puffer[this.klangOrdner() + 'lob'] || this.puffer.lob;
-    if (!buf || !this.ctx) { return 0; }
-    var wann = this.ctx.currentTime + 0.03;
-    var q = this.ctx.createBufferSource();
-    q.buffer = buf;
-    q.connect(this.meister);
-    q.start(wann);
-    this._merken(q);
-    this.spieltBis = Math.max(this.spieltBis, wann + buf.duration + 0.2);
-    return buf.duration;
+    if (!this.ctx || !this.sampler || !this.sampler.bereit()) { return 0; }
+    var achtel = 0.16;
+    var motiv = [
+      { id: 'g1', t: 0,          d: achtel * 1.1 },
+      { id: 'h1', t: achtel,     d: achtel * 1.1 },
+      { id: 'd2', t: achtel * 2, d: achtel * 1.1 },
+      { id: 'c2', t: achtel * 3, d: achtel * 1.1 },
+      { id: 'd2', t: achtel * 4, d: achtel * 5.0 }
+    ];
+    var start = this.ctx.currentTime + 0.05;
+    for (var i = 0; i < motiv.length; i++) {
+      this.spieleTon(motiv[i].id, {
+        wann: start + motiv[i].t, dauer: motiv[i].d, lautstaerke: 0.95
+      });
+    }
+    var dauer = achtel * 9 + this.sampler.ausklang();
+    this.spieltBis = Math.max(this.spieltBis, start + dauer);
+    return dauer;
   };
 
   /** Metronomklick.
@@ -406,7 +255,7 @@
    * Bewusst ein kurzer, gefilterter Rauschstoss und KEIN Sinuston: das
    * Mikrofon hoert den Klick mit, und ein Sinus zwischen 780 und 2400 Hz
    * — oder einer, dessen Vielfache dort landen — wuerde von der
-   * Tonhoehenerkennung als gespielter Ton oder als Naturton daneben
+   * Tonhoehenerkennung als gespielter Ton oder als ueberblasener Ton
    * gelesen. Rauschen hat keine Periode, faellt also durch die
    * Klarheitsschwelle und kann gar nicht erst verwechselt werden.
    */
@@ -480,16 +329,50 @@
     }
     this.laufende.length = 0;
 
-    var selbst = this;
+    var altKlang = (this.klangZiel !== alt) ? this.klangZiel : null;
     setTimeout(function () {
       try { alt.disconnect(); } catch (e) { /* egal */ }
+      if (altKlang) { try { altKlang.disconnect(); } catch (e2) { /* egal */ } }
     }, 80);
 
-    this.meister = this.ctx.createGain();
-    this.meister.gain.value = 1;
-    this.meister.connect(this.ausgang);
+    this._meisterBauen();
     this.spieltBis = 0;
-    void selbst;
+  };
+
+  /** Wie lange braucht der eigene Klang vom Rechnen bis ans Ohr —
+   *  und damit bis ans Mikrofon?
+   *
+   *  Ueber den eingebauten Lautsprecher sind das wenige Millisekunden,
+   *  ueber eine Bluetooth-Box gerne 200 bis 400. Web Audio weiss das
+   *  und sagt es; wo es die Angabe nicht gibt, bleibt es bei null. */
+  Motor.prototype.ausgabeVerzug = function () {
+    if (!this.ctx) { return 0; }
+    var b = this.ctx.baseLatency || 0;
+    var a = this.ctx.outputLatency || 0;
+    return b + a;
+  };
+
+  /** Wann ist ein Ton, der bei `wann` beginnt und `dauer` lang klingt,
+   *  beim MIKROFON verklungen?
+   *
+   *  Dazu gehoert das Absetzen (das rechnet der Sampler dazu) und die
+   *  Laufzeit des Ausgabewegs. Wer erst danach zuhoert, hoert nicht
+   *  sich selbst.
+   *
+   *  Genau daran hing ein Fehler: Level 1 wartete stattdessen feste
+   *  1,7 Sekunden. Der eigene Ton endet aber erst nach 1,73 s, und ueber
+   *  eine Bluetooth-Box kommt er noch einmal Hunderte Millisekunden
+   *  spaeter an. Ab etwa einer halben Sekunde Laufzeit hoerte die App
+   *  ihren eigenen Vorspielton und lobte das Kind dafuer, dass sie
+   *  selbst gespielt hatte.
+   *
+   *  Gerechnet wird bewusst mit DIESEM Ton und nicht mit spieltBis.
+   *  spieltBis ist eine Hoechstmarke ueber alles bisher Eingeplante —
+   *  auch ueber das Lobmotiv — und laege damit weit in der Zukunft. */
+  Motor.prototype.klangEndeAmMikrofon = function (wann, dauer) {
+    if (!this.ctx) { return 0; }
+    var ausklang = this.sampler ? this.sampler.ausklang() : 0.35;
+    return wann + dauer + ausklang + this.ausgabeVerzug();
   };
 
   Motor.prototype.hoertSichSelbst = function () {
@@ -536,15 +419,9 @@
 
   Motor.prototype._analyseAufbauen = function () {
     var selbst = this;
-    var optionen = {
-      hopSize: 128,
-      windowSize: this.erkennung.fensterGroesse || 1536,
-      pitchEvery: this.erkennung.tonhoeheJedenNtenHop || 6,
-      fMin: this.erkennung.fMinHz || 420,
-      fMax: this.erkennung.fMaxHz || 2600,
-      highpassHz: this.erkennung.hochpassHz || 300,
-      riseDb: this.erkennung.wiederholungEinbruchDb || 6
-    };
+    /* Die Umrechnung steht in dsp.js, damit Mikrofon und Pruefstand
+     * garantiert dieselbe Analyse fahren. */
+    var optionen = root.DSP.optionenAus(this.erkennung);
 
     if (this.ctx.audioWorklet && root.AudioWorkletNode) {
       return this._worklet(optionen).then(null, function () {

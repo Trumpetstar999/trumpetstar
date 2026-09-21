@@ -53,21 +53,23 @@
   /* ------------------------------------------------------------------ */
   /* YIN                                                                 */
   /* ------------------------------------------------------------------ */
-  /* TROMPETE: der Suchbereich liegt eine ganze Oktave tiefer als bei der
-   * Blockfloete. Notiertes c1 klingt auf der B-Trompete b0 = 233 Hz; 80
-   * Cent zu tief sind 222 Hz. tauMax entspricht deshalb 190 Hz.
+  /* Der Suchbereich wird bewusst eng gefuehrt: die tiefste real
+   * klingende Frequenz ist B = 233 Hz (notiert c1 auf der B-Trompete),
+   * die hoechste der Nachbarteilton von d2 = 628 Hz. tauMax entspricht
+   * 200 Hz — tief genug, um ein um 80 Cent zu tief geblasenes c1
+   * (223 Hz) noch zu fassen, und hoch genug, dass YIN nicht in eine
+   * Unteroktave rutschen kann.
    *
-   * Damit YIN bei so tiefen Toenen noch genug Perioden sieht, muss das
-   * Fenster groesser sein als bei der Blockfloete: 1536 statt 1024
-   * Samples. Mit den alten Werten (1024 / 420 Hz) versagt die Erkennung
-   * bei sechs von neun Toenen — nachgemessen, nicht geschaetzt. */
+   * Die Vorgaben unten sind nur der Rueckfall. Verbindlich sind die
+   * Werte aus toene.json; optionenAus() rechnet sie um, und sowohl der
+   * Motor als auch der Pruefstand gehen durch diese eine Funktion. */
 
   function Yin(sampleRate, opts) {
     opts = opts || {};
     this.sampleRate = sampleRate;
-    this.windowSize = opts.windowSize || 1536;
-    this.fMin = opts.fMin || 190;
-    this.fMax = opts.fMax || 2600;
+    this.windowSize = opts.windowSize || 2048;
+    this.fMin = opts.fMin || 200;
+    this.fMax = opts.fMax || 1250;
     this.threshold = opts.threshold || 0.15;
 
     this.tauMin = Math.max(2, Math.floor(sampleRate / this.fMax));
@@ -139,10 +141,12 @@
   /* ------------------------------------------------------------------ */
   /* Einsatz-Erkennung (Energieanstieg auf der dB-Huellkurve)            */
   /* ------------------------------------------------------------------ */
-  /* Ein fester Millisekunden-Blick zurueck reicht nicht: eine
-   * Blockfloete ohne Zungenstoss steigt langsam an. Wir suchen deshalb
-   * im Rueckblickfenster das Minimum und datieren den Einsatz dorthin
-   * zurueck, wo der Anstieg begonnen hat.                               */
+  /* Ein fester Millisekunden-Blick zurueck reicht nicht: ein Kind, das
+   * die Zunge noch nicht gebraucht, blaest den Ton langsam an statt ihn
+   * anzustossen. Wir suchen deshalb im Rueckblickfenster das Minimum
+   * und datieren den Einsatz dorthin zurueck, wo der Anstieg begonnen
+   * hat. Bei sauberem Zungenstoss aendert das nichts — dort faellt das
+   * Minimum mit dem Anstieg zusammen.                                   */
 
   function OnsetDetector(opts) {
     opts = opts || {};
@@ -218,7 +222,7 @@
     opts = opts || {};
     this.sampleRate = sampleRate;
     this.hopSize = opts.hopSize || 128;
-    this.windowSize = opts.windowSize || 1536;
+    this.windowSize = opts.windowSize || 2048;
     this.pitchEvery = opts.pitchEvery || 6;          // Hops zwischen YIN-Laeufen
     this.ringSize = 8192;
     this.ring = new Float32Array(this.ringSize);
@@ -227,35 +231,20 @@
     this.hopCount = 0;
     this.samplesSeen = 0;
 
-    this.highpass = new Highpass(sampleRate, opts.highpassHz || 130);
+    this.highpass = new Highpass(sampleRate, opts.highpassHz || 120);
     this.yin = new Yin(sampleRate, {
       windowSize: this.windowSize,
-      fMin: opts.fMin || 190,
-      fMax: opts.fMax || 2600,
+      fMin: opts.fMin || 200,
+      fMax: opts.fMax || 1250,
       threshold: opts.yinThreshold || 0.15
     });
     var proHop = 1000 * this.hopSize / sampleRate;
     this.onsetOpt = {
       riseDb: opts.riseDb != null ? opts.riseDb : 6,
       lookback: Math.max(6, Math.round((opts.onsetLookbackMs || 70) / proHop)),
-      /* Sperrzeit zwischen zwei Einsaetzen. Die kuerzeste Note im Spiel
-       * ist eine Viertel bei 100 BPM = 600 ms; 300 ms Sperre koennen
-       * also nie eine echte Note verschlucken, halten aber jedes
-       * Nachfeuern im gehaltenen Ton sicher zurueck. */
-      minIOIHops: Math.max(4, Math.round((opts.minIOIMs || 300) / proHop))
+      minIOIHops: Math.max(4, Math.round((opts.minIOIMs || 150) / proHop))
     };
     this.onset = new OnsetDetector(this.onsetOpt);
-
-    /* Geglaettete Huellkurve fuer die Einsatzerkennung.
-     *
-     * Blechklang schwebt in der Lautstaerke deutlich staerker als
-     * Floetenklang: zehn kraeftige Teiltoene mit leicht
-     * unterschiedlicher Tonhoehe erzeugen Schwebungen von mehreren
-     * Dezibel. Ungeglaettet feuert der Einsatzdetektor dann mitten im
-     * gehaltenen Ton immer wieder nach — gemessen 15 bis 21 Einsaetze
-     * statt der fuenf gespielten Noten. */
-    this.dbGlatt = -90;
-    this.glaettung = opts.glaettung != null ? opts.glaettung : 0.28;
 
     this.absoluteFloorDb = opts.absoluteFloorDb != null ? opts.absoluteFloorDb : -62;
     this.gateMarginDb = opts.gateMarginDb != null ? opts.gateMarginDb : 12;
@@ -348,9 +337,7 @@
     if (this.noiseFloorDb < -90) { this.noiseFloorDb = -90; }
     var gateDb = Math.max(this.absoluteFloorDb, this.noiseFloorDb + this.gateMarginDb);
 
-    if (this.dbGlatt < -89) { this.dbGlatt = db; }
-    this.dbGlatt += (db - this.dbGlatt) * this.glaettung;
-    var onsetHit = this.onset.push(this.dbGlatt, gateDb);
+    var onsetHit = this.onset.push(db, gateDb);
 
     // Tonhoehe nur jeden n-ten Hop — spart auf altem Geraet spuerbar CPU
     if (this.hopCount % this.pitchEvery === 0) {
@@ -417,7 +404,6 @@
     this.ringWrite = 0; this.pending = 0; this.hopCount = 0; this.samplesSeen = 0;
     this.anzahl = 0; this.verloren = 0;
     this.noiseFloorDb = -70;
-    this.dbGlatt = -90;
     this.onset = new OnsetDetector(this.onsetOpt);
     this.lastPitch = { freq: 0, clarity: 0 };
   };
@@ -431,11 +417,42 @@
     return 1200 * Math.log2(f1 / f2);
   }
 
+  /** Rechnet den Abschnitt 'erkennung' aus toene.json in die Optionen
+   *  des Analyzers um.
+   *
+   *  Diese Funktion gibt es, damit die Umrechnung genau EINMAL im
+   *  Projekt steht. Der Motor baut damit die Analyse fuer das echte
+   *  Mikrofon auf, der Pruefstand und die Tests bauen damit dieselbe
+   *  Analyse fuer synthetische Signale. Stuende sie an beiden Stellen,
+   *  wuerde eine Aenderung an toene.json frueher oder spaeter nur an
+   *  einer davon ankommen — und die Tests wuerden dann etwas anderes
+   *  pruefen als das, was auf dem iPad laeuft.
+   *
+   *  Fenstergroesse und Messtakt haengen an der Tonlage: die tiefe
+   *  B-Trompete braucht ein groesseres Fenster als eine Blockfloete
+   *  (YIN will mehrere Perioden sehen), und weil ein groesseres Fenster
+   *  teurer zu rechnen ist, laeuft die Tonhoehenmessung dafuer
+   *  seltener. Die Einsatzerkennung bleibt davon unberuehrt bei jedem
+   *  Hop — sie bestimmt das Timing, nicht die Tonhoehe. */
+  function optionenAus(erkennung) {
+    var e = erkennung || {};
+    return {
+      hopSize: 128,
+      windowSize: e.fensterProben || 2048,
+      pitchEvery: e.tonhoeheJedeHops || 6,
+      fMin: e.fMinHz || 200,
+      fMax: e.fMaxHz || 1250,
+      highpassHz: e.hochpassHz || 120,
+      riseDb: e.wiederholungEinbruchDb || 6
+    };
+  }
+
   return {
     Highpass: Highpass,
     Yin: Yin,
     OnsetDetector: OnsetDetector,
     Analyzer: Analyzer,
-    centsBetween: centsBetween
+    centsBetween: centsBetween,
+    optionenAus: optionenAus
   };
 });

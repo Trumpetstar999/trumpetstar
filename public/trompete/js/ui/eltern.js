@@ -63,36 +63,65 @@
         selbst._fuellen();
       });
     }
-    var reihe = document.getElementById('eltern-stimmung');
-    [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
-      b.addEventListener('click', function () {
-        var art = b.getAttribute('data-art');
-        var vorher = selbst.k.fortschritt.stimmung();
-        selbst.k.fortschritt.setzeStimmung(art);
-        selbst.k.stimmungAnwenden();
-        /* Instrumentwechsel zieht den passenden Klang mit: das Horn
-         * klingt nicht wie eine Trompete. Umgekehrt genauso. */
-        var motor = selbst.k.motor;
-        if (motor && motor.klangWaehlen && art !== vorher) {
-          if (art === 'F' && motor.klang !== 'synthhorn') { motor.klangWaehlen('synthhorn'); }
-          else if (art !== 'F' && motor.klang === 'synthhorn') { motor.klangWaehlen(''); }
-        }
-        selbst._stimmungZeigen();
-        selbst._klangZeigen();
-      });
-    });
-
-    var start = document.getElementById('eltern-startton');
-    if (start) {
-      [].slice.call(start.querySelectorAll('button')).forEach(function (b) {
+    var strenge = document.getElementById('eltern-schwierigkeit');
+    if (strenge) {
+      [].slice.call(strenge.querySelectorAll('button')).forEach(function (b) {
         b.addEventListener('click', function () {
-          selbst.k.fortschritt.setzeStartton(b.getAttribute('data-start'));
-          selbst._fuellen();
+          selbst.k.fortschritt.setzeSchwierigkeit(b.getAttribute('data-art'));
+          selbst.k.schwierigkeitAnwenden();
+          selbst._strengeZeigen();
+        });
+      });
+    }
+    /* Instrument: Trompete in B, Horn in F, Horn in Es, Tenorhorn.
+     *
+     * Danach laedt die App neu. Daran haengen die klingenden Frequenzen
+     * aller Toene, der Hoerbereich der Erkennung, der Klang und das
+     * Griffbild — ein halber Wechsel waere schlimmer als ein kurzer
+     * Neustart. Der Fortschritt liegt im Speicher des Geraets. */
+    var instrumentreihe = document.getElementById('eltern-instrument');
+    if (instrumentreihe) {
+      [].slice.call(instrumentreihe.querySelectorAll('button')).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var id = b.getAttribute('data-instrument');
+          if (id === root.Instrument.id()) { return; }
+          root.Instrument.setzen(id);
+          root.location.reload();
         });
       });
     }
 
-    this._klangprobe();
+    var farbreihe = document.getElementById('eltern-notenfarbe');
+    if (farbreihe) {
+      [].slice.call(farbreihe.querySelectorAll('button')).forEach(function (b) {
+        b.addEventListener('click', function () {
+          selbst.k.fortschritt.setzeNotenfarbe(b.getAttribute('data-art'));
+          selbst.k.notenfarbeAnwenden();
+          selbst._notenfarbeZeigen();
+        });
+      });
+    }
+    var buchreihe = document.getElementById('eltern-buchnotenfarbe');
+    if (buchreihe) {
+      [].slice.call(buchreihe.querySelectorAll('button')).forEach(function (b) {
+        b.addEventListener('click', function () {
+          selbst.k.fortschritt.setzeBuchNotenfarbe(b.getAttribute('data-art'));
+          selbst._notenfarbeZeigen();
+        });
+      });
+    }
+    /* Die drei Flaggen. Sie schalten nur den Elternbereich um — das
+     * Kind sieht in dieser App ohnehin keinen einzigen Satz. */
+    var sprachreihe = document.getElementById('sprachwahl');
+    if (sprachreihe) {
+      [].slice.call(sprachreihe.querySelectorAll('button')).forEach(function (b) {
+        b.addEventListener('click', function () {
+          selbst.k.fortschritt.setzeSprache(b.getAttribute('data-sprache'));
+          root.Sprachen.setzen(selbst.k.fortschritt.sprache());
+          selbst._fuellen();          // Tabelle und Hinweise neu schreiben
+        });
+      });
+    }
 
     document.getElementById('eltern-zu').addEventListener('click', function () { selbst.schliessen(); });
     document.getElementById('eltern-reset').addEventListener('click', function () {
@@ -100,64 +129,6 @@
       selbst._fuellen();
     });
   };
-
-  /** Klangprobe: alle Trompetentoene einzeln zum Anhoeren. */
-  Eltern.prototype._klangprobe = function () {
-    var selbst = this;
-    var wahl = document.getElementById('eltern-klang-ton');
-    var knopf = document.getElementById('eltern-klang-hoeren');
-    if (!wahl || !knopf) { return; }
-
-    var toene = this.k.toene || [];
-    wahl.innerHTML = '';
-    toene.forEach(function (t) {
-      var o = document.createElement('option');
-      o.value = t.id;
-      var tier = (t.tierName || '').split('/')[0].trim();
-      o.textContent = t.id + (tier ? ' — ' + tier : '');
-      wahl.appendChild(o);
-    });
-
-    /* Klangfarbe: gilt fuer das ganze Spiel und wird gespeichert. */
-    var farbe = document.getElementById('eltern-klang-farbe');
-    var motor0 = this.k.motor;
-    var farben = (root.Motor && root.Motor.KLANGFARBEN) || [{ id: '', name: 'Warm (Standard)' }];
-    if (farbe) {
-      farbe.innerHTML = '';
-      farben.forEach(function (f) {
-        var o = document.createElement('option');
-        o.value = f.id;
-        o.textContent = f.name;
-        if (motor0 && motor0.klang === f.id) { o.selected = true; }
-        farbe.appendChild(o);
-      });
-      farbe.addEventListener('change', function () {
-        var motor = selbst.k.motor;
-        if (!motor || !motor.klangWaehlen) { return; }
-        farbe.disabled = true;
-        var fertig = function () { farbe.disabled = false; hoeren(); };
-        var p = motor.klangWaehlen(farbe.value);
-        if (p && p.then) { p.then(fertig, fertig); } else { fertig(); }
-      });
-    }
-
-    function hoeren() {
-      var motor = selbst.k.motor;
-      if (!motor) { return; }
-      var spielen = function () { motor.spieleTon(wahl.value, { dauer: 1.6 }); };
-      if (motor.aufwecken) {
-        var p = motor.aufwecken();
-        if (p && p.then) { p.then(spielen, spielen); } else { spielen(); }
-      } else {
-        spielen();
-      }
-    }
-
-    knopf.addEventListener('click', hoeren);
-    wahl.addEventListener('change', hoeren);
-  };
-
-
 
   Eltern.prototype.oeffnen = function () {
     this._abbrechen();
@@ -172,51 +143,70 @@
     this.offen = false;
     if (this.mikroUhr) { clearInterval(this.mikroUhr); this.mikroUhr = null; }
     this.k.bildschirm('auswahl');
+    /* Neu aufbauen: auf den Karten stehen Noten, und die koennen sich
+     * gerade in der Farbe geaendert haben. */
+    if (this.k.auswahl) { this.k.auswahl.aufbauen(); }
   };
 
-  Eltern.prototype._stimmungZeigen = function () {
-    var jetzt = this.k.fortschritt.stimmung();
-    var reihe = document.getElementById('eltern-stimmung');
+  Eltern.prototype._strengeZeigen = function () {
+    var jetzt = this.k.fortschritt.schwierigkeit();
+    var reihe = document.getElementById('eltern-schwierigkeit');
+    if (!reihe) { return; }
     [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
       b.className = (b.getAttribute('data-art') === jetzt) ? 'an' : '';
     });
   };
 
-  /** Haelt das Klangfarben-Menue am gewaehlten Klang. */
-  Eltern.prototype._klangZeigen = function () {
-    var farbe = document.getElementById('eltern-klang-farbe');
-    var motor = this.k.motor;
-    if (farbe && motor) { farbe.value = motor.klang || ''; }
-  };
-
-
-  Eltern.prototype._starttonZeigen = function () {
-    var jetzt = this.k.fortschritt.startton();
-    var reihe = document.getElementById('eltern-startton');
+  Eltern.prototype._instrumentZeigen = function () {
+    var jetzt = root.Instrument.id();
+    var reihe = document.getElementById('eltern-instrument');
     if (!reihe) { return; }
     [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
-      b.className = (b.getAttribute('data-start') === jetzt) ? 'an' : '';
+      var an = b.getAttribute('data-instrument') === jetzt;
+      b.className = an ? 'an' : '';
+      b.setAttribute('aria-pressed', an ? 'true' : 'false');
     });
   };
 
+  Eltern.prototype._notenfarbeZeigen = function () {
+    var f = this.k.fortschritt;
+    [['eltern-notenfarbe', f.notenfarbe()], ['eltern-buchnotenfarbe', f.buchNotenfarbe()]].forEach(function (paar) {
+      var reihe = document.getElementById(paar[0]);
+      if (!reihe) { return; }
+      [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
+        b.className = (b.getAttribute('data-art') === paar[1]) ? 'an' : '';
+      });
+    });
+  };
+
+  Eltern.prototype._spracheZeigen = function () {
+    var jetzt = root.Sprachen.jetzt();
+    var reihe = document.getElementById('sprachwahl');
+    if (!reihe) { return; }
+    [].slice.call(reihe.querySelectorAll('button')).forEach(function (b) {
+      var an = b.getAttribute('data-sprache') === jetzt;
+      b.className = an ? 'an' : '';
+      b.setAttribute('aria-pressed', an ? 'true' : 'false');
+    });
+  };
 
   Eltern.prototype._fuellen = function () {
     var selbst = this;
-    this._stimmungZeigen();
-    this._starttonZeigen();
-    this._klangZeigen();
-
-
+    this._spracheZeigen();
+    this._instrumentZeigen();
+    this._strengeZeigen();
+    this._notenfarbeZeigen();
     var koerper = document.querySelector('#eltern-quoten tbody');
     koerper.innerHTML = '';
     this.k.fortschritt.bericht().forEach(function (z) {
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td><span class="tonpunkt" style="background:' + z.farbe + '"></span></td>' +
-        '<td>' + z.id + (z.imVorrat ? '' : ' (noch nicht dabei)') + '</td>' +
+        '<td>' + root.Sprachen.ton(z.id) +
+          (z.imVorrat ? '' : ' ' + root.Sprachen.t('tab.nichtDabei', '(noch nicht dabei)')) + '</td>' +
         '<td class="zahl">' + (z.quote === null ? '–' : Math.round(z.quote * 100) + ' %') + '</td>' +
         '<td class="zahl">' + z.treffer + ' / ' + z.versuche + '</td>' +
-        '<td class="zahl">' + (z.sitzt ? 'sitzt' : '') + '</td>';
+        '<td class="zahl">' + (z.sitzt ? root.Sprachen.t('tab.sitzt', 'sitzt') : '') + '</td>';
       koerper.appendChild(tr);
     });
 
@@ -228,18 +218,21 @@
     var selbst = this;
     var reihe = document.getElementById('eltern-vorrat');
     reihe.innerHTML = '';
-    var vorrat = this.k.fortschritt.vorrat();
+    var vorrat = this.k.fortschritt.vorratGesamt();
 
-    this.k.fortschritt.reihenfolge().forEach(function (t) {
-
+    this.k.toene.slice().sort(function (a, b) {
+      return a.freischaltReihenfolge - b.freischaltReihenfolge;
+    }).forEach(function (t) {
       var drin = vorrat.indexOf(t.id) >= 0;
       var b = document.createElement('button');
       b.className = drin ? 'an' : '';
       b.setAttribute('data-ton', t.id);
       b.innerHTML =
         '<span class="punktchen" style="background:' + t.farbe + '"></span>' +
-        '<span>' + t.id + '</span>' +
-        '<span class="zustand">' + (drin ? 'dabei' : 'aus') + '</span>';
+        '<span>' + root.Sprachen.ton(t.id) + '</span>' +
+        '<span class="zustand">' +
+          (drin ? root.Sprachen.t('ton.dabei', 'dabei') : root.Sprachen.t('ton.aus', 'aus')) +
+        '</span>';
       // Der letzte verbliebene Ton bleibt an: ohne Ton gibt es nichts zu ueben.
       if (drin && vorrat.length === 1) { b.disabled = true; }
       b.addEventListener('click', function () {
@@ -254,11 +247,14 @@
     if (automatik) { automatik.disabled = !hand; }
     var hinweis = document.getElementById('eltern-vorrat-hinweis');
     if (hinweis) {
-      hinweis.textContent = hand
-        ? 'Von Hand gewählt: ' + vorrat.join(', ') +
-          '. Die App schaltet zurzeit keine Töne selbst dazu.'
-        : 'Automatisch: die App nimmt einen neuen Ton dazu, sobald der letzte sitzt. '
-          + 'Zurzeit ' + vorrat.join(', ') + '.';
+      var liste = vorrat.map(function (id) { return root.Sprachen.ton(id); }).join(', ');
+      hinweis.textContent = (hand
+        ? root.Sprachen.t('vorrat.hand',
+            'Von Hand gewählt: {liste}. Die App schaltet zurzeit keine Töne selbst dazu.')
+        : root.Sprachen.t('vorrat.auto',
+            'Automatisch: die App nimmt einen neuen Ton dazu, sobald der letzte sitzt. '
+            + 'Zurzeit {liste}.')
+      ).replace('{liste}', liste);
     }
   };
 
@@ -273,10 +269,12 @@
 
     var k = f.freq ? t.naechsterTon(f.freq) : null;
     setz('mikro-ton', (f.above && k && f.clarity >= this.k.erkennung.clarityMin)
-      ? (k.tonId + (k.oktave ? ' (überblasen)' : '')) : '–');
+      ? (root.Sprachen.ton(k.tonId) +
+         (k.oktave ? ' ' + root.Sprachen.t('mikro.naturton', '(anderer Naturton)') : '')) : '–');
     setz('mikro-hz', f.freq ? f.freq.toFixed(1) + ' Hz' : '–');
     setz('mikro-cent', (f.above && k && f.clarity >= this.k.erkennung.clarityMin)
-      ? (k.cents >= 0 ? '+' : '') + k.cents.toFixed(0) + ' Cent' : '–');
+      ? (k.cents >= 0 ? '+' : '') + k.cents.toFixed(0) + ' ' +
+        root.Sprachen.t('einheit.cent', 'Cent') : '–');
     setz('mikro-db', f.db.toFixed(1) + ' dB');
     setz('mikro-gate', f.gateDb != null ? f.gateDb.toFixed(1) + ' dB' : '–');
 

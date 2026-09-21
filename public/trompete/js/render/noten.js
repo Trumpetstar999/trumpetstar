@@ -66,6 +66,22 @@
   var SCHLUESSEL = null;
   var HAKEN_Y = -2.40;
 
+  /* Kleinster erlaubter Massstab des Violinschluessels. Darunter
+   * bliebe seine obere Schlaufe unter der obersten Notenlinie. */
+  var SK_MIN = 0.85;
+
+  /* Schwarzer Notensatz.
+   *
+   * Die bunten Koepfe sind die Bruecke zwischen Griffbild, Tier und
+   * Ton — fuer den Anfang genau richtig. Irgendwann muss das Kind aber
+   * Noten lesen, wie sie ueberall sonst gedruckt sind: alle schwarz.
+   * Dieser Schalter macht daraus ein normales Notenbild, ohne dass
+   * sich sonst irgendetwas aendert. Er gilt fuer die App; das Buch
+   * setzt ihn nie und bleibt bunt. */
+  var EINFARBIG = false;
+  function tonFarbe(ton) { return EINFARBIG ? 'var(--linie)' : ton.farbe; }
+  function tonRand(ton) { return EINFARBIG ? 'var(--linie)' : ton.farbeRand; }
+
   /* ---------------------------------------------------------------- */
 
   /** Ermittelt die groesstmoegliche Zwischenraum-Groesse Z (in px). */
@@ -123,27 +139,50 @@
       : o.melodie.noten;
     var klingend = noten.filter(function (n) { return !n.pause; });
 
+    /* Lange Lieder brechen in zwei Zeilen um — wie im Buch. Vier Takte
+     * passen in eine Zeile; ein ganzes Lied mit acht oder zwoelf
+     * Takten wird sonst zum unlesbaren Wurm. Der Buchsatz zerlegt
+     * selbst in Systeme und gibt notenAbstand vor — dort bleibt es
+     * bei einer Zeile je Aufruf. */
+    var zeilenzahl = (!einzeln && !o.notenAbstand && o.melodie.takte.length > 4) ? 2 : 1;
+    var zeilenTakte = [];
+    if (zeilenzahl === 2) {
+      var halb = Math.ceil(o.melodie.takte.length / 2);
+      zeilenTakte = [o.melodie.takte.slice(0, halb), o.melodie.takte.slice(halb)];
+    } else if (!einzeln) {
+      zeilenTakte = [o.melodie.takte];
+    }
+
     // Immer das ganze System: fuenf Linien und der Violinschluessel,
     // auch bei einem einzelnen Ton. So sieht das Kind von Anfang an
     // dasselbe Bild wie in richtigen Noten.
     // Mindestbreite je Dauereinheit; ein Notenkopf ist 1.26 breit.
-    var notenAbstand = einzeln ? 1.45 : 1.54;
+    /* Der Notenabstand darf von aussen vorgegeben werden. Die App
+     * tut das nie — sie laesst jede Zeile so breit werden, wie sie
+     * wird. Der Buchsatz braucht es: dort muessen alle Systeme einer
+     * Seite gleich breit sein, sonst franst die Seite rechts aus. */
+    var notenAbstand = o.notenAbstand || (einzeln ? 1.45 : 1.54);
     var mitSchluessel = o.violinschluessel !== false;
-    /* Platz fuer die Taktstriche: vor jedem neuen Takt eine Luecke,
-     * damit ein Strich nie einen Notenkopf beruehrt, und am Ende der
-     * Zeile ein Schlussstrich. */
-    var taktzahl = einzeln ? 1 : o.melodie.takte.length;
     var strichLuecke = 0.62;
     var schlussPlatz = 0.55;                 // fuer den Schlussstrich
     var randRechts = einzeln ? 0.6 : 0.9;    // muss zu `rand` in masse() passen
-    var strichPlatz = einzeln ? 0 : (taktzahl - 1) * strichLuecke + schlussPlatz;
 
-    var gesamtGewicht = 0;
-    for (var gi = 0; gi < noten.length; gi++) {
-      gesamtGewicht += Math.pow(noten[gi].dauer, 0.55);
+    /* Gewicht und Taktzahl der VOLLSTEN Zeile bestimmen die Groesse. */
+    function zeilenGewicht(takte) {
+      var g2 = 0;
+      takte.forEach(function (t) {
+        t.forEach(function (n2) { g2 += Math.pow(n2.dauer, 0.55); });
+      });
+      return g2;
     }
+    var maxGewicht = 0, maxTakte = 1;
+    zeilenTakte.forEach(function (zt) {
+      maxGewicht = Math.max(maxGewicht, zeilenGewicht(zt));
+      maxTakte = Math.max(maxTakte, zt.length);
+    });
+    var strichPlatz = einzeln ? 0 : (maxTakte - 1) * strichLuecke + schlussPlatz;
 
-    /* Wie weit reicht der Inhalt nach oben und unten?
+    /* Wie weit reicht der Inhalt einer Zeile nach oben und unten?
      * Immer mindestens das ganze System (-2 bis +2). */
     var yOben = -2, yUnten = 2;
     for (var yi = 0; yi < noten.length; yi++) {
@@ -162,135 +201,190 @@
     if (!einzeln) { yOben = Math.min(yOben, HAKEN_Y - 0.36); }   // Platz fuers Haekchen
     yOben -= 0.18; yUnten += 0.18;                                // Luft am Rand
 
+    /* Der Violinschluessel braucht seinen Platz.
+     *
+     * Sein Pfad reicht von y = -3.22 bis +3.06, die Einrollung sitzt
+     * auf der g-Linie (y = +1). Bei Massstab sk liegt sein oberer
+     * Punkt bei 1 - 4.22 sk, sein unterer bei 1 + 2.06 sk. Damit die obere Schlaufe IMMER ueber die
+     * oberste Notenlinie (y = -2) hinausragt, darf sk nie unter 0.71
+     * fallen; wir setzen die Untergrenze mit Reserve auf SK_MIN.
+     *
+     * Der so gebrauchte Raum wird hier in die Zeilenhoehe eingerechnet
+     * — sonst waere der Schluessel zwar gross genug, aber angeschnitten. */
+    if (mitSchluessel) {
+      yOben = Math.min(yOben, 1 - 4.22 * SK_MIN - 0.12);
+      yUnten = Math.max(yUnten, 1 + 2.06 * SK_MIN + 0.12);
+    }
+
+    /* Der Abstand zwischen zwei Zeilen, in Zwischenraum-Einheiten. */
+    var zeilenLuft = 0.9;
+    var zeilenHoehe = yUnten - yOben;
+
     var z = masse({
       einzeln: einzeln,
-      gewichtSumme: einzeln ? 1 : gesamtGewicht,
+      gewichtSumme: einzeln ? 1 : maxGewicht,
       notenAbstand: notenAbstand,
       violinschluessel: mitSchluessel,
       strichPlatz: strichPlatz,
-      yOben: yOben, yUnten: yUnten,
+      yOben: yOben,
+      yUnten: yOben + zeilenHoehe * zeilenzahl + zeilenLuft * (zeilenzahl - 1),
       breitePx: o.breitePx, hoehePx: o.hoehePx
     });
 
     var breiteZ = o.breitePx / z, hoeheZ = o.hoehePx / z;
+    var gesamtHoehe = zeilenHoehe * zeilenzahl + zeilenLuft * (zeilenzahl - 1);
     /* Der Ausschnitt wird um die Mitte des Inhalts gelegt, nicht um die
      * Mittellinie — sonst rutschte eine Zeile mit tiefen Toenen aus dem
      * Bild. */
-    var inhaltMitte = (yOben + yUnten) / 2;
+    var inhaltMitte = yOben + gesamtHoehe / 2;
     var oben = inhaltMitte - hoeheZ / 2, links = 0;
     svg.setAttribute('viewBox', links + ' ' + oben + ' ' + breiteZ + ' ' + hoeheZ);
     svg.setAttribute('width', o.breitePx);
     svg.setAttribute('height', o.hoehePx);
 
-    var g = el('g', {});
-    svg.appendChild(g);
-
-    /* Notenlinien — fuenf Stueck, auch wenn zwei aus dem Bild laufen */
-    /* Die Notenlinien enden dort, wo der Schlussstrich steht — er
-     * gehoert immer ans Ende der Zeile, nicht irgendwo davor. */
-    var linienEnde = breiteZ - 0.25;
-    var linienStaerke = 0.115;
-    for (var L = -2; L <= 2; L++) {
-      g.appendChild(el('line', {
-        x1: 0.2, y1: L, x2: linienEnde, y2: L,
-        stroke: 'var(--linie)', 'stroke-width': linienStaerke, 'stroke-linecap': 'round'
-      }));
-    }
-
-    var x = mitSchluessel ? 0.55 : 0.6;
-    if (mitSchluessel) {
-      /* So gross wie moeglich, aber nie ueber den Rand hinaus. Der
-       * Ausschnitt liegt nicht mehr zwangslaeufig symmetrisch um die
-       * Mittellinie — deshalb wird gegen beide Raender einzeln
-       * gerechnet. Der Schluesselpfad reicht von y = -3.22 bis +3.06,
-       * die Einrollung sitzt auf y = +1. */
-      var unten = oben + hoeheZ;
-      var sk = Math.min(1,
-                        (1 - (oben + 0.12)) / 4.22,
-                        ((unten - 0.12) - 1) / 2.06);
-      if (!(sk > 0)) { sk = 0.2; }
-      g.appendChild(el('path', {
-        d: SCHLUESSEL,
-        transform: 'translate(' + (x + 1.05 * sk) + ',' + (1 - sk) + ') scale(' + sk.toFixed(4) + ')',
-        fill: 'none', stroke: 'var(--linie)',
-        'stroke-width': (0.155 / sk).toFixed(4),
-        'stroke-linecap': 'round', 'stroke-linejoin': 'round'
-      }));
-      x += 2.45 * sk;
-    }
-
-    /* Noten setzen: Abstand proportional zur Dauer, aber gestaucht,
-     * damit eine Ganze nicht das halbe System frisst. Die Taktstriche
-     * bekommen eine eigene Luecke — so beruehren sie nie einen Kopf. */
-    var i;
-    var verfuegbar = breiteZ - x - randRechts - strichPlatz;
-    var proGewicht = einzeln ? 0 : verfuegbar / gesamtGewicht;
-
     var positionen = [];
-    var letzterTakt = -1;
 
-    for (i = 0; i < noten.length; i++) {
-      var n = noten[i];
+    /* ---- Eine Zeile zeichnen -------------------------------------- */
+    function zeichneZeile(zeilenNoten, versatz, istLetzte, obenClip, untenClip) {
+      var g = el('g', { transform: versatz ? 'translate(0,' + versatz.toFixed(4) + ')' : null });
+      svg.appendChild(g);
 
-      if (!einzeln && n.takt !== letzterTakt) {
-        if (n.takt > 0) {
-          x += strichLuecke / 2;
+      /* Notenlinien — enden BUENDIG am letzten Taktstrich. Runde
+       * Linienenden ragten darueber hinaus; deshalb stumpfe Enden. */
+      var linienEnde = breiteZ - 0.25;
+      var linienStaerke = 0.085;   /* schlank wie im Notensatz */
+      for (var L = -2; L <= 2; L++) {
+        g.appendChild(el('line', {
+          x1: 0.2, y1: L, x2: linienEnde, y2: L,
+          stroke: 'var(--linie)', 'stroke-width': linienStaerke, 'stroke-linecap': 'butt'
+        }));
+      }
+
+      var x = mitSchluessel ? 0.55 : 0.6;
+      if (mitSchluessel) {
+        /* So gross wie moeglich, aber nie ueber den Rand der eigenen
+         * Zeile hinaus. Der Schluesselpfad reicht von y = -3.22 bis
+         * +3.06, die Einrollung sitzt auf y = +1. */
+        var sk = Math.min(1,
+                          (1 - (obenClip + 0.12)) / 4.22,
+                          ((untenClip - 0.12) - 1) / 2.06);
+        /* Nie kleiner als SK_MIN — sonst verschwindet die obere
+         * Schlaufe zwischen den Notenlinien und der Schluessel sieht
+         * aus wie ein Kringel. */
+        if (!(sk > SK_MIN)) { sk = SK_MIN; }
+        g.appendChild(el('path', {
+          d: SCHLUESSEL,
+          transform: 'translate(' + (x + 1.05 * sk) + ',' + (1 - sk) + ') scale(' + sk.toFixed(4) + ')',
+          fill: 'none', stroke: 'var(--linie)',
+          'stroke-width': (0.155 / sk).toFixed(4),
+          'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+        }));
+        x += 2.45 * sk;
+      }
+
+      /* Noten setzen: Abstand proportional zur Dauer. Jede Zeile
+       * verteilt ihre Noten auf die volle Breite — so enden beide
+       * Zeilen eines Liedes buendig rechts. */
+      var gewicht = 0, ti;
+      for (ti = 0; ti < zeilenNoten.length; ti++) {
+        gewicht += Math.pow(zeilenNoten[ti].dauer, 0.55);
+      }
+      var zeilenStriche = einzeln ? 0 :
+        ((zeilenNoten.length ? (zeilenNoten[zeilenNoten.length - 1].takt - zeilenNoten[0].takt) : 0)
+         * strichLuecke + schlussPlatz);
+      var verfuegbar = breiteZ - x - randRechts - zeilenStriche;
+      var proGewicht = einzeln ? 0 : verfuegbar / gewicht;
+
+      var ersterTakt = zeilenNoten.length ? zeilenNoten[0].takt : 0;
+      var letzterTakt = ersterTakt - 1;
+
+      for (var i = 0; i < zeilenNoten.length; i++) {
+        var n = zeilenNoten[i];
+
+        if (!einzeln && o.taktstriche !== false && n.takt !== letzterTakt) {
+          if (n.takt > ersterTakt) {
+            x += strichLuecke / 2;
+            g.appendChild(el('line', {
+              x1: x, y1: -2, x2: x, y2: 2,
+              stroke: 'var(--linie)', 'stroke-width': 0.075
+            }));
+            x += strichLuecke / 2;
+          }
+          letzterTakt = n.takt;
+        }
+
+        var breiteSlot = einzeln ? 0 : Math.pow(n.dauer, 0.55) * proGewicht;
+        // Die einzelne Note aus Level 1 steht mittig in dem Raum, der
+        // NACH dem Violinschluessel uebrig bleibt.
+        var mitte = einzeln ? (x + (breiteZ - randRechts - x) / 2)
+                            : x + breiteSlot / 2;
+
+        if (n.pause) {
+          zeichnePause(g, mitte, n.wert);
+        } else {
+          var ton = o.toene[n.tonId];
+          var y = -ton.stufe / 2;
+          var ki = klingend.indexOf(n);
+          hilfslinien(g, mitte, y);
+          zeichneNote(g, mitte, y, n.wert, ton, einzeln, ki);
+          /* Position absolut speichern (mit Zeilenversatz), damit der
+           * Marker und der Buchsatz sie direkt verwenden koennen. */
+          positionen.push({ index: noten.indexOf(n), x: mitte, y: y + versatz,
+                            tonId: n.tonId, klingendIndex: ki });
+          if (o.haken && o.haken.indexOf(ki) >= 0) { zeichneHaken(g, mitte, HAKEN_Y); }
+        }
+        x += breiteSlot;
+      }
+
+      /* Am Ende der Zeile: Schlussstrich nur, wenn das Stueck hier
+       * wirklich endet — sonst ein einfacher Taktstrich. */
+      if (!einzeln && o.taktstriche !== false) {
+        var schluss = istLetzte && o.schluss !== false;
+        if (!schluss) {
           g.appendChild(el('line', {
-            x1: x, y1: -2, x2: x, y2: 2,
+            x1: linienEnde - 0.0375, y1: -2, x2: linienEnde - 0.0375, y2: 2,
             stroke: 'var(--linie)', 'stroke-width': 0.075
           }));
-          x += strichLuecke / 2;
+        } else {
+          var dick = 0.2;
+          var xDick = linienEnde - dick / 2;
+          g.appendChild(el('line', {
+            x1: xDick - 0.26, y1: -2, x2: xDick - 0.26, y2: 2,
+            stroke: 'var(--linie)', 'stroke-width': 0.075
+          }));
+          g.appendChild(el('line', {
+            x1: xDick, y1: -2, x2: xDick, y2: 2,
+            stroke: 'var(--linie)', 'stroke-width': dick
+          }));
         }
-        letzterTakt = n.takt;
       }
-
-      var breiteSlot = einzeln ? 0 : Math.pow(n.dauer, 0.55) * proGewicht;
-      // Die einzelne Note aus Level 1 steht mittig in dem Raum, der
-      // NACH dem Violinschluessel uebrig bleibt — nicht in der Mitte
-      // der ganzen Flaeche, sonst klebt sie am Schluessel.
-      var mitte = einzeln ? (x + (breiteZ - randRechts - x) / 2)
-                          : x + breiteSlot / 2;
-
-      if (n.pause) {
-        zeichnePause(g, mitte);
-      } else {
-        var ton = o.toene[n.tonId];
-        var y = -ton.stufe / 2;
-        var ki = klingend.indexOf(n);
-        hilfslinien(g, mitte, y);
-        zeichneNote(g, mitte, y, n.wert, ton, einzeln, ki);
-        positionen.push({ index: i, x: mitte, y: y, tonId: n.tonId, klingendIndex: ki });
-        // Gruenes Haekchen ueber der Note, sobald sie richtig gespielt wurde
-        if (o.haken && o.haken.indexOf(ki) >= 0) { zeichneHaken(g, mitte, HAKEN_Y); }
-      }
-      x += breiteSlot;
     }
 
-    /* Schlussstrich: duenn, dann dick — buendig mit dem Ende der
-     * Notenlinien. */
-    if (!einzeln) {
-      var dick = 0.2;
-      var xDick = linienEnde - dick / 2;
-      g.appendChild(el('line', {
-        x1: xDick - 0.26, y1: -2, x2: xDick - 0.26, y2: 2,
-        stroke: 'var(--linie)', 'stroke-width': 0.075
-      }));
-      g.appendChild(el('line', {
-        x1: xDick, y1: -2, x2: xDick, y2: 2,
-        stroke: 'var(--linie)', 'stroke-width': dick
-      }));
+    if (einzeln) {
+      zeichneZeile(noten, 0, true, oben, oben + hoeheZ);
+    } else {
+      for (var zi = 0; zi < zeilenTakte.length; zi++) {
+        var zn = [];
+        zeilenTakte[zi].forEach(function (t) { t.forEach(function (n3) { zn.push(n3); }); });
+        var versatz = zi * (zeilenHoehe + zeilenLuft);
+        /* Der Schluessel jeder Zeile darf bis an die Zeilengrenzen. */
+        var zOben = (zi === 0) ? oben : yOben - 0.3;
+        var zUnten = (zi === zeilenTakte.length - 1) ? (oben + hoeheZ - versatz) : yUnten + 0.3;
+        zeichneZeile(zn, versatz, zi === zeilenTakte.length - 1, zOben, zUnten);
+      }
     }
 
-    /* Marker: ein weicher Ring um die Note, auf der wir gerade stehen */
+    /* Marker: ein weicher Ring um die Note, auf der wir gerade stehen.
+     * positionen tragen absolute Koordinaten — eine Zeichnung im
+     * Wurzel-SVG genuegt. */
     if (o.markerIndex >= 0) {
-      for (i = 0; i < positionen.length; i++) {
-        if (positionen[i].index === o.markerIndex) {
-          var m = el('circle', {
-            cx: positionen[i].x, cy: positionen[i].y, r: 0.95,
+      for (var mi = 0; mi < positionen.length; mi++) {
+        if (positionen[mi].index === o.markerIndex) {
+          svg.appendChild(el('circle', {
+            cx: positionen[mi].x, cy: positionen[mi].y, r: 0.95,
             fill: 'none', stroke: 'var(--marker)', 'stroke-width': 0.16,
             'class': 'marker-ring'
-          });
-          g.appendChild(m);
+          }));
           break;
         }
       }
@@ -328,16 +422,21 @@
       cx: cx, cy: cy, rx: rx, ry: ry,
       'data-note': klingendIndex == null ? null : klingendIndex,
       transform: 'rotate(-18 ' + cx + ' ' + cy + ')',
-      fill: offen ? 'var(--papier)' : ton.farbe,
-      stroke: ton.farbeRand,
-      'stroke-width': offen ? 0.085 : 0.085
+      /* Halbe und ganze Noten bleiben INNEN offen — dann laeuft die
+       * Notenlinie sichtbar durch den Kopf, so wie es im gedruckten
+       * Notensatz aussieht. Eine papierfarbene Fuellung wuerde die
+       * Linie ausradieren, und eine Note auf der Linie saehe aus, als
+       * schwebte sie daneben. */
+      fill: offen ? 'none' : tonFarbe(ton),
+      stroke: tonRand(ton),
+      'stroke-width': 0.085
     }));
     if (offen) {
       // Bei offenen Koepfen traegt der Ring die Farbe des Tons
       g.appendChild(el('ellipse', {
         cx: cx, cy: cy, rx: rx - 0.115, ry: ry - 0.115,
         transform: 'rotate(-18 ' + cx + ' ' + cy + ')',
-        fill: 'none', stroke: ton.farbe, 'stroke-width': 0.20
+        fill: 'none', stroke: tonFarbe(ton), 'stroke-width': 0.20
       }));
     }
   }
@@ -375,7 +474,26 @@
   }
 
   /* Viertelpause */
-  function zeichnePause(g, cx) {
+  /* Pausen sehen verschieden aus, je nachdem wie lang sie dauern —
+   * sonst lernt das Kind, dass ein Zeichen alles Moegliche heissen
+   * kann. Die Balken sitzen dort, wo sie im Notensatz sitzen:
+   *
+   *   Halbe Pause  liegt OBEN AUF der Mittellinie (y = 0)
+   *   Ganze Pause  haengt UNTER der vierten Linie (y = -1)
+   *
+   * Genau daran unterscheidet man die beiden im Druck.
+   */
+  function zeichnePause(g, cx, wert) {
+    if (wert === 2 || wert === 1) {
+      var breite = 0.86, hoehe = 0.42;
+      var oben = (wert === 2) ? -hoehe : -1;
+      g.appendChild(el('rect', {
+        x: cx - breite / 2, y: oben, width: breite, height: hoehe,
+        fill: 'var(--linie)'
+      }));
+      return;
+    }
+    /* Viertelpause: der uebliche Haken. */
     var d = 'M' + (cx - 0.16) + ',-0.92 L' + (cx + 0.18) + ',-0.30 ' +
             'L' + (cx - 0.14) + ',0.16 L' + (cx + 0.20) + ',0.72 ' +
             'C' + (cx - 0.02) + ',0.52 ' + (cx - 0.24) + ',0.66 ' + (cx - 0.10) + ',0.96';
@@ -385,5 +503,9 @@
     }));
   }
 
-  root.Noten = { zeichne: zeichne, schluesselPfad: schluesselPfad };
+  root.Noten = {
+    zeichne: zeichne, schluesselPfad: schluesselPfad,
+    einfarbig: function (an) { EINFARBIG = !!an; },
+    istEinfarbig: function () { return EINFARBIG; }
+  };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

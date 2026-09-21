@@ -1,24 +1,47 @@
-/* griff.js — Griffbild einer Trompete.
+/* griff.js — Griffbild des gewaehlten Instruments.
  *
- * Die Trompete selbst ist eine fertige Zeichnung (img/trompete-koerper.png):
- * Mundstueck links, Schallbecher rechts, drei Ventilzuege in der Mitte.
- * Darueber liegen nur noch die drei Ventilknoepfe als SVG — die muessen
- * sich bewegen und einfaerben koennen, also bleiben sie gezeichnet.
+ * Drei Bilder, ein Bezugssystem (1774 x 887):
  *
- * Gedrueckte Ventile sind in der Farbe des Tons gefuellt und sichtbar
- * nach unten versetzt, nicht gedrueckte stehen oben und bleiben leer.
- * Das Versetzen ist wichtig: ein fuenfjaehriges Kind erkennt "gedrueckt"
- * an der Bewegung schneller als an der Farbe.
+ *   trompete    die gezeichnete Trompete liegt als CSS-Hintergrund
+ *               hinter dem SVG (`.trompetenbild` in css/stil.css),
+ *               gezeichnet werden nur die drei Perinet-Ventile.
+ *   tenorhorn   dasselbe Ventilwerk, aber der Koerper wird hier
+ *               gezeichnet: ein Tenorhorn liegt nicht flach wie eine
+ *               Trompete, sein Becher zeigt nach oben.
+ *   horn        drei Drehventil-HEBEL statt Perinet-Knoepfe, dazu das
+ *               gewundene Rohr und der grosse Becher.
  *
- * Anders als bei der Blockfloete sagt der Griff allein noch nicht,
- * welcher Ton kommt — c1, g1 und c2 haben alle drei denselben Griff
- * (offen). Was sie trennt, ist die Lippenspannung. Deshalb steht daneben
- * eine kleine Leiter, die zeigt, der wievielte Naturton gemeint ist.
+ * Die GRIFFE sind bei allen drei Bildern dieselben — drei Ventile
+ * senken die Naturtonreihe immer um dieselben Schritte. Nur das Bild
+ * wechselt, damit das Kind sein eigenes Instrument wiedererkennt.
+ *
+ * Warum der Umweg ueber CSS und nicht ein <image> im SVG: eine externe
+ * Bildreferenz INNERHALB eines SVG ist die einzige Art von Verweis, die
+ * je nach Umgebung anders behandelt wird — beim Oeffnen ueber file://,
+ * in aelteren WebKit-Fassungen, beim Ausdrucken. Ein CSS-Hintergrund
+ * wird ueberall gleich geladen, so wie jedes andere Bild der App auch.
+ *
+ * Ein gedruecktes Ventil tut drei Dinge auf einmal: es FAEHRT sichtbar
+ * herunter, es steht danach tiefer, und es ist in der Farbe des Tons
+ * gefuellt. Ein offenes bleibt oben und leer.
+ *
+ * Damit die Bewegung ueberhaupt zu sehen ist, wird beim zweiten und
+ * jedem weiteren Aufruf NICHT neu gezeichnet: die Ventile bleiben
+ * stehen und bekommen nur eine andere Stellung. Bewegt wird die ganze
+ * Ventilgruppe mit einem CSS-transform; was unten aus der Buechse
+ * herausragen wuerde, schneidet ein clipPath weg.
+ *
+ * Links steht das erste Ventil, also der Zeigefinger, dann Mittel-,
+ * dann Ringfinger — beim Horn der linken Hand, sonst der rechten.
+ *
+ * Anders als bei der Blockfloete gehoert zu einem Griff nicht genau ein
+ * Ton: c1, g1 und c2 werden alle drei offen gegriffen und nur durch die
+ * Lippenspannung unterschieden. Das Griffbild allein genuegt also nicht
+ * — es steht immer neben dem Notenkopf, und der sagt, wie hoch.
  */
 (function (root) {
   'use strict';
   var NS = 'http://www.w3.org/2000/svg';
-  var XLINK = 'http://www.w3.org/1999/xlink';
 
   function el(name, attr) {
     var e = document.createElementNS(NS, name);
@@ -28,218 +51,258 @@
     return e;
   }
 
-  /* Breit statt hoch: das Griffbild liegt unter dem Notensystem ueber
-   * die volle Bildschirmbreite. Links die Trompete, rechts die
-   * Naturton-Leiter. */
-  var W = 460, H = 150;
-  var BILD = '/trompete/img/trompete-flach.png';
+  /* Bezugssystem der Zeichnung — dasselbe wie das der Bilddatei. */
+  var W = 1774, H = 887;
 
-  /* Die flache Zeichnung ist 640 x 264 gross. Sie wird auf 250
-   * Einheiten Breite gelegt; alle Ventilmasse ergeben sich aus dem
-   * Bild, damit Knoepfe und Zeichnung zusammenbleiben. */
-  var BILD_X = 26, BILD_Y = 26, BILD_W = 250, BILD_H = 250 * 264 / 640;
-  var S_ = BILD_W / 640;                 // Bild-Pixel -> SVG-Einheiten
-  function bx_(x) { return BILD_X + x * S_; }
-  function by_(y) { return BILD_Y + y * S_; }
-  var SKALA = 0.85;                      // Massstab der gezeichneten Knoepfe
-  var VENTIL_X = [bx_(234), bx_(275.5), bx_(317)];
-  var CASING_OBEN = by_(90);     // Oberkante der Ventilzuege im Bild
-  var VENTIL_OBEN = by_(38);     // Knopf nicht gedrueckt
-  var VENTIL_UNTEN = by_(62);    // Knopf gedrueckt: sichtbar tiefer
-  var VENTIL_R = 6.5;
+  /* Mitten der drei Ventile, in ebendiesem Bezugssystem. */
+  var VENTIL_X = [717, 828, 939];
 
+  /* Der Knopf ist bewusst groesser gezeichnet als am echten Instrument:
+   * er traegt die ganze Auskunft des Bildes und muss auch dann noch zu
+   * lesen sein, wenn das Instrument nur ein schmales Band bekommt. */
+  var KNOPF_B = 116, KNOPF_H = 50, KNOPF_R = 22;
+  var KNOPF_Y = 158;                 // Oberkante, Ventil offen
+  var SCHAFT_B = 26;
+  var SCHAFT_Y = 202;                // knapp unter der Knopfkante
+  var SCHAFT_BIS = 340;              // absichtlich zu lang — wird beschnitten
+  var WEG = 96;                      // so weit faehrt das Ventil herunter
 
+  /* Unterkante des Sichtfelds: die Unterkante des gedrueckten Knopfes,
+   * plus die halbe Strichbreite — sonst schneidet der Rand die untere
+   * Rundung des Knopfes ab. */
+  var SICHT_BIS = KNOPF_Y + WEG + KNOPF_H + 5;
 
+  /* Horn: die Hebel der drei Drehventile. Sie kippen nur ein kurzes
+   * Stueck — ein Drehventil dreht sich, es faehrt nicht. */
+  var HEBEL_Y = 250;                 // Drehventilgehaeuse
+  var PLATTE_Y = 430;                // Fingerplatte, Hebel oben
+  var HEBEL_WEG = 46;
 
-  /* Welches Instrument gezeichnet wird. Das Horn in F hat dieselben
-   * Noten, aber andere Griffe (und Drehventile statt Pumpventile). */
-  var instrument = 'trompete';
-  function setzeInstrument(art) { instrument = (art === 'horn') ? 'horn' : 'trompete'; }
+  /* Jedes SVG braucht seinen eigenen clipPath — es koennen mehrere auf
+   * der Seite stehen (das Griffbild und die beiden Modus-Knoepfe). */
+  var zaehler = 0;
 
-  /* ---- Naturton-Leiter -------------------------------------------- */
-  /* Zeigt, der wievielte Ton auf diesem Griff gemeint ist. Ohne das
-   * waere das Bild fuer c1, g1 und c2 voellig identisch.
-   * Hoehere Stufe heisst festere Lippen. */
-  function leiter(g, naturton, von, bis, farbe, rand, linie) {
-    if (!naturton) { return; }
-    var stufen = bis - von + 1;
-    var dx = stufen > 4 ? 15 : 20;
-    var breite = stufen > 4 ? 11 : 14;
-    var bx = 300, by = 108;
-    for (var n = 0; n < stufen; n++) {
-      var dran = (n + von) === naturton;
-      var hoehe = 12 + n * (stufen > 4 ? 10 : 14);
+  /* Schwarzes Griffbild — dieselbe Einstellung wie beim Notensatz. */
+  var EINFARBIG = false;
+
+  /* Welches Bild gezeichnet wird: 'trompete', 'tenorhorn' oder 'horn'. */
+  var ART = 'trompete';
+
+  var MESSING = 'var(--messing, #D9A13B)';
+
+  /* ------------------------------------------------------------------ */
+  /* Instrumentenkoerper                                                 */
+  /* ------------------------------------------------------------------ */
+
+  /** Tenorhorn: Becher nach oben, Ventile oben auf dem Gehaeuseblock.
+   *  Absichtlich schlicht gezeichnet — es soll erkennbar sein, nicht
+   *  abgebildet. Die drei Buechsen liegen genau unter den Knoepfen. */
+  function koerperTenorhorn(ziel, linie) {
+    var g = el('g', {});
+    // Becher: breiter Trichter nach oben rechts
+    g.appendChild(el('path', {
+      d: 'M 1090 780 C 1120 520 1210 360 1330 250 L 1700 470 '
+       + 'C 1560 520 1420 620 1330 800 Z',
+      fill: MESSING, stroke: linie, 'stroke-width': 10
+    }));
+    g.appendChild(el('ellipse', {
+      cx: 1515, cy: 360, rx: 70, ry: 150, transform: 'rotate(28 1515 360)',
+      fill: MESSING, stroke: linie, 'stroke-width': 10
+    }));
+    // Rohrbogen vom Ventilblock nach rechts in den Becher
+    g.appendChild(el('path', {
+      d: 'M 995 640 C 1030 760 1060 790 1110 790',
+      fill: 'none', stroke: MESSING, 'stroke-width': 46, 'stroke-linecap': 'round'
+    }));
+    // Mundrohr mit Mundstueck links
+    g.appendChild(el('path', {
+      d: 'M 300 470 C 430 470 560 430 660 340',
+      fill: 'none', stroke: MESSING, 'stroke-width': 34, 'stroke-linecap': 'round'
+    }));
+    g.appendChild(el('ellipse', {
+      cx: 288, cy: 470, rx: 34, ry: 26, fill: MESSING, stroke: linie, 'stroke-width': 8
+    }));
+    // Die drei Ventilbuechsen
+    for (var i = 0; i < 3; i++) {
       g.appendChild(el('rect', {
-        x: bx + n * dx, y: by - hoehe, width: breite, height: hoehe, rx: 3,
-        fill: dran ? farbe : 'var(--loch-offen)',
-        stroke: dran ? rand : linie, 'stroke-width': 3
+        x: VENTIL_X[i] - 54, y: 250, width: 108, height: 400, rx: 42,
+        fill: MESSING, stroke: linie, 'stroke-width': 9
       }));
     }
-    g.appendChild(el('line', {
-      x1: bx - 10, y1: by + 6, x2: bx + stufen * dx + 8, y2: by + 6,
-      stroke: linie, 'stroke-width': 3, 'stroke-linecap': 'round', opacity: 0.5
+    // Zug unter dem Block
+    g.appendChild(el('path', {
+      d: 'M 717 650 L 717 800 C 717 840 760 840 760 800 L 760 650',
+      fill: 'none', stroke: MESSING, 'stroke-width': 26, 'stroke-linecap': 'round'
     }));
+    ziel.appendChild(g);
   }
 
-  function zeichne(svg, ton, opt) {
-    opt = opt || {};
+  /** Horn: das gewundene Rohr, der grosse Becher rechts und die drei
+   *  Drehventilgehaeuse, auf denen die Hebel sitzen. */
+  function koerperHorn(ziel, linie) {
+    var g = el('g', {});
+    var cx = 640, cy = 560;
+    // Becher rechts
+    g.appendChild(el('path', {
+      d: 'M 1120 660 C 1180 520 1300 420 1430 380 L 1560 760 '
+       + 'C 1430 770 1280 800 1180 850 Z',
+      fill: MESSING, stroke: linie, 'stroke-width': 10
+    }));
+    g.appendChild(el('ellipse', {
+      cx: 1500, cy: 570, rx: 66, ry: 200, transform: 'rotate(18 1500 570)',
+      fill: MESSING, stroke: linie, 'stroke-width': 10
+    }));
+    // Zwei Windungen
+    g.appendChild(el('circle', { cx: cx, cy: cy, r: 250, fill: 'none', stroke: MESSING, 'stroke-width': 40 }));
+    g.appendChild(el('circle', { cx: cx, cy: cy, r: 250, fill: 'none', stroke: linie, 'stroke-width': 4, opacity: 0.45 }));
+    g.appendChild(el('circle', { cx: cx + 22, cy: cy + 14, r: 168, fill: 'none', stroke: MESSING, 'stroke-width': 32 }));
+    g.appendChild(el('circle', { cx: cx + 22, cy: cy + 14, r: 168, fill: 'none', stroke: linie, 'stroke-width': 4, opacity: 0.35 }));
+    // Rohr von der Windung in den Becher
+    g.appendChild(el('path', {
+      d: 'M 880 640 C 980 700 1060 730 1140 760',
+      fill: 'none', stroke: MESSING, 'stroke-width': 40, 'stroke-linecap': 'round'
+    }));
+    // Mundrohr mit Mundstueck links oben
+    g.appendChild(el('path', {
+      d: 'M 470 400 C 380 330 320 300 250 290',
+      fill: 'none', stroke: MESSING, 'stroke-width': 28, 'stroke-linecap': 'round'
+    }));
+    g.appendChild(el('ellipse', {
+      cx: 238, cy: 288, rx: 30, ry: 23, fill: MESSING, stroke: linie, 'stroke-width': 8
+    }));
+    // Drei Drehventilgehaeuse
+    for (var i = 0; i < 3; i++) {
+      g.appendChild(el('circle', {
+        cx: VENTIL_X[i], cy: HEBEL_Y, r: 56,
+        fill: MESSING, stroke: linie, 'stroke-width': 9
+      }));
+    }
+    ziel.appendChild(g);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Ventile                                                             */
+  /* ------------------------------------------------------------------ */
+
+  /** Baut Koerper und Ventile EINMAL auf und merkt sie sich am SVG. */
+  function aufbauen(svg) {
     while (svg.firstChild) { svg.removeChild(svg.firstChild); }
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
-    var farbe = ton.farbe, rand = ton.farbeRand;
     var linie = 'var(--griff-linie)';
-    var g = el('g', {});
-    svg.appendChild(g);
+    var hebel = (ART === 'horn');
 
-    if (instrument === 'horn') {
-      var gh = ton.griffHorn || ton.griff;
-      /* Das Horn wird gezeichnet, nicht fotografiert — deshalb wird es
-       * hier auf die Groesse der Trompetenzeichnung heruntergerechnet,
-       * damit es das Bild nicht erschlaegt. */
-      var gHorn = el('g', { transform: 'translate(26 28) scale(0.6)' });
-      g.appendChild(gHorn);
-      zeichneHorn(gHorn, gh.ventile || [0, 0, 0], farbe, rand, linie);
-      leiter(g, gh.naturton || ton.naturton, 4, 9, farbe, rand, linie);
-      return svg;
+    if (ART === 'tenorhorn') { koerperTenorhorn(svg, linie); }
+    else if (hebel) { koerperHorn(svg, linie); }
+
+    var aussen;
+    if (hebel) {
+      // Hebel ragen nirgends heraus — kein Beschneiden notwendig.
+      aussen = el('g', {});
+    } else {
+      var id = 'ventilsicht-' + (++zaehler);
+      var defs = el('defs', {});
+      var clip = el('clipPath', { id: id });
+      clip.appendChild(el('rect', { x: 0, y: 0, width: W, height: SICHT_BIS }));
+      defs.appendChild(clip);
+      svg.appendChild(defs);
+      aussen = el('g', { 'clip-path': 'url(#' + id + ')' });
+    }
+    svg.appendChild(aussen);
+
+    var teile = [];
+    for (var i = 0; i < 3; i++) {
+      var mx = VENTIL_X[i];
+      var g = el('g', { 'class': hebel ? 'ventil hebel' : 'ventil' });
+      var schaft, knopf;
+
+      if (hebel) {
+        // Hebelarm vom Gehaeuse hinunter zur Fingerplatte
+        schaft = el('rect', {
+          x: mx - 9, y: HEBEL_Y, width: 18, height: PLATTE_Y - HEBEL_Y, rx: 9,
+          fill: MESSING, 'stroke-width': 4
+        });
+        knopf = el('rect', {
+          'class': 'ventil-knopf',
+          x: mx - 48, y: PLATTE_Y, width: 96, height: 40, rx: 20
+        });
+      } else {
+        schaft = el('rect', {
+          x: mx - SCHAFT_B / 2, y: SCHAFT_Y,
+          width: SCHAFT_B, height: SCHAFT_BIS - SCHAFT_Y, rx: 8,
+          fill: 'var(--ventil-schaft)', 'stroke-width': 5
+        });
+        knopf = el('rect', {
+          'class': 'ventil-knopf',
+          x: mx - KNOPF_B / 2, y: KNOPF_Y,
+          width: KNOPF_B, height: KNOPF_H, rx: KNOPF_R
+        });
+      }
+      g.appendChild(schaft);
+      g.appendChild(knopf);
+      aussen.appendChild(g);
+      teile.push({ gruppe: g, schaft: schaft, knopf: knopf });
+    }
+    svg.__ventile = teile;
+    svg.__art = ART;
+    return teile;
+  }
+
+  /** Zeichnet die drei Ventile in ein SVG.
+   *
+   *  ton  ein Ton aus toene.json — oder, fuer ein Bild ohne bestimmten
+   *       Ton (etwa die Modus-Knoepfe in der Leiste), `Griff.offen`.
+   */
+  function zeichne(svg, ton) {
+    var ventile = (ton && ton.griff && ton.griff.ventile) || [0, 0, 0];
+    var teile = svg.__ventile;
+    /* Nur beim ersten Mal aufbauen — und neu, wenn das Instrument
+     * gewechselt hat. Danach bleiben die Ventile stehen und aendern
+     * bloss ihre Stellung; sonst gaebe es nichts, was sich bewegen
+     * koennte. */
+    if (!teile || teile.length !== 3 || !svg.firstChild || svg.__art !== ART) {
+      teile = aufbauen(svg);
     }
 
+    var farbe = EINFARBIG ? 'var(--linie)' : (ton && ton.farbe) || 'var(--linie)';
+    var rand = EINFARBIG ? 'var(--linie)' : (ton && ton.farbeRand) || 'var(--linie)';
+    var linie = 'var(--griff-linie)';
 
-    /* ---- Die Trompete als fertige Zeichnung --------------------- */
-    var bild = el('image', {
-      x: BILD_X, y: BILD_Y, width: BILD_W, height: BILD_H,
-      preserveAspectRatio: 'xMidYMid meet'
-    });
-    bild.setAttributeNS(XLINK, 'xlink:href', BILD);
-    bild.setAttribute('href', BILD);
-    g.appendChild(bild);
-
-    /* ---- Die drei Ventilknoepfe --------------------------------- */
-    /* Ein Knopf besteht aus vier Teilen: Schaft, Schattenring unter der
-     * Kuppe, die Kuppe selbst und ein heller Glanzpunkt. Das gibt dem
-     * flachen Kreis Tiefe, ohne dass ein Bild noetig waere. */
-    
-    var defs = el('defs', {});
-    svg.appendChild(defs);
-    var gradId = 'ventilglanz-' + Math.random().toString(36).slice(2, 8);
-    var grad = el('linearGradient', { id: gradId, x1: '0%', y1: '0%', x2: '100%', y2: '0%' });
-    grad.appendChild(el('stop', { offset: '0%', 'stop-color': '#000', 'stop-opacity': '0.18' }));
-    grad.appendChild(el('stop', { offset: '30%', 'stop-color': '#fff', 'stop-opacity': '0.55' }));
-    grad.appendChild(el('stop', { offset: '62%', 'stop-color': '#fff', 'stop-opacity': '0.05' }));
-    grad.appendChild(el('stop', { offset: '100%', 'stop-color': '#000', 'stop-opacity': '0.22' }));
-    defs.appendChild(grad);
-
-    var ventile = ton.griff.ventile;
     for (var i = 0; i < 3; i++) {
       var gedrueckt = ventile[i] === 1;
-      var oben = gedrueckt ? VENTIL_UNTEN : VENTIL_OBEN;   // Oberkante Perle
-      var cx = VENTIL_X[i];
-      var perleH = 7.5 * SKALA;      // Hoehe der Perle (kein Kreis!)
-      var rx = VENTIL_R;
-      var ry = 3.0 * SKALA;          // Perspektive der runden Deckflaeche
-
-      // Schaft vom Knopf hinunter in den Ventilzug
-      g.appendChild(el('rect', {
-        x: cx - 3.0 * SKALA, y: oben + perleH - 1,
-        width: 6.0 * SKALA,
-        height: Math.max(0, CASING_OBEN - (oben + perleH) + 4 * SKALA),
-        fill: 'var(--messing)', stroke: linie, 'stroke-width': 1.4
-      }));
-      // Fingerauflage-Ring (Kranz) direkt unter der Perle
-      g.appendChild(el('rect', {
-        x: cx - rx * 0.78, y: oben + perleH - 1.2 * SKALA,
-        width: rx * 1.56, height: 2.6 * SKALA, rx: 1.2 * SKALA,
-        fill: 'var(--messing)', stroke: linie, 'stroke-width': 1.4
-      }));
-      // Perle: kurzer Zylinder — Mantel + gewoelbte Deckflaeche
-      g.appendChild(el('path', {
-        d: 'M ' + (cx - rx) + ' ' + oben +
-           ' L ' + (cx - rx) + ' ' + (oben + perleH) +
-           ' A ' + rx + ' ' + ry + ' 0 0 0 ' + (cx + rx) + ' ' + (oben + perleH) +
-           ' L ' + (cx + rx) + ' ' + oben + ' Z',
-        fill: gedrueckt ? farbe : 'var(--loch-offen)',
-        stroke: gedrueckt ? rand : linie, 'stroke-width': 2
-      }));
-      g.appendChild(el('ellipse', {
-        cx: cx, cy: oben, rx: rx, ry: ry,
-        fill: gedrueckt ? farbe : 'var(--loch-offen)',
-        stroke: gedrueckt ? rand : linie, 'stroke-width': 2
-      }));
-      // Glanz auf dem Mantel
-      g.appendChild(el('path', {
-        d: 'M ' + (cx - rx + 1) + ' ' + oben +
-           ' L ' + (cx - rx + 1) + ' ' + (oben + perleH - 1) +
-           ' A ' + (rx - 1) + ' ' + (ry - 0.6) + ' 0 0 0 ' + (cx + rx - 1) + ' ' + (oben + perleH - 1) +
-           ' L ' + (cx + rx - 1) + ' ' + oben + ' Z',
-        fill: 'url(#' + gradId + ')'
-      }));
+      var t = teile[i];
+      t.gruppe.setAttribute('class',
+        (ART === 'horn' ? 'ventil hebel' : 'ventil') + (gedrueckt ? ' gedrueckt' : ''));
+      t.schaft.setAttribute('stroke', linie);
+      t.knopf.setAttribute('fill', gedrueckt ? farbe : 'var(--loch-offen)');
+      t.knopf.setAttribute('stroke', gedrueckt ? rand : linie);
+      t.knopf.setAttribute('stroke-width', gedrueckt ? 6 : 5);
     }
-
-    leiter(g, ton.naturton, 2, 5, farbe, rand, linie);
     return svg;
   }
 
-  /* ---- Horn in F -------------------------------------------------- */
-  /* Gezeichnet statt fotografiert: das runde Rohr, der grosse Becher
-   * rechts und die drei Drehventil-Hebel, die mit der LINKEN Hand
-   * gedrueckt werden. Gedrueckte Hebel kippen sichtbar nach unten und
-   * bekommen die Farbe des Tons — genau wie bei der Trompete. */
-  function zeichneHorn(g, ventile, farbe, rand, linie) {
-    var messing = 'var(--messing)';
-    var cx = 118, cy = 80;
-
-    // Becher: breiter Trichter nach rechts
-    g.appendChild(el('path', {
-      d: 'M 168 62 C 196 60 214 52 226 40 L 232 118 C 216 108 194 100 168 98 Z',
-      fill: messing, stroke: linie, 'stroke-width': 3
-    }));
-    // Rundes Rohr (zwei Windungen)
-    g.appendChild(el('circle', {
-      cx: cx, cy: cy, r: 42, fill: 'none', stroke: messing, 'stroke-width': 11
-    }));
-    g.appendChild(el('circle', {
-      cx: cx, cy: cy, r: 42, fill: 'none', stroke: linie, 'stroke-width': 1.2, opacity: 0.5
-    }));
-    g.appendChild(el('circle', {
-      cx: cx + 3, cy: cy + 2, r: 27, fill: 'none', stroke: messing, 'stroke-width': 8
-    }));
-    g.appendChild(el('circle', {
-      cx: cx + 3, cy: cy + 2, r: 27, fill: 'none', stroke: linie, 'stroke-width': 1.2, opacity: 0.4
-    }));
-    // Mundrohr mit Mundstueck links oben
-    g.appendChild(el('path', {
-      d: 'M ' + (cx - 36) + ' ' + (cy - 22) + ' C 62 40 52 32 40 30',
-      fill: 'none', stroke: messing, 'stroke-width': 8, 'stroke-linecap': 'round'
-    }));
-    g.appendChild(el('ellipse', {
-      cx: 36, cy: 29, rx: 7, ry: 5.5,
-      fill: messing, stroke: linie, 'stroke-width': 2
-    }));
-
-    // Drei Drehventil-Hebel
-    var HX = [86, 112, 138];
-    for (var i = 0; i < 3; i++) {
-      var gedrueckt = ventile[i] === 1;
-      var y = gedrueckt ? 130 : 122;
-      // Drehventilgehaeuse
-      g.appendChild(el('circle', {
-        cx: HX[i], cy: 104, r: 8,
-        fill: messing, stroke: linie, 'stroke-width': 2
-      }));
-      // Hebelarm
-      g.appendChild(el('line', {
-        x1: HX[i], y1: 104, x2: HX[i], y2: y,
-        stroke: messing, 'stroke-width': 4, 'stroke-linecap': 'round'
-      }));
-      // Fingerplatte
-      g.appendChild(el('rect', {
-        x: HX[i] - 10, y: y, width: 20, height: 9, rx: 4.5,
-        fill: gedrueckt ? farbe : 'var(--loch-offen)',
-        stroke: gedrueckt ? rand : linie, 'stroke-width': 2.5
-      }));
-    }
+  /** Welches Instrument gezeichnet wird. Wird einmal beim Aufbauen der
+   *  App gesetzt, aus der Wahl im Elternbereich. */
+  function setzeArt(art) {
+    ART = (art === 'horn' || art === 'tenorhorn') ? art : 'trompete';
+    /* Nur die Trompete hat ein Hintergrundbild; bei den anderen zeichnet
+     * dieses Modul den Koerper selbst. */
+    [].slice.call(document.querySelectorAll('#griff, .modus-trompete')).forEach(function (svg) {
+      if (ART === 'trompete') { svg.classList.add('trompetenbild'); }
+      else { svg.classList.remove('trompetenbild'); }
+    });
   }
 
-  root.Griff = { zeichne: zeichne, setzeInstrument: setzeInstrument, breite: W, hoehe: H };
-})(typeof globalThis !== 'undefined' ? globalThis : this);
+  /** Ein Ton ohne Ton: alle Ventile offen. Fuer die Modus-Knoepfe in
+   *  der Leiste, die keine Griffe zeigen, sondern nur sagen, um welches
+   *  Instrument es geht. */
+  var OFFEN = { griff: { ventile: [0, 0, 0] } };
 
+  root.Griff = {
+    zeichne: zeichne, breite: W, hoehe: H, offen: OFFEN, weg: WEG,
+    setzeArt: setzeArt,
+    art: function () { return ART; },
+    einfarbig: function (an) { EINFARBIG = !!an; }
+  };
+})(typeof globalThis !== 'undefined' ? globalThis : this);
