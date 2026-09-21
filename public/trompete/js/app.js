@@ -653,11 +653,16 @@
     if (wachVideo) { try { wachVideo.pause(); } catch (e) { /* egal */ } }
   }
 
-  function dienstAnmelden() {
-    if (root.PRUEFSTAND) { return; }        // im Pruefstand stoert der Cache nur
-    if (!root.navigator.serviceWorker) { return; }
-    root.navigator.serviceWorker.register('sw.js').catch(function () { /* dann eben online */ });
+  /* Ein zuvor angemeldeter Service Worker wird abgemeldet — sonst haelt
+   * er auf Geraeten, die die aeltere Fassung schon geoeffnet hatten, alte
+   * Dateien fest. */
+  if (root.navigator && root.navigator.serviceWorker &&
+      root.navigator.serviceWorker.getRegistrations) {
+    root.navigator.serviceWorker.getRegistrations().then(function (liste) {
+      liste.forEach(function (r) { try { r.unregister(); } catch (e) { /* egal */ } });
+    }, function () { /* egal */ });
   }
+
 
   root.KONTEXT = k;
   if (document.readyState === 'loading') {
