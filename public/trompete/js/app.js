@@ -163,13 +163,19 @@
     };
     k.notenfarbeAnwenden();
 
-    /* In den beiden Modus-Knoepfen steht dieselbe Trompete wie unten im
+    /* Welches Instrument gezeichnet wird — Perinet-Ventile fuer Trompete
+     * und Tenorhorn, Drehventil-Hebel fuer das Horn. Das Hintergrundbild
+     * der Trompete wird dabei mitgeschaltet. */
+    root.Griff.setzeArt(k.instrument.griffbild);
+
+    /* In den beiden Modus-Knoepfen steht dasselbe Instrument wie unten im
      * Griffbild — gezeichnet vom selben Modul, nur mit offenen
-     * Ventilen. Sie aendert sich nie, deshalb genuegt es, sie einmal
+     * Ventilen. Es aendert sich nie, deshalb genuegt es, es einmal
      * beim Aufbauen zu zeichnen. */
     [].slice.call(document.querySelectorAll('.modus-trompete')).forEach(function (svg) {
       root.Griff.zeichne(svg, root.Griff.offen);
     });
+
 
     /* Die gewaehlte Sprache gleich beim Start setzen, nicht erst beim
      * Oeffnen des Elternbereichs: an der Wurzel haengt das lang-Attribut,
