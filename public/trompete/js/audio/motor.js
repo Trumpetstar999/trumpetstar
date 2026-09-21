@@ -29,6 +29,13 @@
     this.spieltBis = 0;         // solange laeuft eigene Wiedergabe
     this.fehler = null;
     this.meister = null;        // Summenlautstaerke
+    /* Horn und Tenorhorn klingen weicher als eine Trompete: weniger
+     * Obertoene. Ein Tiefpass ueber den vorgespielten Toenen kommt dem
+     * nahe genug, dass ein Kind sein eigenes Instrument wiedererkennt.
+     * 0 heisst: unveraendert, so wie eingespielt (Trompete). */
+    this.klangfilterHz = opt.klangfilterHz || 0;
+    this.klangZiel = null;      // hier haengen die vorgespielten Toene
+    this.eigeneStimmung = !!opt.eigeneStimmung;
   }
 
   /* ---------------------------------------------------------------- */
