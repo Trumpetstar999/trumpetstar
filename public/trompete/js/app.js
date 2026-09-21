@@ -41,6 +41,12 @@
   }
 
   function aufbauen(daten, lieder, buchDaten) {
+    /* Welches Blechinstrument spielt das Kind? Trompete in B, Horn in F,
+     * Horn in Es oder Tenorhorn. Das muss VOR allem anderen geschehen:
+     * daran haengen die klingenden Frequenzen aller Toene und der
+     * Hoerbereich der Erkennung. Das Notenbild bleibt unberuehrt. */
+    k.instrument = root.Instrument.anwenden(daten);
+
     /* Zwei Tonvorraete, und sie duerfen nicht durcheinandergeraten:
      *
      *   k.toene      die neun Toene des Lehrgangs. Daran haengen der
@@ -68,7 +74,11 @@
 
     // Der Motor spielt auch die Buch-Toene vor; die Erkennung bekommt
     // ihre Toene je Bereich (Tracker.setzeToene).
-    k.motor = new root.Motor({ toene: k.alleToene, erkennung: k.erkennung });
+    k.motor = new root.Motor({
+      toene: k.alleToene, erkennung: k.erkennung,
+      klangfilterHz: k.instrument.klangfilterHz || 0,
+      eigeneStimmung: k.instrument.id !== 'b-trompete'
+    });
     /* Wie streng zugehoert wird. Die Stufen stehen in toene.json, die
      * Wahl im Fortschritt — und der Tracker bekommt sie bei jedem
      * Wechsel neu, weil seine Toleranztabellen daran haengen. */
