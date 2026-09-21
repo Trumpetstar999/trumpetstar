@@ -191,7 +191,9 @@
 
     torVorbereiten();
     fensterEreignisse();
-    dienstAnmelden();
+    /* KEIN Service Worker: das Spiel laeuft innerhalb der Trumpetstar-App
+     * und wird von ihr ausgeliefert. Ein eigener Zwischenspeicher wuerde
+     * alte Dateien festhalten, nachdem die App aktualisiert wurde. */
   }
 
   /* ---------------------------------------------------------------- */
