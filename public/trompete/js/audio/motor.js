@@ -74,6 +74,27 @@
     });
   };
 
+  /** Baut den Summenweg: meister → ausgang, und darueber den Klangweg,
+   *  an dem die vorgespielten Toene haengen. Beim Not-Aus wird beides
+   *  weggeworfen und hier neu gebaut. Das Metronom haengt direkt am
+   *  meister — sein Klick soll nicht mitgefiltert werden. */
+  Motor.prototype._meisterBauen = function () {
+    this.meister = this.ctx.createGain();
+    this.meister.gain.value = 1;
+    this.meister.connect(this.ausgang);
+    if (this.klangfilterHz > 0) {
+      var f = this.ctx.createBiquadFilter();
+      f.type = 'lowpass';
+      f.frequency.value = this.klangfilterHz;
+      f.Q.value = 0.6;
+      f.connect(this.meister);
+      this.klangZiel = f;
+    } else {
+      this.klangZiel = this.meister;
+    }
+  };
+
+
   Motor.prototype._aufwecken = function () {
     var c = this.ctx;
     if (!c) { return Promise.resolve(); }
