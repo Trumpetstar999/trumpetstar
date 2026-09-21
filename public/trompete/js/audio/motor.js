@@ -329,16 +329,14 @@
     }
     this.laufende.length = 0;
 
-    var selbst = this;
+    var altKlang = (this.klangZiel !== alt) ? this.klangZiel : null;
     setTimeout(function () {
       try { alt.disconnect(); } catch (e) { /* egal */ }
+      if (altKlang) { try { altKlang.disconnect(); } catch (e2) { /* egal */ } }
     }, 80);
 
-    this.meister = this.ctx.createGain();
-    this.meister.gain.value = 1;
-    this.meister.connect(this.ausgang);
+    this._meisterBauen();
     this.spieltBis = 0;
-    void selbst;
   };
 
   /** Wie lange braucht der eigene Klang vom Rechnen bis ans Ohr —
