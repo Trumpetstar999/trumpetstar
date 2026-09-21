@@ -5,6 +5,47 @@
   "stimmung": {
     "a1Hz": 440.0
   },
+  "_instrumente": [
+    "Vier Instrumente, EIN Notenbild. Notiert steht immer c1 bis d2 im",
+    "Violinschluessel; wie tief das klingt, sagt 'halbtoeneTiefer'.",
+    "",
+    "  b-trompete   2 Halbtoene tiefer (notiert c1 klingt B, 233 Hz)",
+    "  horn-f       7 Halbtoene tiefer (klingt F, 175 Hz)",
+    "  horn-es      9 Halbtoene tiefer (klingt Es, 156 Hz)",
+    "  tenorhorn   14 Halbtoene tiefer (klingt B, 117 Hz — eine Oktave",
+    "               unter der Trompete; notiert und gegriffen wird es wie",
+    "               eine Trompete in B)",
+    "",
+    "Die Ventilgriffe in 'toene' gelten fuer alle vier: drei Ventile",
+    "senken die Naturtonreihe immer um dieselben Schritte, gleichgueltig",
+    "in welcher Stimmung das Instrument gebaut ist.",
+    "",
+    "'erkennung' verschiebt den Hoerbereich mit nach unten. Der Hochpass",
+    "bleibt dabei so hoch wie moeglich (dicht unter dem tiefsten Ton),",
+    "damit Netzbrummen die Einsatzerkennung nicht auslöst.",
+    "",
+    "'klangfilterHz' macht die Trompetenaufnahmen fuer die tieferen",
+    "Instrumente weicher — ein Horn hat weniger Obertoene als eine",
+    "Trompete. 0 heisst: unverändert, so wie eingespielt."
+  ],
+  "instrumente": [
+    {
+      "id": "b-trompete", "halbtoeneTiefer": 2, "griffbild": "trompete", "klangfilterHz": 0,
+      "erkennung": { "fMinHz": 200, "fMaxHz": 1250, "hochpassHz": 200 }
+    },
+    {
+      "id": "horn-f", "halbtoeneTiefer": 7, "griffbild": "horn", "klangfilterHz": 1500,
+      "erkennung": { "fMinHz": 150, "fMaxHz": 1000, "hochpassHz": 150 }
+    },
+    {
+      "id": "horn-es", "halbtoeneTiefer": 9, "griffbild": "horn", "klangfilterHz": 1350,
+      "erkennung": { "fMinHz": 132, "fMaxHz": 900, "hochpassHz": 135 }
+    },
+    {
+      "id": "tenorhorn", "halbtoeneTiefer": 14, "griffbild": "tenorhorn", "klangfilterHz": 1200,
+      "erkennung": { "fMinHz": 100, "fMaxHz": 760, "hochpassHz": 105 }
+    }
+  ],
   "_transposition": [
     "Die Trompete ist ein B-Instrument: notiert c1 klingt B (233 Hz).",
     "",
