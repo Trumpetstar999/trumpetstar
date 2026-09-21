@@ -173,7 +173,7 @@
     z.vz = vz;
     // `tu`: im Buch ohne Taktangabe gedruckt (die ersten Seiten).
     z.taktart = (this.takte[von].ta && !this.takte[von].tu) ? this.takte[von].ta : null;
-    z.kopfBreite = 0.5 + 2.6 + (vz ? Math.abs(vz) * 0.82 + 0.4 : 0) + (z.taktart ? 2.1 : 0.2);
+    z.kopfBreite = 0.5 + 2.6 + (vz ? Math.abs(vz) * 0.82 + 0.55 : 0) + (z.taktart ? 2.9 : 0.2);
     if (this.takte[von].li === '|:') { z.kopfBreite += 1.1; }
 
     for (var b = von; b < bis; b++) {
@@ -181,7 +181,7 @@
       var teil = { takt: b, noten: [], links: 0 };
       if (b > von) {
         if (takt.vz !== undefined && takt.vz !== vz) { teil.vzWechsel = takt.vz; teil.links += Math.abs(takt.vz || 1) * 0.82 + 0.6; vz = takt.vz; }
-        if (takt.ta) { teil.taWechsel = takt.ta; teil.links += 2.1; }
+        if (takt.ta) { teil.taWechsel = takt.ta; teil.links += 2.9; }
         if (takt.li === '|:') { teil.links += 1.0; }
       }
       if (takt.ta) { taktart = takt.ta; }
@@ -474,14 +474,16 @@
       vorzeichen(g, vz > 0 ? '#' : 'b', x + 0.45, -stufen[i] / 2);
       x += 0.82;
     }
-    return x + 0.4;
+    return x + 0.55;
   };
 
   Bild.prototype._taktart = function (g, x, ta) {
-    var mitte = x + 0.95;
+    /* Vor den Ziffern bleibt Luft, damit sie nicht am Vorzeichen kleben,
+     * und dahinter, damit die erste Note frei steht. */
+    var mitte = x + 1.35;
     zahlZeichnen(g, ta[0], mitte, -1);           // Zaehler: obere Haelfte
     zahlZeichnen(g, ta[1], mitte, 1);            // Nenner: untere Haelfte
-    return x + 2.1;
+    return x + 2.9;
   };
 
   /* Eine Zahl aus den gestochenen Ziffern, waagerecht um `mitte`, mit der
