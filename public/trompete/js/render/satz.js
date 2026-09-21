@@ -173,7 +173,7 @@
     z.vz = vz;
     // `tu`: im Buch ohne Taktangabe gedruckt (die ersten Seiten).
     z.taktart = (this.takte[von].ta && !this.takte[von].tu) ? this.takte[von].ta : null;
-    z.kopfBreite = 0.5 + 2.6 + (vz ? Math.abs(vz) * 0.82 + 0.4 : 0) + (z.taktart ? 2.9 : 0.2);
+    z.kopfBreite = 0.5 + 2.6 + (vz ? Math.abs(vz) * 0.82 + 0.55 : 0) + (z.taktart ? 2.9 : 0.2);
     if (this.takte[von].li === '|:') { z.kopfBreite += 1.1; }
 
     for (var b = von; b < bis; b++) {
