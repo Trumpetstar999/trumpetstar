@@ -175,15 +175,23 @@
     var wann = o.wann != null ? o.wann : this.ctx.currentTime + 0.03;
     var dauer = o.dauer != null ? o.dauer : 1.25;
 
-    /* frequenzHz ist die KLINGENDE Hoehe: notiert c1 klingt B. So hoert
-     * das Kind genau den Ton, den seine eigene Trompete macht, und kann
-     * mitspielen. */
-    var q = this.sampler.spiele(ton.audio, {
+    /* frequenzHz ist die KLINGENDE Hoehe: notiert c1 klingt auf der
+     * Trompete B, auf dem Horn in F ein F. So hoert das Kind genau den
+     * Ton, den sein eigenes Instrument macht, und kann mitspielen.
+     *
+     * Bei Horn und Tenorhorn wird dafuer nicht die Aufnahme desselben
+     * Notennamens genommen, sondern die, die am wenigsten verschoben
+     * werden muss. */
+    var probe = ton.audio;
+    if (this.eigeneStimmung && this.sampler.besteProbe) {
+      probe = this.sampler.besteProbe(ton.frequenzHz) || probe;
+    }
+    var q = this.sampler.spiele(probe, {
       frequenzHz: ton.frequenzHz,
       wann: wann,
       dauer: dauer,
       lautstaerke: o.lautstaerke,
-      ziel: this.meister
+      ziel: this.klangZiel || this.meister
     });
     if (!q) { return 0; }
     this._merken(q);
