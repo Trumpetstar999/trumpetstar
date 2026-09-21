@@ -73,6 +73,24 @@
         });
       });
     }
+    /* Instrument: Trompete in B, Horn in F, Horn in Es, Tenorhorn.
+     *
+     * Danach laedt die App neu. Daran haengen die klingenden Frequenzen
+     * aller Toene, der Hoerbereich der Erkennung, der Klang und das
+     * Griffbild — ein halber Wechsel waere schlimmer als ein kurzer
+     * Neustart. Der Fortschritt liegt im Speicher des Geraets. */
+    var instrumentreihe = document.getElementById('eltern-instrument');
+    if (instrumentreihe) {
+      [].slice.call(instrumentreihe.querySelectorAll('button')).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var id = b.getAttribute('data-instrument');
+          if (id === root.Instrument.id()) { return; }
+          root.Instrument.setzen(id);
+          root.location.reload();
+        });
+      });
+    }
+
     var farbreihe = document.getElementById('eltern-notenfarbe');
     if (farbreihe) {
       [].slice.call(farbreihe.querySelectorAll('button')).forEach(function (b) {
