@@ -126,18 +126,9 @@
    *  sagt getOutputTimestamp, was gerade am Ausgang ist. */
   Motor.prototype.hoerbarJetzt = function () {
     if (!this.ctx) { return 0; }
-    var c = this.ctx;
-    if (typeof c.outputLatency === 'number' && c.outputLatency > 0) {
-      return c.currentTime - this.ausgabeVerzug();
-    }
-    if (c.getOutputTimestamp && root.performance) {
-      var ts = c.getOutputTimestamp();
-      if (ts && ts.contextTime > 0 && ts.performanceTime > 0) {
-        return Math.min(c.currentTime,
-                        ts.contextTime + (root.performance.now() - ts.performanceTime) / 1000);
-      }
-    }
-    return c.currentTime - this.ausgabeVerzug();
+    /* Immer derselbe Rechenweg: eine Uhr, ein Abzug. Sonst springt der
+     * Marker um den Verzug hin und her. */
+    return this.ctx.currentTime - this.ausgabeVerzug();
   };
 
   /* ---------------------------------------------------------------- */
@@ -345,11 +336,33 @@
    *  Ueber den eingebauten Lautsprecher sind das wenige Millisekunden,
    *  ueber eine Bluetooth-Box gerne 200 bis 400. Web Audio weiss das
    *  und sagt es; wo es die Angabe nicht gibt, bleibt es bei null. */
+  var SAFARI_VERZUG = 0.09;   // was Safari verschweigt: gemessener Mittelwert
+  var VERZUG_MAX = 0.4;
+
+  /** Selbst gemessen: was liegt laut getOutputTimestamp gerade am
+   *  Ausgang, und wie weit ist currentTime schon darueber hinaus?
+   *  Genau diese Differenz ist der Verzug. Geglaettet, damit der Marker
+   *  nicht zittert. */
+  Motor.prototype._verzugGemessen = function () {
+    var c = this.ctx;
+    if (!c.getOutputTimestamp || !root.performance) { return null; }
+    var ts = c.getOutputTimestamp();
+    if (!ts || !(ts.contextTime > 0) || !(ts.performanceTime > 0)) { return null; }
+    var amAusgang = ts.contextTime + (root.performance.now() - ts.performanceTime) / 1000;
+    var v = c.currentTime - amAusgang;
+    if (!(v > 0.004) || v > VERZUG_MAX) { return this._verzugGlatt || null; }
+    this._verzugGlatt = (this._verzugGlatt == null) ? v : this._verzugGlatt * 0.85 + v * 0.15;
+    return this._verzugGlatt;
+  };
+
   Motor.prototype.ausgabeVerzug = function () {
     if (!this.ctx) { return 0; }
     var b = this.ctx.baseLatency || 0;
     var a = this.ctx.outputLatency || 0;
-    return b + a;
+    if (b + a > 0.004) { return Math.min(VERZUG_MAX, b + a); }
+    var g = this._verzugGemessen();
+    if (g != null) { return Math.min(VERZUG_MAX, g); }
+    return SAFARI_VERZUG;
   };
 
   /** Wann ist ein Ton, der bei `wann` beginnt und `dauer` lang klingt,
