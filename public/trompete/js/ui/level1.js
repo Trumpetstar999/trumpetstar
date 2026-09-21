@@ -12,6 +12,11 @@
 (function (root) {
   'use strict';
 
+  /* Wie lange nach dem eigenen Klang noch nicht zugehoert wird. Deckt
+   * den Nachhall des Zimmers ab; die Laufzeit des Lautsprechers steckt
+   * schon in motor.eigenerKlangBis(). */
+  var NACHHALL_RAND = 0.30;
+
   var MAX_VERSUCHE_JE_TON = 3;   // danach kommt still ein anderer Ton dran
   var STILLE_BIS_HILFE = 4.5;    // Sekunden ohne jeden Pegel
 
@@ -55,7 +60,6 @@
     this.hoert = false;
     if (this.uhr) { clearInterval(this.uhr); this.uhr = null; }
     if (this.nachspielUhr) { clearTimeout(this.nachspielUhr); this.nachspielUhr = null; }
-    this.k.motor.allesStoppen();
     this.k.knopfBereit(false);
   };
 
@@ -74,9 +78,9 @@
     this.spielt = false;
     this.hoert = false;
     if (this.nachspielUhr) { clearTimeout(this.nachspielUhr); this.nachspielUhr = null; }
-    this.k.motor.allesStoppen();
-    this.k.motor.erkennungZuruecksetzen();
     this.k.grifffeld.classList.remove('pulsiert');
+    /* Auch hier: geplante Toene verstummen nicht von selbst. */
+    this.k.motor.allesStoppen();
     this.k.knopfBereit(false);
   };
 
@@ -102,8 +106,8 @@
   };
 
   Level1.prototype._vorspielenUndHoeren = function () {
-    this.k.motor.spieleTon(this.zielTon, { dauer: 1.35 });
-    this.hoerenAb = this.k.motor.jetzt() + 1.7;
+    var wann = this.k.motor.spieleTon(this.zielTon, { dauer: 1.35 });
+    this.hoerenAb = this._abWannZuhoeren(1.7, wann, 1.35);
     this.hoert = true;
     this.letzterPegel = this.k.motor.jetzt();
     this.k.tracker.reset();
@@ -112,12 +116,34 @@
      * fuer die Erkennung EIN durchgehender Ton, der schon vor dem
      * Zuhoeren begonnen hat — und wuerde deshalb nie gemeldet. Deshalb
      * wird die Erkennung genau dann noch einmal auf null gesetzt, wenn
-     * das Vorspielen zu Ende ist. */
+     * das Vorspielen zu Ende ist. Der Zeitpunkt ist derselbe, ab dem
+     * ueberhaupt zugehoert wird. */
     var selbst = this, marke = this.marke;
     if (this.nachspielUhr) { clearTimeout(this.nachspielUhr); }
     this.nachspielUhr = setTimeout(function () {
       if (selbst._nochAktuell(marke) && selbst.hoert) { selbst.k.tracker.reset(); }
-    }, 1750);
+    }, Math.max(0, (this.hoerenAb - this.k.motor.jetzt()) * 1000) + 50);
+  };
+
+  /* Ab wann darf gezaehlt werden, was das Mikrofon hoert?
+   *
+   * Erst wenn der eigene Vorspielton verklungen UND beim Mikrofon
+   * angekommen ist. Frueher stand hier eine feste Zahl (1,7 s). Die war
+   * schon ohne Lautsprecher 30 ms zu kurz — der Ton endet nach 1,73 s —
+   * und ueber eine Bluetooth-Box um deren ganze Laufzeit. Ab etwa einer
+   * halben Sekunde Laufzeit hoerte die App sich selbst und lobte das
+   * Kind fuer den eigenen Ton.
+   *
+   * Der Motor weiss, wann sein Klang endet und wie lange der Ausgabeweg
+   * braucht. Dazu kommt ein fester Rand fuer den Nachhall des Zimmers.
+   * Die Untergrenze bleibt, damit sich am gewohnten Ablauf nichts
+   * aendert, solange kein Grund dafuer besteht. */
+  Level1.prototype._abWannZuhoeren = function (mindestens, wann, dauer) {
+    var jetzt = this.k.motor.jetzt();
+    var frueheste = jetzt + (mindestens != null ? mindestens : 1.7);
+    if (wann == null) { return frueheste; }
+    return Math.max(frueheste,
+                    this.k.motor.klangEndeAmMikrofon(wann, dauer) + NACHHALL_RAND);
   };
 
   /* ---------------------------------------------------------------- */
@@ -150,11 +176,8 @@
       return;
     }
 
-    if (urteil.art === 'naturton') {
-      /* Richtiger Griff, falscher Naturton — die Lippen waren zu fest
-       * oder zu locker. Das ist kein Fehlgriff und wird deshalb nicht
-       * als Fehlversuch gezaehlt. Die sinkende Feder sagt: weicher
-       * werden lassen. */
+    if (urteil.art === 'ueberblasen') {
+      // Kein Fehlversuch. Nur: die Luft darf sanfter werden.
       this.k.rueckmeldung.feder(this.zielTon).then(function () {
         if (selbst._nochAktuell(marke)) { selbst._weiterHoeren(); }
       });
@@ -176,14 +199,17 @@
   Level1.prototype._weiterHoeren = function () {
     if (!this.laeuft || !this.spielt) { return; }
     this.hoert = true;
-    this.hoerenAb = this.k.motor.jetzt() + 0.25;
+    /* Nach einer Rueckmeldung: die hat gerade selbst geklungen, und
+     * genau dann ist spieltBis aktuell und nicht veraltet. */
+    this.hoerenAb = Math.max(this.k.motor.jetzt() + 0.25,
+                             this.k.motor.spieltBis + this.k.motor.ausgabeVerzug() + NACHHALL_RAND);
     this.letzterPegel = this.k.motor.jetzt();
     this.k.tracker.reset();
   };
 
   /* Nichts gehoert: kein Zeitlimit, kein Abbruch — nur der Zielton
    * noch einmal und ein pulsierendes Griffbild. Beim dritten Mal
-   * lauter, weil die Floete dann vermutlich zu weit weg ist. */
+   * lauter, weil die Trompete dann vermutlich zu weit weg ist. */
   Level1.prototype._wache = function () {
     if (!this.laeuft || !this.spielt || !this.hoert) { return; }
     if (this.k.rueckmeldung.laeuft) { return; }

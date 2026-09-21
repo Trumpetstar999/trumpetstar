@@ -1,6 +1,6 @@
 {
-  "name": "Trompete",
-  "short_name": "Trompete",
+  "name": "Happy Beginners — Pieps lernt Trompete",
+  "short_name": "Pieps",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,17 @@
   "theme_color": "#FDF8EE",
   "lang": "de",
   "icons": [
-    { "src": "img/symbol-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "img/symbol-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "img/symbol-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "img/symbol-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

@@ -7,10 +7,11 @@
   --linie-zart:   #C8BBA4;
   --marker:       #FF8A3D;
   --haken:        #2F9E44;
-  --messing:      #E8C36A;
+  --trompete:     #F7C948;
+  --trompete-hell:#FFE082;
+  --ventil-schaft:#8FD3F0;
   --griff-linie:  #6B563C;
   --loch-offen:   #FFFDF8;
-  --griff-fenster:#B9AC97;
   --karte:        #FFFFFF;
   --karte-rand:   #E3D6BC;
   --schatten:     rgba(90, 70, 40, 0.16);
@@ -92,7 +93,7 @@ img { display: block; max-width: 100%; max-height: 100%; }
 }
 .karte {
   position: relative;
-  flex: 1 1 0; max-width: 31%;
+  flex: 1 1 0; max-width: 23.5%;
   background: var(--karte);
   border: 0.5vh solid var(--karte-rand);
   border-radius: 3.2vh;
@@ -104,18 +105,39 @@ img { display: block; max-width: 100%; max-height: 100%; }
   transition: transform .12s ease-out, box-shadow .12s ease-out;
 }
 .karte:active { transform: scale(0.965); }
+
+/* Die Karten kommen nacheinander herein, von links nach rechts.
+   Das ist die einzige Stelle, an der eine Animation etwas VERZOEGERT:
+   hier laeuft kein Mikrofon und niemand wartet auf einen Einsatz, und
+   das Nacheinander sagt dem Kind, dass es hier etwas auszuwaehlen
+   gibt. Nach knapp einer halben Sekunde ist alles da. */
+.karten.kommen .karte {
+  animation: karte-auf .40s cubic-bezier(.2, 1.25, .4, 1) backwards;
+}
+.karten.kommen .karte:nth-child(2) { animation-delay: .07s; }
+.karten.kommen .karte:nth-child(3) { animation-delay: .14s; }
+@keyframes karte-auf {
+  0%   { transform: translateY(3.5vh) scale(.94); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
 .karte.zuletzt {
   border-color: var(--marker);
   box-shadow: 0 1vh 2.4vh var(--schatten), 0 0 0 0.7vh rgba(255, 138, 61, .22);
 }
 .karte-punkte {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 0.7vh; height: 5vh; align-items: center;
+  display: flex; justify-content: center;
+  gap: 0.6vh; height: 4vh; align-items: center;
   margin-bottom: 1.2vh;
+  width: 100%; padding: 0 0.8vh;
 }
-/* Die Punkte muessen bis zu neun Toene tragen, ohne die Karte zu sprengen. */
+/* Die Punkte muessen bis zu neun Toene tragen, ohne die Karte zu
+ * sprengen und ohne umzubrechen. Deshalb duerfen sie schrumpfen statt
+ * in eine zweite Zeile zu rutschen: eine zweite Zeile wuerde wie ein
+ * zweiter Tonvorrat aussehen. */
 .karte-punkte i {
-  display: block; width: 2.6vh; height: 2.6vh; border-radius: 50%;
+  display: block; flex: 0 1 2.4vh;
+  width: 2.4vh; height: 2.4vh; min-width: 1.2vh;
+  aspect-ratio: 1; border-radius: 50%;
   border: 0.3vh solid rgba(0,0,0,.16);
 }
 /* Wie beim Uebungsbildschirm: das SVG bekommt seine Groesse aus dem
@@ -174,23 +196,30 @@ img { display: block; max-width: 100%; max-height: 100%; }
 #modi { display: flex; gap: 1.2vw; flex: 0 0 auto; }
 #modi button { opacity: .5; }
 #modi button.an { opacity: 1; border-color: var(--marker); }
-#modi .modus-bild {
-  position: relative; display: block;
-  width: 88%; height: 88%;
+
+/* In den Knoepfen steht dieselbe Trompete wie unten im Griffbild —
+   dasselbe Bild, dieselben gezeichneten Ventile, nur klein und immer
+   mit offenen Ventilen. Der Knopf sagt ja nicht, WAS zu greifen ist,
+   sondern WER spielt: die App mit oder das Kind allein.
+
+   Der Kasten ist quadratisch, die Trompete doppelt so breit wie hoch;
+   sie sitzt deshalb als Band in der Mitte, und darunter bleibt Platz
+   fuer den Lautsprecher. */
+.modusbild {
+  position: relative;
+  display: block; width: 92%; height: 92%;
 }
-#modi .modus-bild img {
-  width: 100%; height: 100%; object-fit: contain;
-}
-#modi .klang {
-  position: absolute; right: -4%; bottom: -2%;
+.modus-trompete { display: block; width: 100%; height: 100%; }
+.modus-laut {
+  position: absolute; right: -2%; bottom: 4%;
   width: 42%; height: 42%;
 }
-#modi .klang ellipse, #modi .klang rect {
+.modus-laut path {
   fill: var(--marker); stroke: var(--marker);
-  stroke-width: 2; stroke-linejoin: round;
+  stroke-width: 4; stroke-linejoin: round;
 }
-#modi .klang .welle {
-  fill: none; stroke: var(--marker); stroke-width: 4; stroke-linecap: round;
+.modus-laut .welle {
+  fill: none; stroke: var(--marker); stroke-width: 6; stroke-linecap: round;
 }
 #uebung.stufe1 #modi { display: none; }
 
@@ -229,7 +258,7 @@ img { display: block; max-width: 100%; max-height: 100%; }
   position: relative; overflow: hidden;
   min-width: 0; min-height: 0;
 }
-#noten {
+#noten, #satz {
   display: block; position: absolute;
   left: 50%; top: 50%; transform: translate(-50%, -50%);
 }
@@ -238,11 +267,69 @@ img { display: block; max-width: 100%; max-height: 100%; }
   display: flex; align-items: center; justify-content: center;
   min-width: 0; min-height: 0; overflow: hidden;
 }
+/* Die gezeichnete Trompete.
+ *
+ * Sie liegt als Hintergrund hinter dem SVG, nicht als <image> darin.
+ * Beide werden mittig und seitenverhaeltnistreu eingepasst (contain
+ * hier, xMidYMid meet dort) und haben dasselbe Verhaeltnis 1774:887 —
+ * dadurch sitzen die gezeichneten Ventile genau auf ihren Buechsen,
+ * gleichgueltig wie gross der Kasten gerade ist.
+ *
+ * Warum Hintergrund und nicht <image>: eine Bildreferenz INNERHALB
+ * eines SVG ist die einzige Art von Verweis, die je nach Umgebung
+ * anders behandelt wird. Ein CSS-Hintergrund wird ueberall geladen wie
+ * jedes andere Bild der App. */
+.trompetenbild {
+  background-image: url("../img/trompete-gold.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
 #griff { display: block; height: 100%; width: 100%; }
-#grifffeld.pulsiert #griff { animation: pulsieren 1.5s ease-in-out infinite; }
-@keyframes pulsieren {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: .78; transform: scale(1.035); }
+
+/* Die Ventile fahren, sie springen nicht — aber sie fahren schnell.
+ *
+ * Ein Perinet-Ventil schnalzt: hinunter durch den Finger, herauf durch
+ * die Feder, beides in wenigen Hundertstelsekunden. 55 ms ist gerade
+ * noch als Bewegung zu sehen und schon nicht mehr als Warten zu
+ * spueren. Laenger gedehnt saehe es aus, als klemme das Ventil.
+ *
+ * Bewegt wird die ganze Ventilgruppe mit transform — die eine
+ * Eigenschaft, die jeder Browser fluessig animiert, ohne das Layout neu
+ * zu rechnen. Die Zahl 96 ist der Ventilweg aus griff.js, in
+ * Einheiten des Bezugssystems 1774x887.
+ *
+ * Kein Nachfedern am Ende: bei dieser Dauer waere es nicht als Federn
+ * zu erkennen, sondern nur als Unschaerfe. */
+.ventil {
+  transition: transform 55ms cubic-bezier(.3, .9, .4, 1);
+}
+.ventil.gedrueckt { transform: translateY(96px); }
+.ventil-knopf {
+  transition: fill 55ms linear, stroke 55ms linear;
+}
+
+/* "Schau auf den Griff" — wenn nichts zu hoeren war, spielt die App
+   den Ton noch einmal vor und das Griffbild meldet sich.
+
+   Es pulsieren aber NUR DIE DREI KNOEPFE, nicht die Trompete. Das
+   Instrument steht still; bewegen tut sich daran nur, was sich auch am
+   echten Instrument bewegt. Das ist zugleich die genauere Ansage: der
+   Blick geht auf die Knoepfe und nicht auf das ganze Bild.
+
+   Skaliert wird der Knopf um seine eigene Mitte, dafuer braucht ein
+   SVG-Rechteck transform-box und transform-origin — sonst waere der
+   Bezugspunkt der Nullpunkt der Zeichenflaeche. Die Verschiebung des
+   gedrueckten Ventils sitzt eine Ebene hoeher auf der Gruppe und kommt
+   sich damit nicht in die Quere. */
+#grifffeld.pulsiert .ventil-knopf {
+  transform-box: fill-box; transform-origin: center;
+  animation: knopf-pulsieren 1.5s ease-in-out infinite;
+}
+@keyframes knopf-pulsieren {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.22); opacity: .82; }
 }
 
 /* ================= Tempo ================= */
@@ -304,6 +391,34 @@ img { display: block; max-width: 100%; max-height: 100%; }
   100% { transform: scale(.94); opacity: 0; }
 }
 
+/* Beim Lob fliegen bunte Noten auf — in den Farben des Tonvorrats,
+   die das Kind von den Notenkoepfen und den Ventilen schon kennt.
+
+   Der Kopf ist eine schraeg gestellte Ellipse, der Hals haengt rechts
+   daran; zusammen ist das die Form, die auf dem Notenblatt steht. Der
+   Hals erbt seine Farbe vom Kopf, deshalb genuegt es, dem Kopf eine
+   Farbe zu geben. */
+.jubelnote {
+  position: absolute;
+  width: 4.4vh; height: 3.2vh;
+  border-radius: 50%;
+  opacity: 0;
+  animation: notenflug 1.5s cubic-bezier(.16, .62, .4, 1) forwards;
+}
+.jubelnote::after {
+  content: '';
+  position: absolute; right: 0.1vh; bottom: 45%;
+  width: 0.55vh; height: 4.6vh;
+  border-radius: 0.3vh;
+  background: inherit;
+}
+@keyframes notenflug {
+  0%   { transform: translate(0, 9vh) rotate(-20deg) scale(.35); opacity: 0; }
+  16%  { opacity: 1; }
+  72%  { opacity: 1; }
+  100% { transform: translate(var(--weit, 0), -34vh) rotate(var(--dreh, -20deg)) scale(1); opacity: 0; }
+}
+
 .feder {
   position: absolute;
   width: 15vh; height: 15vh;
@@ -318,7 +433,11 @@ img { display: block; max-width: 100%; max-height: 100%; }
   100% { transform: translate(0, 27vh) rotate(0deg); opacity: 0; }
 }
 
-.marker-ring { animation: blinken .55s ease-in-out infinite alternate; }
+.marker-ring { opacity: 1; }
+/* Der Marker blinkt nicht. Frueher pulsierte er in einem eigenen Takt
+   von gut einer Sekunde — unabhaengig vom Tempo, und damit sichtbar
+   gegen die Musik. Er springt jetzt mit jeder Note weiter, und dieser
+   Sprung ist der einzige Takt, den er schlaegt. */
 .haken {
   transform-box: fill-box; transform-origin: center;
   animation: haken-auf .34s cubic-bezier(.2,1.5,.4,1) 1;
@@ -358,8 +477,27 @@ img { display: block; max-width: 100%; max-height: 100%; }
   padding: 4vh 6vw;
 }
 .eltern-blatt { max-width: 46rem; width: 100%; color: #2C2620; line-height: 1.5; }
-.eltern-blatt h1 { font-size: 1.7rem; margin: 0 0 1.5rem; }
+.eltern-blatt h1 { font-size: 1.7rem; margin: 0; }
+
+/* Kopfzeile: Titel links, die drei Flaggen rechts oben. Sie stehen
+   bewusst ganz oben — wer die Seite nicht lesen kann, muss zuerst
+   finden, wo sich das aendern laesst. */
+.blatt-kopf {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin: 0 0 1.5rem;
+}
+#sprachwahl { display: flex; gap: .45rem; flex-shrink: 0; }
+#sprachwahl button {
+  padding: 0; width: 2.6rem; height: 1.85rem;
+  border: 2px solid #DCD0B8; border-radius: .35rem;
+  background: #fff; overflow: hidden; line-height: 0;
+  opacity: .4; transition: opacity .12s, border-color .12s;
+}
+#sprachwahl button.an { opacity: 1; border-color: #6B563C; }
+#sprachwahl svg { display: block; width: 100%; height: 100%; }
+
 .eltern-blatt h2 { font-size: 1.05rem; margin: 2rem 0 .6rem; color: #6B563C; font-weight: 600; }
+.eltern-blatt h3 { font-size: .95rem; margin: 1.3rem 0 .5rem; color: #6B563C; font-weight: 600; }
 .eltern-blatt table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .eltern-blatt td { padding: .5rem .4rem; border-bottom: 1px solid #EDE3D0; }
 .eltern-blatt td:first-child { width: 3rem; }
@@ -388,13 +526,7 @@ img { display: block; max-width: 100%; max-height: 100%; }
   border: 2px solid #DCD0B8; background: #fff; font-size: .95rem;
 }
 .knopfreihe button.an { border-color: #6B563C; background: #F3E9D6; font-weight: 600; }
-#eltern-klang-ton {
-  padding: .55rem .9rem; border-radius: .6rem;
-  border: 2px solid #DCD0B8; background: #fff;
-  font-size: .95rem; color: #2C2620; min-width: 12rem;
-}
 .hinweis { font-size: .85rem; color: #7A6E5E; margin: .6rem 0 0; }
-
 .mikro-zeile { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px solid #EDE3D0; font-size: .95rem; }
 .mikro-zeile b { font-variant-numeric: tabular-nums; }
 #mikro-balken { margin-top: .8rem; height: .9rem; background: #EDE3D0; border-radius: .45rem; overflow: hidden; }
@@ -433,66 +565,440 @@ img { display: block; max-width: 100%; max-height: 100%; }
 
 /* Level 1: das Griffbild steht NEBEN dem System, nicht darunter.
    Nur so bleibt fuer den Notenkopf fast die ganze Bildschirmhoehe
-   uebrig — und genau das verlangt der Auftrag dort. Vorzaehler und
-   Tempo-Regler gibt es in Level 1 ohnehin nicht. */
-/* Das Griffbild der Trompete liegt quer (Mundstueck links, Becher
-   rechts, daneben die Naturton-Leiter). Es steht trotzdem neben dem
-   System und nicht darunter: eine eigene Zeile haette den Notenkopf um
-   ein Drittel schrumpfen lassen, und der ist das Wichtigere. Die
-   rechte Spalte ist dafuer breiter als bei einem hochkant stehenden
-   Instrument. */
+   uebrig — und genau das verlangt Level 1. Vorzaehler und
+   Tempo-Regler gibt es dort ohnehin nicht.
+
+   Zwei Zahlen sind gegenueber der Blockfloete anders, und beide aus
+   demselben Grund: eine Floete ist hochkant, eine Trompete doppelt so
+   breit wie hoch.
+
+   Die Spalte ist breiter (32vw statt 25vw), weil die Trompete in der
+   Breite an ihre Grenze stoesst und nicht in der Hoehe — jedes
+   Prozent Spaltenbreite macht die drei Ventilknoepfe groesser.
+
+   Und die feste Hoehe sitzt jetzt in der UNTEREN Zeile: das Tier
+   nimmt, was uebrig ist, die Trompete bekommt ihre 22vh. Umgekehrt
+   (wie bei der Floete) bliebe unter dem Bild ein halber Bildschirm
+   leer, denn breiter als die Spalte wird die Trompete nicht. */
 #uebung.stufe1 {
-  grid-template-columns: 1fr 34vw;
-  grid-template-rows: 13vh 1fr 1vh;
-  row-gap: 1.2vh; column-gap: 1.5vw;
+  grid-template-columns: 1fr 32vw;
+  grid-template-rows: 13vh 1fr 22vh 1vh;
+  row-gap: 1.4vh;
 }
 #uebung.stufe1 #leiste    { grid-area: 1 / 1 / 2 / 3; }
-#uebung.stufe1 #notenfeld { grid-area: 2 / 1 / 3 / 2; }
-#uebung.stufe1 #rechts    { grid-area: 2 / 2 / 3 / 3; }
-#uebung.stufe1 #tempofeld { grid-area: 3 / 1 / 4 / 3; }
-
-/* rechte Spalte in Level 1: Tier oben, Griffbild darunter */
-#rechts { display: none; }
-#uebung.stufe1 #rechts {
-  display: flex; flex-direction: column;
-  min-width: 0; min-height: 0; gap: 1vh;
-}
-#uebung.stufe1 #rechts #tierfeld  { flex: 0 0 42%; }
-#uebung.stufe1 #rechts #grifffeld { flex: 1 1 auto; }
+#uebung.stufe1 #notenfeld { grid-area: 2 / 1 / 4 / 2; }
+#uebung.stufe1 #tierfeld  { grid-area: 2 / 2 / 3 / 3; }
+#uebung.stufe1 #grifffeld { grid-area: 3 / 2 / 4 / 3; }
+#uebung.stufe1 #tempofeld { grid-area: 4 / 1 / 5 / 3; }
 
 /* Level 2: senkrecht gestapelt wie im Auftrag aufgezaehlt. Hier ist
    nicht die Hoehe der begrenzende Faktor, sondern die Breite. */
 #uebung.stufe2 {
   grid-template-columns: 1fr;
-  grid-template-rows: 12vh 1fr 17vh 10vh;
-  row-gap: 1.4vh;
+  grid-template-rows: 13vh 1fr 25.5vh 11vh;
+  row-gap: 0.6vh;
 }
-/* In Level 2 und 3 traegt der Kasten nur noch das Griffbild — es liegt
-   quer und nutzt die volle Breite. */
-/* Vier Kinder, vier Zeilen — die Reihenfolge im HTML genuegt.
-   Die Trompete bleibt bewusst kleiner als die Zeile: so beruehrt sie
-   weder die Noten darueber noch den Tempo-Regler darunter. */
-#uebung.stufe2 #rechts { display: block; min-height: 0; padding-bottom: 1vh; }
-#uebung.stufe2 #rechts #tierfeld { display: none; }
-#uebung.stufe2 #rechts #grifffeld { height: 100%; }
-#uebung.stufe2 #griff { max-height: 15.5vh; max-width: 62vh; margin: 0 auto; }
-
-
+#uebung.stufe2 #tierfeld { display: none; }
 
 /* Das Tier zum Ton: g wie Gans, h wie Hamster. Es steht nur in
    Level 1, wo genau ein Ton geuebt wird. */
 #tierfeld {
   display: flex; align-items: center; justify-content: center;
   min-width: 0; min-height: 0; overflow: hidden;
+  /* damit das Tier nicht auf der Trompete steht */
+  padding-bottom: 2vh;
 }
+/* Das Tier huepft herein und atmet danach weiter — sehr langsam und
+   sehr wenig. Ein Bild, das sich gar nicht ruehrt, wirkt auf ein Kind
+   wie ein angehaltenes Bild; ein Bild, das sich zu sehr ruehrt, zieht
+   den Blick von den Noten weg. Vier Sekunden Atemzug und gut ein
+   Prozent Bewegung sind der Punkt dazwischen: man sieht es, wenn man
+   hinsieht, und es stoert nicht, wenn man woanders hinsieht. */
 #tierbild {
-  max-width: 100%; max-height: 100%;
+  /* Nicht ganz bis an den Rand: das Tier soll gross sein, aber nicht
+     die ganze Zelle ausfuellen. Sonst steht es auf einem kurzen
+     Bildschirm unmittelbar auf der Trompete — es hat dann zwar Platz,
+     sieht aber aus, als draenge es hinein. */
+  max-width: 100%; max-height: 88%;
   width: auto; height: auto; object-fit: contain;
-  animation: tier-auf .5s cubic-bezier(.2,1.3,.4,1) 1;
+  animation: tier-auf .5s cubic-bezier(.2,1.3,.4,1) 1,
+             tier-atmen 4s ease-in-out .5s infinite;
 }
 @keyframes tier-auf {
   0%   { transform: scale(.55) translateY(8%); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
+@keyframes tier-atmen {
+  0%, 100% { transform: scale(1) translateY(0) rotate(0deg); }
+  50%      { transform: scale(1.012) translateY(-1.1%) rotate(.7deg); }
+}
 
-#notenfeld, #grifffeld { height: 100%; width: 100%; }
+/* Die drei Felder brauchen eine feste Hoehe, und zwar aus einem Grund,
+   der sich leicht uebersieht: #uebung ist ein Raster, erbt aber von
+   .bildschirm ein align-items:center. Rasterkinder werden damit NICHT
+   auf die Zeilenhoehe gedehnt, sondern wachsen nach ihrem Inhalt.
+
+   Fuer das Tier hiess das: sein max-height:100% lief ins Leere, weil
+   die Hoehe des Feldes selbst auto war. Das Bild (400 x 550) wurde auf
+   die Spaltenbreite gerechnet und damit 373 px hoch — in einer Zeile
+   von 225 px. Auf dem iPad fiel das nicht auf, dort ist die Zeile hoch
+   genug; auf einem Telefon im Querformat ragte das Tier in die
+   Trompete. */
+#notenfeld, #grifffeld, #tierfeld { height: 100%; width: 100%; }
+
+
+/* ================= Umblättern =================
+ *
+ * Rechts unten, wie der Griff zur nächsten Seite am Notenständer.
+ * Er sitzt über dem Raster, damit er die Aufteilung von Level 1 und
+ * Level 2 nicht anfasst, und über der Bühne, damit er auch während
+ * einer Rückmeldung erreichbar bleibt — genau wie das Haus.
+ */
+#umblaettern, #zurueckblaettern {
+  position: absolute; right: 2vw; bottom: 1.6vh;
+  width: 9vh; height: 9vh;
+  border: 0.45vh solid var(--karte-rand);
+  border-radius: 2.4vh;
+  background: var(--karte);
+  box-shadow: 0 0.6vh 1.4vh var(--schatten);
+  padding: 0; z-index: 45;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s linear, opacity .08s linear;
+}
+/* Zurueck steht links daneben — eine Knopfbreite plus Luft. */
+#zurueckblaettern { right: calc(2vw + 10.5vh); }
+
+#umblaettern:active, #zurueckblaettern:active { transform: scale(0.9); opacity: .7; }
+#umblaettern svg, #zurueckblaettern svg { width: 74%; height: 74%; }
+#umblaettern .blatt, #zurueckblaettern .blatt {
+  fill: var(--papier); stroke: var(--linie); stroke-width: 6; stroke-linejoin: round; }
+#umblaettern .ecke, #zurueckblaettern .ecke {
+  fill: none; stroke: var(--linie); stroke-width: 6; stroke-linejoin: round; }
+#umblaettern .pfeil, #zurueckblaettern .pfeil {
+  fill: none; stroke: var(--marker); stroke-width: 7;
+  stroke-linecap: round; stroke-linejoin: round; }
+
+/* Der Tempo-Regler darf nicht unter die Knoepfe laufen. */
+#uebung.stufe2 #tempofeld { padding-right: 23vh; }
+
+
+/* ================= Das Buch =================
+ *
+ * Neben dem iPad liegt das gedruckte Buch. Die App zeigt deshalb
+ * dieselben Seiten als Bilder — das Kind vergleicht, was es sieht, und
+ * muss nichts lesen. Oben die elf farbigen Reiter der Welten, in
+ * denselben Farben wie im Druck.
+ */
+#buch {
+  display: grid;
+  grid-template-rows: 9vh 1fr;
+  row-gap: 1.4vh;
+  padding: 1.6vh 2vw 2vh;
+  background: var(--papier);
+}
+
+#buch-reiter {
+  display: flex; gap: 0.8vw;
+  align-items: stretch; justify-content: center;
+  /* Platz rechts fuer das Haus, damit kein Reiter darunter liegt */
+  padding-right: 13vh;
+  /* Die volle Zeilenhoehe (9vh, so hoch wie das Haus) muss hier stehen:
+     #buch erbt von .bildschirm align-items:center und dehnt seine
+     Rasterkinder nicht (siehe #notenfeld). Sonst wurden die Reiter nur
+     so hoch wie ihre Ziffer — 39 px, zu klein fuer einen Kinderfinger. */
+  height: 100%;
+}
+.buch-reiter {
+  flex: 1 1 0; max-width: 9vh;
+  border: 0.45vh solid rgba(0, 0, 0, .14);
+  border-radius: 1.6vh;
+  box-shadow: 0 0.5vh 1.2vh var(--schatten);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; opacity: .55;
+  transition: transform .1s ease-out, opacity .12s;
+}
+.buch-reiter b {
+  color: #FFFFFF; font-size: 3.4vh; font-weight: 800;
+  text-shadow: 0 0.2vh 0.4vh rgba(0, 0, 0, .35);
+}
+.buch-reiter.an {
+  opacity: 1;
+  transform: translateY(0.5vh);
+  box-shadow: 0 0.8vh 1.8vh var(--schatten), 0 0 0 0.5vh rgba(255, 255, 255, .7) inset;
+}
+.buch-reiter:active { transform: scale(0.93); }
+
+/* Die Seiten der gewaehlten Welt. Bis zu neun passen nebeneinander;
+   mehr gibt es in keiner Welt, deshalb wird hier nie gescrollt. */
+#buch-seiten {
+  display: flex; flex-wrap: wrap;
+  gap: 1.6vh 1.4vw;
+  align-items: center; justify-content: center;
+  align-content: center;
+  min-height: 0;
+}
+.buch-seite {
+  position: relative;
+  height: 34vh; padding: 0;
+  background: var(--karte);
+  border: 0.5vh solid var(--karte-rand);
+  border-radius: 1.8vh;
+  box-shadow: 0 1vh 2.2vh var(--schatten);
+  overflow: hidden;
+  transition: transform .1s ease-out;
+}
+#buch-seiten.viele .buch-seite { height: 30vh; }
+.buch-seite:active { transform: scale(0.95); }
+.buch-seite img { display: block; height: 100%; width: auto; }
+
+/* Ein Stern heisst: das steht. */
+.buch-stern {
+  position: absolute; right: 0.8vh; top: 0.8vh;
+  width: 5vh; height: 5vh;
+  background: var(--trompete);
+  border: 0; pointer-events: none;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+                     50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  filter: drop-shadow(0 0.3vh 0.5vh rgba(0, 0, 0, .3));
+}
+
+#buch-haus {
+  position: absolute; right: 2vw; top: 1.6vh;
+  width: 9vh; height: 9vh;
+  background: var(--karte);
+  border: 0.45vh solid var(--karte-rand);
+  border-radius: 2.4vh;
+  box-shadow: 0 0.5vh 1.4vh var(--schatten);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+#buch-haus:active { transform: scale(0.93); }
+#buch-haus img { width: 76%; height: 76%; object-fit: contain; }
+
+/* Mehrere Lieder auf einer Seite: die Seite gross, und das Kind tippt
+   das Lied an — dieselbe Bewegung wie mit dem Finger im Heft. */
+#buch-lupe {
+  position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(40, 32, 20, .55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50;
+}
+#buch-lupe-blatt {
+  position: relative; height: 94vh;
+  border-radius: 1.2vh; overflow: hidden;
+  box-shadow: 0 1.4vh 3.4vh rgba(0, 0, 0, .4);
+}
+#buch-lupe-bild { display: block; height: 100%; width: auto; }
+#buch-lupe-felder { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.buch-feld {
+  position: absolute; left: 0; right: 0;
+  background: transparent;
+  border: 0.5vh solid transparent;
+  border-radius: 1.4vh;
+  padding: 0;
+}
+.buch-feld:active {
+  background: rgba(255, 138, 61, .22);
+  border-color: var(--marker);
+}
+#buch-lupe-zu {
+  position: absolute; left: 2vw; top: 2vh;
+  width: 9vh; height: 9vh;
+  color: var(--linie);
+  background: var(--karte);
+  border: 0.45vh solid var(--karte-rand);
+  border-radius: 2.4vh;
+  box-shadow: 0 0.5vh 1.4vh var(--schatten);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+}
+#buch-lupe-zu:active { transform: scale(0.93); }
+#buch-lupe-zu svg { width: 54%; height: 54%; }
+
+/* ---- Der Uebungsbildschirm, wenn ein Lied des Buches offen ist ----
+ *
+ * Wie Level 2, nur mit dem Zeilenband unter der Leiste: es sagt, wie
+ * weit das Lied gediehen ist. */
+/* Die Felder stehen hier ausdruecklich im Raster und nicht in der
+   Reihenfolge, in der sie im HTML kommen: das Zeilenband ist bei einem
+   Lied ohne Zeilen gar nicht da, und ohne feste Plaetze wuerde das
+   Notenbild dann in seine Zeile rutschen. */
+#uebung.buch {
+  grid-template-columns: 1fr;
+  grid-template-rows: 13vh 9.4vh 1fr 20vh 11vh;
+  row-gap: 0.6vh;
+}
+#uebung.buch #leiste     { grid-area: 1 / 1 / 2 / 2; }
+#uebung.buch #zeilenband { grid-area: 2 / 1 / 3 / 2; }
+#uebung.buch #notenfeld  { grid-area: 3 / 1 / 4 / 2; }
+#uebung.buch #grifffeld  { grid-area: 4 / 1 / 5 / 2; }
+#uebung.buch #tempofeld  { grid-area: 5 / 1 / 6 / 2; }
+#uebung.buch #tierfeld { display: none; }
+#uebung.buch #tempofeld { padding-right: 23vh; }
+
+/* Der Weg durch das Lied — oben, unter der Leiste.
+ *
+ * Links die gedruckten Zeilen als kleine Abbilder ihrer selbst, durch
+ * einen Strich verbunden; rechts, durch einen Pfeil abgesetzt, das
+ * ganze Lied mit seinem Stern. Alles bleibt papierfarben und duenn: es
+ * soll den Weg zeigen, nicht um Aufmerksamkeit bitten. Farbe hat hier
+ * nur zweierlei Bedeutung — gruen heisst geschafft, orange heisst
+ * hier bist du gerade.
+ */
+#zeilenband {
+  display: flex; align-items: stretch;
+  width: 100%; height: 100%;
+  padding: 0.3vh 0;
+}
+.bandfeld {
+  flex: 1 1 0; min-width: 0;
+  position: relative;
+  background: var(--karte);
+  border: 0.3vh solid var(--karte-rand);
+  border-radius: 1.2vh;
+  padding: 0;
+  transition: border-color .2s, background-color .2s, transform .1s ease-out;
+}
+.bandfeld:active { transform: scale(0.96); }
+
+/* Das Notenbild darin. Es ist ein Bild, kein Notentext: zart, grau und
+   ohne Anspruch, gelesen zu werden. */
+.bandbild {
+  display: block; position: absolute;
+  left: 3.2vh; right: 0.7vh; top: 0.5vh; bottom: 0.5vh;
+  overflow: hidden; opacity: .48;
+}
+.bandbild svg {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Das ganze Lied ist mehr als eine Zeile — es bekommt mehr Platz. */
+.bandfeld.ganz { flex: 1.9 1.9 0; }
+
+/* Der gruene Haken und der Stern sitzen links im Feld, dort, wo im
+   Buch die Nummer der Zeile stuende. */
+.bandmarke {
+  position: absolute; left: 0.7vh; top: 50%;
+  width: 2.2vh; height: 2.2vh; margin-top: -1.1vh;
+  pointer-events: none;
+}
+.bandhaken { opacity: 0; transition: opacity .25s; }
+.bandfeld.geschafft .bandhaken { opacity: 1; }
+.bandhaken circle { fill: var(--haken); }
+.bandhaken path {
+  fill: none; stroke: #FFFFFF; stroke-width: 2.6;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.bandstern path {
+  fill: var(--linie-zart);
+  transition: fill .25s;
+}
+.bandfeld.ganz.geschafft .bandstern path { fill: var(--trompete); }
+
+/* Wo das Kind gerade ist. */
+.bandfeld.hier {
+  border-color: var(--marker);
+  background: #FFF6EF;
+}
+.bandfeld.hier .bandbild { opacity: .8; }
+
+/* Was die Felder verbindet: ein duenner Strich, ein Pfeil vor dem
+   ganzen Lied. Beide sitzen mittig und nehmen nur wenig Platz. */
+.bandstrich, .bandpfeil {
+  flex: 0 0 auto; align-self: center;
+  position: relative;
+}
+.bandstrich {
+  width: 1.4vw; height: 0.3vh;
+  background: var(--linie-zart);
+  transition: background-color .25s;
+}
+.bandstrich.geschafft { background: var(--haken); }
+.bandpfeil { width: 2.6vw; height: 1.6vh; }
+.bandpfeil::before {
+  content: ''; position: absolute;
+  left: 22%; right: 26%; top: 50%;
+  height: 0.3vh; margin-top: -0.15vh;
+  background: var(--linie-zart);
+}
+.bandpfeil::after {
+  content: ''; position: absolute;
+  right: 24%; top: 50%;
+  width: 0.9vh; height: 0.9vh;
+  border-top: 0.3vh solid var(--linie-zart);
+  border-right: 0.3vh solid var(--linie-zart);
+  transform: translate(0, -50%) rotate(45deg);
+}
+
+/* Die beiden Stimmen eines Duetts — die Sterne stehen im Buch an
+   derselben Stelle neben den Systemen. */
+#stimmen { display: flex; gap: 1.2vw; flex: 0 0 auto; }
+#stimmen button {
+  flex: 0 0 auto;
+  width: 11.5vh; height: 11.5vh;
+  border-radius: 2.6vh;
+  background: var(--karte);
+  border: 0.45vh solid var(--karte-rand);
+  box-shadow: 0 0.5vh 1.4vh var(--schatten);
+  display: flex; align-items: center; justify-content: center;
+  padding: 0; opacity: .5;
+  transition: transform .1s ease-out, border-color .12s, opacity .12s;
+}
+#stimmen button:active { transform: scale(0.93); }
+#stimmen button.an { opacity: 1; border-color: var(--marker); }
+.stimmknopf svg { width: 74%; height: 74%; }
+.stimmknopf .stern { fill: #EA008A; }
+.stimmknopf .zahl {
+  fill: #FFFFFF; font-size: 46px; font-weight: 800;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Die vierte Karte der Auswahl zeigt den Umschlag des Buches, ganz und
+   ungeschnitten: genau das Bild, das neben dem iPad liegt. Eine
+   Punktreihe hat sie nicht — im Buch steht, was im Buch steht, und
+   nicht der Tonvorrat eines Levels. */
+.karte-buch .karte-punkte { display: none; }
+.karte-umschlag {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%; max-height: 100%;
+  border-radius: 0.6vh;
+  box-shadow: 0 0.6vh 1.6vh var(--schatten);
+}
+.karten.kommen .karte:nth-child(4) { animation-delay: .21s; }
+
+/* ================= Wer keine Bewegung mag =================
+ *
+ * Manche Kinder — und manche Eltern — reagieren auf Bewegung mit
+ * Unwohlsein; iOS und Android haben dafuer einen Schalter im System.
+ * Wenn er gesetzt ist, bleibt alles Schmueckende stehen.
+ *
+ * Zwei Dinge bleiben ausdruecklich in Bewegung, weil sie nichts
+ * schmuecken, sondern etwas SAGEN:
+ *
+ *   .ventil       das Ventil faehrt herunter. Es zeigt den Griff; ohne
+ *                 die Fahrt springt es, aber es muss sichtbar bleiben,
+ *                 welcher Knopf unten ist.
+ *   #tempogriff   der Regler folgt dem Finger.
+ *
+ * Beides ist ohnehin unter 150 ms und damit keine Bewegung, die
+ * jemanden verfolgt.
+ */
+@media (prefers-reduced-motion: reduce) {
+  #torknopf,
+  #spielknopf.bereit,
+  #grifffeld.pulsiert .ventil-knopf,
+  #tierbild,
+  .karten.kommen .karte,
+  .jubel, .jubelnote, .feder,
+  .marker-ring, .leuchtet, .hof,
+  #hase.winkt,
+  #drehbitte svg {
+    animation: none !important;
+  }
+  /* Was sonst nur durch seine Animation sichtbar wurde, muss trotzdem
+     zu sehen sein. */
+  .jubel, .feder, .jubelnote, #tierbild { opacity: 1; }
+  .jubelnote { display: none; }
+}

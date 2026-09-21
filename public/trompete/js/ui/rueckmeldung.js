@@ -16,7 +16,37 @@
     this.grifffeld = o.grifffeld;
     this.laeuft = false;
     this.bilder = o.bilder || {};
+    /* Die Farben des Tonvorrats — daraus werden die Noten, die beim
+     * Lob auffliegen. Sie aus den Toenen zu nehmen statt eine eigene
+     * Palette zu erfinden ist wichtig: das Kind kennt diese Farben
+     * schon von den Notenkoepfen und den Ventilen. */
+    this.farben = o.farben && o.farben.length ? o.farben : ['#FFC94D'];
   }
+
+  /* Wie viele Noten auffliegen und wie weit sie auseinandergehen.
+   * Ungerade Zahl, damit eine Note in der Mitte gerade nach oben
+   * steigt und der Faecher symmetrisch ist. */
+  var JUBEL_NOTEN = 7;
+  var JUBEL_FAECHER = 17;      // vh nach aussen, ganz aussen
+
+  /** Ein kleiner Notenkopf, der auffliegt. Reines Bild, kein Zeichen —
+   *  es steht nichts geschrieben, es fliegt nur etwas Buntes. */
+  Rueckmeldung.prototype._jubelnoten = function () {
+    var mitte = (JUBEL_NOTEN - 1) / 2;
+    for (var i = 0; i < JUBEL_NOTEN; i++) {
+      var aus = (i - mitte) / mitte;               // -1 .. +1
+      var n = document.createElement('i');
+      n.className = 'jubelnote';
+      n.style.backgroundColor = this.farben[i % this.farben.length];
+      n.style.setProperty('--weit', (aus * JUBEL_FAECHER).toFixed(1) + 'vh');
+      n.style.setProperty('--dreh', (-20 + aus * 26).toFixed(0) + 'deg');
+      /* Gestaffelt, damit es sprudelt statt zu springen. Die aeusseren
+       * gehen zuerst los, die mittlere zuletzt — dann oeffnet sich der
+       * Faecher von aussen nach innen. */
+      n.style.animationDelay = (0.30 - Math.abs(aus) * 0.22).toFixed(2) + 's';
+      this.buehne.appendChild(n);
+    }
+  };
 
   Rueckmeldung.prototype._buehneFrei = function () {
     while (this.buehne.firstChild) { this.buehne.removeChild(this.buehne.firstChild); }
@@ -46,16 +76,18 @@
     this._buehneFrei();
   };
 
-  /** Ganz sauber: immer dasselbe kurze Motiv, damit es wiedererkennbar wird. */
+  /** Ganz sauber: immer dasselbe kurze Motiv, damit es wiedererkennbar
+   *  wird — und dieselben Noten, die dazu auffliegen. */
   Rueckmeldung.prototype.jubel = function () {
     this._buehneFrei();
+    this._jubelnoten();
     var img = document.createElement('img');
     img.src = this.bilder.froh || 'img/vogel-froh.png';
     img.className = 'jubel';
     img.alt = '';
     this.buehne.appendChild(img);
     var dauer = this.motor.spieleLob() || 1.4;
-    return this._sperren(Math.max(1500, dauer * 1000 + 250));
+    return this._sperren(Math.max(1800, dauer * 1000 + 250));
   };
 
   /** Ueberblasen: die Luft wird sanfter. Eine Feder sinkt langsam,
