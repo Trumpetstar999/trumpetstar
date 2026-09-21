@@ -161,10 +161,20 @@
     // Stimmt die Aufnahme exakt nach und verschiebt sie auf die
     // gewuenschte Hoehe. Bei den neun aufgenommenen Toenen ist das eine
     // Korrektur von wenigen Cent, kein hoerbares Verschieben.
-    q.playbackRate.value = o.frequenzHz ? (o.frequenzHz / s.f0) : 1;
+    var rate = o.frequenzHz ? (o.frequenzHz / s.f0) : 1;
+    q.playbackRate.value = rate;
     q.loop = true;
     q.loopStart = s.loopStart;
     q.loopEnd = s.loopEnd;
+
+    /* Wird die Aufnahme tiefer abgespielt — fuer Horn und Tenorhorn um
+     * bis zu eine Oktave — laeuft auch die Ansprache langsamer. Aus dem
+     * kurzen Anstoss wuerde ein Anschwellen, und eine Viertelnote waere
+     * vorbei, bevor der Ton steht. Deshalb wird spaeter in der Ansprache
+     * eingesetzt, genau so weit, dass sie in ECHTER Zeit gleich lang
+     * bleibt. Der Anstoss selbst bleibt dabei erhalten. */
+     var ab = s.start;
+    if (rate < 0.98) { ab = s.loopStart - (s.loopStart - s.start) * rate; }
 
     var g = this.ctx.createGain();
     var laut = o.lautstaerke != null ? o.lautstaerke : 1;
@@ -174,7 +184,7 @@
     q.connect(g);
     g.connect(ziel);
 
-    q.start(wann, s.start);
+    q.start(wann, ab);
     q.stop(wann + dauer + RELEASE_SCHWANZ);
     return q;
   };
