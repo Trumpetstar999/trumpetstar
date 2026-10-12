@@ -47,6 +47,8 @@ export function useUpdateCustomer() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['customers'] });
+      qc.invalidateQueries({ queryKey: ['invoice'] });
+      qc.invalidateQueries({ queryKey: ['invoices'] });
       toast.success('Kunde aktualisiert');
     },
     onError: (e: Error) => toast.error(e.message),

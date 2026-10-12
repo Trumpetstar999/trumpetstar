@@ -8,10 +8,10 @@ import {
   Printer, CheckCircle, Loader2, Pencil, Download, X,
   Building2, Calendar, Hash, CreditCard, Mail, Send
 } from 'lucide-react';
-import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice } from '@/hooks/useInvoices';
+import { useInvoice, useUpdateInvoiceStatus, useFinalizeInvoice, useUpdateCustomer } from '@/hooks/useInvoices';
 import { printInvoice, downloadInvoice } from '@/lib/invoice-print';
 import { formatCurrency, formatDate } from '@/lib/vat';
-import type { Invoice } from '@/types/invoice';
+import type { Invoice, Customer } from '@/types/invoice';
 import { InvoiceEditDialog } from './InvoiceEditDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -41,6 +41,9 @@ interface Props {
 
 export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
+  const updateCustomer = useUpdateCustomer();
+  const [addrEdit, setAddrEdit] = useState(false);
+  const [addr, setAddr] = useState<Customer | null>(null);
   const updateStatus = useUpdateInvoiceStatus();
   const finalizeInvoice = useFinalizeInvoice();
   const [editOpen, setEditOpen] = useState(false);
@@ -210,7 +213,53 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                     <Building2 className="w-3.5 h-3.5 text-slate-600" />
                   </div>
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Kunde</span>
+                  {invoice.customer && !addrEdit && (
+                    <button
+                      type="button"
+                      onClick={() => { setAddr({ ...invoice.customer! }); setAddrEdit(true); }}
+                      className="ml-auto text-xs text-blue-600 hover:underline flex items-center gap-1"
+                    >
+                      <Pencil className="w-3 h-3" /> Adresse ändern
+                    </button>
+                  )}
                 </div>
+                {addrEdit && addr ? (
+                  <div className="space-y-2">
+                    <Input placeholder="Name" value={addr.name || ''} onChange={e => setAddr({ ...addr, name: e.target.value })} />
+                    <Input placeholder="Firma (optional)" value={addr.company_name || ''} onChange={e => setAddr({ ...addr, company_name: e.target.value })} />
+                    <Input placeholder="Straße" value={addr.street || ''} onChange={e => setAddr({ ...addr, street: e.target.value })} />
+                    <div className="flex gap-2">
+                      <Input className="w-24" placeholder="PLZ" value={addr.postal_code || ''} onChange={e => setAddr({ ...addr, postal_code: e.target.value })} />
+                      <Input placeholder="Ort" value={addr.city || ''} onChange={e => setAddr({ ...addr, city: e.target.value })} />
+                    </div>
+                    <Select value={addr.country} onValueChange={v => setAddr({ ...addr, country: v as 'AT' | 'DE' })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AT">Österreich</SelectItem>
+                        <SelectItem value="DE">Deutschland</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input placeholder="UID (optional)" value={addr.uid_number || ''} onChange={e => setAddr({ ...addr, uid_number: e.target.value })} />
+                    <Input placeholder="E-Mail" value={addr.email || ''} onChange={e => setAddr({ ...addr, email: e.target.value })} />
+                    <p className="text-[11px] text-slate-400">Gilt für alle Rechnungen dieses Kunden.</p>
+                    <div className="flex gap-2 justify-end">
+                      <Button size="sm" variant="outline" onClick={() => setAddrEdit(false)}>Abbrechen</Button>
+                      <Button
+                        size="sm"
+                        disabled={updateCustomer.isPending || !addr.name?.trim()}
+                        onClick={() => updateCustomer.mutate({
+                          id: addr.id,
+                          name: addr.name, company_name: addr.company_name || null as any,
+                          street: addr.street, postal_code: addr.postal_code, city: addr.city,
+                          country: addr.country, uid_number: addr.uid_number || null as any,
+                          email: addr.email || null as any,
+                        }, { onSuccess: () => setAddrEdit(false) })}
+                      >
+                        {updateCustomer.isPending && <Loader2 className="w-3 h-3 animate-spin mr-1" />}Speichern
+                      </Button>
+                    </div>
+                  </div>
+                ) : (<>
                 <p className="font-semibold text-slate-900 text-sm leading-tight">
                   {invoice.customer?.company_name || invoice.customer?.name}
                 </p>
@@ -231,6 +280,7 @@ export function InvoiceDetailDialog({ invoiceId, onClose }: Props) {
                     {invoice.customer.email}
                   </p>
                 )}
+                </>)}
               </div>
 
               <div className="space-y-2">
