@@ -49,6 +49,7 @@ export function MembershipStatusBadge() {
         {isBasic && <Sparkles className="w-3.5 h-3.5" />}
         <span>{PLAN_DISPLAY_NAMES[planKey]}</span>
       </div>
+      {!isPro && (
       <button
         type="button"
         onClick={() => navigate('/pricing')}
@@ -56,11 +57,12 @@ export function MembershipStatusBadge() {
           'relative overflow-hidden h-7 min-h-0 px-3 py-0 leading-none rounded-full text-xs font-bold whitespace-nowrap',
           'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 shadow-md',
           'transition-transform hover:scale-105 active:scale-95',
-          !isPro && 'animate-pulse'
+          'animate-pulse'
         )}
       >
         {upgradeLabel}
       </button>
+      )}
     </div>
   );
 }
