@@ -81,7 +81,34 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
     console.error("[welcome-mail] send-email threw:", e);
   }
 
-  // 2) Fallback: Resend
+  // 2) Fallback: Brevo transactional mail (via connector gateway)
+  try {
+    const lk = Deno.env.get("LOVABLE_API_KEY");
+    const bk = Deno.env.get("BREVO_API_KEY");
+    if (lk && bk) {
+      const res = await fetch("https://connector-gateway.lovable.dev/brevo/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${lk}`,
+          "X-Connection-Api-Key": bk,
+        },
+        body: JSON.stringify({
+          sender: { name: "Valentin von Trumpetstar", email: Deno.env.get("BREVO_SENDER_EMAIL") || "Valentin@trumpetstar.com" },
+          to: [{ email, name: firstName || undefined }],
+          subject: t.subject,
+          htmlContent: html,
+        }),
+      });
+      if (res.ok) return;
+      console.error(`[welcome-mail] brevo failed [${res.status}]: ${await res.text()}`);
+    }
+  } catch (e) {
+    console.error("[welcome-mail] brevo threw:", e);
+  }
+
+  // 3) Fallback: Resend
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) throw new Error("welcome mail failed and no RESEND_API_KEY fallback configured");
   const rawFrom = (Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
