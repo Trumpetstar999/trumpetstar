@@ -32,8 +32,14 @@ export function UpgradeDialog({
   
   const upgradePlans = getRequiredUpgradePlans(planKey, requiredPlanKey);
   
+  const FALLBACK: Partial<Record<PlanKey, string>> = {
+    BASIC: "https://www.checkout-ds24.com/product/346007/",
+    PRO: "https://www.checkout-ds24.com/product/575565/",
+  };
+  const linkFor = (p: PlanKey) => getUpgradeLink(p) || FALLBACK[p] || null;
+
   const handleUpgrade = (targetPlan: PlanKey) => {
-    const link = getUpgradeLink(targetPlan);
+    const link = linkFor(targetPlan);
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
@@ -54,7 +60,7 @@ export function UpgradeDialog({
 
         <div className="space-y-3 mt-4">
           {upgradePlans.map((plan) => {
-            const link = getUpgradeLink(plan);
+            const link = linkFor(plan);
             const isPro = plan === 'PRO';
             
             return (
@@ -84,7 +90,7 @@ export function UpgradeDialog({
           )}
         </div>
         
-        {upgradePlans.some(p => !getUpgradeLink(p)) && (
+        {upgradePlans.some(p => !linkFor(p)) && (
           <p className="text-xs text-muted-foreground text-center mt-2">
             Einige Upgrade-Links sind nicht konfiguriert.
           </p>

@@ -67,7 +67,8 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
       // Load fresh data
       checkMembership();
     } else {
-      setState(defaultState);
+      // Signed-out visitors: nothing to load, never block purchase buttons
+      setState({ ...defaultState, isLoading: false });
     }
   }, [user?.id]);
 
@@ -123,6 +124,8 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
         
         setState(newState);
         persistCache(newState);
+      } else {
+        setState(prev => ({ ...prev, isLoading: false }));
       }
     } catch (error) {
       console.error('Membership check error:', error);
