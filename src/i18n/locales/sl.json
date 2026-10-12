@@ -707,5 +707,10 @@
       "subtitle": "Osebni načrt vadbe · Dnevni opomniki · Sledenje napredku",
       "button": "Registrirajte se brezplačno"
     }
+  },
+  "header_upgrade": {
+    "free": "Nadgradi 🚀",
+    "basic": "Postani PRO 👑",
+    "pro": "PRO aktiven ✨"
   }
 }

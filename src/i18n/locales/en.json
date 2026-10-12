@@ -707,5 +707,10 @@
       "subtitle": "Personal practice plan · Daily reminders · Progress tracking",
       "button": "Sign up for free"
     }
+  },
+  "header_upgrade": {
+    "free": "Upgrade 🚀",
+    "basic": "Go PRO 👑",
+    "pro": "PRO active ✨"
   }
 }
