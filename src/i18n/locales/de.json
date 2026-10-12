@@ -707,5 +707,10 @@
       "subtitle": "Persönlicher Übeplan · Tägliche Erinnerungen · Fortschritts-Tracking",
       "button": "Kostenlos anmelden"
     }
+  },
+  "header_upgrade": {
+    "free": "Upgrade 🚀",
+    "basic": "Hol dir PRO 👑",
+    "pro": "PRO aktiv ✨"
   }
 }
