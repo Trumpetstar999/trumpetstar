@@ -79,7 +79,7 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
         </div>
         
         {/* Center: Title + Video Count */}
-        <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-3">
+        <div className="absolute left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3">
           <h1 className="text-2xl font-extrabold tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]">
             {title}
           </h1>
