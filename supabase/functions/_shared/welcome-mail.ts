@@ -84,7 +84,9 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
   // 2) Fallback: Resend
   const resendKey = Deno.env.get("RESEND_API_KEY");
   if (!resendKey) throw new Error("welcome mail failed and no RESEND_API_KEY fallback configured");
-  const from = Deno.env.get("RESEND_FROM_EMAIL") || "Trumpetstar <noreply@trumpetstar.com>";
+  const rawFrom = (Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
+  const validFrom = /^[^<>@\s]+@[^<>@\s]+\.[^<>@\s]+$/.test(rawFrom) || /^.+<[^<>@\s]+@[^<>@\s]+\.[^<>@\s]+>$/.test(rawFrom);
+  const from = validFrom ? rawFrom : "Trumpetstar <noreply@trumpetstar.com>";
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
