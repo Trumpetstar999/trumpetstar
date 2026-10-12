@@ -60,7 +60,7 @@ export function UpgradeDialog({
 
         <div className="space-y-3 mt-4">
           {upgradePlans.map((plan) => {
-            const link = getUpgradeLink(plan);
+            const link = linkFor(plan);
             const isPro = plan === 'PRO';
             
             return (
