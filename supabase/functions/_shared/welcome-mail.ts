@@ -95,7 +95,7 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
           "X-Connection-Api-Key": bk,
         },
         body: JSON.stringify({
-          sender: { name: "Valentin von Trumpetstar", email: Deno.env.get("BREVO_SENDER_EMAIL") || "Valentin@trumpetstar.com" },
+          sender: { name: "Trumpetstar", email: Deno.env.get("BREVO_SENDER_EMAIL") || "info@trumpetstar.com" }, replyTo: { email: "info@trumpetstar.com" },
           to: [{ email, name: firstName || undefined }],
           subject: t.subject,
           htmlContent: html,
