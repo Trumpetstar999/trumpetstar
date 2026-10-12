@@ -90,7 +90,7 @@ export function UpgradeDialog({
           )}
         </div>
         
-        {upgradePlans.some(p => !getUpgradeLink(p)) && (
+        {upgradePlans.some(p => !linkFor(p)) && (
           <p className="text-xs text-muted-foreground text-center mt-2">
             Einige Upgrade-Links sind nicht konfiguriert.
           </p>
