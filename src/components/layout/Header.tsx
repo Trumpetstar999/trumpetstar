@@ -61,7 +61,7 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
 
   return (
     <header className="sticky top-0 z-40 glass safe-top">
-      <div className="relative flex items-center justify-between px-6 py-3">
+      <div className="relative flex items-center justify-between px-3 sm:px-6 py-3">
         {/* Left: Logo */}
         <div className="flex items-center gap-4">
           <a 
@@ -79,7 +79,7 @@ export function Header({ title, stars, isOffline = false, videoCount }: HeaderPr
         </div>
         
         {/* Center: Title + Video Count */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+        <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-3">
           <h1 className="text-2xl font-extrabold tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]">
             {title}
           </h1>
