@@ -32,8 +32,14 @@ export function UpgradeDialog({
   
   const upgradePlans = getRequiredUpgradePlans(planKey, requiredPlanKey);
   
+  const FALLBACK: Partial<Record<PlanKey, string>> = {
+    BASIC: "https://www.checkout-ds24.com/product/346007/",
+    PRO: "https://www.checkout-ds24.com/product/575565/",
+  };
+  const linkFor = (p: PlanKey) => getUpgradeLink(p) || FALLBACK[p] || null;
+
   const handleUpgrade = (targetPlan: PlanKey) => {
-    const link = getUpgradeLink(targetPlan);
+    const link = linkFor(targetPlan);
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
