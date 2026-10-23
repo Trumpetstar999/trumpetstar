@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LevelSidebar } from '@/components/levels/LevelSidebar';
+import { LevelGrid } from '@/components/levels/LevelGrid';
+import levelNavigation from '@/i18n/level-navigation.json';
 import { SectionRow } from '@/components/levels/SectionRow';
 import { WelcomeSection } from '@/components/levels/WelcomeSection';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
@@ -11,7 +12,7 @@ import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { VideoCard } from '@/components/levels/VideoCard';
 import { Level, Section } from '@/types';
 import { PlanKey } from '@/types/plans';
-import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles, ListMusic, Play } from 'lucide-react';
+import { Loader2, Search, X, Film, Clock, ChevronRight, Filter, ListOrdered, Sparkles, ListMusic, Play, LayoutGrid, ArrowLeft, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { useMembership } from '@/hooks/useMembership';
@@ -61,6 +62,7 @@ interface LocalizedSection {
 
 interface LocalizedLevel extends Omit<Level, 'sections'> {
   requiredPlanKey: PlanKey;
+  previewThumbnail?: string;
   difficulty?: Difficulty;
   title_en?: string | null;
   title_es?: string | null;
@@ -82,7 +84,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
   const [newestVideos, setNewestVideos] = useState<LocalizedVideo[]>([]);
   const [difficultyFilter, setDifficultyFilter] = useState<Difficulty | 'all'>('all');
-  const [hasSetInitialDifficulty, setHasSetInitialDifficulty] = useState(false);
   const [limitOverlayOpen, setLimitOverlayOpen] = useState(false);
   const { setIsVideoPlaying } = useVideoPlayer();
   const { canAccessLevel } = useMembership();
@@ -90,6 +91,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t, language, skillLevel } = useLanguage();
+  const navigationText = levelNavigation[language] || levelNavigation.de;
   const { getLocalizedField } = useLocalizedContent();
   const { playlists, canCreatePlaylist } = usePlaylists();
   const [playingPlaylist, setPlayingPlaylist] = useState<PlaylistWithItems | null>(null);
@@ -108,19 +110,6 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       setLimitOverlayOpen(true);
     }
   }, [canStartVideo, recordVideoStart]);
-
-  // Set initial difficulty filter based on user's skill level (only once)
-  useEffect(() => {
-    if (!hasSetInitialDifficulty && skillLevel) {
-      if (skillLevel === 'beginner') {
-        setDifficultyFilter('beginner');
-      } else {
-        // For intermediate users, show all levels
-        setDifficultyFilter('all');
-      }
-      setHasSetInitialDifficulty(true);
-    }
-  }, [skillLevel, hasSetInitialDifficulty]);
 
   // Difficulty options with translations
   const DIFFICULTY_OPTIONS: { value: Difficulty | 'all'; label: string }[] = [
@@ -337,6 +326,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           title_es: level.title_es,
           showcaseId: level.vimeo_showcase_id,
           totalStars: 0,
+          previewThumbnail: sortedVideos[0]?.thumbnail_url || undefined,
           sections,
           requiredPlanKey,
           difficulty: (level.difficulty as Difficulty) || 'beginner',
@@ -344,10 +334,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
       });
 
       setLevels(transformedLevels);
-      // Always default to the first level (Level 1) sorted by sort_order
-      if (transformedLevels.length > 0) {
-        setActiveLevel(transformedLevels[0].id);
-      }
+      setActiveLevel('all');
+      setDifficultyFilter('all');
     } catch (error) {
       console.error('Error fetching levels:', error);
     } finally {
@@ -481,7 +469,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
+    <div className="flex min-h-0 flex-col h-[calc(100dvh-140px)]">
       <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 animate-fade-in flex-wrap">
         <h2 className="text-lg font-semibold text-white shrink-0">{t('levels.title')}</h2>
         
@@ -490,7 +478,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           <Filter className="w-4 h-4 text-white/50" />
           <Select
             value={difficultyFilter}
-            onValueChange={(value) => setDifficultyFilter(value as Difficulty | 'all')}
+            onValueChange={(value) => { setDifficultyFilter(value as Difficulty | 'all'); setActiveLevel('all'); }}
           >
             <SelectTrigger className="w-36 h-9 bg-white/10 border-white/20 text-white text-sm">
               <SelectValue />
@@ -533,22 +521,37 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
         )}
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - hidden when searching */}
-        {!isSearching && (
-          <LevelSidebar
-            levels={filteredLevels}
-            activeLevel={activeLevel}
-            onLevelSelect={setActiveLevel}
-            playlists={playlists}
-            onCreatePlaylist={canCreatePlaylist() ? () => navigate('/app/playlists/new') : undefined}
-          />
-        )}
+      {!isSearching && (
+        <nav aria-label={t('levels.title')} className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3">
+          {[
+            { id: 'all', label: t('levels.allLevels'), icon: LayoutGrid },
+            { id: 'recent', label: t('levels.recentlyWatched'), icon: Clock },
+            { id: 'newest', label: navigationText.newest, icon: Sparkles },
+            { id: 'all-az', label: navigationText.az, icon: ListOrdered },
+          ].map(item => (
+            <Button key={item.id} size="sm" variant="ghost" aria-pressed={activeLevel === item.id}
+              className={activeLevel === item.id ? 'bg-secondary text-foreground hover:bg-secondary hover:text-foreground' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}
+              onClick={() => setActiveLevel(item.id)}>
+              <item.icon />{item.label}
+            </Button>
+          ))}
+          <Select value={activePlaylist ? activeLevel : ''} onValueChange={setActiveLevel}>
+            <SelectTrigger className="w-auto min-w-40 max-w-full bg-secondary text-foreground border-border">
+              <ListMusic className="mr-2 h-4 w-4 shrink-0" /><SelectValue placeholder={navigationText.playlists} />
+            </SelectTrigger>
+            <SelectContent>
+              {playlists.map(playlist => <SelectItem key={playlist.id} value={`playlist-${playlist.id}`}>{playlist.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {canCreatePlaylist() && <Button variant="ghost" size="icon" aria-label={navigationText.create} title={navigationText.create} className="text-muted-foreground hover:bg-secondary hover:text-foreground" onClick={() => navigate('/app/playlists/new')}><Plus /></Button>}
+        </nav>
+      )}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         
         {/* Main content */}
-        <div className="flex-1 overflow-y-auto relative">
+        <div className="min-w-0 flex-1 overflow-y-auto relative" key={isSearching ? 'search' : activeLevel}>
           {/* Welcome Section - always visible at the top when not searching */}
-          {!isSearching && activeLevel !== 'all-az' && (
+          {!isSearching && activeLevel === 'all' && (
             <div className="pt-4">
               <WelcomeSection />
             </div>
@@ -606,6 +609,8 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 </>
               )}
             </div>
+          ) : activeLevel === 'all' ? (
+            <LevelGrid levels={filteredLevels} onSelect={setActiveLevel} />
           ) : activeLevel === 'recent' ? (
             /* Recent Videos View */
             <div className="p-6">
@@ -793,7 +798,7 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
                 items.forEach(item => {
                   const letter = item.displayName.charAt(0).toUpperCase();
                   if (!grouped.has(letter)) grouped.set(letter, []);
-                  grouped.get(letter)!.push(item);
+                  grouped.get(letter)?.push(item);
                 });
 
                 // Split letter groups into 3 columns as evenly as possible
@@ -857,6 +862,10 @@ export function LevelsPage({ onStarEarned }: LevelsPageProps) {
           ) : currentLevel && (
             /* Sections - all levels accessible; daily limit enforced on video click */
             <div className="p-6">
+              <div className="mb-4 flex flex-wrap items-center gap-3">
+                <Button variant="ghost" onClick={() => setActiveLevel('all')} className="text-foreground hover:bg-secondary hover:text-foreground"><ArrowLeft />{t('levels.allLevels')}</Button>
+                <h3 className="text-xl font-semibold text-foreground">{getLocalizedField(currentLevel, 'title')}</h3>
+              </div>
               {currentLevel.sections.map((section, sectionIndex) => (
                 <SectionRow
                   key={section.id}
