@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { PLAN_INFO, PlanKey, FEATURE_CATEGORIES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage } from '@/hooks/useLanguage';
+import { getCheckoutUrl } from '@/lib/checkout';
 
 interface PricingTableProps {
   onSelectPlan?: (planKey: PlanKey) => void;
@@ -30,24 +31,19 @@ const categoryColors = {
 
 export function PricingTable({ onSelectPlan }: PricingTableProps) {
   const [isYearly, setIsYearly] = useState(true);
-  const { planKey: currentPlan, getUpgradeLink, isLoading } = useMembership();
+  const { planKey: currentPlan, isLoading } = useMembership();
   const { t } = useLanguage();
 
   const plans = [PLAN_INFO.FREE, PLAN_INFO.BASIC, PLAN_INFO.PRO];
 
-  // Fallback checkout URLs
-  const CHECKOUT_URLS: Partial<Record<PlanKey, string>> = {
-    BASIC: 'https://www.checkout-ds24.com/product/346007/',
-    PRO: 'https://www.checkout-ds24.com/product/575565/',
-  };
-
   const handleSelectPlan = (planKey: PlanKey) => {
+    const link = getCheckoutUrl(planKey, isYearly ? 'yearly' : 'monthly');
+    if (planKey !== 'FREE' && !link) return;
     if (onSelectPlan) {
       onSelectPlan(planKey);
       return;
     }
     
-    const link = getUpgradeLink(planKey) || CHECKOUT_URLS[planKey];
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
@@ -55,7 +51,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
 
   const getPrice = (plan: typeof PLAN_INFO.FREE) => {
     if (!plan.monthlyPrice) return t('pricing_table.free');
-    const price = isYearly ? Math.round(plan.yearlyPrice! / 12) : plan.monthlyPrice;
+    const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
     return `${price}€`;
   };
 
@@ -150,12 +146,6 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold text-slate-900">{getPrice(plan)}</div>
                   <div className="text-sm text-slate-600">{getPriceSubtext(plan)}</div>
-                  {/* Pro promo */}
-                  {plan.key === 'PRO' && (
-                    <div className="mt-2 inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-1 rounded-full">
-                      {t('pricing_table.promoFirstMonth')}
-                    </div>
-                  )}
                 </div>
 
                 {/* Description */}
@@ -171,10 +161,10 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                     isCurrentPlan && 'bg-emerald-500 hover:bg-emerald-600 text-white'
                   )}
                   variant={isHighlighted ? 'default' : plan.key === 'FREE' ? 'outline' : 'default'}
-                  disabled={isLoading || isCurrentPlan}
+                  disabled={isLoading || isCurrentPlan || (plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly'))}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.cta}
+                  {isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly') ? t('pricing_table.unavailable') : plan.cta}
                 </Button>
               </CardContent>
             </Card>

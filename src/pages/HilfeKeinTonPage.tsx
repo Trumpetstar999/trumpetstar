@@ -59,8 +59,8 @@ export default function HilfeKeinTonPage() {
           
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="bg-[hsl(var(--accent-red))] hover:bg-[hsl(var(--accent-red))]/90 text-white font-semibold" asChild>
-                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> {t('seo_hilfeKeinTon.hero.ctaVideo')}</a>
+              <Button size="lg" variant="default" disabled>
+                <Video className="h-4 w-4 mr-2" /> {t('pricing_table.unavailable')}
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
                 <Link to="/trompete-erster-ton">{t('seo_hilfeKeinTon.hero.ctaBack')}</Link>
@@ -150,8 +150,8 @@ export default function HilfeKeinTonPage() {
               {t('seo_hilfeKeinTon.cta.desc')}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <a href="https://www.checkout-ds24.com/product/575565/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2"><Video className="h-4 w-4" /> {t('seo_hilfeKeinTon.cta.button')}</a>
+              <Button size="lg" variant="default" disabled>
+                <Video className="h-4 w-4 mr-2" /> {t('pricing_table.unavailable')}
               </Button>
             </div>
           </div>

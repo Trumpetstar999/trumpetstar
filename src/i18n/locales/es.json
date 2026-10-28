@@ -55,6 +55,21 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
+    "recoverySent": "Si existe una cuenta con esta dirección, recibirás un enlace para restablecer tu contraseña.",
+    "recoveryResend": "Solicitar un enlace nuevo",
+    "resetTitle": "Establecer una contraseña nueva",
+    "resetPrompt": "Introduce tu nueva contraseña.",
+    "resetInvalid": "Este enlace no es válido o ha caducado.",
+    "resetChecking": "Comprobando el enlace …",
+    "resetRequestNew": "Solicita un nuevo enlace para restablecer la contraseña.",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "showPassword": "Mostrar u ocultar contraseña",
+    "savePassword": "Guardar contraseña",
+    "savingPassword": "Guardando …",
+    "passwordMismatch": "Las contraseñas no coinciden.",
+    "passwordChanged": "Contraseña cambiada",
+    "passwordChangedDesc": "Tu contraseña se actualizó correctamente.",
     "signedOutSuccess": "Sesión cerrada correctamente",
     "toApp": "Ir a la App",
     "navLearn": "Aprender",
@@ -628,7 +643,8 @@
   "pricing_table": {
     "monthly": "Mensual",
     "yearly": "Anual",
-    "saveUpTo": "Ahorra hasta un 35%",
+    "saveUpTo": "Ahorra hasta un 17%",
+    "unavailable": "Compra temporalmente no disponible",
     "recommended": "Recomendado",
     "currentPlan": "Tu Plan",
     "currentPlanBtn": "Plan actual",
@@ -677,7 +693,7 @@
       "q2": "¿Puedo cambiar de plan?",
       "a2": "¡Por supuesto! Puedes actualizar en cualquier momento. Al cambiar a un plan superior, el período restante se prorratea.",
       "q3": "¿Hay garantía de devolución de dinero?",
-      "a3": "Sí, dentro de los primeros 14 días puedes cancelar tu suscripción sin dar razones y recibirás un reembolso completo."
+      "a3": "Sí, dentro de los primeros 30 días puedes cancelar tu suscripción sin dar razones y recibirás un reembolso completo."
     }
   },
   "seo_hilfeKeinTon": {

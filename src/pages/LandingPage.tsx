@@ -25,6 +25,7 @@ import shotProfil from '@/assets/screenshots/profil.webp';
 import testimonialsImg from '@/assets/testimonials-real.webp';
 import { useLanguage } from '@/hooks/useLanguage';
 import { CinematicHero } from '@/components/landing/CinematicHero';
+import { hasRecoveryCallback } from '@/lib/recovery';
 
 /* ─── Nur Safari auf Desktop (kein Chrome/Edge/Firefox, kein iPad/iPhone/Android) ─── */
 function isSafariDesktop(): boolean {
@@ -52,7 +53,6 @@ const SCREENSHOTS = [
 ];
 
 /* ─── Produkt-URLs aus Wissensdatenbank ─── */
-const PRO_CHECKOUT_URL = 'https://www.digistore24.com/product/346007';
 const KIDS_COURSE_URL  = 'https://trumpetstar.com/tsv1/';
 const ADULT_COURSE_URL = 'https://trumpetstar.onepage.me/erwachsenenkurs';
 
@@ -247,6 +247,10 @@ export default function LandingPage() {
 
 
   useEffect(() => {
+    if (hasRecoveryCallback(new URL(window.location.href))) {
+      navigate(`/reset-password${window.location.search}${window.location.hash}`, { replace: true });
+      return;
+    }
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         supabase.from('activity_logs').insert([{
@@ -575,10 +579,10 @@ export default function LandingPage() {
               </ul>
               <Button
                 size="lg"
-                onClick={() => handleCta(PRO_CHECKOUT_URL)}
+                disabled
                 className="lp-btn-shine w-full h-12 font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
               >
-                PRO jetzt freischalten <ArrowRight className="w-4 h-4 lp-icon-pop" />
+                {t('pricing_table.unavailable')}
               </Button>
               <p className="text-white/35 text-xs text-center mt-3">30 Tage Geld-zurück-Garantie · Keine versteckten Kosten</p>
             </div>

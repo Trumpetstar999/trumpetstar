@@ -55,6 +55,21 @@
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot password?",
+    "recoverySent": "If an account exists for this address, you will receive a password reset link.",
+    "recoveryResend": "Request a new link",
+    "resetTitle": "Set a new password",
+    "resetPrompt": "Enter your new password.",
+    "resetInvalid": "This link is invalid or expired.",
+    "resetChecking": "Checking your link …",
+    "resetRequestNew": "Please request a new password reset link.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "showPassword": "Show or hide password",
+    "savePassword": "Save password",
+    "savingPassword": "Saving …",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordChanged": "Password changed",
+    "passwordChangedDesc": "Your password was updated successfully.",
     "signedOutSuccess": "Signed out successfully",
     "toApp": "Go to App",
     "navLearn": "Learn",
@@ -628,7 +643,8 @@
   "pricing_table": {
     "monthly": "Monthly",
     "yearly": "Yearly",
-    "saveUpTo": "Save up to 35%",
+    "saveUpTo": "Save up to 17%",
+    "unavailable": "Purchases temporarily unavailable",
     "recommended": "Recommended",
     "currentPlan": "Your Plan",
     "currentPlanBtn": "Current Plan",
@@ -677,7 +693,7 @@
       "q2": "Can I switch between plans?",
       "a2": "Absolutely! You can upgrade at any time. When switching to a higher plan, the remaining period is prorated.",
       "q3": "Is there a money-back guarantee?",
-      "a3": "Yes, within the first 14 days you can cancel your subscription without giving a reason and receive a full refund."
+      "a3": "Yes, within the first 30 days you can cancel your subscription without giving a reason and receive a full refund."
     }
   },
   "seo_hilfeKeinTon": {

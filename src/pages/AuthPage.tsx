@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
+import { shouldRouteToRecovery } from '@/lib/recovery';
 const VIMEO_HLS_URL = 'https://player.vimeo.com/external/1182895999.m3u8?s=79486abc8212f3e32ae79db02772c8c750c1f891&logging=false';
 
 export default function AuthPage() {
@@ -77,12 +78,20 @@ export default function AuthPage() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (shouldRouteToRecovery(new URL(window.location.href), event)) {
+        navigate(`/reset-password${window.location.search}${window.location.hash}`, { replace: true });
+        return;
+      }
       if (session?.user) {
         navigate(getRedirectPath());
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (shouldRouteToRecovery(new URL(window.location.href))) {
+        navigate(`/reset-password${window.location.search}${window.location.hash}`, { replace: true });
+        return;
+      }
       if (session?.user) {
         navigate(getRedirectPath());
       }
@@ -174,10 +183,11 @@ export default function AuthPage() {
     if (!email) { setLoginError(t('auth.emailRequiredDesc')); return; }
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+      const origin = window.location.hostname === 'localhost' ? 'https://www.trumpetstar.app' : window.location.origin;
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: `${origin}/reset-password` });
       if (error) throw error;
       setForgotPasswordSent(true);
-      toast({ title: t('auth.forgotPassword'), description: t('auth.magicLinkSentToastDesc') });
+      toast({ title: t('auth.forgotPassword'), description: t('auth.recoverySent') });
     } catch (error) {
       console.error('Password reset error:', error);
       toast({ title: t('auth.error'), description: error instanceof Error ? error.message : t('auth.unknownError'), variant: 'destructive' });
@@ -430,9 +440,9 @@ export default function AuthPage() {
                         <Checkbox id="rememberMe-login" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
                         <Label htmlFor="rememberMe-login" className="text-sm font-medium text-white/60 leading-none cursor-pointer">{t('auth.rememberMe')}</Label>
                       </div>
-                      <button type="button" onClick={handleForgotPassword} className="text-sm text-blue-400 hover:text-blue-300 font-medium hover:underline transition-colors">
-                        {t('auth.forgotPassword')}
-                      </button>
+                      <Button type="button" variant="link" onClick={handleForgotPassword} disabled={isLoading} className="text-sm text-primary-foreground font-medium">
+                        {forgotPasswordSent ? t('auth.recoveryResend') : t('auth.forgotPassword')}
+                      </Button>
                     </div>
                     <Button type="submit" className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-md text-white" disabled={isLoading}>
                       {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />{t('auth.signingIn')}</> : t('auth.signIn')}
