@@ -3,13 +3,13 @@ import { getCheckoutUrl, validateCheckoutUrl, GUARANTEE_DAYS } from './checkout'
 import { PLAN_INFO } from '@/types/plans';
 
 describe('checkout safety', () => {
-  it.each(['346007', '575565'])('blocks incorrect product %s', (id) => {
-    expect(validateCheckoutUrl(`https://www.checkout-ds24.com/product/${id}/`)).toBeNull();
-    expect(validateCheckoutUrl(`https://www.digistore24.com/product/${id}?x=1`)).toBeNull();
+  it('uses the owner-supplied Basic product 346007', () => {
+    expect(getCheckoutUrl('BASIC', 'monthly')).toBe('https://www.digistore24.com/product/346007');
+    expect(getCheckoutUrl('BASIC', 'yearly')).toBe('https://www.digistore24.com/product/346007');
   });
-  it.each(['BASIC', 'PRO'] as const)('pauses both unverified periods for %s', (plan) => {
-    expect(getCheckoutUrl(plan, 'monthly')).toBeNull();
-    expect(getCheckoutUrl(plan, 'yearly')).toBeNull();
+  it('uses the owner-supplied Pro product 575565', () => {
+    expect(getCheckoutUrl('PRO', 'monthly')).toBe('https://www.checkout-ds24.com/product/575565/');
+    expect(getCheckoutUrl('PRO', 'yearly')).toBe('https://www.checkout-ds24.com/product/575565/');
   });
   it('rejects unsafe and non-checkout destinations', () => {
     for (const url of [undefined, '', 'javascript:alert(1)', 'https://example.com/product/123/', 'http://www.checkout-ds24.com/product/123/', 'https://www.checkout-ds24.com@evil.com/product/123/']) {
