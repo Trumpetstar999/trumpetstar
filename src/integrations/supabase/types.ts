@@ -4108,6 +4108,10 @@ export type Database = {
       }
       next_invoice_number: { Args: { p_year: number }; Returns: string }
       plan_rank_of: { Args: { _plan: string }; Returns: number }
+      refresh_digistore_membership: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

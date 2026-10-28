@@ -50,6 +50,13 @@
       "when": 1793183548685,
       "tag": "0006_restrict_membership_self_mutation",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793183718629,
+      "tag": "0007_guard_purchase_order_ownership",
+      "breakpoints": true
     }
   ]
 }
