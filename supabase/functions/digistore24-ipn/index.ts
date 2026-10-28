@@ -43,16 +43,6 @@ const EVENT_TYPE_MAP: Record<string, string> = {
   'payment_denial': 'UNKNOWN',
 };
 
-// Payload looks like a completed payment even though the event name is unknown
-function looksLikePayment(raw: Record<string, any>): boolean {
-  const hasOrder = Boolean(raw.order_id || raw.orderId);
-  const hasProduct = Boolean(raw.product_id || raw.productId);
-  const hasMoney = raw.amount !== undefined || raw.amount_brutto !== undefined || raw.pay_sequence_no !== undefined || Boolean(raw.billing_type);
-  const payStatus = String(raw.pay_status || raw.payment_status || '').toLowerCase();
-  const notRevoked = !['refunded', 'chargeback', 'cancelled', 'canceled'].some((s) => payStatus.includes(s));
-  return hasOrder && hasProduct && hasMoney && notRevoked;
-}
-
 interface NormalizedPayload {
   event_type: string;
   order_id: string;
@@ -155,21 +145,6 @@ async function getSetting(
   if (data?.value) return data.value;
   if (envFallback) return Deno.env.get(envFallback) || null;
   return null;
-}
-
-// Validate IPN secret
-function validateSecret(payload: Record<string, any>, expectedSecret: string): boolean {
-  // SECURITY: Reject all requests when no secret is configured — never skip validation
-  if (!expectedSecret) return false;
-  
-  const providedSecret = 
-    payload.sha_sign || 
-    payload.passphrase || 
-    payload.secret || 
-    payload.api_key ||
-    payload.ipn_passphrase;
-  
-  return providedSecret === expectedSecret;
 }
 
 // Look up an auth user by exact email. GoTrue ignores unknown filters, so never trust users[0].
@@ -699,6 +674,7 @@ Deno.serve(async (req) => {
   
   try {
     rawPayload = await parsePayload(req);
+    if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) throw new Error("Invalid payload");
   } catch (parseError) {
     console.error("Failed to parse payload:", parseError);
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
@@ -736,13 +712,13 @@ Deno.serve(async (req) => {
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
     
-    if (existingEvent) {
+    if (existingEvent && existingEvent.status !== "error") {
       console.log(`Duplicate event detected: ${idempotencyKey}, status: ${existingEvent.status}`);
       return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
     // Store event
-    const { data: ipnEvent, error: insertError } = await supabase
+    const { data: insertedEvent, error: insertError } = existingEvent ? { data: existingEvent, error: null } : await supabase
       .from('digistore24_ipn_events')
       .insert({
         idempotency_key: idempotencyKey,
@@ -766,6 +742,8 @@ Deno.serve(async (req) => {
       throw insertError;
     }
     
+    const ipnEvent = insertedEvent;
+    if (!ipnEvent) throw new Error("Event persistence failed");
     // Sofort 200 zurückgeben — Digistore24 bekommt Antwort vor Timeout
     const ipnResponse = new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
 
