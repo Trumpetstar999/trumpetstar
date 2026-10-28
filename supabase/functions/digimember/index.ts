@@ -338,15 +338,31 @@ Deno.serve(async (req) => {
     
     // Action: Check user membership
     if (action === 'check-membership') {
-      const body = await req.json();
-      const { email, userId } = body;
-      
-      if (!email) {
-        return new Response(JSON.stringify({ error: 'Email is required' }), {
-          status: 400,
+      const authorization = req.headers.get('Authorization');
+      if (!authorization?.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+      const authClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY') || '');
+      const { data: identity, error: identityError } = await authClient.auth.getUser(authorization.slice(7));
+      const user = identity?.user;
+      if (identityError || !user?.email) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (!user.email_confirmed_at) {
+        return new Response(JSON.stringify({ error: 'Email verification required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      // Identity is server-derived; request email/userId are never used for lookup or writes.
+      const email = user.email.toLowerCase().trim();
+      const userId = user.id;
       
       // First check if user has a manually set plan in user_memberships
       let manualPlanKey: PlanKey | null = null;

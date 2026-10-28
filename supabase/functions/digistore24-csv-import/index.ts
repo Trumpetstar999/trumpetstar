@@ -47,6 +47,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    const { data: role, error: roleError } = await supabase
+      .from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
+    if (roleError || !role) {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin role required' }), {
+        status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { rows }: { rows: CSVRow[] } = await req.json();
 
     if (!rows || !Array.isArray(rows)) {

@@ -1,4 +1,5 @@
 # Architecture rules
+- Derive membership lookup identity from a verified server-side session; payment imports require a database-backed admin role, and purchase notifications must authenticate before persistence or fulfillment.
 - Keep level browsing in the LevelsPage flow, with a reusable LevelGrid for overview tiles; selecting a tile reuses existing video playback and usage checks.
 - Serve the branded share image as a static public asset referenced by absolute URLs in the sitewide head so non-JavaScript social crawlers can load it.
 - Resolve purchase destinations through the shared verified plan-and-billing-period checkout registry, never cached membership links or fallbacks, so unverified products fail closed without modifying existing entitlements.
