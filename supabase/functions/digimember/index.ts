@@ -29,7 +29,6 @@ interface Plan {
 async function callDigiMemberAPI(endpoint: string, method = 'GET', body?: any): Promise<any> {
   const url = `${DIGIMEMBER_BASE_URL}${endpoint}`;
   
-  console.log(`Calling DigiMember API: ${method} ${url}`);
   
   const headers: Record<string, string> = {
     'X-Digi-Key': DIGIMEMBER_API_KEY,
@@ -51,7 +50,6 @@ async function callDigiMemberAPI(endpoint: string, method = 'GET', body?: any): 
     }
     
     const data = await response.json();
-    console.log(`DigiMember API response:`, JSON.stringify(data).substring(0, 500));
     return data;
   } catch (error) {
     console.error('DigiMember API call failed:', error);
@@ -155,7 +153,6 @@ async function syncProducts(supabaseClient: any) {
 }
 
 async function getUserMembership(email: string) {
-  console.log(`Fetching membership for user: ${email}`);
   
   try {
     const userData = await callDigiMemberAPI(`/user/products?email=${encodeURIComponent(email)}`);
@@ -165,7 +162,6 @@ async function getUserMembership(email: string) {
       .filter(p => p.status === 'active' || p.status === 'enabled')
       .map(p => String(p.product_id));
     
-    console.log(`User ${email} has active products:`, activeProductIds);
     
     return {
       activeProductIds,
@@ -363,6 +359,13 @@ Deno.serve(async (req) => {
       // Identity is server-derived; request email/userId are never used for lookup or writes.
       const email = user.email.toLowerCase().trim();
       const userId = user.id;
+      const { data: paymentHistory } = await supabaseClient.from('digistore24_entitlements')
+        .select('id').eq('user_id', userId).eq('source', 'digistore24').limit(1);
+      const usesPaymentEntitlements = Boolean(paymentHistory?.length);
+      if (usesPaymentEntitlements) {
+        const { error: refreshError } = await supabaseClient.rpc('refresh_digistore_membership', { p_user_id: userId });
+        if (refreshError) throw refreshError;
+      }
       
       // First check if user has a manually set plan in user_memberships
       let manualPlanKey: PlanKey | null = null;
@@ -375,7 +378,7 @@ Deno.serve(async (req) => {
           .eq('user_id', userId)
           .single();
         
-        if (existingMembership?.plan_key && existingMembership.plan_key !== 'FREE') {
+        if (existingMembership?.plan_key && (existingMembership.plan_key !== 'FREE' || usesPaymentEntitlements)) {
           // User has a manually set plan that's not FREE - respect it
           manualPlanKey = existingMembership.plan_key as PlanKey;
           manualPlanRank = existingMembership.plan_rank || 0;
