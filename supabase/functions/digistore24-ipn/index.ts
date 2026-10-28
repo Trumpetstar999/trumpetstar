@@ -408,49 +408,17 @@ async function processIpnEvent(
         break;
     }
     
-    await supabase
+    const { error: entitlementError } = await supabase
       .from('digistore24_entitlements')
       .upsert(entitlementData, { 
         onConflict: 'user_id,entitlement_key,source',
         ignoreDuplicates: false 
       });
     
-    // 5. Update user_memberships for app-wide plan access
-    const { data: currentMembership } = await supabase.from('user_memberships')
-      .select('plan_key, active_product_ids').eq('user_id', userId).maybeSingle();
-    if (product.plan_key && product.plan_key !== 'FREE' && !isManualMembership(currentMembership)) {
-      // Get plan rank
-      const { data: plan } = await supabase
-        .from('plans')
-        .select('rank')
-        .eq('key', product.plan_key)
-        .maybeSingle();
-      
-      const planRank = plan?.rank || 0;
-      
-      if (['PURCHASE', 'RENEWAL'].includes(normalized.event_type)) {
-        await supabase
-          .from('user_memberships')
-          .upsert({
-            user_id: userId,
-            plan_key: product.plan_key,
-            plan_rank: planRank,
-            active_product_ids: [normalized.product_id],
-          }, { onConflict: 'user_id' });
-      } else if (['REFUND', 'CHARGEBACK'].includes(normalized.event_type) || 
-                 (normalized.event_type === 'CANCELLATION' && product.access_policy === 'IMMEDIATE_REVOKE')) {
-        // Downgrade to FREE
-        await supabase
-          .from('user_memberships')
-          .upsert({
-            user_id: userId,
-            plan_key: 'FREE',
-            plan_rank: 0,
-            active_product_ids: [],
-          }, { onConflict: 'user_id' });
-      }
-    }
-    
+    // Recompute from all active entitlements; preserve manual overrides and other purchases.
+    const { error: membershipError } = await supabase.rpc('refresh_digistore_membership', { p_user_id: userId });
+    if (membershipError) throw membershipError;
+
     // 6. Send welcome email for new purchases (first-time activation)
     const shouldSendEmail = 
       (normalized.event_type === 'PURCHASE' && !wasActiveEntitlement) || 
@@ -720,8 +688,8 @@ Deno.serve(async (req) => {
     });
   }
   
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
   
   const supabase = createClient(supabaseUrl, supabaseServiceKey, {
     auth: { persistSession: false },
