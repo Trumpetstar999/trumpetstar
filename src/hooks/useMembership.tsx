@@ -88,23 +88,10 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/digimember?action=check-membership`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: user.email,
-            userId: user.id,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Membership check failed');
-      }
-
-      const data = await response.json();
+      const { data, error: invokeError } = await supabase.functions.invoke('digimember?action=check-membership', {
+        body: {},
+      });
+      if (invokeError) throw invokeError;
       
       if (data.success) {
         // Normalize PREMIUM -> PRO for legacy API responses

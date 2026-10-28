@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { notifyBrevo } from "../_shared/brevo-notify.ts";
 import { sendWelcomeMail } from "../_shared/welcome-mail.ts";
+import { verifyIpnSignature, parseIpnForm, stripIpnCredentials, isManualMembership } from '../_shared/digistore-security.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,17 +40,8 @@ const EVENT_TYPE_MAP: Record<string, string> = {
   'connection_test': 'UNKNOWN',
   'on_payment_missed': 'UNKNOWN',
   'last_paid_day': 'UNKNOWN',
+  'payment_denial': 'UNKNOWN',
 };
-
-// Payload looks like a completed payment even though the event name is unknown
-function looksLikePayment(raw: Record<string, any>): boolean {
-  const hasOrder = Boolean(raw.order_id || raw.orderId);
-  const hasProduct = Boolean(raw.product_id || raw.productId);
-  const hasMoney = raw.amount !== undefined || raw.amount_brutto !== undefined || raw.pay_sequence_no !== undefined || Boolean(raw.billing_type);
-  const payStatus = String(raw.pay_status || raw.payment_status || '').toLowerCase();
-  const notRevoked = !['refunded', 'chargeback', 'cancelled', 'canceled'].some((s) => payStatus.includes(s));
-  return hasOrder && hasProduct && hasMoney && notRevoked;
-}
 
 interface NormalizedPayload {
   event_type: string;
@@ -75,24 +67,14 @@ async function parsePayload(req: Request): Promise<Record<string, any>> {
     return await req.json();
   } else if (contentType.includes("application/x-www-form-urlencoded")) {
     const text = await req.text();
-    const params = new URLSearchParams(text);
-    const result: Record<string, any> = {};
-    for (const [key, value] of params.entries()) {
-      result[key] = value;
-    }
-    return result;
+    return parseIpnForm(text);
   } else {
     // Try JSON first, then form-urlencoded
     const text = await req.text();
     try {
       return JSON.parse(text);
     } catch {
-      const params = new URLSearchParams(text);
-      const result: Record<string, any> = {};
-      for (const [key, value] of params.entries()) {
-        result[key] = value;
-      }
-      return result;
+      return parseIpnForm(text);
     }
   }
 }
@@ -110,11 +92,7 @@ function normalizePayload(raw: Record<string, any>): NormalizedPayload {
   
   let eventType = EVENT_TYPE_MAP[eventName] ?? 'UNKNOWN';
 
-  // Digistore24 occasionally sends event names we don't know yet — don't silently drop real payments
-  if (eventType === 'UNKNOWN' && eventName !== 'connection_test' && looksLikePayment(raw)) {
-    console.warn(`[IPN] Unknown event name "${eventName}" but payload looks like a payment — treating as PURCHASE`);
-    eventType = 'PURCHASE';
-  }
+  // Unknown/missed/denied payments must never be inferred to be successful purchases.
   
   return {
     event_type: eventType,
@@ -145,7 +123,8 @@ function generateIdempotencyKey(raw: Record<string, any>, normalized: Normalized
     normalized.event_type,
     normalized.order_id,
     normalized.subscription_id || 'nosub',
-    raw.event_time || raw.timestamp || Date.now().toString(),
+    normalized.product_id,
+    raw.sha_sign,
   ];
   
   return `ds24_${parts.join('_')}`;
@@ -166,21 +145,6 @@ async function getSetting(
   if (data?.value) return data.value;
   if (envFallback) return Deno.env.get(envFallback) || null;
   return null;
-}
-
-// Validate IPN secret
-function validateSecret(payload: Record<string, any>, expectedSecret: string): boolean {
-  // SECURITY: Reject all requests when no secret is configured — never skip validation
-  if (!expectedSecret) return false;
-  
-  const providedSecret = 
-    payload.sha_sign || 
-    payload.passphrase || 
-    payload.secret || 
-    payload.api_key ||
-    payload.ipn_passphrase;
-  
-  return providedSecret === expectedSecret;
 }
 
 // Look up an auth user by exact email. GoTrue ignores unknown filters, so never trust users[0].
@@ -230,6 +194,10 @@ async function processIpnEvent(
     .eq('id', eventId);
   
   try {
+    if (normalized.event_type === 'UNKNOWN') {
+      await supabase.from('digistore24_ipn_events').update({ status: 'processed', processed_at: new Date().toISOString() }).eq('id', eventId);
+      return;
+    }
     // 1. Find product mapping
     const { data: product, error: productError } = await supabase
       .from('digistore24_products')
@@ -278,8 +246,8 @@ async function processIpnEvent(
     let userLocale = normalized.language;
     
     // Check if user exists via GoTrue REST API with email filter — O(1) statt O(n)
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || '';
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || '';
     const existingUser = await findUserByEmail(normalized.email, supabaseUrl, supabaseServiceKey);
     
     if (existingUser) {
@@ -298,7 +266,7 @@ async function processIpnEvent(
       // Create new user (no password - they'll use magic link)
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email: normalized.email,
-        email_confirm: true,
+        email_confirm: false,
         user_metadata: {
           first_name: normalized.first_name,
           last_name: normalized.last_name,
@@ -307,6 +275,7 @@ async function processIpnEvent(
       });
       
       if (createError) throw createError;
+      if (!newUser?.user) throw new Error('Account creation failed');
       userId = newUser.user.id;
       isNewUser = true;
       
@@ -414,47 +383,17 @@ async function processIpnEvent(
         break;
     }
     
-    await supabase
+    const { error: entitlementError } = await supabase
       .from('digistore24_entitlements')
       .upsert(entitlementData, { 
         onConflict: 'user_id,entitlement_key,source',
         ignoreDuplicates: false 
       });
     
-    // 5. Update user_memberships for app-wide plan access
-    if (product.plan_key && product.plan_key !== 'FREE') {
-      // Get plan rank
-      const { data: plan } = await supabase
-        .from('plans')
-        .select('rank')
-        .eq('key', product.plan_key)
-        .maybeSingle();
-      
-      const planRank = plan?.rank || 0;
-      
-      if (['PURCHASE', 'RENEWAL'].includes(normalized.event_type)) {
-        await supabase
-          .from('user_memberships')
-          .upsert({
-            user_id: userId,
-            plan_key: product.plan_key,
-            plan_rank: planRank,
-            active_product_ids: [normalized.product_id],
-          }, { onConflict: 'user_id' });
-      } else if (['REFUND', 'CHARGEBACK'].includes(normalized.event_type) || 
-                 (normalized.event_type === 'CANCELLATION' && product.access_policy === 'IMMEDIATE_REVOKE')) {
-        // Downgrade to FREE
-        await supabase
-          .from('user_memberships')
-          .upsert({
-            user_id: userId,
-            plan_key: 'FREE',
-            plan_rank: 0,
-            active_product_ids: [],
-          }, { onConflict: 'user_id' });
-      }
-    }
-    
+    // Recompute from all active entitlements; preserve manual overrides and other purchases.
+    const { error: membershipError } = await supabase.rpc('refresh_digistore_membership', { p_user_id: userId });
+    if (membershipError) throw membershipError;
+
     // 6. Send welcome email for new purchases (first-time activation)
     const shouldSendEmail = 
       (normalized.event_type === 'PURCHASE' && !wasActiveEntitlement) || 
@@ -724,8 +663,8 @@ Deno.serve(async (req) => {
     });
   }
   
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
   
   const supabase = createClient(supabaseUrl, supabaseServiceKey, {
     auth: { persistSession: false },
@@ -735,43 +674,36 @@ Deno.serve(async (req) => {
   
   try {
     rawPayload = await parsePayload(req);
-    console.log("Received IPN payload:", JSON.stringify(rawPayload).substring(0, 500));
+    if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) throw new Error("Invalid payload");
   } catch (parseError) {
     console.error("Failed to parse payload:", parseError);
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
   
   try {
-    // Normalize payload
-    const normalized = normalizePayload(rawPayload);
-    const idempotencyKey = generateIdempotencyKey(rawPayload, normalized);
-    
     // Get settings
     const ipnSecret = await getSetting(supabase, 'ipn_secret', 'DIGISTORE24_IPN_SECRET');
     const appBaseUrl = await getSetting(supabase, 'app_base_url', 'APP_BASE_URL') || 'https://trumpetstar.lovable.app';
     const defaultLocale = await getSetting(supabase, 'default_locale') || 'de';
     
-    // Validate secret — only block if a secret IS configured AND it doesn't match
-    if (ipnSecret && !validateSecret(rawPayload, ipnSecret)) {
+    // Fail closed before any event is stored or processed, including missing configuration.
+    if (!await verifyIpnSignature(rawPayload, ipnSecret)) {
       console.warn("Invalid IPN secret provided, payload keys:", Object.keys(rawPayload));
       
-      await supabase
-        .from('digistore24_ipn_events')
-        .insert({
-          idempotency_key: idempotencyKey + '_rejected_' + Date.now(),
-          event_type: normalized.event_type || 'UNKNOWN',
-          order_id: normalized.order_id,
-          subscription_id: normalized.subscription_id,
-          product_id: normalized.product_id,
-          email: normalized.email,
-          raw_payload: rawPayload,
-          normalized_payload: normalized,
-          status: 'rejected',
-          error_message: 'Invalid IPN secret',
-        });
-      
-      return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+      return new Response(JSON.stringify({ error: ipnSecret ? 'Invalid IPN authentication' : 'IPN authentication not configured' }), {
+        status: ipnSecret ? 401 : 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
+
+    if (!rawPayload || Array.isArray(rawPayload)) throw new Error('Invalid IPN payload');
+    const normalized = normalizePayload(rawPayload);
+    if (normalized.event_type !== 'UNKNOWN' &&
+        (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized.email) ||
+         !/^\d{1,20}$/.test(normalized.product_id) || !normalized.order_id || normalized.order_id.length > 200)) {
+      return new Response(JSON.stringify({ error: 'Invalid purchase fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const idempotencyKey = generateIdempotencyKey(rawPayload, normalized);
+    rawPayload = stripIpnCredentials(rawPayload);
     
     // Check idempotency
     const { data: existingEvent } = await supabase
@@ -780,13 +712,13 @@ Deno.serve(async (req) => {
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
     
-    if (existingEvent) {
+    if (existingEvent && existingEvent.status !== "error") {
       console.log(`Duplicate event detected: ${idempotencyKey}, status: ${existingEvent.status}`);
       return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
     // Store event
-    const { data: ipnEvent, error: insertError } = await supabase
+    const { data: insertedEvent, error: insertError } = existingEvent ? { data: existingEvent, error: null } : await supabase
       .from('digistore24_ipn_events')
       .insert({
         idempotency_key: idempotencyKey,
@@ -810,17 +742,21 @@ Deno.serve(async (req) => {
       throw insertError;
     }
     
+    const ipnEvent = insertedEvent;
+    if (!ipnEvent) throw new Error("Event persistence failed");
     // Sofort 200 zurückgeben — Digistore24 bekommt Antwort vor Timeout
     const ipnResponse = new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
 
     // Verarbeitung im Hintergrund (fire-and-forget) — Deno hält die Funktion am Leben
-    processIpnEvent(
+    const processing = processIpnEvent(
       supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
     ).then(() => {
       console.log(`IPN event ${ipnEvent.id} processed successfully`);
     }).catch((processingError: any) => {
       console.error('IPN processing error (non-fatal for DS24):', processingError?.message || processingError);
     });
+
+    EdgeRuntime.waitUntil(processing);
 
     return ipnResponse;
     
