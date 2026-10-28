@@ -25,6 +25,7 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     let cancelled = false;
     let recoveryDetected = false;
+    const isRecoverySession = (userId: string | undefined) => Boolean(userId && sessionStorage.getItem('password_recovery_user') === userId);
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         recoveryDetected = true;
@@ -58,7 +59,7 @@ export default function ResetPasswordPage() {
           const { data } = await supabase.auth.getSession();
           const consumed = !new URL(window.location.href).searchParams.has('code');
           if (consumed) {
-            if (!cancelled) setRecoveryState(data.session && recoveryDetected ? 'ready' : 'invalid');
+            if (!cancelled) setRecoveryState(data.session && (recoveryDetected || isRecoverySession(data.session.user.id)) ? 'ready' : 'invalid');
             return;
           }
           const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -82,8 +83,8 @@ export default function ResetPasswordPage() {
           return;
         }
 
-        await supabase.auth.getSession();
-        if (!cancelled) setRecoveryState(recoveryDetected ? 'ready' : 'invalid');
+        const { data } = await supabase.auth.getSession();
+        if (!cancelled) setRecoveryState(recoveryDetected || isRecoverySession(data.session?.user.id) ? 'ready' : 'invalid');
       } catch (err) {
         console.error('Recovery init error:', err);
         if (!cancelled) setRecoveryState('invalid');
@@ -114,6 +115,7 @@ export default function ResetPasswordPage() {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+      sessionStorage.removeItem('password_recovery_user');
       toast({ title: t('auth.passwordChanged'), description: t('auth.passwordChangedDesc') });
       navigate('/app');
     } catch (error) {
