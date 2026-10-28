@@ -45,6 +45,11 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
     if (loading) return;
 
     const path = location.pathname;
+    // Recovery sessions must not fall through to normal login/app navigation.
+    if (user && sessionStorage.getItem('password_recovery_user') === user.id && path !== '/reset-password') {
+      navigate(`/reset-password${location.search}${location.hash}`, { replace: true });
+      return;
+    }
 
     if (isMiniMode && user) {
       // On mobile + logged in: redirect desktop routes to mobile

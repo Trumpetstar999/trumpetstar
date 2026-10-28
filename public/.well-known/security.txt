@@ -1,0 +1,4 @@
+Contact: mailto:info@trumpetstar.com
+Expires: 2027-10-28T09:05:00Z
+Preferred-Languages: de, en
+Canonical: https://www.trumpetstar.app/.well-known/security.txt
