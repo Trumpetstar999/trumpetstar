@@ -43,6 +43,13 @@
       "when": 1793180218489,
       "tag": "0005_pdf_book_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793183548685,
+      "tag": "0006_restrict_membership_self_mutation",
+      "breakpoints": true
     }
   ]
 }
