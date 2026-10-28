@@ -735,7 +735,6 @@ Deno.serve(async (req) => {
   
   try {
     rawPayload = await parsePayload(req);
-    console.log("Received IPN payload:", JSON.stringify(rawPayload).substring(0, 500));
   } catch (parseError) {
     console.error("Failed to parse payload:", parseError);
     return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
@@ -751,26 +750,13 @@ Deno.serve(async (req) => {
     const appBaseUrl = await getSetting(supabase, 'app_base_url', 'APP_BASE_URL') || 'https://trumpetstar.lovable.app';
     const defaultLocale = await getSetting(supabase, 'default_locale') || 'de';
     
-    // Validate secret — only block if a secret IS configured AND it doesn't match
-    if (ipnSecret && !validateSecret(rawPayload, ipnSecret)) {
+    // Fail closed before any event is stored or processed, including missing configuration.
+    if (!ipnSecret || !validateSecret(rawPayload, ipnSecret)) {
       console.warn("Invalid IPN secret provided, payload keys:", Object.keys(rawPayload));
       
-      await supabase
-        .from('digistore24_ipn_events')
-        .insert({
-          idempotency_key: idempotencyKey + '_rejected_' + Date.now(),
-          event_type: normalized.event_type || 'UNKNOWN',
-          order_id: normalized.order_id,
-          subscription_id: normalized.subscription_id,
-          product_id: normalized.product_id,
-          email: normalized.email,
-          raw_payload: rawPayload,
-          normalized_payload: normalized,
-          status: 'rejected',
-          error_message: 'Invalid IPN secret',
-        });
-      
-      return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+      return new Response(JSON.stringify({ error: ipnSecret ? 'Invalid IPN authentication' : 'IPN authentication not configured' }), {
+        status: ipnSecret ? 401 : 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
     
     // Check idempotency
@@ -814,13 +800,15 @@ Deno.serve(async (req) => {
     const ipnResponse = new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
 
     // Verarbeitung im Hintergrund (fire-and-forget) — Deno hält die Funktion am Leben
-    processIpnEvent(
+    const processing = processIpnEvent(
       supabase, ipnEvent.id, normalized, { appBaseUrl, defaultLocale }, rawPayload
     ).then(() => {
       console.log(`IPN event ${ipnEvent.id} processed successfully`);
     }).catch((processingError: any) => {
       console.error('IPN processing error (non-fatal for DS24):', processingError?.message || processingError);
     });
+
+    EdgeRuntime.waitUntil(processing);
 
     return ipnResponse;
     
