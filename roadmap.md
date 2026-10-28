@@ -1,4 +1,6 @@
 # Tasks
+- [ ] Step 1: Harden purchase notifications, membership identity binding and admin-only imports; verify rejection and fulfillment paths.
+- [ ] Steps 2–5: Paid content, mail endpoints, QR/leads/uploads and remaining security warnings (subsequent scope).
 - [x] Fix five critical access-policy findings; anonymous denial/admin access and PDF download verified (7 integration tests).
 - [x] Fix mobile password recovery redirect and callback handling (18 regression tests; real signed-in mobile form verified without changing the user's password).
 - [ ] Verify a fresh emailed recovery link and actual password change on a designated test account; awaiting test account/mail access.
