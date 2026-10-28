@@ -79,6 +79,7 @@ export async function grantAccess(admin: any, input: GrantInput): Promise<GrantR
     .from("digistore24_products")
     .select("*")
     .eq("digistore_product_id", productId)
+    .eq("is_active", true)
     .maybeSingle();
 
   if (!product) {
@@ -98,7 +99,7 @@ export async function grantAccess(admin: any, input: GrantInput): Promise<GrantR
   if (!user) {
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
-      email_confirm: true,
+      email_confirm: false,
       user_metadata: {
         first_name: input.first_name || "",
         last_name: input.last_name || "",

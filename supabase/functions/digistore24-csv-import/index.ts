@@ -66,6 +66,9 @@ Deno.serve(async (req) => {
     let imported = 0;
     let skipped = 0;
     const errors: string[] = [];
+    const { data: products } = await supabase.from('digistore24_products')
+      .select('digistore_product_id, plan_key').eq('is_active', true);
+    const { data: plans } = await supabase.from('plans').select('key, rank');
 
     // Pre-fetch all existing auth users once (avoid N+1 listUsers calls)
     const { data: allAuthData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
@@ -78,6 +81,8 @@ Deno.serve(async (req) => {
       try {
         const email = row.email?.toLowerCase().trim();
         if (!email) { skipped++; continue; }
+        const product = products?.find(p => p.digistore_product_id === row.product_id?.trim());
+        if (!product) { errors.push('Unknown or inactive product'); skipped++; continue; }
 
         const isActive = row.payment_status?.trim() === 'Zahlungen aktiv';
         const subscriptionStatus = isActive ? 'active' : 'cancelled';
@@ -165,9 +170,10 @@ Deno.serve(async (req) => {
             .from('user_memberships')
             .upsert({
               user_id: authUserId,
-              plan_key: 'PRO',
-              current_plan: 'PRO',
-              plan_rank: 3,
+              plan_key: product.plan_key,
+              current_plan: product.plan_key,
+              plan_rank: plans?.find(p => p.key === product.plan_key)?.rank ?? 0,
+              active_product_ids: [row.product_id.trim()],
               last_synced_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id', ignoreDuplicates: false });
