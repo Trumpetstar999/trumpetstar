@@ -55,6 +55,21 @@
     "email": "E-pošta",
     "password": "Geslo",
     "forgotPassword": "Pozabljeno geslo?",
+    "recoverySent": "Če račun s tem naslovom obstaja, boste prejeli povezavo za ponastavitev gesla.",
+    "recoveryResend": "Zahtevaj novo povezavo",
+    "resetTitle": "Nastavi novo geslo",
+    "resetPrompt": "Vnesite novo geslo.",
+    "resetInvalid": "Ta povezava ni veljavna ali je potekla.",
+    "resetChecking": "Preverjanje povezave …",
+    "resetRequestNew": "Zahtevajte novo povezavo za ponastavitev gesla.",
+    "newPassword": "Novo geslo",
+    "confirmPassword": "Potrdi geslo",
+    "showPassword": "Pokaži ali skrij geslo",
+    "savePassword": "Shrani geslo",
+    "savingPassword": "Shranjevanje …",
+    "passwordMismatch": "Gesli se ne ujemata.",
+    "passwordChanged": "Geslo spremenjeno",
+    "passwordChangedDesc": "Vaše geslo je bilo uspešno posodobljeno.",
     "signedOutSuccess": "Uspešno ste se odjavili",
     "toApp": "Na aplikacijo",
     "navLearn": "Učenje",
@@ -628,7 +643,8 @@
   "pricing_table": {
     "monthly": "Mesečno",
     "yearly": "Letno",
-    "saveUpTo": "Prihrani do 35%",
+    "saveUpTo": "Prihrani do 17%",
+    "unavailable": "Nakup trenutno ni na voljo",
     "recommended": "Priporočeno",
     "currentPlan": "Tvoj načrt",
     "currentPlanBtn": "Trenutni načrt",
@@ -677,7 +693,7 @@
       "q2": "Ali lahko zamenjam načrt?",
       "a2": "Seveda! Nadgradnjo lahko opravite kadar koli. Pri prehodu na višji načrt se preostalo obdobje sorazmerno obračuna.",
       "q3": "Ali obstaja garancija vračila denarja?",
-      "a3": "Da, v prvih 14 dneh lahko odpovete naročnino brez navedbe razloga in prejmete celotno povračilo."
+      "a3": "Da, v prvih 30 dneh lahko odpovete naročnino brez navedbe razloga in prejmete celotno povračilo."
     }
   },
   "seo_hilfeKeinTon": {

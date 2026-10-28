@@ -51,6 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        if (event === 'PASSWORD_RECOVERY' && session?.user) {
+          sessionStorage.setItem('password_recovery_user', session.user.id);
+        } else if (event === 'SIGNED_OUT') {
+          sessionStorage.removeItem('password_recovery_user');
+        }
 
         if (!initialised) {
           initialised = true;
