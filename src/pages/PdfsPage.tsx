@@ -71,7 +71,14 @@ export function PdfsPage() {
         .order('sort_index', { ascending: true });
 
       if (error) throw error;
-      return (data || []) as PdfDocument[];
+      const readable = (data || []) as PdfDocument[];
+      // Catalog lists every active book (without file paths) so locked ones can be bought.
+      const { data: catalog } = await (supabase as any).rpc('get_pdf_book_catalog');
+      const known = new Set(readable.map((p) => p.id));
+      const locked = ((catalog || []) as PdfDocument[])
+        .filter((c) => !known.has(c.id))
+        .map((c) => ({ ...c, pdf_file_url: '', is_active: true }));
+      return [...readable, ...locked].sort((a, b) => a.sort_index - b.sort_index);
     },
     enabled: !!user,
   });

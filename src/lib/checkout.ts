@@ -2,12 +2,12 @@ import type { PlanKey } from '@/types/plans';
 
 export type BillingPeriod = 'monthly' | 'yearly';
 export const GUARANTEE_DAYS = 30;
-const BLOCKED_PRODUCTS = new Set(['346007', '575565']);
+const BLOCKED_PRODUCTS = new Set<string>();
 
 // Only individually verified plan/period URLs may reopen purchases.
 const VERIFIED_CHECKOUTS: Record<'BASIC' | 'PRO', Record<BillingPeriod, string | null>> = {
-  BASIC: { monthly: null, yearly: null },
-  PRO: { monthly: null, yearly: null },
+  BASIC: { monthly: 'https://www.digistore24.com/product/346007', yearly: 'https://www.digistore24.com/product/346007' },
+  PRO: { monthly: 'https://www.checkout-ds24.com/product/575565/', yearly: 'https://www.checkout-ds24.com/product/575565/' },
 };
 
 export function validateCheckoutUrl(value: string | null | undefined): string | null {

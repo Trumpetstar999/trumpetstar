@@ -4,6 +4,7 @@
 - [ ] Verify a fresh emailed recovery link and actual password change on a designated test account; awaiting test account/mail access.
 - [x] Pause unverified Basic/Pro checkouts and block products 346007 and 575565; prices/30-day guarantee checked on desktop/iPhone/iPad.
 - [x] Emergency publication requested for https://www.trumpetstar.app after resolving five critical findings; deployment completion not confirmed.
-- [ ] Reopen purchases only after four correct, verified Digistore24 checkout URLs are supplied.
+- [x] Reopen purchases with owner-supplied Basic 346007 and Pro 575565 links (same link for monthly and yearly).
+- [x] Show all books (locked with buy link) to free users.
 - [x] Use the Trumpetstar logo for WhatsApp link previews (takes effect on the live site after publishing).
 - [x] Replace the level sidebar with a complete thumbnail tile overview and verify navigation (49 levels, selection and return checked signed in).
