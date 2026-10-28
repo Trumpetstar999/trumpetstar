@@ -29,6 +29,13 @@
       "when": 1788508594053,
       "tag": "0003_tighten_security_definer_function_execute_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793178949996,
+      "tag": "0004_restrict_exposed_configuration_and_pdf_reads",
+      "breakpoints": true
     }
   ]
 }
