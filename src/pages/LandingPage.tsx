@@ -725,10 +725,10 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => handleCta(PRO_CHECKOUT_URL)}
+                disabled
                 className="lp-btn-shine h-14 px-8 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
               >
-                Direkt PRO freischalten
+                {t('pricing_table.unavailable')}
               </Button>
             </div>
             <p className="text-white/35 text-xs mt-4">
