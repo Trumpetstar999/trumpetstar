@@ -4039,6 +4039,25 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_pdf_book_catalog: {
+        Args: never
+        Returns: {
+          cover_image_url: string
+          description: string
+          description_en: string
+          description_es: string
+          id: string
+          language: string
+          level_id: string
+          order_link: string
+          page_count: number
+          plan_required: string
+          sort_index: number
+          title: string
+          title_en: string
+          title_es: string
+        }[]
+      }
       get_public_star_ranking: {
         Args: never
         Returns: {
