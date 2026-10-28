@@ -64,20 +64,15 @@ const TEXTS = {
   },
 };
 
-const CHECKOUT_URLS: Partial<Record<PlanKey, string>> = {
-  BASIC: 'https://www.checkout-ds24.com/product/346007/',
-  PRO: 'https://www.checkout-ds24.com/product/575565/',
-};
-
 export default function MobilePlanPage() {
   const { planKey, getUpgradeLink, refreshMembership, isLoading } = useMembership();
-  const { language } = useLanguage();
+  const { language, t: translate } = useLanguage();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const t = TEXTS[language] || TEXTS.de;
 
   const handleUpgrade = (key: PlanKey) => {
-    const link = getUpgradeLink(key) || CHECKOUT_URLS[key];
+    const link = getUpgradeLink(key);
     if (link) {
       window.open(link, '_blank', 'noopener,noreferrer');
     }
@@ -138,12 +133,6 @@ export default function MobilePlanPage() {
                   <span className="text-2xl font-bold text-slate-900">{plan.price}</span>
                 </div>
 
-                {plan.key === 'PRO' && (
-                  <div className="bg-amber-50 text-amber-800 text-xs font-semibold px-3 py-1.5 rounded-full inline-block">
-                    {t.proPromo}
-                  </div>
-                )}
-
                 {!isCurrent && plan.key !== 'FREE' && (
                   <Button
                     className={cn(
@@ -153,8 +142,9 @@ export default function MobilePlanPage() {
                         : ''
                     )}
                     onClick={() => handleUpgrade(plan.key)}
+                    disabled={isLoading || !getUpgradeLink(plan.key)}
                   >
-                    {plan.cta}
+                    {getUpgradeLink(plan.key) ? plan.cta : translate('pricing_table.unavailable')}
                   </Button>
                 )}
 

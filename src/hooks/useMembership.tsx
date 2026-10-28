@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { PlanKey, UpgradeLinks, canAccessPlan, PLAN_RANKS } from '@/types/plans';
+import { getCheckoutUrl } from '@/lib/checkout';
 
 interface MembershipState {
   isLoading: boolean;
@@ -150,10 +151,8 @@ export function MembershipProvider({ children }: { children: ReactNode }) {
   }, [state.planKey]);
 
   const getUpgradeLink = useCallback((planKey: PlanKey): string | null => {
-    if (planKey === 'BASIC') return state.upgradeLinks.BASIC;
-    if (planKey === 'PRO') return state.upgradeLinks.PRO;
-    return null;
-  }, [state.upgradeLinks]);
+    return getCheckoutUrl(planKey);
+  }, []);
 
   // Auto-refresh on focus (if cache expired)
   useEffect(() => {

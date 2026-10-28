@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { PlanKey, PLAN_DISPLAY_NAMES, getRequiredUpgradePlans } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface UpgradeDialogProps {
   open: boolean;
@@ -29,14 +30,11 @@ export function UpgradeDialog({
   description = DEFAULT_DESCRIPTION,
 }: UpgradeDialogProps) {
   const { planKey, getUpgradeLink, isLoading } = useMembership();
+  const { t } = useLanguage();
   
   const upgradePlans = getRequiredUpgradePlans(planKey, requiredPlanKey);
   
-  const FALLBACK: Partial<Record<PlanKey, string>> = {
-    BASIC: "https://www.checkout-ds24.com/product/346007/",
-    PRO: "https://www.checkout-ds24.com/product/575565/",
-  };
-  const linkFor = (p: PlanKey) => getUpgradeLink(p) || FALLBACK[p] || null;
+  const linkFor = (p: PlanKey) => getUpgradeLink(p);
 
   const handleUpgrade = (targetPlan: PlanKey) => {
     const link = linkFor(targetPlan);
@@ -77,7 +75,7 @@ export function UpgradeDialog({
                 size="lg"
               >
                 {isPro && <Sparkles className="w-5 h-5" />}
-                {PLAN_DISPLAY_NAMES[plan]}
+                {link ? PLAN_DISPLAY_NAMES[plan] : t('pricing_table.unavailable')}
                 <ExternalLink className="w-4 h-4 ml-1" />
               </Button>
             );
@@ -92,7 +90,7 @@ export function UpgradeDialog({
         
         {upgradePlans.some(p => !linkFor(p)) && (
           <p className="text-xs text-muted-foreground text-center mt-2">
-            Einige Upgrade-Links sind nicht konfiguriert.
+            {t('pricing_table.unavailable')}
           </p>
         )}
       </DialogContent>

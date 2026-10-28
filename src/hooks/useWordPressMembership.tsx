@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { getCheckoutUrl } from '@/lib/checkout';
 
 export type MembershipPlan = 'FREE' | 'PLAN_A' | 'PLAN_B';
 
@@ -344,15 +345,8 @@ export function WordPressMembershipProvider({ children }: { children: ReactNode 
   }, [state.plan]);
 
   const getUpgradeLink = useCallback((requiredPlan: MembershipPlan): string | null => {
-    if (!state.upgradeLinks) return null;
-    
-    if (requiredPlan === 'PLAN_A') {
-      return state.upgradeLinks.planA;
-    } else if (requiredPlan === 'PLAN_B') {
-      return state.upgradeLinks.planB;
-    }
-    return null;
-  }, [state.upgradeLinks]);
+    return getCheckoutUrl(requiredPlan === 'PLAN_A' ? 'BASIC' : requiredPlan === 'PLAN_B' ? 'PRO' : 'FREE');
+  }, []);
 
   // Auto-refresh on window focus
   useEffect(() => {

@@ -6,6 +6,9 @@ import { useAuth } from '@/hooks/useAuth';
 // Routes that are allowed on mobile (auth, onboarding, mobile routes)
 const MOBILE_ALLOWED_PREFIXES = [
   '/auth',
+  '/login',
+  '/signup',
+  '/reset-password',
   '/mobile/',
   '/mobile/home',
   '/mobile/plan',
