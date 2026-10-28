@@ -4,3 +4,4 @@
 - Resolve purchase destinations through the shared verified plan-and-billing-period checkout registry, never cached membership links or fallbacks, so unverified products fail closed without modifying existing entitlements.
 - Keep password recovery public and exempt from mobile app redirects; preserve recovery intent before the auth client consumes callback tokens.
 - Use Happy DOM for component tests to avoid native canvas requirements in the managed test sandbox.
+- Keep operational mail templates and sync logs admin-only; audio metadata and review prompts require sign-in, and private course PDFs require exact document-to-object binding plus server-side plan entitlement.
