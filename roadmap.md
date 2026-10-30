@@ -1,4 +1,5 @@
 # Tasks
+- [ ] October 30 12:10 requested real registration/onboarding/contact-sync/voucher/Brevo E2E: preview is signed out and automatic self-session has no matching auth account; requires the user's chosen admin account and a designated registration test identity. Preserve existing uncertain singleton voucher until provider reconciliation.
 - [x] Correct welcome provider response parsing against official Swagger: identified data.discount_code_id/code creation response, top-level coupon lookup, whole-second ISO dates; no second code generated.
 - [ ] Recheck existing welcome test using corrected provider lookup; blocked on active signed-in admin session (requester has no matching auth account for automatic session minting). Do not reset uncertain ledger without provider evidence.
 - [x] Implement one-time multilingual welcome vouchers in authenticated brevo-sync-contact; private schema applied, deployed, 33 rule/regression checks passed, admin-only singleton test documented.
