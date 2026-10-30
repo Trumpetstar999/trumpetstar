@@ -1,4 +1,5 @@
 # Architecture rules
+- Request login and recovery emails through the managed auth client, never the legacy SMTP relay or privileged link generator; keep verification URLs intact and return callbacks to public auth pages.
 - Derive membership lookup identity from a verified server-side session; payment imports require a database-backed admin role, and purchase notifications must authenticate before persistence or fulfillment.
 - Verify original Digistore24 parameters with the official case-sensitive SHA-512 signature, strip credential fields before storage, keep order ownership immutable and recompute plans from active entitlements while preserving manual overrides.
 - Keep level browsing in the LevelsPage flow, with a reusable LevelGrid for overview tiles; selecting a tile reuses existing video playback and usage checks.
