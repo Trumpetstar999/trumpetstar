@@ -51,7 +51,7 @@ export const providers = {
     // Read-only reconciliation: only positively identified provider records can advance delivery.
     const confirmed = response.ok && body?.result === 'success' && (data?.code === row.voucher_code || data?.voucher?.code === row.voucher_code);
     return { confirmed, reason: confirmed ? 'voucher_found' : body?.result === 'error' ? 'provider_lookup_rejected' : 'provider_lookup_unconfirmed',
-      ...(!confirmed ? { diagnostic: { http_status: response.status, json_received: body !== null, success_result: body?.result === 'success', explicit_error: body?.result === 'error' } } : {}) };
+      ...(!confirmed ? { diagnostic: { http_status: response.status, json_received: body !== null, success_result: body?.result === 'success', explicit_error: body?.result === 'error', data_keys: data && typeof data === 'object' ? Object.keys(data).filter(k => /^[a-z_]{1,40}$/.test(k)) : [], requested_code_matches_value: data && typeof data === 'object' ? Object.values(data).includes(row.voucher_code) : false } } : {}) };
   },
   async voucher(row: WelcomeRow): Promise<ProviderResult> {
     const key = Deno.env.get('DIGISTORE24_API_KEY');
