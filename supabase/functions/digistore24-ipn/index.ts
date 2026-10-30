@@ -1,46 +1,14 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { notifyBrevo } from "../_shared/brevo-notify.ts";
 import { sendWelcomeMail } from "../_shared/welcome-mail.ts";
-import { verifyIpnSignature, parseIpnForm, stripIpnCredentials, isManualMembership } from '../_shared/digistore-security.ts';
+import { verifyIpnSignature, parseIpnForm, stripIpnCredentials } from '../_shared/digistore-security.ts';
+
+import { EVENT_TYPE_MAP, entitlementTransition } from '../_shared/digistore-events.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-// Event type mapping from Digistore24 to internal types
-const EVENT_TYPE_MAP: Record<string, string> = {
-  // Purchase events
-  'on_payment': 'PURCHASE',
-  'on_payment_complete': 'PURCHASE',
-  'payment': 'PURCHASE',
-  'order_complete': 'PURCHASE',
-  // Renewal events
-  'on_rebill_resumed': 'RENEWAL',
-  'on_rebill': 'RENEWAL',
-  'rebilling': 'RENEWAL',
-  'rebill_payment': 'RENEWAL',
-  // Cancellation events
-  'on_rebill_cancelled': 'CANCELLATION',
-  'on_refund_request': 'CANCELLATION',
-  'subscription_cancelled': 'CANCELLATION',
-  'cancel': 'CANCELLATION',
-  // Refund events
-  'on_refund': 'REFUND',
-  'refund': 'REFUND',
-  'refund_complete': 'REFUND',
-  // Chargeback events
-  'on_chargeback': 'CHARGEBACK',
-  'chargeback': 'CHARGEBACK',
-  // Additional Digistore24 event names
-  'on_upgrade': 'PURCHASE',
-  'on_upgrade_complete': 'PURCHASE',
-  'on_affiliation': 'UNKNOWN',
-  'connection_test': 'UNKNOWN',
-  'on_payment_missed': 'UNKNOWN',
-  'last_paid_day': 'UNKNOWN',
-  'payment_denial': 'UNKNOWN',
 };
 
 interface NormalizedPayload {
@@ -303,28 +271,12 @@ async function processIpnEvent(
       subscriptionData.current_period_end = new Date(normalized.period_end).toISOString();
     }
     
-    // Set status based on event type
-    switch (normalized.event_type) {
-      case 'PURCHASE':
-      case 'RENEWAL':
-        subscriptionData.status = 'active';
-        subscriptionData.cancel_at_period_end = false;
-        break;
-      case 'CANCELLATION':
-        if (product.access_policy === 'IMMEDIATE_REVOKE') {
-          subscriptionData.status = 'cancelled';
-        } else {
-          subscriptionData.cancel_at_period_end = true;
-        }
-        break;
-      case 'REFUND':
-        subscriptionData.status = 'refunded';
-        break;
-      case 'CHARGEBACK':
-        subscriptionData.status = 'chargeback';
-        break;
-    }
-    
+    const transition = entitlementTransition(normalized.event_type, normalized.period_end
+      ? new Date(normalized.period_end).toISOString() : null);
+    if (!transition) throw new Error('Unsupported entitlement transition');
+    subscriptionData.status = transition.status;
+    subscriptionData.cancel_at_period_end = transition.cancel_at_period_end;
+
     const { data: subscription, error: subError } = await supabase
       .from('digistore24_subscriptions')
       .upsert(subscriptionData, { 
@@ -357,32 +309,9 @@ async function processIpnEvent(
       subscription_id: subscription.id,
     };
     
-    switch (normalized.event_type) {
-      case 'PURCHASE':
-      case 'RENEWAL':
-        entitlementData.active = true;
-        entitlementData.valid_until = normalized.period_end 
-          ? new Date(normalized.period_end).toISOString() 
-          : null;
-        break;
-      case 'CANCELLATION':
-        if (product.access_policy === 'IMMEDIATE_REVOKE') {
-          entitlementData.active = false;
-        } else {
-          // Keep active until period end
-          entitlementData.active = true;
-          entitlementData.valid_until = normalized.period_end 
-            ? new Date(normalized.period_end).toISOString() 
-            : null;
-        }
-        break;
-      case 'REFUND':
-      case 'CHARGEBACK':
-        // Always revoke on refund/chargeback regardless of policy
-        entitlementData.active = false;
-        break;
-    }
-    
+    entitlementData.active = transition.active;
+    entitlementData.valid_until = transition.valid_until;
+
     const { error: entitlementError } = await supabase
       .from('digistore24_entitlements')
       .upsert(entitlementData, { 
@@ -416,7 +345,7 @@ async function processIpnEvent(
     }
 
     // 6b. Push purchase/plan update to App B (fire-and-forget)
-    if (['PURCHASE', 'RENEWAL', 'REFUND', 'CHARGEBACK', 'CANCELLATION'].includes(normalized.event_type)) {
+    if (['PURCHASE', 'RENEWAL', 'REFUND', 'CHARGEBACK', 'CANCELLATION', 'PAYMENT_MISSED'].includes(normalized.event_type)) {
       try {
         const pushSyncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push-sync`;
         await fetch(pushSyncUrl, {
@@ -500,7 +429,7 @@ async function processIpnEvent(
 
       const txStatus = normalized.event_type === 'REFUND' ? 'refunded' 
         : normalized.event_type === 'CHARGEBACK' ? 'chargeback'
-        : normalized.event_type === 'CANCELLATION' ? 'cancelled'
+        : ['CANCELLATION', 'PAYMENT_MISSED'].includes(normalized.event_type) ? 'cancelled'
         : 'completed';
 
       await supabase
@@ -564,7 +493,7 @@ async function processIpnEvent(
               lifetime_value: normalized.amount || 0,
             });
         }
-        console.log(`[leads] Upserted lead for ${normalized.email}`);
+        console.log('[leads] Purchase lead updated');
       } catch (leadErr) {
         console.error('Error writing to leads table:', leadErr);
       }
@@ -653,7 +582,7 @@ Deno.serve(async (req) => {
 
   // Digistore24 sends GET requests as health checks — respond with 200
   if (req.method === "GET") {
-    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
   
   // Only accept POST for actual IPN events
@@ -677,14 +606,14 @@ Deno.serve(async (req) => {
     rawPayload = await parsePayload(req);
     if (!rawPayload || typeof rawPayload !== "object" || Array.isArray(rawPayload)) throw new Error("Invalid payload");
   } catch (parseError) {
-    console.error("Failed to parse payload:", parseError);
-    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    console.warn("Invalid IPN payload");
+    return new Response("Invalid payload", { status: 401, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
   
   try {
     // Get settings
     const ipnSecret = await getSetting(supabase, 'ipn_secret', 'DIGISTORE24_IPN_SECRET');
-    const appBaseUrl = await getSetting(supabase, 'app_base_url', 'APP_BASE_URL') || 'https://trumpetstar.lovable.app';
+    const appBaseUrl = await getSetting(supabase, 'app_base_url', 'APP_BASE_URL') || 'https://www.trumpetstar.app';
     const defaultLocale = await getSetting(supabase, 'default_locale') || 'de';
     
     // Fail closed before any event is stored or processed, including missing configuration.
@@ -694,6 +623,11 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: ipnSecret ? 'Invalid IPN authentication' : 'IPN authentication not configured' }), {
         status: ipnSecret ? 401 : 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
+    // A signed connection test has no persistence or fulfillment side effects.
+    if (rawPayload.event === 'connection_test') {
+      return new Response('OK', { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/plain' } });
     }
 
     if (!rawPayload || Array.isArray(rawPayload)) throw new Error('Invalid IPN payload');
@@ -715,7 +649,7 @@ Deno.serve(async (req) => {
     
     if (existingEvent && existingEvent.status !== "error") {
       console.log(`Duplicate event detected: ${idempotencyKey}, status: ${existingEvent.status}`);
-      return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+      return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
     
     // Store event
@@ -738,7 +672,7 @@ Deno.serve(async (req) => {
     if (insertError) {
       if (insertError.code === '23505') {
         // Race condition duplicate — still OK
-        return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+        return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
       }
       throw insertError;
     }
@@ -746,7 +680,7 @@ Deno.serve(async (req) => {
     const ipnEvent = insertedEvent;
     if (!ipnEvent) throw new Error("Event persistence failed");
     // Sofort 200 zurückgeben — Digistore24 bekommt Antwort vor Timeout
-    const ipnResponse = new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    const ipnResponse = new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
 
     // Verarbeitung im Hintergrund (fire-and-forget) — Deno hält die Funktion am Leben
     const processing = processIpnEvent(
@@ -763,7 +697,7 @@ Deno.serve(async (req) => {
     
   } catch (error: any) {
     console.error("IPN handler error:", error);
-    // Always 200 — never let DS24 see a 5xx which triggers deactivation
-    return new Response("ok", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    // Persistence errors must be retried, not silently acknowledged.
+    return new Response("IPN temporarily unavailable", { status: 503, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
 });

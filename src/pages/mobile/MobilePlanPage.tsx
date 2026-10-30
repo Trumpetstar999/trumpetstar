@@ -134,6 +134,8 @@ export default function MobilePlanPage() {
                   <span className="text-2xl font-bold text-slate-900">{plan.price}</span>
                 </div>
 
+                <PlanTerms planKey={plan.key} period="monthly" />
+
                 {!isCurrent && plan.key !== 'FREE' && (
                   <Button
                     className={cn(
