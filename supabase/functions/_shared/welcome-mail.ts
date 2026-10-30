@@ -1,4 +1,5 @@
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+import { escapeHtml } from './escape-html.ts';
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || '';
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 export interface WelcomeMailParams {
@@ -14,7 +15,9 @@ export interface WelcomeMailParams {
  * Primary channel: the house SMTP relay (send-email). Resend is only used as a fallback.
  */
 export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Promise<void> {
-  const { email, firstName, locale, appBaseUrl, productName } = params;
+  const { email, locale, appBaseUrl } = params;
+  const firstName = escapeHtml(params.firstName);
+  const productName = escapeHtml(params.productName);
 
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
@@ -22,7 +25,7 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
     options: { redirectTo: `${appBaseUrl}/app` },
   });
   if (linkError) throw linkError;
-  const magicLink = linkData.properties.action_link;
+  const magicLink = escapeHtml(linkData.properties.action_link);
 
   const texts: Record<string, { subject: string; hello: string; intro: string; cta: string; note: string }> = {
     de: {
