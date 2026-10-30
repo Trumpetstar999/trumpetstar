@@ -1,5 +1,7 @@
 # Tasks
-- [ ] Step 1: Harden purchase notifications, membership identity binding and admin-only imports; verify rejection and fulfillment paths.
+- [x] Step 1 hardening: Mandatory signed IPN, session-bound membership checks, admin-only CSV imports, own membership mutation removed, Basic mapping corrected, order ownership locked, email confirmation enforced.
+- [x] Verify deployed signed connection notification (processed), tampered notification (401), no forged event persistence, signed-in app and purchase offers; 26 regression tests passed.
+- [ ] Step 1 full purchase E2E: Needs a designated non-admin test account and provider-side signed test purchase; connection notification does not verify plan activation, refund or email delivery.
 - [ ] Steps 2–5: Paid content, mail endpoints, QR/leads/uploads and remaining security warnings (subsequent scope).
 - [x] Fix five critical access-policy findings; anonymous denial/admin access and PDF download verified (7 integration tests).
 - [x] Fix mobile password recovery redirect and callback handling (18 regression tests; real signed-in mobile form verified without changing the user's password).

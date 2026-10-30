@@ -389,6 +389,7 @@ async function processIpnEvent(
         onConflict: 'user_id,entitlement_key,source',
         ignoreDuplicates: false 
       });
+    if (entitlementError) throw entitlementError;
     
     // Recompute from all active entitlements; preserve manual overrides and other purchases.
     const { error: membershipError } = await supabase.rpc('refresh_digistore_membership', { p_user_id: userId });

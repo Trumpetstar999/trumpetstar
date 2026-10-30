@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
+import { escapeHtml } from '../../supabase/functions/_shared/escape-html';
 import { verifyIpnSignature, parseIpnForm, isManualMembership, stripIpnCredentials } from '../../supabase/functions/_shared/digistore-security';
 
 const secret = 'test-only-not-a-live-secret';
@@ -8,6 +9,9 @@ function sign(raw: Record<string, string>) {
   return { ...raw, sha_sign: createHash('sha512').update(canonical).digest('hex').toUpperCase() };
 }
 describe('payment authentication', () => {
+  it('escapes purchase names in welcome mail', () => {
+    expect(escapeHtml('<a href="evil">&')).toBe('&lt;a href=&quot;evil&quot;&gt;&amp;');
+  });
   const purchase = { event: 'on_payment', product_id: '346007', email: 'test@example.com', order_id: 'TEST-1', amount: '0', first_name: 'Übung' };
   it('requires configured secret even for a signed request', async () => {
     expect(await verifyIpnSignature(sign(purchase), null)).toBe(false);
