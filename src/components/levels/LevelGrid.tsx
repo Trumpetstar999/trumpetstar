@@ -20,7 +20,7 @@ export function LevelGrid({ levels, onSelect }: { levels: TileLevel[]; onSelect:
   return (
     <section className="p-4 sm:p-6" aria-label={t('levels.allLevels')}>
       <h3 className="mb-4 text-xl font-semibold text-foreground">{t('levels.allLevels')}</h3>
-      <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-5 gap-3">
         {levels.map(level => {
           const title = getLocalizedField(level, 'title');
           const thumbnail = level.previewThumbnail || level.sections.flatMap(section => section.videos)[0]?.thumbnail;
@@ -46,12 +46,12 @@ export function LevelGrid({ levels, onSelect }: { levels: TileLevel[]; onSelect:
                   }}
                 />
               </span>
-              <span className="flex min-h-20 items-center justify-between gap-3 p-4">
+              <span className="flex min-h-16 items-center justify-between gap-2 p-3">
                 <span className="min-w-0">
-                  <span className="block break-words text-base font-semibold">{title}</span>
+                  <span className="block break-words text-sm font-semibold">{title}</span>
                   {level.difficulty && <span className="mt-1 block text-xs text-muted-foreground">{t(`levels.difficulty.${level.difficulty}`)}</span>}
                 </span>
-                <ChevronRight className="shrink-0 text-reward-gold" aria-hidden="true" />
+                <ChevronRight className="h-4 w-4 shrink-0 text-reward-gold" aria-hidden="true" />
               </span>
             </Button>
           );
