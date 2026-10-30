@@ -49,10 +49,11 @@ export const providers = {
     const response = await fetch(url, { headers: { 'X-DS-API-KEY': key, Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
     const body = await response.json().catch(() => null);
     const data = body?.data;
+    const coupon = body?.coupon ?? data?.coupon ?? data?.voucher;
     // Read-only reconciliation: only positively identified provider records can advance delivery.
-    const confirmed = response.ok && body?.result === 'success' && (data?.code === row.voucher_code || data?.voucher?.code === row.voucher_code || data?.coupon?.code === row.voucher_code);
+    const confirmed = response.ok && body?.result === 'success' && (coupon?.code === row.voucher_code || data?.code === row.voucher_code);
     return { confirmed, reason: confirmed ? 'voucher_found' : body?.result === 'error' ? 'provider_lookup_rejected' : 'provider_lookup_unconfirmed',
-      ...(!confirmed ? { diagnostic: { http_status: response.status, success_result: body?.result === 'success', coupon_present: data?.coupon != null, coupon_type: typeof data?.coupon, coupon_keys: data?.coupon && typeof data.coupon === 'object' ? Object.keys(data.coupon).filter(k => /^[a-z_]{1,40}$/.test(k)) : [] } } : {}) };
+      ...(!confirmed ? { diagnostic: { http_status: response.status, success_result: body?.result === 'success', coupon_present: coupon != null } } : {}) };
   },
   async voucher(row: WelcomeRow): Promise<ProviderResult> {
     const key = Deno.env.get('DIGISTORE24_API_KEY');
