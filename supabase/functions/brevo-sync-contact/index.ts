@@ -1,7 +1,8 @@
 import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
 import { adminClient, getCaller, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
 import { deliverWelcome, welcomeStore, providers } from './welcome-delivery.ts';
-import { TEST_EMAIL, welcomeLanguage } from './welcome-content.ts';
+import { TEST_EMAIL, TEST_USER_ID, welcomeLanguage } from './welcome-content.ts';
+import type { WelcomeRow } from './welcome-types.ts';
 
 interface Payload {
   email?: string;
@@ -12,6 +13,7 @@ interface Payload {
   is_customer?: boolean;
   force?: boolean;
   test_welcome?: boolean;
+  inspect_test_voucher?: boolean;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,7 +29,8 @@ Deno.serve(async (req) => {
     if (body.language != null && typeof body.language !== 'string') return json({ error: 'Invalid language' }, 400);
     if (body.first_name != null && typeof body.first_name !== 'string') return json({ error: 'Invalid first name' }, 400);
     const appUser = body.source === 'app_user';
-    const test = body.test_welcome === true;
+    const inspect = body.inspect_test_voucher === true;
+    const test = body.test_welcome === true || inspect;
     const caller = appUser || test ? await getCaller(req) : null;
     if ((appUser || test) && (!req.headers.get('Authorization')?.startsWith('Bearer ') || !caller?.email)) return json({ error: 'Unauthorized' }, 401);
     if (test && !await requireAdmin(req)) return json({ error: 'Admin required' }, 403);
@@ -48,6 +51,11 @@ Deno.serve(async (req) => {
 
 
     const supabase = adminClient();
+    if (inspect) {
+      const { data, error } = await supabase.from('app_welcome_vouchers').select('*').eq('user_id', TEST_USER_ID).eq('is_test', true).maybeSingle();
+      if (error || !data) return json({ error: 'Test reservation missing' }, 404);
+      return json(await providers.inspectVoucher(data as WelcomeRow));
+    }
     const lang = appUser || test ? welcomeLanguage(body.language) : normalizeLang(body.language);
     // Test is isolated from contact lists and real user identities, with a single permanent ledger reservation.
     const welcome = async () => {
