@@ -67,3 +67,21 @@ No new secret names are introduced. Provider permissions and verified sender sti
 The current official reference at https://digistore24.com/api/docs/index.html (schemas `paths/createVoucher.yaml` and `paths/getVoucher.yaml`) documents `data.discount_code_id` plus `data.code` for creation and a top-level `coupon` for lookup. The implementation now accepts an identified creation result for the exact reserved code even without `result`, and reads the top-level coupon. Legacy form-urlencoded fields remain exactly as requested. Provider dates use documented ISO 8601 whole seconds with explicit `+00:00`, with new reservations also rounded to seconds to keep the 72-hour interval exact.
 
 The earlier uncertain test reservation has not been reset. A fresh authenticated admin lookup is required; no active requester session was available for this follow-up, and automatic session minting could not match the requesting user's account. Sign in in the preview before rerunning `inspect_test_voucher: true`. The corrected code has unit coverage, but this is not a claim of a successful provider send.
+## 24-hour follow-up reminder
+
+Exactly one follow-up per registration, 23–25 hours before `expires_at`, in the row's language (de/en/es/sl), same design, sender `Trumpetstar GmbH <info@trumpetstar.com>`, no unsubscribe link. Code: `reminder-workflow.ts` (rules), `reminder-content.ts` (copy), `reminder-delivery.ts` (DB/provider). The welcome mail flow is unchanged.
+
+- **Eligible:** welcome `status='sent'`, `WELCOME25-` code, `is_test=false`, `reminder_status` `pending`/`failed` (or stale `checking` >15 min, which is before any mail call).
+- **Pre-send check:** Digistore24 `getVoucher`; requires `is_active` active and `count_left > 0` and not expired. Otherwise `reminder_status='skipped'` permanently with `reminder_error='Skipped: <redeemed|inactive|expired|voucher_not_found>'`.
+- **Claim:** conditional update `pending|failed → checking` with a fresh `reminder_claim_id`; every later write requires the same claim ID, so parallel runs cannot both send. `sending`/`uncertain` are never retried automatically (Brevo may have accepted). Explicit Brevo rejection → `failed` and retried next hour with the same voucher (max 3 attempts, then `skipped`).
+- **Scheduler:** pg_cron job `welcome-voucher-reminder-hourly` at minute 7 every hour. Each run mints a random single-use token into `welcome_reminder_run_tokens` (service-only, RLS on, no client grants) and sends it as `x-reminder-run-token`; the function consumes it via `consume_welcome_reminder_token` (service_role only, 10-minute validity). No API key or service-role key exists in SQL, source or logs; the only key in the job is the public anon key. Forged/missing tokens get 401.
+- **Admin test:** `supabase.functions.invoke('brevo-sync-contact', { body: { test_reminder: true } })` as database-backed admin. Uses the existing singleton test voucher for `schulterm@me.com`, bypasses only the time window, still checks Digistore24, subject prefixed `[TEST · Follow-up-Erinnerung]`. Never creates a voucher.
+
+### Verified run (October 30, 2026, 19:01 Vienna)
+
+- 11 follow-up tests + 21 welcome tests passed.
+- Forged scheduler token → 401; test call without admin → 403.
+- Admin test run 1 → `sent`; Digistore24 pre-check passed (active, count_left > 0) on the existing test voucher; no voucher created. Run 2 → `sent`, `alreadySent:true`.
+- DB: test row `reminder_status=sent`, `reminder_attempts=1`, message ID stored; welcome status/message unchanged.
+- Brevo: one `requests` (19:01:12) and one `delivered` (19:01:21) for the test reminder, tag `app-welcome-voucher-reminder-test`; no second follow-up event.
+- Scheduler job executed manually once with its exact command → HTTP 200, `candidates: 0` (the one production 25% row enters its window around Nov 1, 13:14–15:14 Vienna); token consumed.

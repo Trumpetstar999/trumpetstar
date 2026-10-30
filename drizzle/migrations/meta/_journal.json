@@ -64,6 +64,13 @@
       "when": 1793361436453,
       "tag": "0008_private_app_welcome_vouchers",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793383128684,
+      "tag": "0009_welcome_voucher_reminders",
+      "breakpoints": true
     }
   ]
 }

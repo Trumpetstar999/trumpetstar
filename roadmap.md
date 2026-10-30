@@ -26,4 +26,4 @@
 - [x] Reopen purchases with owner-supplied Basic 346007 and Pro 575565 links (same link for monthly and yearly).
 - [x] Show all books (locked with buy link) to free users.
 - [x] Use the Trumpetstar logo for WhatsApp link previews (takes effect on the live site after publishing).
-- [x] Replace the level sidebar with a complete thumbnail tile overview and verify navigation (49 levels, selection and return checked signed in).
+- [x] Replace the level sidebar with a complete thumbnail tile overview and verify navigation (49 levels, selection and return checked signed in).- [x] October 30 24h welcome-voucher follow-up: migration, hourly scheduler, admin test delivered once to schulterm@me.com, second run alreadySent; first production reminder due ~Nov 1 13:14–15:14 Vienna (unobserved).

@@ -97,6 +97,13 @@ export type Database = {
           id: string
           is_test: boolean
           language: string
+          reminder_attempts: number
+          reminder_claim_id: string | null
+          reminder_claimed_at: string | null
+          reminder_error: string | null
+          reminder_message_id: string | null
+          reminder_sent_at: string | null
+          reminder_status: string
           sent_at: string | null
           status: string
           updated_at: string
@@ -113,6 +120,13 @@ export type Database = {
           id?: string
           is_test?: boolean
           language?: string
+          reminder_attempts?: number
+          reminder_claim_id?: string | null
+          reminder_claimed_at?: string | null
+          reminder_error?: string | null
+          reminder_message_id?: string | null
+          reminder_sent_at?: string | null
+          reminder_status?: string
           sent_at?: string | null
           status?: string
           updated_at?: string
@@ -129,6 +143,13 @@ export type Database = {
           id?: string
           is_test?: boolean
           language?: string
+          reminder_attempts?: number
+          reminder_claim_id?: string | null
+          reminder_claimed_at?: string | null
+          reminder_error?: string | null
+          reminder_message_id?: string | null
+          reminder_sent_at?: string | null
+          reminder_status?: string
           sent_at?: string | null
           status?: string
           updated_at?: string
@@ -3955,6 +3976,21 @@ export type Database = {
           },
         ]
       }
+      welcome_reminder_run_tokens: {
+        Row: {
+          created_at: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          token?: string
+        }
+        Relationships: []
+      }
       welcome_video_progress: {
         Row: {
           created_at: string
@@ -4063,6 +4099,10 @@ export type Database = {
       }
       can_access_plan: { Args: { _plan: string }; Returns: boolean }
       can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
+      consume_welcome_reminder_token: {
+        Args: { p_token: string }
+        Returns: boolean
+      }
       finalize_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
       get_friends_star_ranking: {
         Args: { _user_id: string }

@@ -1,6 +1,7 @@
 import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
 import { adminClient, getCaller, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
 import { deliverWelcome, welcomeStore, providers } from './welcome-delivery.ts';
+import { runReminders, runTestReminder } from './reminder-delivery.ts';
 import { TEST_EMAIL, TEST_USER_ID, welcomeLanguage } from './welcome-content.ts';
 import type { WelcomeRow } from './welcome-types.ts';
 
@@ -14,6 +15,8 @@ interface Payload {
   force?: boolean;
   test_welcome?: boolean;
   inspect_test_voucher?: boolean;
+  reminder_run?: boolean;
+  test_reminder?: boolean;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,6 +36,18 @@ Deno.serve(async (req) => {
     if (body.segment != null && (typeof body.segment !== 'string' || body.segment.length > 50)) return json({ error: 'Invalid segment' }, 400);
     if (body.force !== undefined && typeof body.force !== 'boolean') return json({ error: 'Invalid force flag' }, 400);
     if (body.is_customer !== undefined && typeof body.is_customer !== 'boolean') return json({ error: 'Invalid customer flag' }, 400);
+    if (body.reminder_run === true) {
+      // Scheduler authenticates with a single-use token it minted inside the database moments earlier.
+      const token = req.headers.get('x-reminder-run-token') ?? '';
+      const db = adminClient();
+      const { data: valid, error } = await db.rpc('consume_welcome_reminder_token', { p_token: token });
+      if (error || valid !== true) return json({ error: 'Unauthorized' }, 401);
+      return json(await runReminders(db));
+    }
+    if (body.test_reminder === true) {
+      if (!await requireAdmin(req)) return json({ error: 'Admin required' }, 403);
+      return json(await runTestReminder(adminClient()));
+    }
     const appUser = body.source === 'app_user';
     const inspect = body.inspect_test_voucher === true;
     const test = body.test_welcome === true || inspect;
