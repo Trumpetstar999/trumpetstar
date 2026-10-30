@@ -18,6 +18,8 @@ export interface PlanInfo {
   monthlyPrice?: number;
   yearlyPrice?: number;
   yearlyDiscount?: number;
+  minimumTermMonths?: number;
+  introductoryPrice?: number;
   features: PlanFeature[];
   highlighted?: boolean;
 }
@@ -56,6 +58,11 @@ export const PLAN_DISPLAY_NAMES: Record<PlanKey, string> = {
 };
 
 // Complete plan information
+export function calculateYearlyDiscount(monthly: number, yearly: number): number {
+  return monthly > 0 ? Math.floor((1 - yearly / (monthly * 12)) * 100) : 0;
+}
+const BASIC_PRICES = { monthlyPrice: 15, yearlyPrice: 149 };
+const PRO_PRICES = { monthlyPrice: 59, yearlyPrice: 500 };
 export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
   FREE: {
     key: 'FREE',
@@ -92,9 +99,9 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
     shortDescription: 'Zugriff auf alle Videos & Lernmaterialien.',
     description: 'Enthält alle Lernvideos, alle Noten/Materialien, MusicXML-Viewer, Offline, KI-Chat in DE/EN/ES, Fortschrittsanzeige, Kalender & Spielspaß-Tools. Kein persönliches Feedback von Lehrern.',
     cta: 'Basic freischalten',
-    monthlyPrice: 15,
-    yearlyPrice: 149,
-    yearlyDiscount: 17,
+    ...BASIC_PRICES,
+    yearlyDiscount: calculateYearlyDiscount(BASIC_PRICES.monthlyPrice, BASIC_PRICES.yearlyPrice),
+    minimumTermMonths: 6,
     features: [
       // Lernen
       { category: 'lernen', name: 'Ausgewählte Lernvideos', included: true },
@@ -124,9 +131,10 @@ export const PLAN_INFO: Record<PlanKey, PlanInfo> = {
     shortDescription: 'Alle Vorteile von Basic + persönliches Feedback.',
     description: 'Enthält alles aus Basic + individuelles Feedback zu eigenen Videos, 1:1 Chat mit Lehrer, regelmäßige Live-Feedback-Calls, priorisierter Support.',
     cta: 'Pro freischalten',
-    monthlyPrice: 59,
-    yearlyPrice: 600,
-    yearlyDiscount: 15,
+    ...PRO_PRICES,
+    yearlyDiscount: calculateYearlyDiscount(PRO_PRICES.monthlyPrice, PRO_PRICES.yearlyPrice),
+    minimumTermMonths: 6,
+    introductoryPrice: 1,
     highlighted: true,
     features: [
       // Lernen
