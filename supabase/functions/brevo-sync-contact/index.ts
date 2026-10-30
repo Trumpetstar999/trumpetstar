@@ -28,6 +28,11 @@ Deno.serve(async (req) => {
     if (body.test_welcome !== undefined && typeof body.test_welcome !== 'boolean') return json({ error: 'Invalid test flag' }, 400);
     if (body.language != null && typeof body.language !== 'string') return json({ error: 'Invalid language' }, 400);
     if (body.first_name != null && typeof body.first_name !== 'string') return json({ error: 'Invalid first name' }, 400);
+    if (body.inspect_test_voucher !== undefined && typeof body.inspect_test_voucher !== 'boolean') return json({ error: 'Invalid inspection flag' }, 400);
+    if (body.source != null && (typeof body.source !== 'string' || body.source.length > 50)) return json({ error: 'Invalid source' }, 400);
+    if (body.segment != null && (typeof body.segment !== 'string' || body.segment.length > 50)) return json({ error: 'Invalid segment' }, 400);
+    if (body.force !== undefined && typeof body.force !== 'boolean') return json({ error: 'Invalid force flag' }, 400);
+    if (body.is_customer !== undefined && typeof body.is_customer !== 'boolean') return json({ error: 'Invalid customer flag' }, 400);
     const appUser = body.source === 'app_user';
     const inspect = body.inspect_test_voucher === true;
     const test = body.test_welcome === true || inspect;

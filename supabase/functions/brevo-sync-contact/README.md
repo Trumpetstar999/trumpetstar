@@ -35,3 +35,11 @@ The caller sees welcome status even when a language contact list is missing or a
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`: existing managed runtime values.
 
 No new secret names are introduced. Provider permissions and verified sender still require live verification.
+
+## Executed checks (October 30, 2026)
+
+- 15 welcome business-rule/concurrency/retry tests and 18 existing payment-security tests passed.
+- Schema applied; unique user, normalized email, voucher code and singleton-test indexes confirmed; latest application build OK.
+- Deployed unauthenticated test returned 401. Authenticated admin test reached Digistore24; HTTP 200 did not contain the expected `result: success`, so the ledger is `voucher_uncertain`. A repeat kept the same row/status and did not send a mail.
+- Admin-only read-only lookup (`inspect_test_voucher: true`) returned a successful provider envelope, but no positively identified coupon record. The test voucher creation and Brevo send are **not verified**. No success is claimed and uncertain state is not reset.
+- Required named secrets are already configured. The remaining blocker is the provider createVoucher response/permission reconciliation, not an identified missing secret. Check the reserved code in Digistore24 before any retry. Inbox delivery and actual redemption still need verification.
