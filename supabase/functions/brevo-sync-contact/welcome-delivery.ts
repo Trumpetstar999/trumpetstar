@@ -40,11 +40,23 @@ export function welcomeStore(db: DB): WelcomeStore {
   };
 }
 export const providers = {
+  async inspectVoucher(row: WelcomeRow): Promise<{ confirmed: boolean; reason: string }> {
+    const key = Deno.env.get('DIGISTORE24_API_KEY');
+    if (!key) return { confirmed: false, reason: 'configuration_missing' };
+    const url = new URL('https://www.digistore24.com/api/call/getVoucher');
+    url.searchParams.set('code', row.voucher_code);
+    const response = await fetch(url, { headers: { 'X-DS-API-KEY': key, Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
+    const body = await response.json().catch(() => null);
+    const data = body?.data;
+    // Read-only reconciliation: only positively identified provider records can advance delivery.
+    const confirmed = response.ok && body?.result === 'success' && (data?.code === row.voucher_code || data?.voucher?.code === row.voucher_code);
+    return { confirmed, reason: confirmed ? 'voucher_found' : body?.result === 'error' ? 'provider_lookup_rejected' : 'provider_lookup_unconfirmed' };
+  },
   async voucher(row: WelcomeRow): Promise<ProviderResult> {
     const key = Deno.env.get('DIGISTORE24_API_KEY');
     if (!key) throw new Error('DIGISTORE24_API_KEY is not configured');
     const response = await fetch('https://www.digistore24.com/api/call/createVoucher', {
-      method: 'POST', headers: { 'X-DS-API-KEY': key, 'Content-Type': 'application/x-www-form-urlencoded' },
+      method: 'POST', headers: { 'X-DS-API-KEY': key, Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
       body: voucherFields(row.voucher_code, row.created_at, row.expires_at), signal: AbortSignal.timeout(20000),
     });
     const text = await response.text();
