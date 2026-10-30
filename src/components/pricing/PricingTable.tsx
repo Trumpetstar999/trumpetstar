@@ -10,6 +10,8 @@ import { PLAN_INFO, PlanKey, FEATURE_CATEGORIES } from '@/types/plans';
 import { useMembership } from '@/hooks/useMembership';
 import { useLanguage } from '@/hooks/useLanguage';
 import { getCheckoutUrl } from '@/lib/checkout';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface PricingTableProps {
   onSelectPlan?: (planKey: PlanKey) => void;
@@ -31,12 +33,21 @@ const categoryColors = {
 
 export function PricingTable({ onSelectPlan }: PricingTableProps) {
   const [isYearly, setIsYearly] = useState(true);
-  const { planKey: currentPlan, isLoading } = useMembership();
+  const { planKey: membershipPlan, isLoading: membershipLoading } = useMembership();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const isGuest = !authLoading && !user;
+  const currentPlan = user && !membershipLoading ? membershipPlan : null;
+  const isLoading = authLoading || (!!user && membershipLoading);
   const { t } = useLanguage();
 
   const plans = [PLAN_INFO.FREE, PLAN_INFO.BASIC, PLAN_INFO.PRO];
 
   const handleSelectPlan = (planKey: PlanKey) => {
+    if (planKey === 'FREE' && !onSelectPlan) {
+      navigate(user ? '/app' : '/signup');
+      return;
+    }
     const link = getCheckoutUrl(planKey, isYearly ? 'yearly' : 'monthly');
     if (planKey !== 'FREE' && !link) return;
     if (onSelectPlan) {
@@ -161,10 +172,10 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                     isCurrentPlan && 'bg-emerald-500 hover:bg-emerald-600 text-white'
                   )}
                   variant={isHighlighted ? 'default' : plan.key === 'FREE' ? 'outline' : 'default'}
-                  disabled={isLoading || isCurrentPlan || (plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly'))}
+                  disabled={(plan.key !== 'FREE' && isLoading) || (isCurrentPlan && plan.key !== 'FREE') || (plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly'))}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly') ? t('pricing_table.unavailable') : plan.cta}
+                  {plan.key === 'FREE' && !onSelectPlan ? (isGuest || isLoading ? t('landing.hero.ctaStart') : t('pricing_table.toApp')) : isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly') ? t('pricing_table.unavailable') : plan.cta}
                 </Button>
               </CardContent>
             </Card>

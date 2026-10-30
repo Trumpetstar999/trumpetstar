@@ -81,7 +81,7 @@ export default function TrompeteAnsatzAtmungPage() {
           <AnimatedSection direction="up" delay={350}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/login"><PlayCircle className="mr-2 h-4 w-4" /> Jetzt anmelden & kostenlos starten</Link>
+                <Link to="/signup"><PlayCircle className="mr-2 h-4 w-4" /> Jetzt anmelden & kostenlos starten</Link>
               </Button>
             </div>
           </AnimatedSection>
@@ -233,7 +233,7 @@ export default function TrompeteAnsatzAtmungPage() {
           <h2 className="text-3xl font-bold text-white mb-4">{t('seo_ansatzAtmung.cta.title')}</h2>
           <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_ansatzAtmung.cta.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/login">{t('seo_ansatzAtmung.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/signup">{t('seo_ansatzAtmung.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </AnimatedSection>
       </div>

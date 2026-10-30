@@ -68,7 +68,7 @@ export default function TrompeteLernenPage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">{t('seo_trompeteLernen.hero.cta')}</Link>
+                <Link to="/signup">{t('seo_trompeteLernen.hero.cta')}</Link>
               </Button>
             </div>
           </AnimatedSection>
@@ -289,7 +289,7 @@ export default function TrompeteLernenPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">{t('seo_trompeteLernen.cta.button')}</Link>
+              <Link to="/signup">{t('seo_trompeteLernen.cta.button')}</Link>
             </Button>
           </div>
         </AnimatedSection>
