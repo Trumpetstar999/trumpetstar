@@ -1,6 +1,7 @@
 import { adminClient } from '../_shared/brevo-auth.ts';
 import { brevoFetch } from '../_shared/brevo.ts';
 import { TEST_EMAIL, TEST_USER_ID, voucherExpiry, voucherFields, welcomeEmail, type WelcomeLanguage } from './welcome-content.ts';
+import { voucherResponse } from './voucher-response.ts';
 
 type DB = ReturnType<typeof adminClient>;
 import type { WelcomeRow, WelcomeStore, ProviderResult } from './welcome-types.ts';
@@ -63,8 +64,7 @@ export const providers = {
     const text = await response.text();
     let body: { result?: string; data?: { code?: string } } | null = null;
     try { body = JSON.parse(text); } catch { /* Never log raw provider data or credentials. */ }
-    const ok = response.ok && body?.result === 'success';
-    return { ok, status: response.status, uncertain: !ok && (response.status >= 500 || response.ok) };
+    return voucherResponse(response.status, body);
   },
   async mail(row: WelcomeRow): Promise<ProviderResult> {
     const result = await brevoFetch('/smtp/email', { method: 'POST', logErrors: false, body: {
