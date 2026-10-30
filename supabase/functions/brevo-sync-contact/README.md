@@ -1,0 +1,37 @@
+# App welcome voucher automation
+
+`brevo-sync-contact` keeps existing contact synchronization. An authenticated `source: "app_user"` request uses the verified auth user's email, not the supplied email. The first reservation permanently captures the client language (`de`, `en`, `es`, `sl`, otherwise `de`) and first name. Existing app users changing language are eligible if they have no previous reservation; no bulk backfill runs.
+
+## One-time admin E2E test
+
+While signed in as a database-backed admin, invoke the existing function through the app's managed client:
+
+```ts
+await supabase.functions.invoke('brevo-sync-contact', {
+  body: { test_welcome: true, language: 'de', first_name: 'Mario' }
+});
+```
+
+The target is always `schulterm@me.com`; request email is ignored. The singleton test uses a reserved synthetic user ID, `is_test=true`, and the same unique email index as production. It neither consumes the admin's welcome entitlement nor changes contact lists. A second call cannot create a second voucher or email; successful repeat returns `alreadySent:true`. Do not delete/reset the test row. This is a **real voucher and real email**, not a simulated send.
+
+## Verification
+
+1. Cloud database: inspect `app_welcome_vouchers WHERE is_test=true`; expect `sent`, one code, exact creation + 72-hour expiry, `brevo_message_id`, and `sent_at`. Anon/authenticated clients cannot read or write this ledger.
+2. Digistore24 account: find the stored code, confirm products `346007,575565`, first rate `15`, other rates `0`, upgrade policy `not_valid`, count limit `Y`, count left `1`, and timestamps. Check checkout prefill without completing a purchase. The documented parameter is `voucher`, as requested: https://help.digistore24.com/hc/en-us/articles/23640618463633-Pre-fill-order-form-with-GET-parameters .
+3. Brevo transactional log: find `brevo_message_id`, verify recipient, sender `Trumpetstar GmbH <info@trumpetstar.com>`, language and delivery status. `sent` means Brevo accepted the send, not inbox receipt; confirm inbox separately.
+4. Repeat the request; verify row count, voucher count and mail count remain one.
+
+## Failure handling
+
+Atomic database stage claims prevent parallel sends. Explicit provider rejections leave `voucher_failed` or `mail_failed`; repeat the original authenticated sync after correcting the failure. Mail retries reuse the original voucher/code/expiry/language. `voucher_creating`, `sending`, `voucher_uncertain`, `mail_uncertain` are **never automatically retried**: a timeout or worker crash may have happened after the provider accepted the action. Inspect provider records before service-role reconciliation to `voucher_created`, `mail_failed` (only if demonstrably not accepted), or `sent` with the real Brevo ID. No system can guarantee automatic exactly-once across non-idempotent external APIs and lost acknowledgements; this implementation chooses duplicate prevention over blind retries. Expired vouchers are not regenerated.
+
+The caller sees welcome status even when a language contact list is missing or auto-sync is disabled. Welcome email is independent of newsletter lists. Currently EN/ES/SL lists are not configured; this does not block their welcome mail or create new lists.
+
+## Required secrets
+
+- `DIGISTORE24_API_KEY`: existing direct legacy API key, permission to create vouchers.
+- `BREVO_API_KEY`: existing linked Brevo connector credential (gateway-backed, not a direct provider key).
+- `LOVABLE_API_KEY`: existing gateway authentication.
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`: existing managed runtime values.
+
+No new secret names are introduced. Provider permissions and verified sender still require live verification.

@@ -63,7 +63,7 @@ export const providers = {
     return { ok, status: response.status, uncertain: !ok && (response.status >= 500 || response.ok) };
   },
   async mail(row: WelcomeRow): Promise<ProviderResult> {
-    const result = await brevoFetch('/smtp/email', { method: 'POST', body: {
+    const result = await brevoFetch('/smtp/email', { method: 'POST', logErrors: false, body: {
       sender: { name: 'Trumpetstar GmbH', email: 'info@trumpetstar.com' },
       to: [{ email: row.email, ...(row.first_name ? { name: row.first_name } : {}) }],
       ...welcomeEmail(row.language, row.first_name, row.voucher_code, row.expires_at),
