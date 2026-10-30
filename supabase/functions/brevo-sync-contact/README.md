@@ -6,6 +6,10 @@
 
 New reservations use `WELCOME25-` codes with exactly 25% on the first payment; later rates remain 0%, upgrades excluded, one redemption, exactly 72 hours. All DE/EN/ES/SL subjects and messages reflect 25%. Existing sent production records are not changed or deleted. Existing unsent legacy reservations require reconciliation before delivery; never send a 25% mail against an old 15% voucher or create another voucher blindly.
 
+### 25% deployment verification (2026-10-30)
+
+39 checks passed (21 welcome rules/retries and 18 payment-security checks). Function redeployed. Protected `test_welcome` and `inspect_test_voucher` requests returned 401 because no usable preview admin session was injected; automatic self-session minting also had no matching auth user. Database still has exactly one singleton test row, `voucher_uncertain`, without a Brevo message ID. No ledger was reset, no production records changed, and no new voucher or mail was created in this run. Live 25% voucher values, Brevo delivery and successful live retry remain unverified. The existing legacy test requires provider reconciliation, not a second voucher.
+
 ## One-time admin E2E test
 
 While signed in as a database-backed admin, invoke the existing function through the app's managed client:
