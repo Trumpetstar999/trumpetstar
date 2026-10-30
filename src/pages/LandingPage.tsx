@@ -26,6 +26,7 @@ import testimonialsImg from '@/assets/testimonials-real.webp';
 import { useLanguage } from '@/hooks/useLanguage';
 import { CinematicHero } from '@/components/landing/CinematicHero';
 import { hasRecoveryCallback } from '@/lib/recovery';
+import { PricingTable } from '@/components/pricing/PricingTable';
 
 /* ─── Nur Safari auf Desktop (kein Chrome/Edge/Firefox, kein iPad/iPhone/Android) ─── */
 function isSafariDesktop(): boolean {
@@ -523,71 +524,10 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════
             SECTION 4 — PRICING
         ══════════════════════════════════════ */}
-        <section className="max-w-4xl mx-auto px-5 py-16 border-t border-white/10">
-          <h2 className="text-3xl font-bold text-white text-center mb-3">Kostenlos starten – wann du willst upgraden</h2>
-          <p className="text-center text-white/55 text-sm mb-12">Kein Risiko. Kein Vertrag. 30 Tage Geld-zurück-Garantie.</p>
-
-          <div className="grid md:grid-cols-2 gap-6 items-stretch">
-
-            {/* FREE */}
-            <div data-reveal className="lp-hover-lift bg-white/[0.07] border border-white/[0.12] hover:border-white/30 rounded-2xl p-7 flex flex-col">
-              <div className="mb-5">
-                <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-1">Kostenlos</p>
-                <div className="flex items-end gap-1 mb-1">
-                  <span className="text-4xl font-extrabold text-white">€0</span>
-                  <span className="text-white/40 text-sm mb-1.5">/Monat</span>
-                </div>
-                <p className="text-white/55 text-sm">Jetzt sofort loslegen – ohne Kreditkarte.</p>
-              </div>
-              <ul className="space-y-3 mb-7 flex-1">
-                {FREE_FEATURES.map(f => (
-                  <li key={f} className="flex items-center gap-2.5 text-white/70 text-sm">
-                    <CheckCircle className="w-4 h-4 text-white/40 shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => handleCta(null)}
-                className="lp-btn-shine w-full h-12 font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl"
-              >
-                Kostenlos starten
-              </Button>
-            </div>
-
-            {/* PRO */}
-            <div data-reveal data-reveal-delay="1" className="lp-hover-lift bg-white/[0.10] border-2 border-[hsl(var(--reward-gold))]/50 hover:border-[hsl(var(--reward-gold))] rounded-2xl p-7 flex flex-col relative overflow-hidden hover:shadow-2xl hover:shadow-yellow-500/20">
-              <div className="absolute top-0 right-0 bg-[hsl(var(--reward-gold))] text-slate-900 text-xs font-bold px-3 py-1.5 rounded-bl-xl uppercase tracking-wide">
-                Beliebt
-              </div>
-              <div className="mb-5">
-                <p className="text-[hsl(var(--reward-gold))] text-xs font-bold uppercase tracking-widest mb-1">PRO Zugang</p>
-                <div className="flex items-end gap-1 mb-1">
-                  <span className="text-4xl font-extrabold text-white">Alles inklusive</span>
-                </div>
-                <p className="text-white/55 text-sm">30 Tage Geld-zurück · Jederzeit kündbar</p>
-              </div>
-              <ul className="space-y-3 mb-7 flex-1">
-                {PRO_FEATURES.map(f => (
-                  <li key={f} className="flex items-center gap-2.5 text-white text-sm">
-                    <CheckCircle className="w-4 h-4 text-[hsl(var(--reward-gold))] shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                size="lg"
-                disabled
-                className="lp-btn-shine w-full h-12 font-bold bg-[hsl(var(--reward-gold))] hover:bg-[hsl(48,100%,43%)] text-slate-900 rounded-xl shadow-xl shadow-yellow-500/30 gap-2"
-              >
-                {t('pricing_table.unavailable')}
-              </Button>
-              <p className="text-white/35 text-xs text-center mt-3">30 Tage Geld-zurück-Garantie · Keine versteckten Kosten</p>
-            </div>
-
-          </div>
+        <section className="max-w-6xl mx-auto px-5 py-16 border-t border-border">
+          <h2 className="text-3xl font-bold text-foreground text-center mb-3">{t('pricing.hero.title')}</h2>
+          <p className="text-center text-muted-foreground text-sm mb-12">{t('pricing_table.guarantee')}</p>
+          <PricingTable />
         </section>
 
 
@@ -712,7 +652,7 @@ export default function LandingPage() {
               Dein erstes Stück wartet auf dich
             </h2>
             <p className="text-white/55 text-sm mb-8 max-w-md mx-auto">
-              Registriere dich kostenlos und leg sofort los – oder steig direkt mit dem vollen PRO-Zugang ein. 30 Tage Geld-zurück, jederzeit kündbar.
+              {t('pricing_table.finalOffer')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button
@@ -725,14 +665,14 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                disabled
+                onClick={() => navigate('/pricing')}
                 className="lp-btn-shine h-14 px-8 text-base font-semibold bg-white/10 hover:bg-white/20 text-white border-white/25 rounded-xl gap-2"
               >
-                {t('pricing_table.unavailable')}
+                {t('pricing_table.viewPlans')}
               </Button>
             </div>
             <p className="text-white/35 text-xs mt-4">
-              Keine Kreditkarte für Free · 30 Tage Geld-zurück auf PRO · Jederzeit kündbar
+              {t('pricing_table.offerTerms')}
             </p>
 
 

@@ -9,6 +9,7 @@ import { Check, Crown, Sparkles, RefreshCw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlanKey, PLAN_INFO } from '@/types/plans';
 import { toast } from 'sonner';
+import { PlanTerms } from '@/components/pricing/PlanTerms';
 
 const TEXTS = {
   de: {

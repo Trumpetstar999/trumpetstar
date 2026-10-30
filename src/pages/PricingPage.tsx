@@ -34,10 +34,10 @@ export function PricingPage() {
             <div className="relative z-10 flex flex-col items-center gap-3">
               <ShieldCheck className="w-12 h-12 text-emerald-400" />
               <h2 className="text-2xl md:text-3xl font-bold text-white">
-                30 Tage Geld-zurück-Garantie
+                {t('pricing_table.guarantee')}
               </h2>
               <p className="text-white/70 max-w-lg text-sm md:text-base">
-                Teste Trumpetstar risikofrei. Wenn du nicht zufrieden bist, erhältst du innerhalb von 30 Tagen dein Geld zurück — ohne Wenn und Aber.
+                {t('pricing_table.guaranteeDescription')}
               </p>
             </div>
           </div>

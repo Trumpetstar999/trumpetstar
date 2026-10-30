@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Check, X, Crown, Sparkles, BookOpen, MessageCircle, Music, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { getCheckoutUrl } from '@/lib/checkout';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { PlanTerms } from './PlanTerms';
 
 interface PricingTableProps {
   onSelectPlan?: (planKey: PlanKey) => void;
@@ -108,7 +109,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
         >
           {t('pricing_table.yearly')}
           <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-            {t('pricing_table.saveUpTo')}
+            {t('pricing_table.saveUpTo', { percent: Math.max(...plans.map(p => p.yearlyDiscount ?? 0)) })}
           </Badge>
         </Label>
       </div>
@@ -148,7 +149,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   {plan.title}
                 </CardTitle>
                 <CardDescription className="text-sm text-slate-600">
-                  {plan.shortDescription}
+                  {t(`pricing_table.planCopy.${plan.key}.short`)}
                 </CardDescription>
               </CardHeader>
 
@@ -157,11 +158,12 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold text-slate-900">{getPrice(plan)}</div>
                   <div className="text-sm text-slate-600">{getPriceSubtext(plan)}</div>
+                  <PlanTerms planKey={plan.key} period={isYearly ? 'yearly' : 'monthly'} />
                 </div>
 
                 {/* Description */}
                 <p className="text-sm text-slate-600 mb-6 flex-1 leading-relaxed">
-                  {plan.description}
+                  {t(`pricing_table.planCopy.${plan.key}.description`)}
                 </p>
 
                 {/* CTA Button */}
@@ -175,7 +177,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                   disabled={(plan.key !== 'FREE' && isLoading) || (isCurrentPlan && plan.key !== 'FREE') || (plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly'))}
                   onClick={() => handleSelectPlan(plan.key)}
                 >
-                  {plan.key === 'FREE' && !onSelectPlan ? (isGuest || isLoading ? t('landing.hero.ctaStart') : t('pricing_table.toApp')) : isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly') ? t('pricing_table.unavailable') : plan.cta}
+                  {plan.key === 'FREE' && !onSelectPlan ? (isGuest || isLoading ? t('landing.hero.ctaStart') : t('pricing_table.toApp')) : isCurrentPlan ? t('pricing_table.currentPlanBtn') : plan.key !== 'FREE' && !getCheckoutUrl(plan.key, isYearly ? 'yearly' : 'monthly') ? t('pricing_table.unavailable') : t(`pricing_table.planCopy.${plan.key}.cta`)}
                 </Button>
               </CardContent>
             </Card>
@@ -216,7 +218,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
               {featuresByCategory.map(category => {
                 const Icon = categoryIcons[category.category];
                 return (
-                  <>
+                  <Fragment key={category.category}>
                     {/* Category Header */}
                     <tr key={category.category} className="border-b">
                       <td colSpan={4} className="p-0">
@@ -255,7 +257,7 @@ export function PricingTable({ onSelectPlan }: PricingTableProps) {
                         })}
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
