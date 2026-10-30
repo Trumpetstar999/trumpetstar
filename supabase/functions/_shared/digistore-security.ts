@@ -21,7 +21,7 @@ export async function verifyIpnSignature(raw: Record<string, unknown>, secret: s
 export function parseIpnForm(text: string): Record<string, string> {
   const raw: Record<string, string> = Object.create(null);
   for (const [key, value] of new URLSearchParams(text)) {
-    if (Object.hasOwn(raw, key)) throw new Error('Duplicate IPN parameter');
+    if (Object.prototype.hasOwnProperty.call(raw, key)) throw new Error('Duplicate IPN parameter');
     raw[key] = value;
   }
   return raw;
