@@ -1,4 +1,5 @@
 # Tasks
+- [ ] October 30 connection completion: Run provider connection test, disable only the identified old webhook after success, verify a real purchase activates the buyer's plan; requires provider access and a designated real order.
 - [x] October 30 instructions: Four verified checkout payment plans, shared prices/discounts and localized minimum terms; 16 real checkout clicks across DE/EN/ES/SL and live provider prices/names checked.
 - [x] October 30 instructions: Product mapping/ranks correct; prior failures reviewed without activation; signed connection 200 OK/no writes, forged requests 401/no writes; six entitlement transitions unit-tested. 44 tests passed, 7 privileged integration tests skipped.
 - [ ] October 30 provider acceptance: Mario must switch to generic signed IPN and perform non-admin test purchase/refund; no provider changes by Lovable.
