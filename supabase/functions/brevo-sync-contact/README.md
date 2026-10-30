@@ -12,6 +12,16 @@ New reservations use `WELCOME25-` codes with exactly 25% on the first payment; l
 
 ## One-time admin E2E test
 
+### Confirmed live test (2026-10-30 13:42 UTC)
+
+The authenticated admin inspection succeeded. Both `getVoucher` and `listVouchers` confirmed the old reserved singleton `WELCOME15` code absent; its row had no sent timestamp or message ID. Only that unsent test reservation was reconciled to the current offer, retaining its identity. Sent production data was not changed. Brevo had a separate earlier 15% email; it was not resent or changed.
+
+One protected `test_welcome` call returned `sent`, `alreadySent:false`. Both provider reads identified exactly one matching new test voucher with `first_rate=25`, `other_rates=0`, `product_ids=346007,575565`, `is_count_limited=Y`, `count_left=1`, and `upgrade_policy=not_valid`. Validity: October 30, 2026 14:42:32 to November 2, 2026 14:42:32 Europe/Vienna (exactly 72 hours).
+
+Brevo events matched the database message ID: one `requests` event at 14:42:38 and `delivered` at 14:42:45 Europe/Vienna, recipient `schulterm@me.com`, sender `info@trumpetstar.com`, subject `Willkommen bei Trumpetstar – dein persönlicher 25-%-Gutschein`. Exactly one distinct matching 25% German welcome send was found. Delivery confirms recipient-server acceptance, not human reading or redemption.
+
+Exactly one subsequent protected retry returned `sent`, `alreadySent:true`. The row, voucher code, Brevo message ID and provider total remained unchanged (24 total vouchers, including one pre-existing production 25% voucher and the new singleton test). No duplicate test voucher or mail was created. Full codes are intentionally omitted from this report.
+
 While signed in as a database-backed admin, invoke the existing function through the app's managed client:
 
 ```ts
