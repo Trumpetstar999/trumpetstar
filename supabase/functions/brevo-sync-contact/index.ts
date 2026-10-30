@@ -1,6 +1,6 @@
 import { corsHeaders, json, normalizeLang, upsertContact } from '../_shared/brevo.ts';
 import { adminClient, getCaller, isInternalCall, requireAdmin } from '../_shared/brevo-auth.ts';
-import { deliverWelcome, welcomeStore } from './welcome-delivery.ts';
+import { deliverWelcome, welcomeStore, providers } from './welcome-delivery.ts';
 import { TEST_EMAIL, welcomeLanguage } from './welcome-content.ts';
 
 interface Payload {
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
       const missing = ['DIGISTORE24_API_KEY', 'BREVO_API_KEY', 'LOVABLE_API_KEY'].filter(name => !Deno.env.get(name));
       if (missing.length) return { status: 'configuration_missing', missing };
       return await deliverWelcome(welcomeStore(supabase), { userId: caller.id, email, lang,
-        firstName: typeof body.first_name === 'string' ? body.first_name.trim().split(/\s+/)[0].slice(0, 100) || null : null, test });
+        firstName: typeof body.first_name === 'string' ? body.first_name.trim().split(/\s+/)[0].slice(0, 100) || null : null, test }, providers);
     };
     if (test) {
       const result = await welcome();

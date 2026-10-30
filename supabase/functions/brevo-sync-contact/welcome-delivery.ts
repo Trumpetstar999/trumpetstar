@@ -3,21 +3,13 @@ import { brevoFetch } from '../_shared/brevo.ts';
 import { TEST_EMAIL, TEST_USER_ID, voucherExpiry, voucherFields, welcomeEmail, type WelcomeLanguage } from './welcome-content.ts';
 
 type DB = ReturnType<typeof adminClient>;
-export interface WelcomeRow {
-  id: string; user_id: string; email: string; language: WelcomeLanguage;
-  voucher_code: string; expires_at: string; created_at: string; status: string;
-  first_name: string | null; brevo_message_id: string | null;
-}
-export interface WelcomeStore {
-  reserve(input: { userId: string; email: string; lang: WelcomeLanguage; firstName: string | null; test: boolean }): Promise<WelcomeRow>;
-  claim(row: WelcomeRow, allowed: string[], next: string): Promise<boolean>;
-  update(id: string, values: Record<string, unknown>): Promise<void>;
-}
+import type { WelcomeRow, WelcomeStore, ProviderResult } from './welcome-types.ts';
+export { deliverWelcome } from './welcome-workflow.ts';
 export function welcomeStore(db: DB): WelcomeStore {
   return {
     async reserve(input) {
       const createdAt = new Date().toISOString();
-      const code = `WELCOME15-${crypto.randomUUID().replaceAll('-', '').slice(0, 16).toUpperCase()}`;
+      const code = `WELCOME15-${crypto.randomUUID().replace(/-/g, '').slice(0, 16).toUpperCase()}`;
       const { data, error } = await db.from('app_welcome_vouchers').insert({
         user_id: input.test ? TEST_USER_ID : input.userId, email: input.test ? TEST_EMAIL : input.email,
         language: input.lang, first_name: input.firstName, voucher_code: code,
@@ -47,7 +39,6 @@ export function welcomeStore(db: DB): WelcomeStore {
     },
   };
 }
-export interface ProviderResult { ok: boolean; uncertain?: boolean; status: number; messageId?: string }
 export const providers = {
   async voucher(row: WelcomeRow): Promise<ProviderResult> {
     const key = Deno.env.get('DIGISTORE24_API_KEY');
@@ -74,36 +65,3 @@ export const providers = {
       uncertain: result.status >= 500 || (result.ok && !data?.messageId) };
   },
 };
-export async function deliverWelcome(store: WelcomeStore, input: Parameters<WelcomeStore['reserve']>[0], api = providers) {
-  const row = await store.reserve(input);
-  if (row.status === 'sent') return { status: 'sent', alreadySent: true };
-  if (new Date(row.expires_at).getTime() <= Date.now()) {
-    if (['pending', 'voucher_failed', 'voucher_created', 'mail_failed'].includes(row.status)) await store.update(row.id, { status: 'expired' });
-    return { status: row.status.includes('uncertain') ? row.status : 'expired' };
-  }
-  if (['pending', 'voucher_failed'].includes(row.status)) {
-    if (!await store.claim(row, ['pending', 'voucher_failed'], 'voucher_creating')) return { status: 'in_progress' };
-    let result: ProviderResult;
-    try { result = await api.voucher(row); }
-    catch { await store.update(row.id, { status: 'voucher_uncertain', error_message: 'Voucher outcome unknown; provider reconciliation required' }); return { status: 'voucher_uncertain' }; }
-    if (!result.ok) {
-      const status = result.uncertain ? 'voucher_uncertain' : 'voucher_failed';
-      await store.update(row.id, { status, error_message: `Digistore24 rejected voucher [${result.status}]` });
-      return { status };
-    }
-    await store.update(row.id, { status: 'voucher_created', error_message: null });
-    row.status = 'voucher_created';
-  }
-  if (!['voucher_created', 'mail_failed'].includes(row.status)) return { status: row.status };
-  if (!await store.claim(row, ['voucher_created', 'mail_failed'], 'sending')) return { status: 'in_progress' };
-  let result: ProviderResult;
-  try { result = await api.mail(row); }
-  catch { await store.update(row.id, { status: 'mail_uncertain', error_message: 'Mail outcome unknown; Brevo reconciliation required' }); return { status: 'mail_uncertain' }; }
-  if (!result.ok) {
-    const status = result.uncertain ? 'mail_uncertain' : 'mail_failed';
-    await store.update(row.id, { status, error_message: `Brevo rejected mail [${result.status}]` });
-    return { status };
-  }
-  await store.update(row.id, { status: 'sent', brevo_message_id: result.messageId, sent_at: new Date().toISOString(), error_message: null });
-  return { status: 'sent', alreadySent: false };
-}

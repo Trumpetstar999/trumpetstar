@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { deliverWelcome, type WelcomeRow, type WelcomeStore } from '../../supabase/functions/brevo-sync-contact/welcome-delivery';
+import { deliverWelcome } from '../../supabase/functions/brevo-sync-contact/welcome-workflow';
+import type { WelcomeRow, WelcomeStore } from '../../supabase/functions/brevo-sync-contact/welcome-types';
 import { voucherFields, voucherExpiry, welcomeLanguage, WELCOME_LANGUAGES, TEST_EMAIL, voucherCheckout } from '../../supabase/functions/brevo-sync-contact/welcome-content';
 
 const input = { userId: 'user', email: 'user@example.com', lang: 'sl' as const, firstName: 'Mario', test: false };
