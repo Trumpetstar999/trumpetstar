@@ -72,30 +72,6 @@
     "passwordChangedDesc": "Dein Passwort wurde erfolgreich aktualisiert.",
     "signedOutSuccess": "Erfolgreich abgemeldet",
     "toApp": "Zur App",
-    "monthlyTerms": "Mindestlaufzeit {{months}} Monate.",
-    "proMonthlyTerms": "{{intro}} € im ersten Monat, danach {{price}} €/Monat. Mindestlaufzeit {{months}} Monate.",
-    "annualTerms": "Abrechnung jährlich. Mindestlaufzeit 1 Jahr.",
-    "viewPlans": "Tarife ansehen",
-    "finalOffer": "Starte kostenlos oder wähle Basic oder Pro. Für bezahlte Tarife gilt eine 30-Tage-Geld-zurück-Garantie.",
-    "offerTerms": "Free ohne Kreditkarte · Monatlich: 6 Monate Mindestlaufzeit · Jährlich: 1 Jahr Mindestlaufzeit",
-    "guaranteeDescription": "Teste Trumpetstar mit 30 Tagen Geld-zurück-Garantie.",
-    "planCopy": {
-      "FREE": {
-        "short": "Ausgewählte Lerninhalte entdecken.",
-        "description": "Kostenloser Zugang zu ausgewählten Videos, Noten und Basistools.",
-        "cta": "Kostenlos starten"
-      },
-      "BASIC": {
-        "short": "Alle Videos und Lernmaterialien.",
-        "description": "Alle Lernvideos und Noten, KI-Assistent und Übe-Tools. Ohne persönliches Lehrerfeedback.",
-        "cta": "Basic freischalten"
-      },
-      "PRO": {
-        "short": "Basic plus persönliches Feedback.",
-        "description": "Alles aus Basic, dazu Video-Feedback, Lehrerchat und Live-Feedback.",
-        "cta": "Pro freischalten"
-      }
-    },
     "navLearn": "Lernen",
     "navPricing": "Preise",
     "footerTagline": "Trompete lernen mit der Star-Methode – Buch, Videos und App für alle Altersgruppen.",
@@ -681,7 +657,31 @@
     "compareTitle": "Funktionen im Vergleich",
     "compareFeature": "Funktion",
     "guarantee": "30 Tage Geld-zurück-Garantie",
-    "toApp": "Zur App"
+    "toApp": "Zur App",
+    "monthlyTerms": "Mindestlaufzeit {{months}} Monate.",
+    "proMonthlyTerms": "{{intro}} € im ersten Monat, danach {{price}} €/Monat. Mindestlaufzeit {{months}} Monate.",
+    "annualTerms": "Abrechnung jährlich. Mindestlaufzeit 1 Jahr.",
+    "viewPlans": "Tarife ansehen",
+    "finalOffer": "Starte kostenlos oder wähle Basic oder Pro. Für bezahlte Tarife gilt eine 30-Tage-Geld-zurück-Garantie.",
+    "offerTerms": "Free ohne Kreditkarte · Monatlich: 6 Monate Mindestlaufzeit · Jährlich: 1 Jahr Mindestlaufzeit",
+    "guaranteeDescription": "Teste Trumpetstar mit 30 Tagen Geld-zurück-Garantie.",
+    "planCopy": {
+      "FREE": {
+        "short": "Ausgewählte Lerninhalte entdecken.",
+        "description": "Kostenloser Zugang zu ausgewählten Videos, Noten und Basistools.",
+        "cta": "Kostenlos starten"
+      },
+      "BASIC": {
+        "short": "Alle Videos und Lernmaterialien.",
+        "description": "Alle Lernvideos und Noten, KI-Assistent und Übe-Tools. Ohne persönliches Lehrerfeedback.",
+        "cta": "Basic freischalten"
+      },
+      "PRO": {
+        "short": "Basic plus persönliches Feedback.",
+        "description": "Alles aus Basic, dazu Video-Feedback, Lehrerchat und Live-Feedback.",
+        "cta": "Pro freischalten"
+      }
+    }
   },
   "layout": {
     "nav": {
