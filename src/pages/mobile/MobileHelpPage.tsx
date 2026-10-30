@@ -14,7 +14,7 @@ const FAQ = {
   de: [
     { q: 'Wie öffne ich die App am iPad?', a: 'Öffne Safari auf deinem iPad, gehe zu trumpetstar.lovable.app und drehe das iPad ins Querformat. Logge dich mit deinem Account ein und du hast Zugriff auf alle Features.' },
     { q: 'Warum funktioniert die Lernwelt nicht am Handy?', a: 'Noten, Videos und Übe-Tools sind für größere Displays optimiert. Auf kleinen Bildschirmen wäre die Bedienung eingeschränkt. Deshalb empfehlen wir iPad/Tablet im Querformat oder einen Laptop.' },
-    { q: 'Kann ich jederzeit kündigen?', a: 'Ja, du kannst dein Abo jederzeit kündigen. Bei Jahresabos läuft dein Zugang bis zum Ende der bezahlten Periode weiter.' },
+    { q: '__subscription_terms__', a: '' },
     { q: 'Kann ich zwischen Plänen wechseln?', a: 'Klar! Du kannst jederzeit upgraden. Beim Wechsel zu einem höheren Plan wird der restliche Zeitraum anteilig verrechnet.' },
     { q: 'Gibt es eine Geld-zurück-Garantie?', a: 'Ja, innerhalb der ersten 30 Tage kannst du dein Abo ohne Angabe von Gründen kündigen und erhältst dein Geld zurück.' },
     { q: 'Welches Gerät brauche ich?', a: 'iPad (ab 2018), Android-Tablet, oder einen Laptop/Desktop mit aktuellem Chrome, Safari oder Firefox. Ein stabiles Internet ist empfohlen.' },
@@ -22,7 +22,7 @@ const FAQ = {
   en: [
     { q: 'How do I open the app on iPad?', a: 'Open Safari on your iPad, go to trumpetstar.lovable.app and rotate to landscape. Log in with your account to access all features.' },
     { q: 'Why doesn\'t the learning world work on mobile?', a: 'Sheet music, videos, and practice tools are optimized for larger displays. On small screens, the experience would be limited. We recommend iPad/tablet in landscape or a laptop.' },
-    { q: 'Can I cancel anytime?', a: 'Yes, you can cancel your subscription at any time. Annual plans continue until the end of the paid period.' },
+    { q: '__subscription_terms__', a: '' },
     { q: 'Can I switch between plans?', a: 'Of course! You can upgrade at any time. When switching to a higher plan, the remaining period is prorated.' },
     { q: 'Is there a money-back guarantee?', a: 'Yes, within the first 30 days you can cancel without reason and receive a full refund.' },
     { q: 'What device do I need?', a: 'iPad (2018+), Android tablet, or a laptop/desktop with current Chrome, Safari or Firefox. A stable internet connection is recommended.' },
@@ -30,7 +30,7 @@ const FAQ = {
   es: [
     { q: '¿Cómo abro la app en iPad?', a: 'Abre Safari en tu iPad, ve a trumpetstar.lovable.app y gíralo en horizontal. Inicia sesión con tu cuenta para acceder a todas las funciones.' },
     { q: '¿Por qué no funciona en el móvil?', a: 'Las partituras, videos y herramientas de práctica están optimizados para pantallas grandes. En pantallas pequeñas, la experiencia sería limitada.' },
-    { q: '¿Puedo cancelar en cualquier momento?', a: 'Sí, puedes cancelar tu suscripción en cualquier momento. Los planes anuales continúan hasta el final del período pagado.' },
+    { q: '__subscription_terms__', a: '' },
     { q: '¿Hay garantía de devolución?', a: 'Sí, dentro de los primeros 30 días puedes cancelar sin motivo y recibir un reembolso completo.' },
   ],
 };
@@ -42,13 +42,14 @@ const TEXTS = {
 };
 
 export default function MobileHelpPage() {
-  const { language } = useLanguage();
+  const { language, t: translate } = useLanguage();
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const faq = FAQ[language] || FAQ.de;
+  const faq = (FAQ[language] || FAQ.de).map(item => item.q === '__subscription_terms__'
+    ? { q: translate('pricing.faq.q1'), a: translate('pricing.faq.a1') } : item);
   const t = TEXTS[language] || TEXTS.de;
 
   const handleSendFeedback = async () => {

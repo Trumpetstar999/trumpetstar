@@ -643,7 +643,7 @@
   "pricing_table": {
     "monthly": "Mesečno",
     "yearly": "Letno",
-    "saveUpTo": "Prihrani do 17%",
+    "saveUpTo": "Prihrani do {{percent}}%",
     "unavailable": "Nakup trenutno ni na voljo",
     "recommended": "Priporočeno",
     "currentPlan": "Tvoj načrt",
@@ -657,7 +657,31 @@
     "compareTitle": "Primerjava funkcij",
     "compareFeature": "Funkcija",
     "guarantee": "30-dnevna garancija vračila denarja",
-    "toApp": "V aplikacijo"
+    "toApp": "V aplikacijo",
+    "monthlyTerms": "Najkrajše trajanje {{months}} mesecev.",
+    "proMonthlyTerms": "{{intro}} € za prvi mesec, nato {{price}} €/mesec. Najkrajše trajanje {{months}} mesecev.",
+    "annualTerms": "Letno obračunavanje. Najkrajše trajanje 1 leto.",
+    "viewPlans": "Ogled načrtov",
+    "finalOffer": "Začni brezplačno ali izberi Basic ali Pro. Plačljivi načrti vključujejo 30-dnevno garancijo vračila denarja.",
+    "offerTerms": "Free brez kreditne kartice · Mesečno: najmanj 6 mesecev · Letno: najmanj 1 leto",
+    "guaranteeDescription": "Preizkusi Trumpetstar s 30-dnevno garancijo vračila denarja.",
+    "planCopy": {
+      "FREE": {
+        "short": "Odkrij izbrane učne vsebine.",
+        "description": "Brezplačen dostop do izbranih videov, not in osnovnih orodij.",
+        "cta": "Začni brezplačno"
+      },
+      "BASIC": {
+        "short": "Vsi videi in učni materiali.",
+        "description": "Vsi učni videi in note, pomočnik UI in orodja za vadbo. Brez osebnih povratnih informacij učitelja.",
+        "cta": "Odkleni Basic"
+      },
+      "PRO": {
+        "short": "Basic z osebnimi povratnimi informacijami.",
+        "description": "Vse iz Basic ter povratne informacije o videih, klepet z učiteljem in povratne informacije v živo.",
+        "cta": "Odkleni Pro"
+      }
+    }
   },
   "layout": {
     "nav": {
@@ -689,8 +713,8 @@
     },
     "faq": {
       "title": "Pogosta vprašanja",
-      "q1": "Ali lahko kadar koli odpovem naročnino?",
-      "a1": "Da, naročnino lahko odpovete kadar koli. Pri letnih naročninah vaš dostop velja do konca plačanega obdobja.",
+      "q1": "Kakšno je najkrajše trajanje?",
+      "a1": "Basic in Pro: mesečni načrti trajajo najmanj 6 mesecev, letni načrti pa najmanj 1 leto. Še vedno velja 30-dnevna garancija vračila denarja.",
       "q2": "Ali lahko zamenjam načrt?",
       "a2": "Seveda! Nadgradnjo lahko opravite kadar koli. Pri prehodu na višji načrt se preostalo obdobje sorazmerno obračuna.",
       "q3": "Ali obstaja garancija vračila denarja?",

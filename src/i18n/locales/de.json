@@ -643,7 +643,7 @@
   "pricing_table": {
     "monthly": "Monatlich",
     "yearly": "Jährlich",
-    "saveUpTo": "Spare bis zu 17%",
+    "saveUpTo": "Spare bis zu {{percent}}%",
     "unavailable": "Kauf vorübergehend nicht verfügbar",
     "recommended": "Empfohlen",
     "currentPlan": "Dein Plan",
@@ -657,7 +657,31 @@
     "compareTitle": "Funktionen im Vergleich",
     "compareFeature": "Funktion",
     "guarantee": "30 Tage Geld-zurück-Garantie",
-    "toApp": "Zur App"
+    "toApp": "Zur App",
+    "monthlyTerms": "Mindestlaufzeit {{months}} Monate.",
+    "proMonthlyTerms": "{{intro}} € im ersten Monat, danach {{price}} €/Monat. Mindestlaufzeit {{months}} Monate.",
+    "annualTerms": "Abrechnung jährlich. Mindestlaufzeit 1 Jahr.",
+    "viewPlans": "Tarife ansehen",
+    "finalOffer": "Starte kostenlos oder wähle Basic oder Pro. Für bezahlte Tarife gilt eine 30-Tage-Geld-zurück-Garantie.",
+    "offerTerms": "Free ohne Kreditkarte · Monatlich: 6 Monate Mindestlaufzeit · Jährlich: 1 Jahr Mindestlaufzeit",
+    "guaranteeDescription": "Teste Trumpetstar mit 30 Tagen Geld-zurück-Garantie.",
+    "planCopy": {
+      "FREE": {
+        "short": "Ausgewählte Lerninhalte entdecken.",
+        "description": "Kostenloser Zugang zu ausgewählten Videos, Noten und Basistools.",
+        "cta": "Kostenlos starten"
+      },
+      "BASIC": {
+        "short": "Alle Videos und Lernmaterialien.",
+        "description": "Alle Lernvideos und Noten, KI-Assistent und Übe-Tools. Ohne persönliches Lehrerfeedback.",
+        "cta": "Basic freischalten"
+      },
+      "PRO": {
+        "short": "Basic plus persönliches Feedback.",
+        "description": "Alles aus Basic, dazu Video-Feedback, Lehrerchat und Live-Feedback.",
+        "cta": "Pro freischalten"
+      }
+    }
   },
   "layout": {
     "nav": {
@@ -689,8 +713,8 @@
     },
     "faq": {
       "title": "Häufige Fragen",
-      "q1": "Kann ich jederzeit kündigen?",
-      "a1": "Ja, du kannst dein Abo jederzeit kündigen. Bei Jahresabos läuft dein Zugang bis zum Ende der bezahlten Periode weiter.",
+      "q1": "Welche Mindestlaufzeit gilt?",
+      "a1": "Basic und Pro: monatlich mindestens 6 Monate, jährlich mindestens 1 Jahr. Die 30-Tage-Geld-zurück-Garantie bleibt bestehen.",
       "q2": "Kann ich zwischen Plänen wechseln?",
       "a2": "Klar! Du kannst jederzeit upgraden. Beim Wechsel zu einem höheren Plan wird der restliche Zeitraum anteilig verrechnet.",
       "q3": "Gibt es eine Geld-zurück-Garantie?",

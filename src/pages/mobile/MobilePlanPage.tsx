@@ -9,6 +9,7 @@ import { Check, Crown, Sparkles, RefreshCw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlanKey, PLAN_INFO } from '@/types/plans';
 import { toast } from 'sonner';
+import { PlanTerms } from '@/components/pricing/PlanTerms';
 
 const TEXTS = {
   de: {
@@ -132,6 +133,8 @@ export default function MobilePlanPage() {
                 <div className="flex items-baseline gap-1">
                   <span className="text-2xl font-bold text-slate-900">{plan.price}</span>
                 </div>
+
+                <PlanTerms planKey={plan.key} period="monthly" />
 
                 {!isCurrent && plan.key !== 'FREE' && (
                   <Button

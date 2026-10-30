@@ -643,7 +643,7 @@
   "pricing_table": {
     "monthly": "Monthly",
     "yearly": "Yearly",
-    "saveUpTo": "Save up to 17%",
+    "saveUpTo": "Save up to {{percent}}%",
     "unavailable": "Purchases temporarily unavailable",
     "recommended": "Recommended",
     "currentPlan": "Your Plan",
@@ -657,7 +657,31 @@
     "compareTitle": "Feature Comparison",
     "compareFeature": "Feature",
     "guarantee": "30-day money-back guarantee",
-    "toApp": "Go to app"
+    "toApp": "Go to app",
+    "monthlyTerms": "Minimum term {{months}} months.",
+    "proMonthlyTerms": "€{{intro}} for the first month, then €{{price}}/month. Minimum term {{months}} months.",
+    "annualTerms": "Billed annually. Minimum term 1 year.",
+    "viewPlans": "View plans",
+    "finalOffer": "Start free or choose Basic or Pro. Paid plans include a 30-day money-back guarantee.",
+    "offerTerms": "Free needs no credit card · Monthly: 6-month minimum term · Annual: 1-year minimum term",
+    "guaranteeDescription": "Try Trumpetstar with a 30-day money-back guarantee.",
+    "planCopy": {
+      "FREE": {
+        "short": "Explore selected lessons.",
+        "description": "Free access to selected videos, sheet music and basic tools.",
+        "cta": "Start free"
+      },
+      "BASIC": {
+        "short": "All videos and learning materials.",
+        "description": "All lesson videos and sheet music, AI assistant and practice tools. No personal teacher feedback.",
+        "cta": "Unlock Basic"
+      },
+      "PRO": {
+        "short": "Basic plus personal feedback.",
+        "description": "Everything in Basic plus video feedback, teacher chat and live feedback.",
+        "cta": "Unlock Pro"
+      }
+    }
   },
   "layout": {
     "nav": {
@@ -689,8 +713,8 @@
     },
     "faq": {
       "title": "Frequently Asked Questions",
-      "q1": "Can I cancel at any time?",
-      "a1": "Yes, you can cancel your subscription at any time. For annual plans, your access continues until the end of the paid period.",
+      "q1": "What is the minimum term?",
+      "a1": "Basic and Pro: monthly plans have a minimum term of 6 months; annual plans have a minimum term of 1 year. The 30-day money-back guarantee still applies.",
       "q2": "Can I switch between plans?",
       "a2": "Absolutely! You can upgrade at any time. When switching to a higher plan, the remaining period is prorated.",
       "q3": "Is there a money-back guarantee?",

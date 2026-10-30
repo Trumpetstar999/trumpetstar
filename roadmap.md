@@ -1,4 +1,7 @@
 # Tasks
+- [x] October 30 instructions: Four verified checkout payment plans, shared prices/discounts and localized minimum terms; 16 real checkout clicks across DE/EN/ES/SL and live provider prices/names checked.
+- [x] October 30 instructions: Product mapping/ranks correct; prior failures reviewed without activation; signed connection 200 OK/no writes, forged requests 401/no writes; six entitlement transitions unit-tested. 44 tests passed, 7 privileged integration tests skipped.
+- [ ] October 30 provider acceptance: Mario must switch to generic signed IPN and perform non-admin test purchase/refund; no provider changes by Lovable.
 - [x] Repair magic-link requests (legacy relay returned 502) using managed auth; raise blocked auth-email hourly limit to 100. Browser requests: magiclink 200, recovery 200; 14 regression tests passed.
 - [ ] Verify newest delivered magic/recovery links from the recipient mailbox; no mailbox access, and the malformed historical /verify link remains unverified.
 - [x] Step 1 hardening: Mandatory signed IPN, session-bound membership checks, admin-only CSV imports, own membership mutation removed, Basic mapping corrected, order ownership locked, email confirmation enforced.
