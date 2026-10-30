@@ -643,7 +643,7 @@
   "pricing_table": {
     "monthly": "Mensual",
     "yearly": "Anual",
-    "saveUpTo": "Ahorra hasta un 17%",
+    "saveUpTo": "Ahorra hasta un {{percent}}%",
     "unavailable": "Compra temporalmente no disponible",
     "recommended": "Recomendado",
     "currentPlan": "Tu Plan",
@@ -657,7 +657,31 @@
     "compareTitle": "Comparación de funciones",
     "compareFeature": "Función",
     "guarantee": "Garantía de devolución de 30 días",
-    "toApp": "Ir a la app"
+    "toApp": "Ir a la app",
+    "monthlyTerms": "Duración mínima de {{months}} meses.",
+    "proMonthlyTerms": "{{intro}} € el primer mes, después {{price}} €/mes. Duración mínima de {{months}} meses.",
+    "annualTerms": "Facturación anual. Duración mínima de 1 año.",
+    "viewPlans": "Ver planes",
+    "finalOffer": "Empieza gratis o elige Basic o Pro. Los planes de pago incluyen una garantía de devolución de 30 días.",
+    "offerTerms": "Free sin tarjeta · Mensual: mínimo 6 meses · Anual: mínimo 1 año",
+    "guaranteeDescription": "Prueba Trumpetstar con una garantía de devolución de 30 días.",
+    "planCopy": {
+      "FREE": {
+        "short": "Descubre lecciones seleccionadas.",
+        "description": "Acceso gratuito a videos seleccionados, partituras y herramientas básicas.",
+        "cta": "Empezar gratis"
+      },
+      "BASIC": {
+        "short": "Todos los videos y materiales.",
+        "description": "Todos los videos y partituras, asistente de IA y herramientas de práctica. Sin feedback personal del profesor.",
+        "cta": "Activar Basic"
+      },
+      "PRO": {
+        "short": "Basic con feedback personal.",
+        "description": "Todo lo de Basic, más feedback de video, chat con el profesor y feedback en directo.",
+        "cta": "Activar Pro"
+      }
+    }
   },
   "layout": {
     "nav": {
@@ -689,8 +713,8 @@
     },
     "faq": {
       "title": "Preguntas Frecuentes",
-      "q1": "¿Puedo cancelar en cualquier momento?",
-      "a1": "Sí, puedes cancelar tu suscripción en cualquier momento. Para planes anuales, tu acceso continúa hasta el final del período pagado.",
+      "q1": "¿Cuál es la duración mínima?",
+      "a1": "Basic y Pro: los planes mensuales tienen una duración mínima de 6 meses; los anuales, de 1 año. Se mantiene la garantía de devolución de 30 días.",
       "q2": "¿Puedo cambiar de plan?",
       "a2": "¡Por supuesto! Puedes actualizar en cualquier momento. Al cambiar a un plan superior, el período restante se prorratea.",
       "q3": "¿Hay garantía de devolución de dinero?",
