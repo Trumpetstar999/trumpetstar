@@ -25,7 +25,7 @@ export function json(body: unknown, status = 200) {
 /** Calls the Brevo API through the Lovable connector gateway. */
 export async function brevoFetch(
   path: string,
-  init: { method?: string; body?: unknown } = {},
+  init: { method?: string; body?: unknown; logErrors?: boolean } = {},
 ): Promise<{ ok: boolean; status: number; data: unknown; text: string }> {
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY');
@@ -50,7 +50,7 @@ export async function brevoFetch(
   } catch {
     data = null;
   }
-  if (!res.ok) {
+  if (!res.ok && init.logErrors !== false) {
     console.error(`[brevo] ${init.method ?? 'GET'} ${path} failed [${res.status}]: ${text}`);
   }
   return { ok: res.ok, status: res.status, data, text };
