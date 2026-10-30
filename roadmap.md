@@ -1,4 +1,7 @@
 # Tasks
+- [x] October 30 connection diagnostics: Provider API valid; deployed receiver returns exact 200 OK for signed connection_test and 401 unsigned; 29 checkout/security tests passed. Today’s 7 provider purchases include no Basic/Pro order; no new purchase IPN received.
+- [ ] October 30 provider completion: Run Test connection on the new generic IPN in Digistore24, then disable only the identified old webhook; blocked on backoffice access (no documented API management method).
+- [ ] October 30 real purchase verification: Needs a new Basic/Pro purchase and its order number; verify receipt, entitlement and buyer UI without manually activating prior failed purchases.
 - [x] October 30 instructions: Four verified checkout payment plans, shared prices/discounts and localized minimum terms; 16 real checkout clicks across DE/EN/ES/SL and live provider prices/names checked.
 - [x] October 30 instructions: Product mapping/ranks correct; prior failures reviewed without activation; signed connection 200 OK/no writes, forged requests 401/no writes; six entitlement transitions unit-tested. 44 tests passed, 7 privileged integration tests skipped.
 - [ ] October 30 provider acceptance: Mario must switch to generic signed IPN and perform non-admin test purchase/refund; no provider changes by Lovable.
