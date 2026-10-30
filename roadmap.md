@@ -1,5 +1,6 @@
 # Tasks
-- [ ] Repair magic-link and forgot-password requests and verify email callback behavior without weakening sign-in security.
+- [x] Repair magic-link requests (legacy relay returned 502) using managed auth; raise blocked auth-email hourly limit to 100. Browser requests: magiclink 200, recovery 200; 14 regression tests passed.
+- [ ] Verify newest delivered magic/recovery links from the recipient mailbox; no mailbox access, and the malformed historical /verify link remains unverified.
 - [x] Step 1 hardening: Mandatory signed IPN, session-bound membership checks, admin-only CSV imports, own membership mutation removed, Basic mapping corrected, order ownership locked, email confirmation enforced.
 - [x] Verify deployed signed connection notification (processed), tampered notification (401), no forged event persistence, signed-in app and purchase offers; 26 regression tests passed.
 - [ ] Step 1 full purchase E2E: Needs a designated non-admin test account and provider-side signed test purchase; connection notification does not verify plan activation, refund or email delivery.
