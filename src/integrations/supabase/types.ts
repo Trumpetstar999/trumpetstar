@@ -86,6 +86,57 @@ export type Database = {
           },
         ]
       }
+      app_welcome_vouchers: {
+        Row: {
+          brevo_message_id: string | null
+          created_at: string
+          email: string
+          error_message: string | null
+          expires_at: string
+          first_name: string | null
+          id: string
+          is_test: boolean
+          language: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          voucher_code: string
+        }
+        Insert: {
+          brevo_message_id?: string | null
+          created_at?: string
+          email: string
+          error_message?: string | null
+          expires_at: string
+          first_name?: string | null
+          id?: string
+          is_test?: boolean
+          language?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          voucher_code: string
+        }
+        Update: {
+          brevo_message_id?: string | null
+          created_at?: string
+          email?: string
+          error_message?: string | null
+          expires_at?: string
+          first_name?: string | null
+          id?: string
+          is_test?: boolean
+          language?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          voucher_code?: string
+        }
+        Relationships: []
+      }
       assistant_conversations: {
         Row: {
           created_at: string
