@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { voucherResponse } from '../../supabase/functions/brevo-sync-contact/voucher-response';
 import { deliverWelcome } from '../../supabase/functions/brevo-sync-contact/welcome-workflow';
 import type { WelcomeRow, WelcomeStore } from '../../supabase/functions/brevo-sync-contact/welcome-types';
 import { voucherFields, voucherExpiry, welcomeLanguage, WELCOME_LANGUAGES, TEST_EMAIL, voucherCheckout } from '../../supabase/functions/brevo-sync-contact/welcome-content';
@@ -29,6 +30,9 @@ describe('welcome voucher business rules', () => {
   it('fixes the test recipient', () => expect(TEST_EMAIL).toBe('schulterm@me.com'));
 });
 describe('welcome delivery idempotency', () => {
+  it('recognizes the documented createVoucher response only for the reserved code', () => { expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'WELCOME15-12345678' } }, 'WELCOME15-12345678').ok).toBe(true); expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'DIFFERENT' } }, 'WELCOME15-12345678').ok).toBe(false); });
+  it('treats HTTP 200 explicit provider rejection as failed, not accepted or ambiguous', () => { expect(voucherResponse(200, { result: 'error' })).toMatchObject({ ok: false, uncertain: false }); expect(voucherResponse(200, { result: 'success' })).toMatchObject({ ok: true }); });
+  it('keeps malformed or missing provider acknowledgement ambiguous', () => expect(voucherResponse(200, null)).toMatchObject({ ok: false, uncertain: true }));
   it('sends only once when called twice', async () => { const h = harness(); await deliverWelcome(h.store, input, h.api); await deliverWelcome(h.store, input, h.api); expect(h.counts()).toEqual({ vouchers: 1, mails: 1 }); expect(h.row()?.status).toBe('sent'); });
   it('atomically claims concurrent requests', async () => { const h = harness(); await Promise.all(Array.from({ length: 10 }, () => deliverWelcome(h.store, input, h.api))); expect(h.counts()).toEqual({ vouchers: 1, mails: 1 }); });
   it('reuses the original voucher and language after a rejected mail', async () => { const h = harness(); let code = ''; await deliverWelcome(h.store, input, { ...h.api, async mail() { return { ok: false, status: 400 }; } }); const original = h.row()?.voucher_code; await deliverWelcome(h.store, { ...input, lang: 'en' }, { ...h.api, async mail(row) { code = row.voucher_code; expect(row.language).toBe('sl'); return h.api.mail(); } }); expect(code).toBe(original); expect(h.counts().vouchers).toBe(1); expect(h.row()?.status).toBe('sent'); });

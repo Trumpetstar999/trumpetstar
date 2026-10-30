@@ -1,6 +1,7 @@
 import { adminClient } from '../_shared/brevo-auth.ts';
 import { brevoFetch } from '../_shared/brevo.ts';
 import { TEST_EMAIL, TEST_USER_ID, voucherExpiry, voucherFields, welcomeEmail, type WelcomeLanguage } from './welcome-content.ts';
+import { voucherResponse } from './voucher-response.ts';
 
 type DB = ReturnType<typeof adminClient>;
 import type { WelcomeRow, WelcomeStore, ProviderResult } from './welcome-types.ts';
@@ -8,7 +9,7 @@ export { deliverWelcome } from './welcome-workflow.ts';
 export function welcomeStore(db: DB): WelcomeStore {
   return {
     async reserve(input) {
-      const createdAt = new Date().toISOString();
+      const createdAt = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString();
       const code = `WELCOME15-${crypto.randomUUID().replace(/-/g, '').slice(0, 16).toUpperCase()}`;
       const { data, error } = await db.from('app_welcome_vouchers').insert({
         user_id: input.test ? TEST_USER_ID : input.userId, email: input.test ? TEST_EMAIL : input.email,
@@ -48,10 +49,11 @@ export const providers = {
     const response = await fetch(url, { headers: { 'X-DS-API-KEY': key, Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
     const body = await response.json().catch(() => null);
     const data = body?.data;
+    const coupon = body?.coupon ?? data?.coupon ?? data?.voucher;
     // Read-only reconciliation: only positively identified provider records can advance delivery.
-    const confirmed = response.ok && body?.result === 'success' && (data?.code === row.voucher_code || data?.voucher?.code === row.voucher_code || data?.coupon?.code === row.voucher_code);
+    const confirmed = response.ok && body?.result === 'success' && (coupon?.code === row.voucher_code || data?.code === row.voucher_code);
     return { confirmed, reason: confirmed ? 'voucher_found' : body?.result === 'error' ? 'provider_lookup_rejected' : 'provider_lookup_unconfirmed',
-      ...(!confirmed ? { diagnostic: { http_status: response.status, success_result: body?.result === 'success', coupon_present: data?.coupon != null, coupon_type: typeof data?.coupon, coupon_keys: data?.coupon && typeof data.coupon === 'object' ? Object.keys(data.coupon).filter(k => /^[a-z_]{1,40}$/.test(k)) : [] } } : {}) };
+      ...(!confirmed ? { diagnostic: { http_status: response.status, success_result: body?.result === 'success', coupon_present: coupon != null } } : {}) };
   },
   async voucher(row: WelcomeRow): Promise<ProviderResult> {
     const key = Deno.env.get('DIGISTORE24_API_KEY');
@@ -63,8 +65,7 @@ export const providers = {
     const text = await response.text();
     let body: { result?: string; data?: { code?: string } } | null = null;
     try { body = JSON.parse(text); } catch { /* Never log raw provider data or credentials. */ }
-    const ok = response.ok && body?.result === 'success';
-    return { ok, status: response.status, uncertain: !ok && (response.status >= 500 || response.ok) };
+    return voucherResponse(response.status, body, row.voucher_code);
   },
   async mail(row: WelcomeRow): Promise<ProviderResult> {
     const result = await brevoFetch('/smtp/email', { method: 'POST', logErrors: false, body: {

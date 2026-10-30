@@ -9,7 +9,7 @@ export const VOUCHER_DAYS = 3;
 export function voucherFields(code: string, createdAt: string, expiresAt: string) {
   return new URLSearchParams({
     'data[code]': code, 'data[product_ids]': '346007,575565',
-    'data[valid_from]': createdAt, 'data[expires_at]': expiresAt,
+    'data[valid_from]': new Date(createdAt).toISOString().replace(/\.\d{3}Z$/, '+00:00'), 'data[expires_at]': new Date(expiresAt).toISOString().replace(/\.\d{3}Z$/, '+00:00'),
     'data[first_rate]': '15', 'data[other_rates]': '0',
     'data[is_count_limited]': 'Y', 'data[count_left]': '1', 'data[upgrade_policy]': 'not_valid',
   });

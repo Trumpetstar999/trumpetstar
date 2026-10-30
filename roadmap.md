@@ -1,4 +1,6 @@
 # Tasks
+- [x] Correct welcome provider response parsing against official Swagger: identified data.discount_code_id/code creation response, top-level coupon lookup, whole-second ISO dates; no second code generated.
+- [ ] Recheck existing welcome test using corrected provider lookup; blocked on active signed-in admin session (requester has no matching auth account for automatic session minting). Do not reset uncertain ledger without provider evidence.
 - [x] Implement one-time multilingual welcome vouchers in authenticated brevo-sync-contact; private schema applied, deployed, 33 rule/regression checks passed, admin-only singleton test documented.
 - [ ] Welcome voucher live acceptance: admin E2E reached DigiStore24 but returned an unconfirmed createVoucher result; ledger locked at voucher_uncertain, repeat created no new send. Requires provider reconciliation of reserved test code; Brevo delivery and redemption not verified. All required named secrets are configured.
 - [x] October 30 connection diagnostics: Provider API valid; deployed receiver returns exact 200 OK for signed connection_test and 401 unsigned; 29 checkout/security tests passed. Today’s 7 provider purchases include no Basic/Pro order; no new purchase IPN received.

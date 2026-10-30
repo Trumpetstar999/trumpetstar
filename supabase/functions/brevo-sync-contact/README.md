@@ -43,3 +43,9 @@ No new secret names are introduced. Provider permissions and verified sender sti
 - Deployed unauthenticated test returned 401. Authenticated admin test reached Digistore24; HTTP 200 did not contain the expected `result: success`, so the ledger is `voucher_uncertain`. A repeat kept the same row/status and did not send a mail.
 - Admin-only read-only lookup (`inspect_test_voucher: true`) returned a successful provider envelope, but no positively identified coupon record. The test voucher creation and Brevo send are **not verified**. No success is claimed and uncertain state is not reset.
 - Required named secrets are already configured. The remaining blocker is the provider createVoucher response/permission reconciliation, not an identified missing secret. Check the reserved code in Digistore24 before any retry. Inbox delivery and actual redemption still need verification.
+
+## Follow-up correction
+
+The current official reference at https://digistore24.com/api/docs/index.html (schemas `paths/createVoucher.yaml` and `paths/getVoucher.yaml`) documents `data.discount_code_id` plus `data.code` for creation and a top-level `coupon` for lookup. The implementation now accepts an identified creation result for the exact reserved code even without `result`, and reads the top-level coupon. Legacy form-urlencoded fields remain exactly as requested. Provider dates use documented ISO 8601 whole seconds with explicit `+00:00`, with new reservations also rounded to seconds to keep the 72-hour interval exact.
+
+The earlier uncertain test reservation has not been reset. A fresh authenticated admin lookup is required; no active requester session was available for this follow-up, and automatic session minting could not match the requesting user's account. Sign in in the preview before rerunning `inspect_test_voucher: true`. The corrected code has unit coverage, but this is not a claim of a successful provider send.
