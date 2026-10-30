@@ -2,6 +2,14 @@
 
 `brevo-sync-contact` keeps existing contact synchronization. An authenticated `source: "app_user"` request uses the verified auth user's email, not the supplied email. The first reservation permanently captures the client language (`de`, `en`, `es`, `sl`, otherwise `de`) and first name. Existing app users changing language are eligible if they have no previous reservation; no bulk backfill runs.
 
+## Current offer
+
+New reservations use `WELCOME25-` codes with exactly 25% on the first payment; later rates remain 0%, upgrades excluded, one redemption, exactly 72 hours. All DE/EN/ES/SL subjects and messages reflect 25%. Existing sent production records are not changed or deleted. Existing unsent legacy reservations require reconciliation before delivery; never send a 25% mail against an old 15% voucher or create another voucher blindly.
+
+### 25% deployment verification (2026-10-30)
+
+39 checks passed (21 welcome rules/retries and 18 payment-security checks). Function redeployed. Protected `test_welcome` and `inspect_test_voucher` requests returned 401 because no usable preview admin session was injected; automatic self-session minting also had no matching auth user. Database still has exactly one singleton test row, `voucher_uncertain`, without a Brevo message ID. No ledger was reset, no production records changed, and no new voucher or mail was created in this run. Live 25% voucher values, Brevo delivery and successful live retry remain unverified. The existing legacy test requires provider reconciliation, not a second voucher.
+
 ## One-time admin E2E test
 
 While signed in as a database-backed admin, invoke the existing function through the app's managed client:
@@ -17,7 +25,7 @@ The target is always `schulterm@me.com`; request email is ignored. The singleton
 ## Verification
 
 1. Cloud database: inspect `app_welcome_vouchers WHERE is_test=true`; expect `sent`, one code, exact creation + 72-hour expiry, `brevo_message_id`, and `sent_at`. Anon/authenticated clients cannot read or write this ledger.
-2. Digistore24 account: find the stored code, confirm products `346007,575565`, first rate `15`, other rates `0`, upgrade policy `not_valid`, count limit `Y`, count left `1`, and timestamps. Check checkout prefill without completing a purchase. The documented parameter is `voucher`, as requested: https://help.digistore24.com/hc/en-us/articles/23640618463633-Pre-fill-order-form-with-GET-parameters .
+2. Digistore24 account: find the stored code, confirm products `346007,575565`, first rate `25`, other rates `0`, upgrade policy `not_valid`, count limit `Y`, count left `1`, and timestamps. Check checkout prefill without completing a purchase. The documented parameter is `voucher`, as requested: https://help.digistore24.com/hc/en-us/articles/23640618463633-Pre-fill-order-form-with-GET-parameters .
 3. Brevo transactional log: find `brevo_message_id`, verify recipient, sender `Trumpetstar GmbH <info@trumpetstar.com>`, language and delivery status. `sent` means Brevo accepted the send, not inbox receipt; confirm inbox separately.
 4. Repeat the request; verify row count, voucher count and mail count remain one.
 

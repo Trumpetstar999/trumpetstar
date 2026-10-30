@@ -2,6 +2,8 @@ import type { WelcomeStore, ProviderResult } from './welcome-types.ts';
 export async function deliverWelcome(store: WelcomeStore, input: Parameters<WelcomeStore['reserve']>[0], api: { voucher(row: import('./welcome-types.ts').WelcomeRow): Promise<ProviderResult>; mail(row: import('./welcome-types.ts').WelcomeRow): Promise<ProviderResult> }) {
   const row = await store.reserve(input);
   if (row.status === 'sent') return { status: 'sent', alreadySent: true };
+  // Existing offers must be reconciled at the provider, never relabeled by a mail retry.
+  if (!row.voucher_code.startsWith('WELCOME25-')) return { status: 'legacy_offer_reconciliation_required' };
   if (new Date(row.expires_at).getTime() <= Date.now()) {
     if (['pending', 'voucher_failed', 'voucher_created', 'mail_failed'].includes(row.status)) await store.update(row.id, { status: 'expired' });
     return { status: row.status.includes('uncertain') ? row.status : 'expired' };

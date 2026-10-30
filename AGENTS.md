@@ -1,5 +1,5 @@
 # Architecture rules
-- Keep app welcome delivery in the authenticated contact-sync function with a service-only unique user/email ledger and atomic stage claims; stop ambiguous provider outcomes for reconciliation to prevent duplicate vouchers or mail, and isolate the singleton admin test from production identities.
+- Keep app welcome delivery in the authenticated contact-sync function with a service-only unique user/email ledger and atomic stage claims; stop ambiguous provider outcomes and unsent legacy offers for reconciliation to prevent duplicate vouchers, mismatched discount emails or mail, and isolate the singleton admin test from production identities.
 - Request login and recovery emails through the managed auth client, never the legacy SMTP relay or privileged link generator; keep verification URLs intact and return callbacks to public auth pages.
 - Derive membership lookup identity from a verified server-side session; payment imports require a database-backed admin role, and purchase notifications must authenticate before persistence or fulfillment.
 - Verify original Digistore24 parameters with the official case-sensitive SHA-512 signature, strip credential fields before storage, keep order ownership immutable and recompute plans from active entitlements while preserving manual overrides.

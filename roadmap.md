@@ -1,4 +1,6 @@
 # Tasks
+- [x] Switch new welcome vouchers/code prefix and four localized emails to 25%, preserve sent production data, block legacy discount mismatches; 39 tests passed, function redeployed, build OK.
+- [ ] Verify 25% singleton admin test/provider values/Brevo/live idempotency: protected calls still return 401 and self-session cannot match requester; existing single test row remains voucher_uncertain with no mail ID. Needs usable chosen admin session and provider reconciliation of old test, not a second voucher.
 - [ ] October 30 12:10 requested real registration/onboarding/contact-sync/voucher/Brevo E2E: preview is signed out and automatic self-session has no matching auth account; requires the user's chosen admin account and a designated registration test identity. Preserve existing uncertain singleton voucher until provider reconciliation.
 - [x] Correct welcome provider response parsing against official Swagger: identified data.discount_code_id/code creation response, top-level coupon lookup, whole-second ISO dates; no second code generated.
 - [ ] Recheck existing welcome test using corrected provider lookup; blocked on active signed-in admin session (requester has no matching auth account for automatic session minting). Do not reset uncertain ledger without provider evidence.

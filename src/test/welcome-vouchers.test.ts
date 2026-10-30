@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { voucherResponse } from '../../supabase/functions/brevo-sync-contact/voucher-response';
 import { deliverWelcome } from '../../supabase/functions/brevo-sync-contact/welcome-workflow';
 import type { WelcomeRow, WelcomeStore } from '../../supabase/functions/brevo-sync-contact/welcome-types';
-import { voucherFields, voucherExpiry, welcomeLanguage, WELCOME_LANGUAGES, TEST_EMAIL, voucherCheckout } from '../../supabase/functions/brevo-sync-contact/welcome-content';
+import { voucherFields, voucherExpiry, welcomeLanguage, WELCOME_LANGUAGES, TEST_EMAIL, newVoucherCode, voucherCheckout } from '../../supabase/functions/brevo-sync-contact/welcome-content';
 
 const input = { userId: 'user', email: 'user@example.com', lang: 'sl' as const, firstName: 'Mario', test: false };
 function harness() {
@@ -10,7 +10,7 @@ function harness() {
   let vouchers = 0, mails = 0;
   const store: WelcomeStore = {
     async reserve(i) { row ??= { id: '1', user_id: i.userId, email: i.email, language: i.lang, first_name: i.firstName,
-      created_at: new Date().toISOString(), expires_at: voucherExpiry(new Date().toISOString()), voucher_code: 'WELCOME15-0123456789ABCDEF', status: 'pending', brevo_message_id: null }; return { ...row }; },
+      created_at: new Date().toISOString(), expires_at: voucherExpiry(new Date().toISOString()), voucher_code: 'WELCOME25-0123456789ABCDEF', status: 'pending', brevo_message_id: null }; return { ...row }; },
     async claim(r, allowed, next) { if (!row || !allowed.includes(row.status)) return false; row.status = next; return true; },
     async update(id, values) { if (row) Object.assign(row, values); },
   };
@@ -18,19 +18,22 @@ function harness() {
   return { store, api, counts: () => ({ vouchers, mails }), row: () => row };
 }
 describe('welcome voucher business rules', () => {
-  const fields = voucherFields('WELCOME15-12345678', '2026-10-30T12:00:00.000Z', '2026-11-02T12:00:00.000Z');
+  const fields = voucherFields('WELCOME25-12345678', '2026-10-30T12:00:00.000Z', '2026-11-02T12:00:00.000Z');
+  it('generates unique WELCOME25 codes', () => { const codes = Array.from({ length: 100 }, newVoucherCode); expect(codes.every(code => /^WELCOME25-[A-F0-9]{16}$/.test(code))).toBe(true); expect(new Set(codes).size).toBe(100); });
   it('restricts products exactly to Basic 346007 and Pro 575565', () => expect(fields.get('data[product_ids]')).toBe('346007,575565'));
-  it('discounts the first payment by exactly 15 percent', () => expect(fields.get('data[first_rate]')).toBe('15'));
+  it('discounts the first payment by exactly 25 percent', () => expect(fields.get('data[first_rate]')).toBe('25'));
   it('does not discount subsequent payments', () => expect(fields.get('data[other_rates]')).toBe('0'));
   it('does not discount upgrades', () => expect(fields.get('data[upgrade_policy]')).toBe('not_valid'));
   it('allows exactly one redemption', () => { expect(fields.get('data[is_count_limited]')).toBe('Y'); expect(fields.get('data[count_left]')).toBe('1'); });
   it('expires exactly three days after creation', () => expect(voucherExpiry('2026-10-30T12:00:00.000Z')).toBe('2026-11-02T12:00:00.000Z'));
   it('supports exactly the existing four onboarding languages with German fallback', () => { expect(WELCOME_LANGUAGES).toEqual(['de', 'en', 'es', 'sl']); for (const lang of WELCOME_LANGUAGES) expect(welcomeLanguage(lang)).toBe(lang); expect(welcomeLanguage('fr')).toBe('de'); expect(welcomeLanguage(undefined)).toBe('de'); });
-  it('uses documented voucher checkout parameter', () => expect(voucherCheckout('346007', 'WELCOME15-12345678')).toBe('https://www.digistore24.com/product/346007?voucher=WELCOME15-12345678'));
+  it('uses documented voucher checkout parameter', () => expect(voucherCheckout('346007', 'WELCOME25-12345678')).toBe('https://www.digistore24.com/product/346007?voucher=WELCOME25-12345678'));
   it('fixes the test recipient', () => expect(TEST_EMAIL).toBe('schulterm@me.com'));
 });
 describe('welcome delivery idempotency', () => {
-  it('recognizes the documented createVoucher response only for the reserved code', () => { expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'WELCOME15-12345678' } }, 'WELCOME15-12345678').ok).toBe(true); expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'DIFFERENT' } }, 'WELCOME15-12345678').ok).toBe(false); });
+  it('does not change sent legacy production records or send again', async () => { const h = harness(); await h.store.reserve(input); await h.store.update('1', { voucher_code: 'WELCOME15-OLD', status: 'sent' }); expect(await deliverWelcome(h.store, input, h.api)).toEqual({ status: 'sent', alreadySent: true }); expect(h.row()?.voucher_code).toBe('WELCOME15-OLD'); expect(h.counts()).toEqual({ vouchers: 0, mails: 0 }); });
+  it('blocks a 25 percent mail for an unreconciled legacy voucher', async () => { const h = harness(); await h.store.reserve(input); await h.store.update('1', { voucher_code: 'WELCOME15-OLD', status: 'voucher_created' }); expect(await deliverWelcome(h.store, input, h.api)).toEqual({ status: 'legacy_offer_reconciliation_required' }); expect(h.counts()).toEqual({ vouchers: 0, mails: 0 }); });
+  it('recognizes the documented createVoucher response only for the reserved code', () => { expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'WELCOME25-12345678' } }, 'WELCOME25-12345678').ok).toBe(true); expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'DIFFERENT' } }, 'WELCOME25-12345678').ok).toBe(false); });
   it('treats HTTP 200 explicit provider rejection as failed, not accepted or ambiguous', () => { expect(voucherResponse(200, { result: 'error' })).toMatchObject({ ok: false, uncertain: false }); expect(voucherResponse(200, { result: 'success' })).toMatchObject({ ok: true }); });
   it('keeps malformed or missing provider acknowledgement ambiguous', () => expect(voucherResponse(200, null)).toMatchObject({ ok: false, uncertain: true }));
   it('sends only once when called twice', async () => { const h = harness(); await deliverWelcome(h.store, input, h.api); await deliverWelcome(h.store, input, h.api); expect(h.counts()).toEqual({ vouchers: 1, mails: 1 }); expect(h.row()?.status).toBe('sent'); });
