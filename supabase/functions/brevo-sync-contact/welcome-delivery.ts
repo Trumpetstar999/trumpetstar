@@ -9,7 +9,7 @@ export { deliverWelcome } from './welcome-workflow.ts';
 export function welcomeStore(db: DB): WelcomeStore {
   return {
     async reserve(input) {
-      const createdAt = new Date().toISOString();
+      const createdAt = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString();
       const code = `WELCOME15-${crypto.randomUUID().replace(/-/g, '').slice(0, 16).toUpperCase()}`;
       const { data, error } = await db.from('app_welcome_vouchers').insert({
         user_id: input.test ? TEST_USER_ID : input.userId, email: input.test ? TEST_EMAIL : input.email,
@@ -65,7 +65,7 @@ export const providers = {
     const text = await response.text();
     let body: { result?: string; data?: { code?: string } } | null = null;
     try { body = JSON.parse(text); } catch { /* Never log raw provider data or credentials. */ }
-    return voucherResponse(response.status, body);
+    return voucherResponse(response.status, body, row.voucher_code);
   },
   async mail(row: WelcomeRow): Promise<ProviderResult> {
     const result = await brevoFetch('/smtp/email', { method: 'POST', logErrors: false, body: {

@@ -30,6 +30,7 @@ describe('welcome voucher business rules', () => {
   it('fixes the test recipient', () => expect(TEST_EMAIL).toBe('schulterm@me.com'));
 });
 describe('welcome delivery idempotency', () => {
+  it('recognizes the documented createVoucher response only for the reserved code', () => { expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'WELCOME15-12345678' } }, 'WELCOME15-12345678').ok).toBe(true); expect(voucherResponse(200, { data: { discount_code_id: 123, code: 'DIFFERENT' } }, 'WELCOME15-12345678').ok).toBe(false); });
   it('treats HTTP 200 explicit provider rejection as failed, not accepted or ambiguous', () => { expect(voucherResponse(200, { result: 'error' })).toMatchObject({ ok: false, uncertain: false }); expect(voucherResponse(200, { result: 'success' })).toMatchObject({ ok: true }); });
   it('keeps malformed or missing provider acknowledgement ambiguous', () => expect(voucherResponse(200, null)).toMatchObject({ ok: false, uncertain: true }));
   it('sends only once when called twice', async () => { const h = harness(); await deliverWelcome(h.store, input, h.api); await deliverWelcome(h.store, input, h.api); expect(h.counts()).toEqual({ vouchers: 1, mails: 1 }); expect(h.row()?.status).toBe('sent'); });
