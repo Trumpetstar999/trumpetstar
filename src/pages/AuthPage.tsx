@@ -14,6 +14,7 @@ import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import { shouldRouteToRecovery } from '@/lib/recovery';
+import { requestAuthEmail } from '@/lib/auth-email';
 const VIMEO_HLS_URL = 'https://player.vimeo.com/external/1182895999.m3u8?s=79486abc8212f3e32ae79db02772c8c750c1f891&logging=false';
 
 export default function AuthPage() {
@@ -108,13 +109,8 @@ export default function AuthPage() {
     }
     setIsLoading(true);
     try {
-      const browserLang = navigator.language?.substring(0, 2) || 'de';
-      const locale = ['de', 'en', 'es'].includes(browserLang) ? browserLang : 'de';
-      const { data, error } = await supabase.functions.invoke('send-magic-link', {
-        body: { email: email.trim().toLowerCase(), locale, redirectTo: `${window.location.origin}/app` },
-      });
+      const { error } = await requestAuthEmail(supabase, email, window.location.origin, 'magiclink');
       if (error) throw error;
-      if (data?.error) throw new Error(data.error);
       setMagicLinkSent(true);
       toast({ title: t('auth.magicLinkSentToast'), description: t('auth.magicLinkSentToastDesc') });
     } catch (error) {
@@ -183,8 +179,7 @@ export default function AuthPage() {
     if (!email) { setLoginError(t('auth.emailRequiredDesc')); return; }
     setIsLoading(true);
     try {
-      const origin = window.location.hostname === 'localhost' ? 'https://www.trumpetstar.app' : window.location.origin;
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), { redirectTo: `${origin}/reset-password` });
+      const { error } = await requestAuthEmail(supabase, email, window.location.origin, 'recovery');
       if (error) throw error;
       setForgotPasswordSent(true);
       toast({ title: t('auth.forgotPassword'), description: t('auth.recoverySent') });
