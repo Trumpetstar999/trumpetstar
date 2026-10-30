@@ -1,6 +1,6 @@
 import { adminClient } from '../_shared/brevo-auth.ts';
 import { brevoFetch } from '../_shared/brevo.ts';
-import { TEST_EMAIL, TEST_USER_ID, voucherExpiry, voucherFields, welcomeEmail, type WelcomeLanguage } from './welcome-content.ts';
+import { TEST_EMAIL, TEST_USER_ID, newVoucherCode, voucherExpiry, voucherFields, welcomeEmail, type WelcomeLanguage } from './welcome-content.ts';
 import { voucherResponse } from './voucher-response.ts';
 
 type DB = ReturnType<typeof adminClient>;
@@ -10,7 +10,7 @@ export function welcomeStore(db: DB): WelcomeStore {
   return {
     async reserve(input) {
       const createdAt = new Date(Math.floor(Date.now() / 1000) * 1000).toISOString();
-      const code = `WELCOME15-${crypto.randomUUID().replace(/-/g, '').slice(0, 16).toUpperCase()}`;
+      const code = newVoucherCode();
       const { data, error } = await db.from('app_welcome_vouchers').insert({
         user_id: input.test ? TEST_USER_ID : input.userId, email: input.test ? TEST_EMAIL : input.email,
         language: input.lang, first_name: input.firstName, voucher_code: code,
