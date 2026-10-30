@@ -1,4 +1,5 @@
 # Tasks
+- [ ] Implement one-time multilingual welcome vouchers in brevo-sync-contact; apply private schema, deploy, test safe admin-only delivery and document provider verification.
 - [x] October 30 connection diagnostics: Provider API valid; deployed receiver returns exact 200 OK for signed connection_test and 401 unsigned; 29 checkout/security tests passed. Today’s 7 provider purchases include no Basic/Pro order; no new purchase IPN received.
 - [ ] October 30 provider completion: Run Test connection on the new generic IPN in Digistore24, then disable only the identified old webhook; blocked on backoffice access (no documented API management method).
 - [ ] October 30 real purchase verification: Needs a new Basic/Pro purchase and its order number; verify receipt, entitlement and buyer UI without manually activating prior failed purchases.
