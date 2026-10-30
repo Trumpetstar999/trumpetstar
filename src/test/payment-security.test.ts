@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import { escapeHtml } from '../../supabase/functions/_shared/escape-html';
 import { verifyIpnSignature, parseIpnForm, isManualMembership, stripIpnCredentials } from '../../supabase/functions/_shared/digistore-security';
+import { EVENT_TYPE_MAP, entitlementTransition } from '../../supabase/functions/_shared/digistore-events';
 
 const secret = 'test-only-not-a-live-secret';
 function sign(raw: Record<string, string>) {
@@ -34,5 +35,25 @@ describe('payment authentication', () => {
   it('preserves a manually assigned plan', () => {
     expect(isManualMembership({ plan_key: 'PRO', active_product_ids: [] })).toBe(true);
     expect(isManualMembership({ plan_key: 'PRO', active_product_ids: ['575565'] })).toBe(false);
+  });
+});
+
+describe('Digistore24 entitlement events', () => {
+  it.each([
+    ['on_payment', true, 'active'],
+    ['on_rebill_resumed', true, 'active'],
+    ['on_refund', false, 'refunded'],
+    ['on_chargeback', false, 'chargeback'],
+    ['on_rebill_cancelled', false, 'cancelled'],
+    ['on_payment_missed', false, 'expired'],
+  ])('%s applies the required entitlement state', (event, active, status) => {
+    expect(entitlementTransition(EVENT_TYPE_MAP[event], null)).toEqual({ active, status, valid_until: null, cancel_at_period_end: false });
+  });
+  it('connection tests and unknown events cannot change entitlements', () => {
+    expect(entitlementTransition(EVENT_TYPE_MAP.connection_test ?? 'UNKNOWN', null)).toBeNull();
+    expect(entitlementTransition('UNKNOWN', null)).toBeNull();
+  });
+  it('cancellation cannot grant indefinite access without a period end', () => {
+    expect(entitlementTransition('CANCELLATION', null)?.active).toBe(false);
   });
 });

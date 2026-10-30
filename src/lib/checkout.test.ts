@@ -36,5 +36,12 @@ describe('checkout safety', () => {
     expect(PLAN_INFO.BASIC.yearlyDiscount).toBe(17);
     expect(PLAN_INFO.PRO.yearlyDiscount).toBe(29);
   });
+  it('uses a six-month minimum term for both monthly paid plans', () => {
+    expect(PLAN_INFO.BASIC.minimumTermMonths).toBe(6);
+    expect(PLAN_INFO.PRO.minimumTermMonths).toBe(6);
+  });
+  it('starts Pro monthly at one euro', () => {
+    expect(PLAN_INFO.PRO.introductoryPrice).toBe(1);
+  });
   it('keeps the guarantee at 30 days', () => expect(GUARANTEE_DAYS).toBe(30));
 });
