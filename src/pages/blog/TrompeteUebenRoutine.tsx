@@ -152,7 +152,7 @@ export default function TrompeteUebenRoutine() {
           <h3 className="text-2xl font-bold text-white mb-2">{t('seo_uebenRoutine.cta.title')}</h3>
           <p className="text-white/60 mb-6 text-sm">{t('seo_uebenRoutine.cta.subtitle')}</p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-            <Link to="/auth">{t('seo_uebenRoutine.cta.button')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
+            <Link to="/signup">{t('seo_uebenRoutine.cta.button')} <ArrowRight className="ml-2 w-4 h-4" /></Link>
           </Button>
         </AnimatedSection>
 

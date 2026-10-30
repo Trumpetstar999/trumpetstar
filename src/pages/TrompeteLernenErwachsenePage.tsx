@@ -71,7 +71,7 @@ export default function TrompeteLernenErwachsenePage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">{t('seo_erwachsene.hero.cta')}</Link>
+                <Link to="/signup">{t('seo_erwachsene.hero.cta')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
                 <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>
@@ -247,7 +247,7 @@ export default function TrompeteLernenErwachsenePage() {
           <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_erwachsene.cta.subtitle')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">{t('seo_erwachsene.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/signup">{t('seo_erwachsene.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <a href="https://event.webinarjam.com/8mqw0/login/4k9oxcx0aksws6s4" target="_blank" rel="noopener noreferrer">Gratis-Webinar ansehen</a>

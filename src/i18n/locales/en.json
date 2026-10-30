@@ -656,7 +656,8 @@
     "promoFirstMonth": "🎉 First month only €1",
     "compareTitle": "Feature Comparison",
     "compareFeature": "Feature",
-    "guarantee": "30-day money-back guarantee"
+    "guarantee": "30-day money-back guarantee",
+    "toApp": "Go to app"
   },
   "layout": {
     "nav": {

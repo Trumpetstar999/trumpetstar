@@ -69,7 +69,7 @@ export default function TrompeteLernenKinderPage() {
           <AnimatedSection direction="up" delay={300}>
             <div className="flex flex-wrap justify-center gap-4">
               <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-                <Link to="/auth">{t('seo_kinder.hero.cta')}</Link>
+                <Link to="/signup">{t('seo_kinder.hero.cta')}</Link>
               </Button>
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
                 <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
@@ -271,7 +271,7 @@ export default function TrompeteLernenKinderPage() {
           <p className="text-white/70 mb-6 max-w-xl mx-auto">{t('seo_kinder.cta.subtitle')}</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
-              <Link to="/auth">{t('seo_kinder.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/signup">{t('seo_kinder.cta.button')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
               <a href="mailto:valentin@trumpetstar.com?subject=Kostenlose%20Beratung&body=Ich%20m%C3%B6chte%20eine%20Beratung%20-%20Der%20Eltern-Guide.">Kostenlose Beratung</a>
