@@ -1,4 +1,5 @@
 import { escapeHtml } from './escape-html.ts';
+import { deliverPurchaseWelcomeOnce } from './purchase-replay.ts';
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || '';
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -8,6 +9,7 @@ export interface WelcomeMailParams {
   locale: string;
   appBaseUrl: string;
   productName: string;
+  orderId?: string;
 }
 
 /**
@@ -19,13 +21,16 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
   const firstName = escapeHtml(params.firstName);
   const productName = escapeHtml(params.productName);
 
+  let magicLink = escapeHtml(`${appBaseUrl}/auth`);
+  if (!params.orderId) {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email,
     options: { redirectTo: `${appBaseUrl}/app` },
   });
   if (linkError) throw linkError;
-  const magicLink = escapeHtml(linkData.properties.action_link);
+  magicLink = escapeHtml(linkData.properties.action_link);
+  }
 
   const texts: Record<string, { subject: string; hello: string; intro: string; cta: string; note: string }> = {
     de: {
@@ -58,6 +63,15 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
     },
   };
   const t = texts[locale] || texts.de;
+  if (params.orderId) {
+    const notes: Record<string, string> = {
+      de: 'Melde dich mit deiner E-Mail-Adresse an. Einen Login-Link kannst du auf der Anmeldeseite anfordern.',
+      en: 'Sign in with your email address. You can request a login link on the sign-in page.',
+      es: 'Inicia sesión con tu correo electrónico. Puedes solicitar un enlace en la página de acceso.',
+      sl: 'Prijavi se s svojim e-naslovom. Povezavo za prijavo lahko zahtevaš na strani za prijavo.',
+    };
+    t.note = notes[locale] || notes.de;
+  }
 
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
@@ -70,6 +84,37 @@ export async function sendWelcomeMail(admin: any, params: WelcomeMailParams): Pr
       <hr style="border:none;border-top:1px solid #e2e8f0;margin:30px 0;">
       <p style="color:#94a3b8;font-size:12px;">Trumpetstar | Deine Online-Trompetenschule</p>
     </div>`;
+
+  // Purchase delivery is atomically claimed per order, with one provider attempt and no fallback.
+  if (params.orderId) {
+    const result = await deliverPurchaseWelcomeOnce(async () => {
+      const { error } = await admin.from('purchase_welcome_deliveries').insert({ order_id: params.orderId });
+      if (error?.code === '23505') return false;
+      if (error) throw new Error('Purchase mail claim failed');
+      return true;
+    }, async () => {
+      const lk = Deno.env.get('LOVABLE_API_KEY');
+      const bk = Deno.env.get('BREVO_API_KEY');
+      if (!lk || !bk) throw new Error('Purchase mail provider not configured');
+      const res = await fetch('https://connector-gateway.lovable.dev/brevo/smtp/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${lk}`, 'X-Connection-Api-Key': bk },
+        body: JSON.stringify({ sender: { name: 'Trumpetstar GmbH', email: 'info@trumpetstar.com' }, to: [{ email }], subject: t.subject, htmlContent: html }),
+      });
+      if (!res.ok) throw new Error('Purchase mail provider rejected delivery');
+      const response = await res.json();
+      if (!response.messageId) throw new Error('Purchase mail outcome unknown');
+      const { data: log, error: logError } = await admin.from('email_log').insert({ recipient_email: email, subject: t.subject, status: 'sent', sent_at: new Date().toISOString() }).select('id').single();
+      if (logError) throw new Error('Purchase mail accepted but log failed');
+      const { error } = await admin.from('purchase_welcome_deliveries').update({ email_log_id: log.id }).eq('order_id', params.orderId);
+      if (error) throw new Error('Purchase mail accepted but ledger failed');
+    }, async status => {
+      const { error } = await admin.from('purchase_welcome_deliveries').update({ status, sent_at: status === 'sent' ? new Date().toISOString() : null }).eq('order_id', params.orderId);
+      if (error) throw new Error('Purchase mail status persistence failed');
+    });
+    console.log(`[purchase-welcome] order ${params.orderId}: ${result}`);
+    return;
+  }
 
   // 1) House SMTP relay
   try {

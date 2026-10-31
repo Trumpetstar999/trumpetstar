@@ -2966,6 +2966,30 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_welcome_deliveries: {
+        Row: {
+          created_at: string
+          email_log_id: string | null
+          order_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email_log_id?: string | null
+          order_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email_log_id?: string | null
+          order_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       qr_codes: {
         Row: {
           audio_id: string | null
