@@ -6,7 +6,7 @@ import { WELCOME_LANGUAGES } from '../../supabase/functions/brevo-sync-contact/w
 const H = 3600000;
 const NOW = Date.parse('2026-11-01T13:00:00Z');
 function harness(expiresInHours = 24, active = true, mailOk = true) {
-  const row: ReminderRow = { id: '1', email: 'u@example.com', language: 'de', first_name: 'Mario', voucher_code: 'WELCOME25-0123456789ABCDEF',
+  const row: ReminderRow & { reminder_error?: string } = { id: '1', email: 'u@example.com', language: 'de', first_name: 'Mario', voucher_code: 'WELCOME25-0123456789ABCDEF',
     expires_at: new Date(NOW + expiresInHours * H).toISOString(), status: 'sent', is_test: false, reminder_status: 'pending', reminder_attempts: 0 };
   let owner: string | null = null, mails = 0, lookups = 0;
   const store: ReminderStore = {
