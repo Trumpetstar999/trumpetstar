@@ -3,6 +3,7 @@
 - Request login and recovery emails through the managed auth client, never the legacy SMTP relay or privileged link generator; keep verification URLs intact and return callbacks to public auth pages.
 - Derive membership lookup identity from a verified server-side session; payment imports require a database-backed admin role, and purchase notifications must authenticate before persistence or fulfillment.
 - Verify original Digistore24 parameters with the official case-sensitive SHA-512 signature, strip credential fields before storage, keep order ownership immutable and recompute plans from active entitlements while preserving manual overrides.
+- Use provider transaction identity for purchase persistence and signature-independent event deduplication; claim purchase welcome mail once per order with a service-only ledger and a single provider attempt, stopping uncertain sends to prevent duplicate replay mails.
 - Keep level browsing in the LevelsPage flow, with a reusable LevelGrid for overview tiles; selecting a tile reuses existing video playback and usage checks.
 - Serve the branded share image as a static public asset referenced by absolute URLs in the sitewide head so non-JavaScript social crawlers can load it.
 - Resolve purchase destinations through the shared verified product-and-payment-plan registry; require exactly one numeric plan query and fail closed without fallbacks so billing choices cannot silently change.

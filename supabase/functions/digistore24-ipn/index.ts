@@ -4,6 +4,7 @@ import { sendWelcomeMail } from "../_shared/welcome-mail.ts";
 import { verifyIpnSignature, parseIpnForm, stripIpnCredentials } from '../_shared/digistore-security.ts';
 
 import { EVENT_TYPE_MAP, entitlementTransition } from '../_shared/digistore-events.ts';
+import { purchaseTransactionId } from '../_shared/purchase-replay.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -92,7 +93,7 @@ function generateIdempotencyKey(raw: Record<string, any>, normalized: Normalized
     normalized.order_id,
     normalized.subscription_id || 'nosub',
     normalized.product_id,
-    raw.sha_sign,
+    typeof raw.transaction_id === 'string' ? raw.transaction_id : 'legacy',
   ];
   
   return `ds24_${parts.join('_')}`;
@@ -337,6 +338,7 @@ async function processIpnEvent(
           locale: userLocale || settings.defaultLocale,
           appBaseUrl: settings.appBaseUrl,
           productName: product.name,
+          orderId: normalized.order_id,
         });
       } catch (emailError) {
         console.error('Failed to send welcome email:', emailError);
@@ -432,10 +434,10 @@ async function processIpnEvent(
         : ['CANCELLATION', 'PAYMENT_MISSED'].includes(normalized.event_type) ? 'cancelled'
         : 'completed';
 
-      await supabase
+      const { error: transactionError } = await supabase
         .from('digistore24_transactions')
         .upsert({
-          digistore_transaction_id: normalized.order_id + '_' + normalized.event_type,
+          digistore_transaction_id: purchaseTransactionId(rawPayload, normalized.order_id, normalized.event_type),
           customer_id: cust?.id || null,
           product_id: normalized.product_id,
           product_name: product.name,
@@ -446,9 +448,10 @@ async function processIpnEvent(
           refund_date: ['REFUND', 'CHARGEBACK'].includes(normalized.event_type) ? new Date().toISOString() : null,
           raw_data: rawPayload,
         }, { onConflict: 'digistore_transaction_id' });
+      if (transactionError) throw transactionError;
     } catch (custError) {
       console.error('Error writing to customers/transactions tables:', custError);
-      // Don't fail the main flow
+      throw new Error('Purchase customer/transaction persistence failed');
     }
 
     // 9. Upsert lead into CRM for PURCHASE events
