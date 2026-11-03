@@ -34,6 +34,7 @@
 ## Redesign „iPhone-Home“
 - [x] Etappe 1–3: heller Homescreen, Start ohne Login, Module eingehängt
 - [ ] Bestehende Modulinhalte auf helles Design umstellen
+- [ ] Nächster Abschnitt: Metronom und Audioplayer hell gestalten, auf Phone/Tablet testen; Audio-Engines und Zahlpläne unverändert
 - [ ] Etappe 4: Neuigkeiten-Glocke (app_updates), Profil-Sheet
 - [ ] Etappe 5: Shop-Karussell + /shop (alle Digistore24-Produkte)
 - [ ] Etappe 6–8: Grifftabelle, Rhythmus-Baukasten, Beginnerkurs & Noten-Tabelle
