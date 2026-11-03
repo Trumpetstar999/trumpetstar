@@ -109,6 +109,9 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
   const smootherRef = useRef<ExponentialSmoothing>(new ExponentialSmoothing(0.12));
   const lastNoteRef = useRef<string | null>(null);
   const startedRef = useRef(false);
+  const referenceRef = useRef(referenceA4);
+  referenceRef.current = referenceA4;
+  const lastSignalRef = useRef(0);
 
   const analyze = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
@@ -117,7 +120,8 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
     const frequency = autoCorrelate(bufferRef.current, audioContextRef.current.sampleRate);
 
     if (frequency > 0 && frequency < 2000) {
-      const data = frequencyToNote(frequency, referenceA4);
+      lastSignalRef.current = performance.now();
+      const data = frequencyToNote(frequency, referenceRef.current);
       
       if (lastNoteRef.current !== data.note) {
         smootherRef.current.reset();
@@ -127,10 +131,14 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       const smoothed = smootherRef.current.update(data.cents);
       setSmoothedCents(Math.round(smoothed));
       setPitchData(data);
+    } else if (performance.now() - lastSignalRef.current > 600) {
+      setPitchData(null);
+      setSmoothedCents(0);
+      smootherRef.current.reset();
     }
 
     rafIdRef.current = requestAnimationFrame(analyze);
-  }, [referenceA4]);
+  }, []);
 
   // -----------------------------------------------------------------------
   // Start listening – PROVEN iOS Safari unlock sequence

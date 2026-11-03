@@ -19,3 +19,4 @@
 - Import original shop covers into the app asset store and cache verified provider prices; subscription cards reuse PLAN_INFO terms and the verified checkout registry so introductory prices never hide recurring charges or select another payment plan.
 - Open the shared product purchase dialog from shop cards and carousel before external checkout; reuse PLAN_INFO, PlanTerms and the verified checkout registry for billing selection so compact previews cannot bypass complete purchase terms.
 - Keep rhythm-builder rules (bar capacity, placement, pitch assignment) in the pure tested rhythm module; beginner lessons are admin-managed rows readable only by signed-in users, so course content needs no code changes.
+- Keep all tuner entry points on the shared light TunerPopup, use VexFlow for live notation and a tested concert-to-written pitch mapping; retain the existing microphone detection and Safari unlock path.

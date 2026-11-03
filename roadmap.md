@@ -34,6 +34,7 @@
 - [x] Replace the level sidebar with a complete thumbnail tile overview and verify navigation (49 levels, selection and return checked signed in).- [x] October 30 24h welcome-voucher follow-up: migration, hourly scheduler, admin test delivered once to schulterm@me.com, second run alreadySent; first production reminder due ~Nov 1 13:14–15:14 Vienna (unobserved).
 
 ## Redesign „iPhone-Home“
+- [x] Tuner neu gestaltet: heller gemeinsamer Dialog, VexFlow-Notensystem mit B-Trompeten-/Klingend-Auswahl, Hoch/Tief/Stimmt-Anzeige, Kammerton 430–450 Hz und vier Sprachen. Mikrofonfluss mit WAV-Eingabe geprüft: B♭3 → C4, zu tief, zu hoch, Stille, Stopp; vier Regeltests bestanden. Keine Zahlplan-/Kauf-/Mail-Änderungen.
 - [x] Etappe 1–3: heller Homescreen, Start ohne Login, Module eingehängt
 - [ ] Bestehende Modulinhalte auf helles Design umstellen
 - [x] Metronom und Audioplayer hell gestaltet, vier Sprachen, goldene Wiedergabe, zugängliche Buttons; echte Metronom- und Audiowiedergabe (56 Titel nach Anmeldung), Transposition und Loop getestet, Phone/Tablet ohne seitliches Überlaufen. 18 Zugriffs-/Checkout-/Recovery-Tests bestanden; keine Laufzeitfehler, Build OK. Audio-Engines und Zahlpläne unverändert.
