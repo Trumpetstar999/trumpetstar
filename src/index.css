@@ -671,7 +671,7 @@ input[type="range"]:focus {
   --primary: 211 85% 34%;
 }
 .tuner-staff { height: 180px; }
-.tuner-staff svg { width: 100%; height: 100%; overflow: visible; }
+.tuner-staff svg { display: block; width: 100%; max-width: 100%; height: 100%; overflow: visible; }
 /* Radix menus are portalled outside the module surface. */
 body:has(.ts-light-module) [data-radix-popper-content-wrapper] {
   --popover: var(--ts-card);

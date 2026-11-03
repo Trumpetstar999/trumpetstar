@@ -43,7 +43,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label={copy.close} title={copy.close} className="text-ts-on hover:bg-ts-on/20 hover:text-ts-on"><X /></Button>
         </header>
-        <div className="px-5 pt-4 pb-5 sm:px-7">
+        <div className="min-w-0 px-5 pt-4 pb-5 sm:px-7">
           <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
             {[true, false].map(mode => <Button key={String(mode)} size="sm" variant={trumpet === mode ? 'secondary' : 'ghost'} aria-pressed={trumpet === mode} onClick={() => setTrumpet(mode)} className={trumpet === mode ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'}>{mode ? copy.instrument : copy.concert}</Button>)}
           </div>
