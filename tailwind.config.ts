@@ -14,6 +14,17 @@ export default {
     },
     extend: {
       colors: {
+        ts: {
+          sky: "hsl(var(--ts-sky))",
+          deep: "hsl(var(--ts-deep))",
+          gold: "hsl(var(--ts-gold))",
+          red: "hsl(var(--ts-red))",
+          ink: "hsl(var(--ts-ink))",
+          muted: "hsl(var(--ts-ink-muted))",
+          surface: "hsl(var(--ts-surface))",
+          card: "hsl(var(--ts-card))",
+          on: "hsl(var(--ts-on-gradient))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
