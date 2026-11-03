@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useAuth } from '@/hooks/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,7 +60,10 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
     setLoading(true); setError(false); textCache.current.clear();
     void (async () => {
       try {
-        const bytes = new Uint8Array(await (pdfBlob ? pdfBlob.arrayBuffer() : fetch(pdfBlobUrl).then(r => { if (!r.ok) throw new Error(); return r.arrayBuffer(); })));
+        let buffer: ArrayBuffer;
+        if (pdfBlob) buffer = await pdfBlob.arrayBuffer();
+        else { const response = await fetch(pdfBlobUrl); if (!response.ok) throw new Error(); buffer = await response.arrayBuffer(); }
+        const bytes = new Uint8Array(buffer);
         if (String.fromCharCode(...bytes.slice(0, 5)) !== '%PDF-') throw new Error('Invalid PDF');
         const lib = await import('pdfjs-dist'); if (cancelled) return;
         lib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -229,7 +232,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
         <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{doc && Array.from({ length: doc.numPages }, (_, i) => <PdfThumbnail key={i} doc={doc} page={i + 1} selected={i + 1 === currentPage} label={copy.page} onSelect={() => { changePage(i + 1); if (window.innerWidth < 640) setSidebar(false); }} />)}</div>
       </aside>}
       <div ref={areaRef} className="relative min-w-0 flex-1 overflow-hidden bg-muted/50">
-        <TransformWrapper ref={transformRef} minScale={0.6} maxScale={5} centerOnInit centerZoomedOut limitToBounds panning={{ excluded: tool === 'hand' ? [] : ['pdf-mark-surface'] }} wheel={{ step: 0.06 }} doubleClick={{ disabled: tool !== 'hand', mode: 'toggle', step: 1 }} onTransformed={(_, state) => setScale(state.scale)}>
+        <TransformWrapper ref={transformRef} minScale={0.6} maxScale={5} centerOnInit centerZoomedOut limitToBounds panning={{ excluded: tool === 'hand' ? [] : ['pdf-mark-surface'] }} wheel={{ step: 0.06 }} doubleClick={{ disabled: tool !== 'hand', mode: 'toggle', step: 1 }} onTransform={(_, state) => setScale(state.scale)}>
           <TransformComponent wrapperClass="pdf-zoom-viewport" contentClass="pdf-zoom-content">
             <div className="pdf-paper relative shrink-0" style={{ width: size.width * fit, height: size.height * fit }}>
               <canvas ref={canvasRef} className="block h-full w-full" aria-label={`${copy.page} ${currentPage}`} />
