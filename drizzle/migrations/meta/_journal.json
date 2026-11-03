@@ -78,6 +78,13 @@
       "when": 1793425709904,
       "tag": "0010_purchase_welcome_once",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793709067934,
+      "tag": "0011_app_updates_and_shop_products",
+      "breakpoints": true
     }
   ]
 }
