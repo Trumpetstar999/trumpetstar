@@ -1,4 +1,4 @@
-import { lazy, ReactNode, Suspense, useEffect, useState } from 'react';
+import { lazy, ReactNode, Suspense, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -57,7 +57,6 @@ export const PlaylistsModule = () => <RequireAuth><Module route="/playlists" tab
 export const FeedbackModule = () => <RequireAuth><Module route="/feedback" tab="chats"><ChatsPage /></Module></RequireAuth>;
 export const AudioModule = () => <Module route="/audio" tab="audios"><AudiosPage /></Module>;
 export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs"><PdfsPage /></Module></RequireAuth>;
-export const TunerRoute = () => <><Navigate to="/" replace state={{ openTuner: true }} /></>;
 export const TunerModulePage = () => <Module route="/tuner" surface="light"><TunerModule /></Module>;
 export const GriffModule = () => <Module route="/grifftabelle" surface="light"><ComingSoon /></Module>;
 export const ProfileModule = () => (
@@ -76,6 +75,5 @@ export function AppEntryRedirect() {
     sessionStorage.removeItem('returnTo');
     return next ?? '/';
   });
-  useEffect(() => {}, []);
   return <Navigate to={target === '/app' ? '/' : target} replace />;
 }
