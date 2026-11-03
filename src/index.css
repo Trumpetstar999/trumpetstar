@@ -656,6 +656,13 @@ input[type="range"]:focus {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+/* Audio controls must keep dark text in selected and hover states. */
+.ts-light-module.ts-audio-player {
+  --primary: 211 85% 34%;
+  --muted-foreground: 214 22% 34%;
+  --accent: 210 60% 91%;
+  --accent-foreground: var(--ts-ink);
+}
 /* Radix menus are portalled outside the module surface. */
 body:has(.ts-light-module) [data-radix-popper-content-wrapper] {
   --popover: var(--ts-card);
