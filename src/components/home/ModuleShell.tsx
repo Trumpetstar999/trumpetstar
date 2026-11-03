@@ -6,6 +6,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { TabId } from '@/types';
 import { takeZoomOrigin } from './zoomOrigin';
+import { Button } from '@/components/ui/button';
 
 /** Maps legacy in-app tab jumps to the new module routes. */
 const TAB_ROUTES: Partial<Record<TabId, string>> = {
@@ -44,7 +45,7 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient',
   return (
     <TabNavigationProvider activeTab={tab} onTabChange={onTabChange}>
       <motion.div
-        className={`ts-system-font fixed inset-0 overflow-y-auto overflow-x-hidden ${surface === 'gradient' ? 'ts-gradient' : 'bg-ts-surface text-ts-ink'}`}
+        className={`ts-system-font fixed inset-0 overflow-y-auto overflow-x-hidden ${surface === 'gradient' ? 'ts-gradient' : 'ts-light-module'}`}
         style={{ transformOrigin: '0 0' }}
         initial={initial}
         animate={{ opacity: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, borderRadius: 0 }}
@@ -53,13 +54,13 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient',
         <header className="ts-gradient sticky top-0 z-30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="mx-auto max-w-[1100px] px-4 pt-2 pb-3">
             <div className="flex items-center justify-between">
-              <button
+              <Button variant="ghost"
                 onClick={() => navigate('/')}
-                className="flex items-center min-h-11 -ml-2 pr-3 text-[17px] font-medium text-ts-on"
+                className="flex items-center min-h-11 -ml-2 pr-3 text-[17px] font-medium text-ts-on hover:bg-ts-on/10 hover:text-ts-on [&_svg]:size-7"
                 aria-label={t('home.home')}
               >
                 <ChevronLeft className="w-7 h-7" /> {t('home.home')}
-              </button>
+              </Button>
               {icon && <img src={icon} alt="" className="w-10 h-10" />}
             </div>
             <h1 className="text-[32px] font-extrabold leading-tight text-ts-on mt-1">{title}</h1>

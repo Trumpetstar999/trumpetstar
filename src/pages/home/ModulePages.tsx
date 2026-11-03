@@ -52,10 +52,10 @@ export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surfa
 export const VideosModule = () => <RequireAuth><Module route="/videos" tab="levels"><LevelsPage onStarEarned={() => {}} /></Module></RequireAuth>;
 export const RhythmusModule = () => <Module route="/rhythmus" surface="light"><ComingSoon /></Module>;
 export const GamesModule = () => <RequireAuth><Module route="/games" tab="game"><GamePage /></Module></RequireAuth>;
-export const MetronomModule = () => <Module route="/metronom" tab="metronome"><MetronomePage /></Module>;
+export const MetronomModule = () => <Module route="/metronom" tab="metronome" surface="light"><MetronomePage /></Module>;
 export const PlaylistsModule = () => <RequireAuth><Module route="/playlists" tab="practice"><PracticePage /></Module></RequireAuth>;
 export const FeedbackModule = () => <RequireAuth><Module route="/feedback" tab="chats"><ChatsPage /></Module></RequireAuth>;
-export const AudioModule = () => <Module route="/audio" tab="audios"><AudiosPage /></Module>;
+export const AudioModule = () => <Module route="/audio" tab="audios" surface="light"><AudiosPage /></Module>;
 export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs"><PdfsPage /></Module></RequireAuth>;
 export const TunerModulePage = () => <Module route="/tuner" surface="light"><TunerModule /></Module>;
 export const GriffModule = () => <Module route="/grifftabelle" surface="light"><ComingSoon /></Module>;

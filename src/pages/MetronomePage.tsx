@@ -9,6 +9,8 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Button } from '@/components/ui/button';
+import { PRACTICE_COPY } from '@/i18n/practice-tools';
 
 type Mode = 'metronome' | 'drummachine';
 
@@ -78,7 +80,8 @@ export function MetronomePage() {
 
   const metronome = useMetronomeEngine();
   const drumMachine = useDrumMachineEngine();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const copy = PRACTICE_COPY[language];
 
   const isRunning = mode === 'metronome' ? metronome.isRunning : drumMachine.isRunning;
 
@@ -185,49 +188,47 @@ export function MetronomePage() {
   const selectedBeat = beats.find(b => b.id === selectedBeatId);
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4 pb-24 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-foreground">Metronom</h1>
-        <p className="text-sm text-muted-foreground mt-1">Üben mit Klick oder Beats</p>
-      </div>
-
+    <div className="flex flex-col items-center gap-6 p-4 pb-24 max-w-lg mx-auto ts-light-module">
       {/* Mode Toggle */}
-      <div className="flex bg-muted rounded-xl p-1 w-full max-w-xs">
-        <button
+      <div className="flex bg-muted rounded-lg p-1 w-full max-w-xs">
+        <Button variant="secondary"
           onClick={() => handleModeChange('metronome')}
+          aria-pressed={mode === 'metronome'}
           className={cn(
             'flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all',
             mode === 'metronome' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          Metronom
-        </button>
-        <button
+          {copy.metronome}
+        </Button>
+        <Button variant="secondary"
           onClick={() => handleModeChange('drummachine')}
+          aria-pressed={mode === 'drummachine'}
           className={cn(
             'flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all',
             mode === 'drummachine' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          DrumMachine
-        </button>
+          {copy.drums}
+        </Button>
       </div>
 
       {/* BPM Display & Controls */}
       <div className="flex flex-col items-center gap-3">
-        <div className="text-7xl font-bold text-foreground tabular-nums tracking-tight">
+        <div className="text-7xl font-bold text-foreground tabular-nums ">
           {bpm}
         </div>
-        <span className="text-sm text-muted-foreground uppercase tracking-widest">BPM</span>
+        <span className="text-sm text-muted-foreground uppercase ">BPM</span>
         <div className="flex items-center gap-4">
-          <button
+          <Button variant="secondary"
             onClick={() => setBpm(b => Math.max(30, b - 1))}
+            aria-label={copy.decrease} title={copy.decrease}
             className="w-12 h-12 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
           >
             <Minus className="w-5 h-5" />
-          </button>
+          </Button>
           <input
+            aria-label={t('player.tempo')}
             type="range"
             min={30}
             max={240}
@@ -235,12 +236,13 @@ export function MetronomePage() {
             onChange={e => setBpm(Number(e.target.value))}
             className="w-40 accent-primary"
           />
-          <button
+          <Button variant="secondary"
             onClick={() => setBpm(b => Math.min(240, b + 1))}
+            aria-label={copy.increase} title={copy.increase}
             className="w-12 h-12 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
           >
             <Plus className="w-5 h-5" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -262,31 +264,32 @@ export function MetronomePage() {
       )}
 
       {/* Start/Stop */}
-      <button
+      <Button variant="secondary"
         onClick={handleStartStop}
+        aria-label={t(isRunning ? 'player.stop' : 'player.play')} title={t(isRunning ? 'player.stop' : 'player.play')}
         disabled={mode === 'drummachine' && !selectedBeatId}
         className={cn(
           'w-20 h-20 rounded-full flex items-center justify-center shadow-lg transition-all',
           isRunning
             ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
-            : 'bg-primary hover:bg-primary/90 text-primary-foreground',
+            : 'bg-gold hover:bg-gold/90 text-gold-foreground',
           mode === 'drummachine' && !selectedBeatId && 'opacity-50 cursor-not-allowed'
         )}
       >
-        {isRunning ? <Square className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}
-      </button>
+        {isRunning ? <Square className="!w-8 !h-8" /> : <Play className="!w-8 !h-8 ml-1" />}
+      </Button>
 
       {/* Tap Tempo */}
-      <button
+      <Button variant="secondary"
         onClick={handleTap}
         className="px-6 py-2.5 rounded-xl bg-secondary text-secondary-foreground font-medium text-sm hover:bg-secondary/80 transition-colors"
       >
         TAP
-      </button>
+      </Button>
 
       {/* Time Signature */}
       <div className="flex items-center gap-3">
-        <Label className="text-sm text-muted-foreground">Taktart:</Label>
+        <Label className="text-sm text-muted-foreground">{copy.meter}</Label>
         <Select value={String(timeSignatureTop)} onValueChange={v => setTimeSignatureTop(Number(v))}>
           <SelectTrigger className="w-16"><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -308,7 +311,7 @@ export function MetronomePage() {
 
       {/* Volume */}
       <div className="w-full max-w-xs space-y-2">
-        <Label className="text-sm text-muted-foreground">Lautstärke</Label>
+        <Label className="text-sm text-muted-foreground">{t('player.volume')}</Label>
         <Slider
           value={[volume * 100]}
           onValueChange={v => setVolume(v[0] / 100)}
@@ -322,31 +325,31 @@ export function MetronomePage() {
       {mode === 'metronome' && (
         <div className="w-full max-w-xs space-y-4 border-t border-border pt-4">
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">Sound</Label>
+            <Label className="text-sm text-muted-foreground">{copy.sound}</Label>
             <Select value={soundStyle} onValueChange={v => setSoundStyle(v as SoundStyle)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="click">Click</SelectItem>
-                <SelectItem value="woodblock">Woodblock</SelectItem>
-                <SelectItem value="beep">Beep</SelectItem>
-                <SelectItem value="rim">Rim</SelectItem>
+                <SelectItem value="click">{copy.click}</SelectItem>
+                <SelectItem value="woodblock">{copy.woodblock}</SelectItem>
+                <SelectItem value="beep">{copy.beep}</SelectItem>
+                <SelectItem value="rim">{copy.rim}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between">
-            <Label className="text-sm text-muted-foreground">Akzent auf 1</Label>
+            <Label className="text-sm text-muted-foreground">{copy.accent}</Label>
             <Switch checked={accentBeat1} onCheckedChange={setAccentBeat1} />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">Unterteilung</Label>
+            <Label className="text-sm text-muted-foreground">{copy.subdivision}</Label>
             <Select value={subdivision} onValueChange={v => setSubdivision(v as Subdivision)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="off">Aus</SelectItem>
-                <SelectItem value="8th">Achtel</SelectItem>
-                <SelectItem value="triplet">Triolen</SelectItem>
+                <SelectItem value="off">{copy.off}</SelectItem>
+                <SelectItem value="8th">{copy.eighth}</SelectItem>
+                <SelectItem value="triplet">{copy.triplet}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -356,12 +359,12 @@ export function MetronomePage() {
       {mode === 'drummachine' && (
         <div className="w-full max-w-xs space-y-4 border-t border-border pt-4">
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">Beat</Label>
+            <Label className="text-sm text-muted-foreground">{copy.beat}</Label>
             {beats.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic">Keine Beats verfügbar</p>
+              <p className="text-sm text-muted-foreground italic">{copy.noBeats}</p>
             ) : (
               <Select value={selectedBeatId || ''} onValueChange={handleBeatChange}>
-                <SelectTrigger><SelectValue placeholder="Beat wählen..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={copy.selectBeat} /></SelectTrigger>
                 <SelectContent>
                   {beats.map(beat => (
                     <SelectItem key={beat.id} value={beat.id}>
@@ -376,15 +379,15 @@ export function MetronomePage() {
           {selectedBeat && (
             <div className="text-xs text-muted-foreground bg-muted rounded-lg p-3">
               {selectedBeat.native_bpm ? (
-                <span>Original: {selectedBeat.native_bpm} BPM → Jetzt: {bpm} BPM ({Math.round((bpm / selectedBeat.native_bpm) * 100)}%)</span>
+                <span>{copy.original}: {selectedBeat.native_bpm} BPM → {copy.current}: {bpm} BPM ({Math.round((bpm / selectedBeat.native_bpm) * 100)}%)</span>
               ) : (
-                <span>Native BPM fehlt – Tempo bleibt original.</span>
+                <span>{copy.nativeMissing}</span>
               )}
             </div>
           )}
 
           {drumMachine.isLoading && (
-            <p className="text-xs text-muted-foreground text-center animate-pulse">Lade Beat...</p>
+            <p className="text-xs text-muted-foreground text-center animate-pulse">{copy.loadingBeat}</p>
           )}
         </div>
       )}
