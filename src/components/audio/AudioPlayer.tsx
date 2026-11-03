@@ -107,10 +107,10 @@ export function AudioPlayer() {
   const selectedLevel = levels.find(l => l.id === selectedLevelId);
 
   return (
-    <div className="ts-light-module flex h-full min-h-0 flex-col md:flex-row overflow-hidden">
+    <div className="ts-light-module ts-audio-player flex h-full min-h-0 flex-col md:flex-row overflow-hidden">
       <aside className="shrink-0 border-b md:border-b-0 md:border-r border-border bg-card md:w-56 md:flex md:flex-col md:min-h-0">
         <div className="flex items-center gap-2 px-4 pt-4 pb-2 text-muted-foreground">
-          <Music2 className="w-4 h-4 text-primary" /><h2 className="text-xs font-bold uppercase">{t('levels.title')}</h2>
+          <Music2 className="w-4 h-4 text-primary" /><h2 className="text-sm font-bold uppercase">{t('levels.title')}</h2>
         </div>
         <nav aria-label={t('levels.title')} className="flex md:flex-col gap-1 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden px-3 pb-3 md:flex-1 md:min-h-0">
           {isLoadingLevels ? <Loader2 className="w-5 h-5 animate-spin m-3" /> : levels.map(level => (
@@ -125,8 +125,8 @@ export function AudioPlayer() {
       <div className="flex flex-1 flex-col min-w-0 min-h-0 overflow-hidden">
         <div className="flex items-center gap-2 px-4 pt-4 pb-3 shrink-0">
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-sm truncate">{selectedLevel?.name ?? copy.chooseLevel}</h2>
-            {!isSearchMode && <p className="text-xs text-muted-foreground">{tracks.length} {copy.tracks}</p>}
+            <h2 className="font-semibold text-base break-words">{selectedLevel?.name ?? copy.chooseLevel}</h2>
+            {!isSearchMode && <p className="text-sm text-muted-foreground">{tracks.length} {copy.tracks}</p>}
           </div>
           <Button variant="secondary" size="icon" aria-label={t('common.search')} title={t('common.search')} aria-pressed={showSearch}
             onClick={() => { setShowSearch(!showSearch); setShowSettings(false); }}><Search /></Button>
@@ -135,7 +135,7 @@ export function AudioPlayer() {
         </div>
         {showSearch && <div className="px-4 pb-2 shrink-0"><Input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} aria-label={t('common.search')} placeholder={copy.searchPlaceholder} className="bg-card" /></div>}
         {showSettings && <section className="mx-4 mb-2 border-b border-border pb-3 shrink-0">
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2">{copy.transposition}</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground mb-2">{copy.transposition}</h3>
           <div className="flex flex-wrap gap-1.5">{TRANSPOSITION_OPTIONS.map(opt => (
             <Button key={opt.id} variant="secondary" size="sm" aria-pressed={player.transpositionId === opt.id}
               onClick={() => { player.setTranspositionId(opt.id); setShowSettings(false); }}
@@ -144,7 +144,7 @@ export function AudioPlayer() {
             </Button>
           ))}</div>
         </section>}
-        {isSearchMode && <p className="px-4 text-xs text-muted-foreground shrink-0">{isSearching ? t('common.loading') : t('common.resultsCount', { count: searchResults.length })}</p>}
+        {isSearchMode && <p className="px-4 text-sm text-muted-foreground shrink-0">{isSearching ? t('common.loading') : t('common.resultsCount', { count: searchResults.length })}</p>}
         <div className="flex-1 overflow-y-auto px-4 min-h-0 py-1">
           {(isSearchMode ? isSearching : isLoadingTracks) ? <div className="flex justify-center py-10"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
             : displayTracks.length === 0 ? <p className="text-muted-foreground text-sm py-8 text-center">{isSearchMode ? t('common.noResults') : copy.noTracks}</p>
@@ -156,21 +156,21 @@ export function AudioPlayer() {
                   {active && player.isPlaying ? <Play className="!size-3" /> : index + 1}
                 </span>
                 <span className="flex-1 min-w-0 break-words">{track.display_name}</span>
-                {!!track.duration_seconds && <span className="text-xs text-muted-foreground shrink-0">{formatTime(track.duration_seconds)}</span>}
+                {!!track.duration_seconds && <span className="text-sm text-muted-foreground shrink-0 tabular-nums">{formatTime(track.duration_seconds)}</span>}
               </Button>;
             })}
         </div>
         <section aria-label={t('navigation.audios')} className="shrink-0 px-4 pt-3 pb-4 border-t border-border bg-card space-y-3">
           {player.currentTrack && <div className="flex gap-2 items-center min-w-0">
             {player.isLoading && <Loader2 className="size-4 animate-spin shrink-0" />}
-            <p className="text-sm font-semibold truncate">{player.currentTrack.display_name}</p>
+            <p className="text-base font-semibold break-words">{player.currentTrack.display_name}</p>
           </div>}
           <div className="space-y-2">
             <div className="relative">
               {player.loop.enabled && player.duration > 0 && <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-gold/30 rounded-full pointer-events-none" style={{ left: `${loopStartPercent}%`, width: `${loopEndPercent - loopStartPercent}%` }} />}
               <Slider aria-label={t('player.selectTrack')} value={[player.currentTime]} min={0} max={player.duration || 1} step={0.1} disabled={!player.currentTrack || player.isLoading} onValueChange={([value]) => player.seek(value)} />
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground tabular-nums"><span>{formatTime(player.currentTime)}</span><span>{formatTime(player.duration)}</span></div>
+            <div className="flex justify-between text-sm text-muted-foreground tabular-nums"><span>{formatTime(player.currentTime)}</span><span>{formatTime(player.duration)}</span></div>
           </div>
           <div className="flex items-center justify-center gap-3 md:gap-5">
             <Button variant="secondary" size="icon" title={copy.previous} aria-label={copy.previous} disabled={currentTrackIndex <= 0} onClick={() => currentTrackIndex > 0 && player.loadTrack(tracks[currentTrackIndex - 1])} className="rounded-full"><SkipBack /></Button>
@@ -179,7 +179,7 @@ export function AudioPlayer() {
             <Button variant="secondary" size="icon" title={copy.next} aria-label={copy.next} disabled={currentTrackIndex < 0 || currentTrackIndex >= tracks.length - 1} onClick={() => currentTrackIndex >= 0 && currentTrackIndex < tracks.length - 1 && player.loadTrack(tracks[currentTrackIndex + 1])} className="rounded-full"><SkipForward /></Button>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex-1 space-y-2"><div className="flex justify-between text-xs"><span className="text-muted-foreground">{t('player.tempo')}</span><span className="font-bold text-primary tabular-nums">{player.tempo}%</span></div>
+            <div className="flex-1 space-y-2"><div className="flex justify-between text-sm"><span className="text-muted-foreground">{t('player.tempo')}</span><span className="font-bold text-primary tabular-nums">{player.tempo}%</span></div>
               <Slider aria-label={t('player.tempo')} value={[player.tempo]} min={40} max={150} step={1} onValueChange={([value]) => player.setTempo(value)} />
             </div>
             {player.tempo !== 100 && <Button variant="secondary" size="icon" aria-label={copy.resetTempo} title={copy.resetTempo} onClick={() => player.setTempo(100)}><RotateCcw /></Button>}
@@ -190,8 +190,8 @@ export function AudioPlayer() {
           {showLoop && <div className="space-y-3 pt-1">
             <div className="flex items-center justify-between"><label htmlFor="audio-loop" className="text-sm text-muted-foreground">{copy.enableLoop}</label><Switch id="audio-loop" checked={player.loop.enabled} onCheckedChange={player.toggleLoopEnabled} /></div>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="secondary" onClick={player.setLoopStartToCurrent} disabled={!player.currentTrack} className="h-auto min-h-11 flex-col gap-0 py-2"><span>{copy.loopStart}</span><span className="text-xs font-normal text-muted-foreground">{formatTime(player.loop.start)}</span></Button>
-              <Button variant="secondary" onClick={player.setLoopEndToCurrent} disabled={!player.currentTrack} className="h-auto min-h-11 flex-col gap-0 py-2"><span>{copy.loopEnd}</span><span className="text-xs font-normal text-muted-foreground">{formatTime(player.loop.end)}</span></Button>
+              <Button variant="secondary" onClick={player.setLoopStartToCurrent} disabled={!player.currentTrack} className="h-auto min-h-11 flex-col gap-0 py-2"><span>{copy.loopStart}</span><span className="text-sm font-normal text-muted-foreground">{formatTime(player.loop.start)}</span></Button>
+              <Button variant="secondary" onClick={player.setLoopEndToCurrent} disabled={!player.currentTrack} className="h-auto min-h-11 flex-col gap-0 py-2"><span>{copy.loopEnd}</span><span className="text-sm font-normal text-muted-foreground">{formatTime(player.loop.end)}</span></Button>
             </div>
           </div>}
         </section>
