@@ -42,6 +42,8 @@ export function FingeringChart() {
     const ink = cssColor('--ts-ink'), mark = cssColor('--ts-red');
     c.setFillStyle(ink); c.setStrokeStyle(ink);
     const stave = new Stave(0, 40, width - 10).addClef('treble');
+    stave.setStyle({ strokeStyle: ink, fillStyle: ink });
+    (stave as unknown as { setDefaultLedgerLineStyle?: (s: object) => void }).setDefaultLedgerLineStyle?.({ strokeStyle: ink, lineWidth: 1.4 });
     stave.setContext(c).draw();
     const notes = FINGERINGS.map((n, i) => {
       const sn = new StaveNote({ keys: [n.key], duration: 'q', auto_stem: true });
