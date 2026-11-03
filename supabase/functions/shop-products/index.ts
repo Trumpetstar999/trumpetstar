@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const list: Record<string, unknown>[] = Array.isArray(raw) ? raw : Object.values(raw);
     const now = new Date().toISOString();
 
-    const { data: existing } = await db.from('shop_products').select('id');
+    const { data: existing } = await db.from('shop_products').select('id, price');
     const known = new Set((existing ?? []).map((r) => r.id));
 
     for (const p of list) {
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       const active = String(p.is_active ?? 'Y').toUpperCase() !== 'N';
       if (known.has(id)) {
         const patch: Record<string, unknown> = { name, created_at: created, synced_at: now };
-        if (price != null) patch.price = price;
+        if (price != null && existing?.find((r) => r.id === id)?.price == null) patch.price = price;
         await db.from('shop_products').update(patch).eq('id', id);
       } else {
         await db.from('shop_products').insert({
