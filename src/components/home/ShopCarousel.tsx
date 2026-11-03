@@ -17,7 +17,7 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
   const price = formatPrice(plan ? plan.introductoryPrice ?? plan.monthlyPrice ?? null : p.price, p.currency, language);
   if (compact) {
     const content = <>
-      <span className="block aspect-square bg-ts-surface w-full">
+      <span className="block aspect-square shrink-0 bg-ts-surface w-full">
         <img src={p.image_url || '/logo_trumpetstar.png'} alt="" className="w-full h-full object-contain p-2" loading="lazy" />
       </span>
       <span className="block p-3">
@@ -25,7 +25,7 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
         <span className="block mt-2 text-base font-bold text-ts-ink tabular-nums">{price}</span>
       </span>
     </>;
-    const compactClassName = `block rounded-lg bg-ts-card p-0 overflow-hidden shadow-sm ${className}`;
+    const compactClassName = `flex flex-col items-stretch justify-start rounded-lg bg-ts-card p-0 overflow-hidden shadow-sm ${className}`;
     return <>
       <Button variant="ghost" onClick={() => setPurchaseOpen(true)} className={`${compactClassName} h-auto whitespace-normal text-left hover:bg-ts-surface`} aria-label={[p.name, price].join('. ')}>{content}</Button>
       {purchaseOpen && <ShopPurchaseDialog product={p} onClose={() => setPurchaseOpen(false)} />}
