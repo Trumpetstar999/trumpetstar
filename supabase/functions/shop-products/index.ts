@@ -1,5 +1,6 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { initialShopVisibility } from './visibility.ts';
 
 const CACHE_MS = 60 * 60 * 1000;
 
@@ -21,7 +22,10 @@ function toIso(v: unknown): string | null {
 /** Public: refreshes the product cache at most hourly; manual fields are never overwritten. */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const url = Deno.env.get('SUPABASE_URL');
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!url || !serviceKey) return json({ refreshed: false, reason: 'not_configured' }, 503);
+  const db = createClient(url, serviceKey);
 
   const { data: latest } = await db.from('shop_products').select('synced_at').order('synced_at', { ascending: false, nullsFirst: false }).limit(1).maybeSingle();
   const last = latest?.synced_at ? Date.parse(latest.synced_at) : 0;
@@ -49,7 +53,7 @@ Deno.serve(async (req) => {
       if (!name) continue;
       const price = num(p.price ?? p.amount ?? p.first_amount);
       const created = toIso(p.created_at) ?? now;
-      const active = String(p.is_active ?? 'Y').toUpperCase() !== 'N';
+      const active = initialShopVisibility(p.is_active);
       if (known.has(id)) {
         const patch: Record<string, unknown> = { name, created_at: created, synced_at: now };
         if (price != null && existing?.find((r) => r.id === id)?.price == null) patch.price = price;
@@ -57,9 +61,8 @@ Deno.serve(async (req) => {
       } else {
         await db.from('shop_products').insert({
           id, name, price, currency: String(p.currency ?? 'EUR'), created_at: created,
-          order_url: `https://www.digistore24.com/product/${id}`, visible: false, synced_at: now,
+          order_url: `https://www.digistore24.com/product/${id}`, visible: active, synced_at: now,
         });
-        void active;
       }
     }
     // Mark sync time even when nothing changed so the hourly gate holds.
