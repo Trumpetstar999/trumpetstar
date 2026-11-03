@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Accidental, Formatter, Renderer, Stave, StaveNote } from 'vexflow';
+import { Accidental, Renderer, Stave, StaveNote, TickContext } from 'vexflow';
 import type { writtenTunerNote } from '@/lib/tuner-note';
 
 export function TunerStaff({ note, label }: { note: ReturnType<typeof writtenTunerNote> | null; label: string }) {
@@ -20,7 +20,10 @@ export function TunerStaff({ note, label }: { note: ReturnType<typeof writtenTun
       const n = new StaveNote({ keys: [note.key], duration: 'w' });
       if (note.accidental) n.addModifier(new Accidental(note.accidental));
       n.setStyle({ fillStyle: ink, strokeStyle: ink });
-      Formatter.FormatAndDraw(context, stave, [n]);
+      n.setStave(stave).setContext(context);
+      new TickContext().addTickable(n).preFormat().setX(0);
+      n.setXShift(180 - n.getNoteHeadBeginX() - n.getGlyph().getWidth() / 2);
+      n.draw();
     }
     const svg = el.querySelector('svg');
     svg?.setAttribute('viewBox', '0 0 360 200');

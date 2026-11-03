@@ -27,7 +27,7 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
     try { await startListening(); } finally { handledRef.current = false; setStarting(false); }
   };
   const active = isListening && !!pitchData;
-  const note = active ? writtenTunerNote(pitchData.noteIndex, pitchData.octave, trumpet) : null;
+  const note = active ? writtenTunerNote(pitchData.noteIndex, pitchData.octave, trumpet, language) : null;
   const direction = tuningDirection(smoothedCents);
   const StatusIcon = direction === 'tuned' ? Check : direction === 'low' ? ArrowDown : ArrowUp;
   const color = !active ? 'text-muted-foreground' : direction === 'tuned' ? 'text-tuner-tuned' : 'text-destructive';
