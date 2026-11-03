@@ -18,4 +18,14 @@ describe('tuner notation and direction', () => {
     expect(tuningDirection(5)).toBe('tuned');
     expect(tuningDirection(6)).toBe('high');
   });
+  it('uses German B for Bb and H for B natural', () => {
+    expect(writtenTunerNote(10, 4, false, 'de').name).toBe('B');
+    expect(writtenTunerNote(11, 4, false, 'de').name).toBe('H');
+    expect(writtenTunerNote(9, 4, true, 'de').name).toBe('H');
+  });
+  it('localizes accidentals without changing the written pitch', () => {
+    expect(writtenTunerNote(1, 4, false, 'de')).toEqual({ name: 'Cis', octave: 4, key: 'c/4', accidental: '#' });
+    expect(writtenTunerNote(10, 4, false, 'es').name).toBe('Si♭');
+    expect(writtenTunerNote(11, 4, false, 'sl').name).toBe('H');
+  });
 });
