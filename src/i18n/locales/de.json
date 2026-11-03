@@ -785,6 +785,24 @@
     "lang": "Sprache",
     "locked": "Login nötig",
     "openTuner": "Tuner öffnen",
-    "not": "Noten"
+    "not": "Noten",
+    "newsEmpty": "Noch keine Neuigkeiten.",
+    "newsMore": "Mehr erfahren",
+    "shopNew": "Neu im Shop",
+    "shopAll": "Alle",
+    "shopBuy": "Kaufen",
+    "shopBadge": "NEU",
+    "shopEmpty": "Gerade keine Produkte verfügbar.",
+    "myRec": "Meine Aufnahmen",
+    "openProfile": "Profil öffnen",
+    "logout": "Abmelden",
+    "levelLabel": "Level",
+    "lvlBeginner": "Anfänger",
+    "lvlIntermediate": "Fortgeschritten",
+    "griffHint": "Tippe auf eine Note, um den Griff zu sehen.",
+    "griffOpen": "Leer – kein Ventil",
+    "griffPress": "Ventil {{valves}} drücken",
+    "valve": "Ventil {{n}}",
+    "playTone": "Ton abspielen"
   }
 }

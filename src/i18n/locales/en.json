@@ -785,6 +785,24 @@
     "lang": "Language",
     "locked": "Login required",
     "openTuner": "Open tuner",
-    "not": "Sheet Music"
+    "not": "Sheet Music",
+    "newsEmpty": "No news yet.",
+    "newsMore": "Learn more",
+    "shopNew": "New in the shop",
+    "shopAll": "All",
+    "shopBuy": "Buy",
+    "shopBadge": "NEW",
+    "shopEmpty": "No products available right now.",
+    "myRec": "My recordings",
+    "openProfile": "Open profile",
+    "logout": "Sign out",
+    "levelLabel": "Level",
+    "lvlBeginner": "Beginner",
+    "lvlIntermediate": "Advanced",
+    "griffHint": "Tap a note to see its fingering.",
+    "griffOpen": "Open – no valve",
+    "griffPress": "Press valve {{valves}}",
+    "valve": "Valve {{n}}",
+    "playTone": "Play tone"
   }
 }
