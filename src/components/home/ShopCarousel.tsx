@@ -7,11 +7,23 @@ import { formatPrice, isNewProduct, shopCheckoutUrl, ShopProduct } from '@/lib/s
 import { Button } from '@/components/ui/button';
 import { PLAN_INFO } from '@/types/plans';
 
-export function ShopProductCard({ p, className = '' }: { p: ShopProduct; className?: string }) {
+export function ShopProductCard({ p, className = '', compact = false }: { p: ShopProduct; className?: string; compact?: boolean }) {
   const { t, language } = useLanguage();
   const planKey = p.id === '575565' ? 'PRO' : p.id === '346007' ? 'BASIC' : null;
   const plan = planKey ? PLAN_INFO[planKey] : null;
   const orderUrl = shopCheckoutUrl(p);
+  const price = formatPrice(plan ? plan.introductoryPrice ?? plan.monthlyPrice ?? null : p.price, p.currency, language);
+  const terms = plan ? t(`pricing_table.${planKey === 'PRO' ? 'proMonthlyTerms' : 'monthlyTerms'}`, { price: plan.monthlyPrice ?? 0, intro: plan.introductoryPrice ?? 0, months: plan.minimumTermMonths ?? 6 }) : undefined;
+  if (compact) {
+    const content = <>
+      <span className="block text-sm font-bold text-ts-ink break-words">{p.name}</span>
+      <span className="block mt-2 text-base font-bold text-ts-ink tabular-nums">{price}</span>
+    </>;
+    const compactClassName = `block rounded-lg bg-ts-card p-3 shadow-sm ${className}`;
+    return orderUrl
+      ? <a href={orderUrl} target="_blank" rel="noopener noreferrer" className={`${compactClassName} hover:bg-ts-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ts-deep`} title={terms} aria-label={[p.name, price, terms].filter(Boolean).join('. ')}>{content}</a>
+      : <div className={compactClassName}>{content}</div>;
+  }
   return (
     <div className={`flex flex-col rounded-[20px] bg-ts-card overflow-hidden shadow-sm ${className}`}>
       <div className="relative aspect-square bg-ts-surface flex items-center justify-center">
@@ -68,7 +80,7 @@ export function ShopCarousel() {
         <Link to="/shop" className="text-sm font-bold text-ts-deep">{t('home.shopAll')} ›</Link>
       </div>
       <div ref={ref} onScroll={onScroll} className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-1 px-1 pb-1">
-        {products.map((p) => <ShopProductCard key={p.id} p={p} className="snap-start shrink-0 w-[42%] sm:w-[30%] md:w-[23%]" />)}
+        {products.map((p) => <ShopProductCard key={p.id} p={p} compact className="snap-start shrink-0 w-[42%] sm:w-[30%] md:w-[23%]" />)}
       </div>
       <div className="flex justify-center gap-1.5 mt-3" aria-hidden>
         {products.map((p, i) => <span key={p.id} className={`h-1.5 rounded-full transition-all ${i === index ? 'w-4 bg-ts-deep' : 'w-1.5 bg-ts-muted/40'}`} />)}
