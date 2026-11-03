@@ -680,3 +680,44 @@ body:has(.ts-light-module) [data-radix-popper-content-wrapper] {
   --accent-foreground: var(--ts-ink);
   --border: 213 30% 84%;
 }
+
+/* Apple-inspired PDF workspace: document colors stay separate from UI roles. */
+.pdf-workspace {
+  --background: 210 20% 97%;
+  --foreground: 215 25% 17%;
+  --muted: 210 14% 91%;
+  --muted-foreground: 215 12% 40%;
+  --primary: 211 85% 38%;
+  --accent: 210 55% 92%;
+  --accent-foreground: 215 25% 17%;
+  --border: 210 14% 85%;
+  --pdf-paper: hsl(0 0% 100%);
+  --pdf-paper-shadow: 0 2px 14px hsl(215 20% 20% / .16);
+  --pdf-ink-ink: hsl(215 25% 12%);
+  --pdf-ink-blue: hsl(212 90% 42%);
+  --pdf-ink-red: hsl(4 78% 47%);
+  --pdf-ink-green: hsl(148 68% 30%);
+  --pdf-ink-gold: hsl(48 100% 50%);
+  --pdf-match: hsl(48 100% 50% / .38);
+  height: 100dvh;
+}
+.pdf-topbar { min-height: calc(58px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+.pdf-footer { padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+.pdf-zoom-viewport { width: 100% !important; height: 100% !important; touch-action: none; }
+.pdf-zoom-content { min-width: 0; }
+.pdf-paper { background: var(--pdf-paper); box-shadow: var(--pdf-paper-shadow); }
+.pdf-thumbnail-paper { width: 100%; aspect-ratio: 0.707; background: var(--pdf-paper); box-shadow: var(--pdf-paper-shadow); overflow: hidden; }
+.pdf-mark-surface { touch-action: none; }
+.pdf-search-match { background: var(--pdf-match); border-radius: 2px; }
+.pdf-swatch { width: 18px; height: 18px; border-radius: 50%; display: block; }
+.pdf-swatch-ink { background: var(--pdf-ink-ink); }
+.pdf-swatch-blue { background: var(--pdf-ink-blue); }
+.pdf-swatch-red { background: var(--pdf-ink-red); }
+.pdf-swatch-green { background: var(--pdf-ink-green); }
+.pdf-swatch-gold { background: var(--pdf-ink-gold); }
+.pdf-print-frame { position: fixed; top: -10000px; left: -10000px; width: 210mm; height: 297mm; border: 0; }
+@media (max-width: 639px) {
+  .pdf-sidebar { position: absolute; inset: 0 auto 0 0; box-shadow: var(--pdf-paper-shadow); }
+  .pdf-markbar button, .pdf-footer button { width: 36px; }
+  .pdf-markbar button { min-width: 36px; }
+}
