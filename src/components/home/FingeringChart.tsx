@@ -29,6 +29,7 @@ export function FingeringChart() {
   const { t } = useLanguage();
   const host = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<number | null>(null);
+  const [xs, setXs] = useState<number[]>([]);
   const width = LEFT + FINGERINGS.length * SLOT + 20;
 
   useEffect(() => {
@@ -51,6 +52,8 @@ export function FingeringChart() {
     const voice = new Voice({ num_beats: notes.length, beat_value: 4 }).addTickables(notes);
     new Formatter().joinVoices([voice]).format([voice], width - LEFT - 30);
     voice.draw(c, stave);
+    const next = notes.map((n) => n.getAbsoluteX() + 6);
+    setXs((prev) => (prev.length === next.length && prev.every((x, i) => Math.abs(x - next[i]) < 0.5) ? prev : next));
     el.querySelector('svg')?.setAttribute('aria-hidden', 'true');
   }, [selected, width]);
 
@@ -62,10 +65,10 @@ export function FingeringChart() {
       <div className="rounded-[20px] bg-ts-card shadow-sm overflow-x-auto">
         <div className="relative" style={{ width }}>
           <div ref={host} />
-          <div className="absolute inset-0 flex" style={{ paddingLeft: LEFT }}>
+          <div className="absolute inset-0">
             {FINGERINGS.map((n, i) => (
               <button key={n.name} onClick={() => choose(i)} aria-label={n.name} aria-pressed={i === selected}
-                className="h-full flex items-end justify-center pb-1 text-[11px] font-semibold text-ts-muted" style={{ width: SLOT }}>
+                className="absolute top-0 h-full flex items-end justify-center pb-1 text-[11px] font-semibold text-ts-muted" style={{ width: SLOT - 4, left: (xs[i] ?? LEFT + i * SLOT) - (SLOT - 4) / 2 }}>
                 <span className={i === selected ? 'text-ts-red font-extrabold' : ''}>{n.name}</span>
               </button>
             ))}
