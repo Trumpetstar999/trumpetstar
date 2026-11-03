@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { isSafeShopOrderUrl, ShopProduct, sortShopProducts } from '@/lib/shop';
 
-let refreshRequested = false;
-
-/** Reads the cached shop; asks the server to refresh at most once per page load (server enforces hourly). */
+/** Each shop surface reloads after sync; the server enforces the hourly provider cache. */
 export function useShopProducts() {
   const [products, setProducts] = useState<ShopProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,12 +15,14 @@ export function useShopProducts() {
       setProducts(sortShopProducts(((data as ShopProduct[]) ?? []).filter((p) => isSafeShopOrderUrl(p.order_url))));
       setLoading(false);
     };
-    load();
-    if (!refreshRequested) {
-      refreshRequested = true;
-      supabase.functions.invoke('shop-products').then(({ data }) => { if (data?.refreshed) load(); }).catch(() => {});
-    }
-    return () => { alive = false; };
+    const refresh = async () => {
+      await supabase.functions.invoke('shop-products').catch(() => {});
+      if (alive) await load();
+    };
+    void load();
+    void refresh();
+    const timer = window.setInterval(() => { void refresh(); }, 60 * 60 * 1000);
+    return () => { alive = false; window.clearInterval(timer); };
   }, []);
 
   return { products, loading };
