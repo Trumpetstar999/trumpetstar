@@ -27,7 +27,6 @@ export function PdfInk({ marks, tool, color, width, ratio, canvasRef, onCommit, 
   const pointers = useRef(new Set<number>());
   const snapshot = useRef<ImageData | null>(null);
   const colors = useRef<Record<InkColor, string>>({ ink: '', blue: '', red: '', green: '', gold: '' });
-  const repaint = useRef(() => {});
   useEffect(() => {
     const canvas = canvasRef.current; const ctx = canvas?.getContext('2d'); if (!canvas || !ctx) return;
     let cancelled = false;
@@ -35,7 +34,6 @@ export function PdfInk({ marks, tool, color, width, ratio, canvasRef, onCommit, 
     const style = getComputedStyle(canvas);
     for (const c of Object.keys(colors.current) as InkColor[]) colors.current[c] = style.getPropertyValue(`--pdf-ink-${c}`).trim();
     const draw = () => { for (const s of marks.strokes) paintStroke(ctx, s, canvas.width, canvas.height, colors.current); };
-    repaint.current = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); draw(); };
     if (marks.imageData) {
       const img = new Image(); img.onload = () => { if (!cancelled) { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); draw(); } }; img.src = marks.imageData;
     } else draw();
@@ -57,7 +55,7 @@ export function PdfInk({ marks, tool, color, width, ratio, canvasRef, onCommit, 
     e.currentTarget.setPointerCapture(e.pointerId);
     const ctx = e.currentTarget.getContext('2d'); if (!ctx) return;
     snapshot.current = ctx.getImageData(0, 0, e.currentTarget.width, e.currentTarget.height);
-    stroke.current = { tool, color: tool === 'highlight' ? 'gold' : color, width: tool === 'highlight' ? width * 7 : tool === 'eraser' ? width * 9 : width, points: [point(e)] };
+    stroke.current = { tool, color, width: tool === 'highlight' ? width * 7 : tool === 'eraser' ? width * 9 : width, points: [point(e)] };
   };
   const move = (e: PointerEvent<HTMLCanvasElement>) => {
     const s = stroke.current; const ctx = e.currentTarget.getContext('2d'); if (!s || !ctx || pointers.current.size !== 1) return;

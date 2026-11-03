@@ -166,7 +166,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
       toast.success(copy.saved);
     } catch { toast.error(copy.saveError); } finally { setSaving(false); }
   }, [user, annotationsReady, saving, dirty, pdf.id, copy]);
-  const print = () => {
+  const print = useCallback(() => {
     const page = canvasRef.current; if (!page || loading || error) return;
     const merged = document.createElement('canvas'); merged.width = page.width; merged.height = page.height;
     const ctx = merged.getContext('2d'); if (!ctx) return;
@@ -180,7 +180,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
       if (img?.complete) run(); else img?.addEventListener('load', run, { once: true });
     };
     frame.srcdoc = buildCurrentPagePrint(merged.toDataURL('image/png'), page.width, page.height); document.body.appendChild(frame);
-  };
+  }, [loading, error, copy.print]);
   const selectHit = (index: number) => { if (!hits.length) return; const n = (index + hits.length) % hits.length; setHitIndex(n); changePage(hits[n].page); };
 
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -205,9 +205,10 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
       if (e.key === 'Escape') close();
       if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); void save(); }
       if ((e.metaKey || e.ctrlKey) && e.key === 'f') { e.preventDefault(); setSearchOpen(true); }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'p') { e.preventDefault(); print(); }
     };
     window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler);
-  }, [currentPage, changePage, close, save]);
+  }, [currentPage, changePage, close, save, print]);
 
   const fit = Math.max(0.1, Math.min((area.width - 40) / size.width, (area.height - 40) / size.height));
   const icon = (label: string, glyph: React.ReactNode, action: () => void, disabled = false, selected = false) => <Button size="icon" variant="ghost" aria-label={label} title={label} disabled={disabled} onClick={action} aria-pressed={selected || undefined} className={cn('shrink-0 text-muted-foreground', selected && 'bg-secondary text-primary')}>{glyph}</Button>;
@@ -249,7 +250,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
       <div className="flex items-center justify-center gap-1 overflow-x-auto px-2 py-1">
         {icon(copy.hand, <Hand />, () => setTool('hand'), false, tool === 'hand')}
         {icon(copy.pencil, <Pencil />, () => setTool('pencil'), !annotationsReady, tool === 'pencil')}
-        {icon(copy.highlight, <Highlighter />, () => setTool('highlight'), !annotationsReady, tool === 'highlight')}
+        {icon(copy.highlight, <Highlighter />, () => { setTool('highlight'); setColor('gold'); }, !annotationsReady, tool === 'highlight')}
         {icon(copy.signature, <Signature />, () => { setTool('signature'); setColor('ink'); setWidth(3); }, !annotationsReady, tool === 'signature')}
         {icon(copy.eraser, <Eraser />, () => setTool('eraser'), !annotationsReady, tool === 'eraser')}
         <span className="mx-1 h-6 w-px shrink-0 bg-border" />
@@ -259,7 +260,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
         {icon(saving ? copy.saving : copy.save, saving ? <Loader2 className="animate-spin" /> : dirty.size ? <Save /> : <Check />, () => void save(), !dirty.size || saving)}
       </div>
       {tool !== 'hand' && <div className="flex items-center justify-center gap-3 border-t border-border/60 px-3 py-1">
-        <div role="group" aria-label={copy.colors} className="flex gap-1">{(['ink', 'blue', 'red', 'green', 'gold'] as InkColor[]).map(c => <Button key={c} variant="ghost" size="icon" className="h-9 w-9" title={copy[c]} aria-label={copy[c]} aria-pressed={color === c} onClick={() => { setColor(c); if (tool === 'highlight') setTool('pencil'); }}><span className={cn('pdf-swatch', `pdf-swatch-${c}`, color === c && 'ring-2 ring-primary ring-offset-2 ring-offset-card')} /></Button>)}</div>
+        <div role="group" aria-label={copy.colors} className="flex gap-1">{(['ink', 'blue', 'red', 'green', 'gold'] as InkColor[]).map(c => <Button key={c} variant="ghost" size="icon" className="h-9 w-9" title={copy[c]} aria-label={copy[c]} aria-pressed={color === c} onClick={() => setColor(c)}><span className={cn('pdf-swatch', `pdf-swatch-${c}`, color === c && 'ring-2 ring-primary ring-offset-2 ring-offset-card')} /></Button>)}</div>
         <Slider aria-label={copy.width} value={[width]} min={2} max={12} step={1} onValueChange={([value]) => setWidth(value)} className="w-24" />
       </div>}
     </div>
