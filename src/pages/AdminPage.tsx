@@ -1,3 +1,4 @@
+import { AdminHomeContentManager } from '@/components/admin/AdminHomeContentManager';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -41,7 +42,7 @@ import { toast } from 'sonner';
 import '@/styles/admin.css';
 
 type View = 'levels' | 'sections' | 'videos';
-type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'qrcodes' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'system';
+type AdminTab = 'dashboard' | 'users' | 'leads' | 'marketing' | 'seo' | 'mailbox' | 'knowledge' | 'shipping' | 'invoices' | 'inbox' | 'levels' | 'pdfs' | 'musicxml' | 'products' | 'digistore24' | 'beats' | 'audioplayer' | 'qrcodes' | 'assistant' | 'classrooms' | 'feedback' | 'features' | 'emails' | 'reviews' | 'homecontent' | 'system';
 type AssistantSubTab = 'content' | 'repertoire' | 'feedback';
 type PdfSubTab = 'documents' | 'audio';
 
@@ -168,6 +169,7 @@ export default function AdminPage() {
       case 'inbox': return 'Postfach';
       case 'emails': return 'E-Mail Templates';
       case 'reviews': return 'Google Reviews';
+      case 'homecontent': return 'Neuigkeiten & Shop';
       case 'system': return 'Systemstatus';
       default: return 'Admin';
     }
@@ -198,6 +200,7 @@ export default function AdminPage() {
       case 'inbox': return 'Eingehende E-Mails und Valentin\'s AI-Entwürfe';
       case 'emails': return 'E-Mail-Vorlagen bearbeiten und verwalten';
       case 'reviews': return 'Google Review Link und Prompt-Regeln konfigurieren';
+      case 'homecontent': return 'Neuigkeiten-Glocke und Shop-Karussell der Startseite';
       case 'system': return 'Systemstatus und Einstellungen';
       default: return '';
     }
@@ -489,6 +492,7 @@ export default function AdminPage() {
           {activeTab === 'features' && <FeatureFlagManager />}
           {activeTab === 'emails' && <EmailTemplateManager />}
           {activeTab === 'reviews' && <ReviewSettingsManager />}
+          {activeTab === 'homecontent' && <AdminHomeContentManager />}
           {activeTab === 'system' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Status Cards */}

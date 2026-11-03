@@ -24,7 +24,8 @@ import {
   Truck,
   Receipt,
   Headphones,
-  QrCode
+  QrCode,
+  Bell
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,6 +59,7 @@ const menuItems = [
   { id: 'feedback', label: 'Feedback & Chats', icon: MessageSquare },
   { id: 'emails', label: 'E-Mail Templates', icon: Mail },
   { id: 'reviews', label: 'Google Reviews', icon: Star },
+  { id: 'homecontent', label: 'Neuigkeiten & Shop', icon: Bell },
   { id: 'features', label: 'Feature Flags', icon: ToggleRight },
   { id: 'system', label: 'Einstellungen', icon: Settings },
 ];
