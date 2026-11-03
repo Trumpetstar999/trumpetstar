@@ -1,156 +1,89 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Volume2, VolumeX } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { ArrowDown, ArrowUp, Check, Mic, MicOff, X, Minus, Plus } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { usePitchDetection } from '@/hooks/usePitchDetection';
-import { TunerDial } from './TunerDial';
-import { NoteWheel } from './NoteWheel';
-import { TunerControls } from './TunerControls';
-import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
+import { TUNER_COPY } from '@/i18n/tuner';
+import { tuningDirection, writtenTunerNote } from '@/lib/tuner-note';
+import { TunerStaff } from './TunerStaff';
 
-interface TunerPopupProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface TunerPopupProps { isOpen: boolean; onClose: () => void; }
 
 export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
+  const { language } = useLanguage();
+  const copy = TUNER_COPY[language];
   const [referenceA4, setReferenceA4] = useState(440);
+  const [trumpet, setTrumpet] = useState(true);
+  const [starting, setStarting] = useState(false);
   const { isListening, pitchData, smoothedCents, error, startListening, stopListening } = usePitchDetection(referenceA4);
-
-  // Stop listening when popup closes (no auto-start — iOS requires user gesture)
-  useEffect(() => {
-    if (!isOpen) {
-      stopListening();
-    }
-  }, [isOpen, stopListening]);
-
-  // Guard for dual touchend + click
   const handledRef = useRef(false);
-
-  const handleToggleListening = (e?: React.TouchEvent | React.MouseEvent) => {
-    if (e) e.preventDefault();
-    if (isListening) {
-      stopListening();
-      handledRef.current = false;
-    } else {
-      if (handledRef.current) return;
-      handledRef.current = true;
-      startListening();
-      setTimeout(() => { handledRef.current = false; }, 500);
-    }
+  useEffect(() => { if (!isOpen) stopListening(); }, [isOpen, stopListening]);
+  const toggle = async () => {
+    if (handledRef.current) return;
+    if (isListening) { stopListening(); return; }
+    handledRef.current = true;
+    setStarting(true);
+    try { await startListening(); } finally { handledRef.current = false; setStarting(false); }
   };
+  const active = isListening && !!pitchData;
+  const note = active ? writtenTunerNote(pitchData.noteIndex, pitchData.octave, trumpet) : null;
+  const direction = tuningDirection(smoothedCents);
+  const StatusIcon = direction === 'tuned' ? Check : direction === 'low' ? ArrowDown : ArrowUp;
+  const color = !active ? 'text-muted-foreground' : direction === 'tuned' ? 'text-tuner-tuned' : 'text-destructive';
+  const status = active ? copy[direction] : isListening ? copy.waiting : copy.ready;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent 
-        className={cn(
-          "w-[90vw] max-w-[380px] p-0 border-0 overflow-hidden"
-        )}
-        style={{
-          background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 50%, #3d2d22 100%)',
-          boxShadow: '0 25px 80px -15px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)',
-          borderRadius: '16px',
-          border: '3px solid #6d5545'
-        }}
-      >
-        <VisuallyHidden>
-          <DialogTitle>Bb Trumpet Tuner</DialogTitle>
-        </VisuallyHidden>
-        
-        {/* Header */}
-        <div 
-          className="flex items-center justify-between px-4 py-2"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
-        >
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent aria-describedby="tuner-instrument" className="ts-light-module ts-tuner w-[calc(100vw-24px)] max-w-[480px] max-h-[calc(100dvh-24px)] overflow-y-auto rounded-lg border-0 p-0 gap-0 [&>button]:hidden">
+        <header className="ts-gradient flex items-center justify-between px-5 py-4">
           <div>
-            <h2 
-              className="text-base font-bold italic"
-              style={{ color: '#e8dcc8', fontFamily: 'serif' }}
-            >
-              Bb Trumpet Tuner
-            </h2>
+            <DialogTitle className="text-xl font-bold text-ts-on">{copy.title}</DialogTitle>
+            <DialogDescription id="tuner-instrument" className="mt-1 text-sm text-ts-on">{trumpet ? copy.instrument : copy.concert}</DialogDescription>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs" style={{ color: '#a08060' }}>
-              A={referenceA4}Hz
-            </span>
-            <button 
-              onClick={onClose}
-              className="w-7 h-7 rounded-full flex items-center justify-center transition-all hover:opacity-80"
-              style={{
-                background: 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
-                border: '1px solid #6d5545',
-                color: '#c4a882'
-              }}
-            >
-              <X className="w-4 h-4" />
-            </button>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={copy.close} title={copy.close} className="text-ts-on hover:bg-ts-on/20 hover:text-ts-on"><X /></Button>
+        </header>
+        <div className="px-5 pt-4 pb-5 sm:px-7">
+          <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+            {[true, false].map(mode => <Button key={String(mode)} size="sm" variant={trumpet === mode ? 'secondary' : 'ghost'} aria-pressed={trumpet === mode} onClick={() => setTrumpet(mode)} className={trumpet === mode ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'}>{mode ? copy.instrument : copy.concert}</Button>)}
           </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="px-3 py-3 space-y-3">
-          {error && (
-            <div 
-              className="p-2 rounded-lg text-xs text-center"
-              style={{
-                background: 'rgba(200,50,50,0.2)',
-                border: '1px solid rgba(200,50,50,0.3)',
-                color: '#ff8888'
-              }}
-            >
-              {error}
+          <div className="mt-4 text-center">
+            <div className="h-16 flex items-baseline justify-center gap-1 text-primary">
+              <span className="text-6xl font-bold">{note?.name ?? '—'}</span>
+              {note && <span className="text-xl font-semibold">{note.octave}</span>}
             </div>
-          )}
-
-          <TunerDial 
-            cents={smoothedCents} 
-            isActive={isListening && !!pitchData}
-            note={pitchData?.note ?? '—'}
-            octave={pitchData?.octave ?? 0}
-          />
-
-          <NoteWheel 
-            currentNoteIndex={pitchData?.noteIndex ?? -1}
-            isActive={isListening && !!pitchData}
-          />
-
-          {/* Listening Toggle – dual touchend + click for iPad */}
-          <div className="flex justify-center">
-            <button
-              onTouchEnd={handleToggleListening}
-              onClick={handleToggleListening}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full transition-all"
-              style={{
-                background: isListening 
-                  ? 'linear-gradient(180deg, #2a5530 0%, #1a3320 100%)'
-                  : 'linear-gradient(180deg, #5c4535 0%, #4a3728 100%)',
-                border: isListening 
-                  ? '1px solid #3a7540'
-                  : '1px solid #6d5545',
-                color: isListening ? '#88dd88' : '#c4a882',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-              }}
-            >
-              {isListening ? (
-                <>
-                  <Volume2 className="w-4 h-4" />
-                  <span className="text-xs font-medium">Hört zu...</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-4 h-4" />
-                  <span className="text-xs font-medium">Aktivieren</span>
-                </>
-              )}
-            </button>
+            <TunerStaff note={note} label={copy.staff} />
+            <div className={`flex min-h-8 justify-center items-center gap-2 text-lg font-bold ${color}`} role="status">
+              {active && <StatusIcon className="h-5 w-5" />}{status}
+            </div>
+            <div className="mt-3 w-full" role="meter" aria-label={status} aria-valuemin={-50} aria-valuemax={50} aria-valuenow={active ? smoothedCents : 0}>
+              <svg viewBox="0 0 400 60" className="w-full h-[60px]" aria-hidden="true">
+                <rect x="10" y="20" width="380" height="8" rx="4" className="fill-muted" />
+                <rect x="181" y="17" width="38" height="14" rx="4" className="fill-tuner-tuned/20" />
+                {Array.from({ length: 21 }, (_, i) => <line key={i} x1={10 + i * 19} x2={10 + i * 19} y1={i % 5 === 0 ? 12 : 17} y2="32" className={i === 10 ? 'stroke-tuner-tuned' : 'stroke-muted-foreground/50'} strokeWidth={i === 10 ? 2 : 1} />)}
+                {active && <path d="M -6 -7 L 6 -7 L 0 0 Z" transform={`translate(${200 + Math.max(-50, Math.min(50, smoothedCents)) * 3.8}, 17)`} className={direction === 'tuned' ? 'fill-tuner-tuned' : 'fill-destructive'} />}
+                {[-50, -25, 0, 25, 50].map((v, i) => <text key={v} x={10 + i * 95} y="53" textAnchor={i === 0 ? 'start' : i === 4 ? 'end' : 'middle'} className="fill-muted-foreground" fontSize="12">{v > 0 ? `+${v}` : v}</text>)}
+              </svg>
+            </div>
+            <div className="flex items-center justify-center gap-4 text-sm tabular-nums text-muted-foreground h-7">
+              <span>{active ? `${smoothedCents > 0 ? '+' : ''}${smoothedCents}` : '—'} ct</span>
+              <span className="h-3 border-l border-border" />
+              <span>{active ? pitchData.frequency.toFixed(1) : '—'} Hz</span>
+            </div>
+          </div>
+          {error && <p role="alert" className="my-3 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{copy.microphoneError}</p>}
+          <Button onClick={toggle} disabled={starting} variant={isListening ? 'outline' : 'default'} className={`mt-4 w-full h-12 text-base font-bold ${!isListening ? 'bg-gold text-gold-foreground hover:bg-gold/90' : ''}`}>
+            {isListening ? <MicOff /> : <Mic />}{isListening ? copy.stop : copy.start}
+          </Button>
+          <div className="mt-4 pt-4 border-t border-border flex items-center justify-between gap-2">
+            <span className="text-sm font-medium text-muted-foreground">{copy.reference}</span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" disabled={referenceA4 <= 430} aria-label={copy.decrease} title={copy.decrease} onClick={() => setReferenceA4(v => Math.max(430, v - 1))}><Minus /></Button>
+              <span className="w-[70px] text-center font-semibold tabular-nums text-sm">{referenceA4} Hz</span>
+              <Button variant="outline" size="icon" disabled={referenceA4 >= 450} aria-label={copy.increase} title={copy.increase} onClick={() => setReferenceA4(v => Math.min(450, v + 1))}><Plus /></Button>
+            </div>
           </div>
         </div>
-
-        <TunerControls 
-          referenceA4={referenceA4}
-          onReferenceChange={setReferenceA4}
-        />
       </DialogContent>
     </Dialog>
   );
