@@ -15,6 +15,7 @@ import { PlanKey } from '@/types/plans';
 import { toast } from 'sonner';
 import { usePdfViewer } from '@/hooks/usePdfViewer';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { STAGE_COPY } from '@/i18n/stage-copy';
 
 interface PdfDocument {
   id: string;
@@ -49,7 +50,7 @@ export function PdfsPage() {
   const { canAccessLevel, isLoading: membershipLoading } = useMembership();
   const { setIsPdfViewerOpen } = usePdfViewer();
   const { getPdfBlob, downloadProgress, isCached, clearCache } = usePdfCache();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { getLocalizedField } = useLocalizedContent();
   
   const [selectedPdfId, setSelectedPdfId] = useState<string | null>(null);
@@ -100,6 +101,14 @@ export function PdfsPage() {
   }, [pdfs, isCached]);
 
   // Fetch audio tracks for selected PDF
+  const { data: levels = [] } = useQuery({
+    queryKey: ['pdf-levels'],
+    queryFn: async () => {
+      const { data } = await supabase.from('levels').select('id, title, title_en, title_es, sort_order').order('sort_order');
+      return data ?? [];
+    },
+  });
+
   const { data: audioTracks = [] } = useQuery({
     queryKey: ['pdf-audio-tracks', selectedPdfId],
     queryFn: async () => {
@@ -218,6 +227,12 @@ export function PdfsPage() {
   });
 
 
+  const stageCopy = STAGE_COPY[language] ?? STAGE_COPY.de;
+  const groups = [
+    ...levels.map((lv) => ({ id: lv.id, title: getLocalizedField(lv, 'title'), items: filteredPdfs.filter((p) => p.level_id === lv.id) })),
+    { id: 'other', title: stageCopy.otherSheets, items: filteredPdfs.filter((p) => !p.level_id || !levels.some((lv) => lv.id === p.level_id)) },
+  ].filter((g) => g.items.length > 0);
+
   if (isLoading) {
     return (
       <div className="flex h-[calc(100vh-140px)] items-center justify-center">
@@ -251,7 +266,7 @@ export function PdfsPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">{t('pdfs.title')}</h1>
-                <p className="text-sm text-white/70">{t('pdfs.available', { count: pdfs.length })}</p>
+                <p className="text-sm text-muted-foreground">{t('pdfs.available', { count: pdfs.length })}</p>
               </div>
             </div>
             
@@ -265,7 +280,7 @@ export function PdfsPage() {
               />
               
               {/* Search */}
-              <div className="relative w-64">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder={t('pdfs.searchPlaceholder')}
@@ -281,8 +296,11 @@ export function PdfsPage() {
         {/* Book Grid */}
         <ScrollArea className="flex-1">
           <div className="p-6 max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8 justify-items-center">
-              {filteredPdfs.map((pdf) => {
+            {groups.map((group) => (
+              <section key={group.id} className="mb-8">
+                <h2 className="mb-4 text-lg font-extrabold text-foreground">{group.title}</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 md:gap-8 justify-items-center">
+              {group.items.map((pdf) => {
                 const hasAccess = canAccessLevel(pdf.plan_required as PlanKey);
                 const isDownloading = downloadProgress?.pdfId === pdf.id && downloadProgress.isDownloading;
                 const progress = downloadProgress?.pdfId === pdf.id ? downloadProgress.progress : 0;
@@ -308,7 +326,9 @@ export function PdfsPage() {
                   />
                 );
               })}
-            </div>
+                </div>
+              </section>
+            ))}
 
             {filteredPdfs.length === 0 && (
               <div className="text-center py-16 text-muted-foreground">
