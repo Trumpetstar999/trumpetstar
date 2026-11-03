@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Trumpetstar – Videos</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A9BFF"/><stop offset=".45" stop-color="#0068DB"/><stop offset="1" stop-color="#0087FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".08" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+    <g id="glyph"><circle fill="currentColor" cx="330" cy="310" r="88"/>
+    <circle fill="currentColor" cx="540" cy="310" r="88"/>
+    <rect fill="currentColor" x="196" y="390" width="470" height="330" rx="64"/>
+    <path fill="currentColor" d="M640 500 L828 400 C840 394 852 402 852 416 L852 694 C852 708 840 716 828 710 L640 610 Z"/></g>
+    <mask id="gm"><g style="color:#FFFFFF"><use xlink:href="#glyph"/></g></mask>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <g style="color:#00285C" opacity=".38" filter="url(#drop)"><use xlink:href="#glyph" y="26"/></g>
+    <rect width="1024" height="1024" fill="url(#face)" mask="url(#gm)"/>
+    <circle cx="330" cy="310" r="34" fill="#F5A623"/>
+    <circle cx="540" cy="310" r="34" fill="#F5A623"/>
+    <path d="M374 470 L374 640 C374 652 386 658 396 652 L536 566 C546 560 546 550 536 544 L396 458 C386 452 374 458 374 470 Z" fill="#E74C3C"/>
+    <rect x="5" y="5" width="1014" height="1014" rx="223" fill="none" stroke="url(#rim)" stroke-width="10"/>
+  </g>
+</svg>

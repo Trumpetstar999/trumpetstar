@@ -17,6 +17,8 @@ import { MobileRouteGuard } from "./components/mobile/MobileRouteGuard";
 // Eager: landing & auth (likely first paint targets)
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
+import { HomeScreen } from "./components/home/HomeScreen";
+import * as M from "./pages/home/ModulePages";
 
 // Lazy: app shell + all secondary routes
 const Index = lazy(() => import("./pages/Index"));
@@ -87,7 +89,21 @@ const App = () => (
                     <Suspense fallback={<RouteFallback />}>
                       <Routes>
                         {/* Public Landing */}
-                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/" element={<HomeScreen />} />
+                        <Route path="/trompete-lernen-app" element={<LandingPage />} />
+                        {/* Homescreen modules */}
+                        <Route path="/beginner" element={<M.BeginnerModule />} />
+                        <Route path="/videos" element={<M.VideosModule />} />
+                        <Route path="/rhythmus" element={<M.RhythmusModule />} />
+                        <Route path="/games" element={<M.GamesModule />} />
+                        <Route path="/metronom" element={<M.MetronomModule />} />
+                        <Route path="/playlists" element={<M.PlaylistsModule />} />
+                        <Route path="/feedback" element={<M.FeedbackModule />} />
+                        <Route path="/audio" element={<M.AudioModule />} />
+                        <Route path="/noten" element={<M.NotenModule />} />
+                        <Route path="/tuner" element={<M.TunerModulePage />} />
+                        <Route path="/grifftabelle" element={<M.GriffModule />} />
+                        <Route path="/profil" element={<M.ProfileModule />} />
                         {/* Blog Routes */}
                         <Route path="/blog" element={<BlogPage />} />
                         <Route path="/blog/trompete-lernen-erwachsene" element={<TrompeteLernenErwachsene />} />
@@ -112,9 +128,12 @@ const App = () => (
                         <Route path="/mobile/locked" element={<MobileLockedPage />} />
 
                         {/* Protected App Routes */}
-                        <Route path="/app" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                        <Route path="/app" element={<M.AppEntryRedirect />} />
+                        <Route path="/app/legacy" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                         <Route path="/app/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-                        <Route path="/app/chats" element={<ProtectedRoute><ChatsPage /></ProtectedRoute>} />
+                        <Route path="/app/chats" element={<Navigate to="/feedback" replace />} />
+                        <Route path="/chats" element={<Navigate to="/feedback" replace />} />
+                        <Route path="/pdfs" element={<Navigate to="/noten" replace />} />
                         <Route path="/app/classroom" element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
                         <Route path="/app/musicxml" element={<ProtectedRoute><MusicXMLPage /></ProtectedRoute>} />
                         <Route path="/app/musicxml/:id" element={<ProtectedRoute><MusicXMLViewerPage /></ProtectedRoute>} />
@@ -150,8 +169,8 @@ const App = () => (
 
                         {/* Common URL redirects */}
                         <Route path="/shop" element={<Navigate to="/pricing" replace />} />
-                        <Route path="/levels" element={<Navigate to="/app" replace />} />
-                        <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+                        <Route path="/levels" element={<Navigate to="/videos" replace />} />
+                        <Route path="/dashboard" element={<Navigate to="/" replace />} />
                         <Route path="/register" element={<Navigate to="/signup" replace />} />
 
                         {/* Legacy redirect: old /musicxml/:id links */}

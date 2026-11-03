@@ -598,3 +598,38 @@ input[type="range"]:focus {
   0%, 60% { left: -120%; }
   80%, 100% { left: 130%; }
 }
+
+/* ===== Redesign "iPhone-Home" (light) ===== */
+:root {
+  --ts-sky: 207 100% 50%;
+  --ts-deep: 211 100% 43%;
+  --ts-bright: 207 100% 49%;
+  --ts-gold: 37 91% 55%;
+  --ts-red: 6 78% 57%;
+  --ts-ink: 214 70% 18%;
+  --ts-ink-muted: 214 17% 43%;
+  --ts-surface: 214 50% 96%;
+  --ts-card: 0 0% 100%;
+  --ts-on-gradient: 0 0% 100%;
+  --ts-gradient: linear-gradient(180deg, hsl(var(--ts-sky)) 0%, hsl(var(--ts-deep)) 40%, hsl(var(--ts-bright)) 100%);
+  --ts-wall:
+    radial-gradient(60% 40% at 0% 0%, hsl(207 100% 50% / .28), transparent 70%),
+    radial-gradient(50% 35% at 100% 62%, hsl(37 91% 55% / .20), transparent 70%),
+    radial-gradient(45% 30% at 10% 100%, hsl(6 78% 57% / .14), transparent 70%),
+    linear-gradient(180deg, hsl(209 100% 95%) 0%, hsl(209 100% 91%) 50%, hsl(209 100% 88%) 100%);
+  --ts-ease: cubic-bezier(.32,.72,0,1);
+  --ts-icon-shadow: 0 8px 18px hsl(214 100% 31% / .22), 0 1px 2px hsl(214 100% 20% / .18);
+}
+.ts-wall { background: var(--ts-wall); background-attachment: fixed; color: hsl(var(--ts-ink)); }
+.ts-gradient { background: var(--ts-gradient); color: hsl(var(--ts-on-gradient)); }
+.ts-glass {
+  background: hsl(0 0% 100% / .62);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid hsl(0 0% 100% / .85);
+  box-shadow: 0 4px 14px hsl(214 100% 27% / .12);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ts-glass { background: hsl(0 0% 100% / .9); }
+}
+.ts-system-font { font-family: -apple-system, "SF Pro Text", Roboto, Arial, sans-serif; }

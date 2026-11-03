@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Trumpetstar – Shop</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A9BFF"/><stop offset=".45" stop-color="#0068DB"/><stop offset="1" stop-color="#0087FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".08" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+    <g id="glyph"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="56" d="M390 400 V330 A122 122 0 0 1 634 330 V400"/>
+    <path fill="currentColor" d="M252 380 H772 C796 380 812 398 814 420 L842 790 C844 820 822 840 794 840 H230 C202 840 180 820 182 790 L210 420 C212 398 228 380 252 380 Z"/></g>
+    <mask id="gm"><g style="color:#FFFFFF"><use xlink:href="#glyph"/></g></mask>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <g style="color:#00285C" opacity=".38" filter="url(#drop)"><use xlink:href="#glyph" y="26"/></g>
+    <rect width="1024" height="1024" fill="url(#face)" mask="url(#gm)"/>
+    <path d="M252 380 H772 C796 380 812 398 814 420 L820 500 H204 L210 420 C212 398 228 380 252 380 Z" fill="#E74C3C"/>
+    <polygon points="512.0,530.0 546.4,612.7 635.6,619.8 567.6,678.1 588.4,765.2 512.0,718.5 435.6,765.2 456.4,678.1 388.4,619.8 477.6,612.7" fill="#F5A623"/>
+    <circle cx="390" cy="440" r="22" fill="#FFFFFF"/>
+    <circle cx="634" cy="440" r="22" fill="#FFFFFF"/>
+    <rect x="5" y="5" width="1014" height="1014" rx="223" fill="none" stroke="url(#rim)" stroke-width="10"/>
+  </g>
+</svg>

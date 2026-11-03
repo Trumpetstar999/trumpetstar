@@ -70,11 +70,11 @@ export default function AuthPage() {
       return redirectParam;
     }
     const returnTo = sessionStorage.getItem('returnTo');
-    if (returnTo && returnTo.startsWith('/app')) {
+    if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
       sessionStorage.removeItem('returnTo');
       return returnTo;
     }
-    return isMiniMode ? '/mobile/home' : '/app';
+    return '/';
   };
 
   useEffect(() => {
