@@ -54,7 +54,7 @@ export function BeginnerCourse() {
         <h2 className="text-2xl font-extrabold">{title}</h2>
         {url && <LessonVideo key={url} url={url} title={title} />}
         <div className="flex flex-wrap gap-2">
-          {open.video_url && <button onClick={() => setMode('video')} aria-pressed={mode === 'video'} className={`rounded-full px-5 py-3 font-bold ${mode === 'video' ? 'bg-ts-deep text-primary-foreground' : 'bg-ts-card'}`}>{c.video}</button>}
+          {open.video_url && <button onClick={() => setMode('video')} aria-pressed={mode === 'video'} className={`rounded-full px-5 py-3 font-bold ${mode === 'video' ? 'bg-ts-deep text-ts-on' : 'bg-ts-card'}`}>{c.video}</button>}
           {open.playalong_url && <button onClick={() => setMode('playalong')} aria-pressed={mode === 'playalong'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 font-bold ${mode === 'playalong' ? 'bg-ts-gold text-ts-ink' : 'bg-ts-card'}`}><Play className="h-4 w-4" />{c.playalong}</button>}
         </div>
       </div>

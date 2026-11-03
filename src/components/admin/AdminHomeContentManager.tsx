@@ -123,6 +123,61 @@ export function AdminHomeContentManager() {
     <div className="space-y-10">
       <UpdatesSection />
       <ShopSection />
+      <LessonsSection />
     </div>
+  );
+}
+
+function LessonsSection() {
+  type L = { id: string; sort_order: number; title_i18n: Record<string, string>; video_url: string | null; playalong_url: string | null; cover_url: string | null; active: boolean };
+  const blank = () => ({ title: { de: '', en: '', es: '', sl: '' } as Record<string, string>, video: '', playalong: '', cover: '', order: 0, active: true });
+  const [items, setItems] = useState<L[]>([]);
+  const [draft, setDraft] = useState(blank());
+  const [editId, setEditId] = useState<string | null>(null);
+  const load = async () => {
+    const { data } = await supabase.from('beginner_lessons').select('*').order('sort_order');
+    setItems((data as L[]) ?? []);
+  };
+  useEffect(() => { load(); }, []);
+  const okUrl = (u: string) => !u || /^https:\/\//.test(u);
+  const save = async () => {
+    if (!draft.title.de.trim()) { toast.error('Deutscher Titel fehlt'); return; }
+    if (![draft.video, draft.playalong, draft.cover].every(okUrl)) { toast.error('Links müssen mit https:// beginnen'); return; }
+    const row = { title_i18n: draft.title, video_url: draft.video || null, playalong_url: draft.playalong || null, cover_url: draft.cover || null, sort_order: draft.order, active: draft.active };
+    const { error } = editId ? await supabase.from('beginner_lessons').update(row).eq('id', editId) : await supabase.from('beginner_lessons').insert(row);
+    if (error) { toast.error(error.message); return; }
+    toast.success('Gespeichert'); setDraft(blank()); setEditId(null); load();
+  };
+  const remove = async (id: string) => { if (!confirm('Lektion löschen?')) return; await supabase.from('beginner_lessons').delete().eq('id', id); load(); };
+  return (
+    <section className="space-y-4">
+      <h2 className="text-xl font-bold">Beginnerkurs-Lektionen</h2>
+      <div className="grid md:grid-cols-2 gap-3 rounded-xl border p-4">
+        {LANGS.map((l) => (
+          <Input key={l} placeholder={`Titel (${l.toUpperCase()})`} value={draft.title[l]} onChange={(e) => setDraft({ ...draft, title: { ...draft.title, [l]: e.target.value } })} />
+        ))}
+        <Input placeholder="Video-Link (Vimeo/YouTube/https)" value={draft.video} onChange={(e) => setDraft({ ...draft, video: e.target.value.trim() })} />
+        <Input placeholder="Mitspiel-Video-Link" value={draft.playalong} onChange={(e) => setDraft({ ...draft, playalong: e.target.value.trim() })} />
+        <Input placeholder="Cover-Bild-Link" value={draft.cover} onChange={(e) => setDraft({ ...draft, cover: e.target.value.trim() })} />
+        <div className="flex items-center gap-3">
+          <Input type="number" className="w-28" aria-label="Reihenfolge" value={draft.order} onChange={(e) => setDraft({ ...draft, order: Number(e.target.value) || 0 })} />
+          <label className="flex items-center gap-2 text-sm"><Switch checked={draft.active} onCheckedChange={(v) => setDraft({ ...draft, active: v })} />Sichtbar</label>
+        </div>
+        <div className="md:col-span-2 flex gap-2">
+          <Button onClick={save}>{editId ? 'Änderung speichern' : 'Lektion anlegen'}</Button>
+          {editId && <Button variant="outline" onClick={() => { setEditId(null); setDraft(blank()); }}>Abbrechen</Button>}
+        </div>
+      </div>
+      <ul className="space-y-2">
+        {items.map((l) => (
+          <li key={l.id} className="flex items-center gap-3 rounded-lg border p-3">
+            <span className="w-10 text-xs opacity-70">#{l.sort_order}</span>
+            <span className="flex-1 font-medium">{l.title_i18n?.de}{!l.active && ' (ausgeblendet)'}</span>
+            <Button size="sm" variant="outline" onClick={() => { setEditId(l.id); setDraft({ title: { ...blank().title, ...l.title_i18n }, video: l.video_url ?? '', playalong: l.playalong_url ?? '', cover: l.cover_url ?? '', order: l.sort_order, active: l.active }); }}>Bearbeiten</Button>
+            <Button size="sm" variant="ghost" onClick={() => remove(l.id)} aria-label="Löschen"><Trash2 className="w-4 h-4" /></Button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

@@ -98,7 +98,7 @@ export function RhythmBuilder() {
         <div role="radiogroup" className="inline-flex rounded-full bg-ts-card p-1 shadow-sm">
           {([2, 4] as const).map((n) => (
             <button key={n} role="radio" aria-checked={count === n} onClick={() => switchCount(n)}
-              className={`rounded-full px-4 py-2 text-sm font-bold transition ${count === n ? 'bg-ts-deep text-primary-foreground' : 'text-ts-ink'}`}>
+              className={`rounded-full px-4 py-2 text-sm font-bold transition ${count === n ? 'bg-ts-deep text-ts-on' : 'text-ts-ink'}`}>
               {n === 2 ? c.bars2 : c.bars4}
             </button>
           ))}
@@ -131,13 +131,13 @@ export function RhythmBuilder() {
               className={`cursor-pointer rounded-[18px] border-2 bg-ts-card p-2 shadow-sm ${activeBar === i ? 'border-ts-deep' : 'border-transparent'}`}>
               <div className="flex items-center justify-between px-1 text-xs font-bold">
                 <span>{c.bar} {i + 1}</span>
-                <span className={full ? 'text-ts-green' : 'text-ts-muted'}>{barFill(bar) / 2}/4 {full ? `· ${c.full}` : ''}</span>
+                <span className={full ? 'text-ts-deep' : 'text-ts-muted'}>{barFill(bar) / 2}/4 {full ? `· ${c.full}` : ''}</span>
               </div>
               <BarStaff bar={bar} index={i} selected={sel?.bar === i ? sel.block : null} />
               <div className="flex flex-wrap gap-1">
                 {bar.map((bl, j) => (
                   <button key={j} onClick={(e) => { e.stopPropagation(); setSel({ bar: i, block: j }); }}
-                    className={`rounded-full px-2 py-1 text-xs font-semibold ${sel?.bar === i && sel.block === j ? 'bg-ts-red text-primary-foreground' : 'bg-muted text-ts-ink'}`}>
+                    className={`rounded-full px-2 py-1 text-xs font-semibold ${sel?.bar === i && sel.block === j ? 'bg-ts-red text-ts-on' : 'bg-muted text-ts-ink'}`}>
                     {c[bl.kind]}
                   </button>
                 ))}
@@ -154,7 +154,7 @@ export function RhythmBuilder() {
               <span className="w-16 text-sm font-bold">{c.note} {h + 1}</span>
               {SCALE.map((s, si) => (
                 <button key={s.name} aria-pressed={p === si} onClick={() => setBars(setPitch(bars, sel.bar, sel.block, h, si))}
-                  className={`min-w-10 rounded-lg px-2 py-2 text-sm font-bold ${p === si ? 'bg-ts-deep text-primary-foreground' : 'bg-muted text-ts-ink'}`}>
+                  className={`min-w-10 rounded-lg px-2 py-2 text-sm font-bold ${p === si ? 'bg-ts-deep text-ts-on' : 'bg-muted text-ts-ink'}`}>
                   {s.name}
                 </button>
               ))}
