@@ -6,9 +6,11 @@ import { useShopProducts } from '@/hooks/useShopProducts';
 import { formatPrice, isNewProduct, shopCheckoutUrl, ShopProduct } from '@/lib/shop';
 import { Button } from '@/components/ui/button';
 import { PLAN_INFO } from '@/types/plans';
+import { ShopPurchaseDialog } from './ShopPurchaseDialog';
 
 export function ShopProductCard({ p, className = '', compact = false }: { p: ShopProduct; className?: string; compact?: boolean }) {
   const { t, language } = useLanguage();
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
   const planKey = p.id === '575565' ? 'PRO' : p.id === '346007' ? 'BASIC' : null;
   const plan = planKey ? PLAN_INFO[planKey] : null;
   const orderUrl = shopCheckoutUrl(p);
@@ -20,9 +22,10 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
       <span className="block mt-2 text-base font-bold text-ts-ink tabular-nums">{price}</span>
     </>;
     const compactClassName = `block rounded-lg bg-ts-card p-3 shadow-sm ${className}`;
-    return orderUrl
-      ? <a href={orderUrl} target="_blank" rel="noopener noreferrer" className={`${compactClassName} hover:bg-ts-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ts-deep`} title={terms} aria-label={[p.name, price, terms].filter(Boolean).join('. ')}>{content}</a>
-      : <div className={compactClassName}>{content}</div>;
+    return <>
+      <Button variant="ghost" onClick={() => setPurchaseOpen(true)} className={`${compactClassName} h-auto whitespace-normal text-left hover:bg-ts-surface`} aria-label={[p.name, price].join('. ')}>{content}</Button>
+      {purchaseOpen && <ShopPurchaseDialog product={p} onClose={() => setPurchaseOpen(false)} />}
+    </>;
   }
   return (
     <div className={`flex flex-col rounded-[20px] bg-ts-card overflow-hidden shadow-sm ${className}`}>
@@ -36,10 +39,11 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
         <p className="text-sm font-bold text-ts-ink line-clamp-2 min-h-[2.5rem]">{p.name}</p>
         <p className="text-base font-bold text-ts-ink min-h-5">{formatPrice(plan ? plan.introductoryPrice ?? plan.monthlyPrice ?? null : p.price, p.currency, language)}</p>
         {plan && <p className="text-xs leading-relaxed text-ts-ink">{t(`pricing_table.${planKey === 'PRO' ? 'proMonthlyTerms' : 'monthlyTerms'}`, { price: plan.monthlyPrice ?? 0, intro: plan.introductoryPrice ?? 0, months: plan.minimumTermMonths ?? 6 })}</p>}
-        {orderUrl && <Button asChild className="mt-auto rounded-full bg-ts-gold hover:bg-ts-gold/90 text-ts-ink text-sm font-extrabold active:scale-95 transition">
-          <a href={orderUrl} target="_blank" rel="noopener noreferrer">{t('home.shopBuy')}</a>
+        {orderUrl && <Button onClick={() => setPurchaseOpen(true)} className="mt-auto rounded-full bg-ts-gold hover:bg-ts-gold/90 text-ts-ink text-sm font-extrabold active:scale-95 transition">
+          {t('home.shopBuy')}
         </Button>}
       </div>
+      {purchaseOpen && <ShopPurchaseDialog product={p} onClose={() => setPurchaseOpen(false)} />}
     </div>
   );
 }
