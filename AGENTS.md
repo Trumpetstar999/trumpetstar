@@ -17,3 +17,4 @@
 
 - Serve homescreen shop items only from the cached shop table refreshed at most hourly by a public server function; provider sync publishes new active products automatically, leaves inactive products hidden, and preserves existing admin-curated price, cover, order and visibility fields. Each mounted shop surface reloads after sync and requests hourly refresh so carousel and cards do not require manual approval or page reloads.
 - Import original shop covers into the app asset store and cache verified provider prices; subscription cards reuse PLAN_INFO terms and the verified checkout registry so introductory prices never hide recurring charges or select another payment plan.
+- Open the shared product purchase dialog from shop cards and carousel before external checkout; reuse PLAN_INFO, PlanTerms and the verified checkout registry for billing selection so compact previews cannot bypass complete purchase terms.
