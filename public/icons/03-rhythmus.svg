@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Trumpetstar – Rhythmus</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A9BFF"/><stop offset=".45" stop-color="#0068DB"/><stop offset="1" stop-color="#0087FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".08" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+    <g id="glyph"><rect fill="currentColor" x="196" y="530" width="300" height="270" rx="44"/>
+    <rect fill="currentColor" x="528" y="530" width="300" height="270" rx="44"/>
+    <rect fill="currentColor" x="362" y="228" width="300" height="270" rx="44"/></g>
+    <mask id="gm"><g style="color:#FFFFFF"><use xlink:href="#glyph"/></g></mask>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <g style="color:#00285C" opacity=".38" filter="url(#drop)"><use xlink:href="#glyph" y="26"/></g>
+    <rect width="1024" height="1024" fill="url(#face)" mask="url(#gm)"/>
+    <rect x="362" y="228" width="300" height="270" rx="44" fill="#E74C3C"/>
+    <ellipse cx="330" cy="720" rx="34" ry="25" transform="rotate(-22 330 720)" fill="#0068DB"/><rect x="356" y="600" width="11" height="120" rx="4" fill="#0068DB"/>
+    <ellipse cx="650" cy="720" rx="34" ry="25" transform="rotate(-22 650 720)" fill="#0068DB"/><rect x="676" y="600" width="11" height="120" rx="4" fill="#0068DB"/><rect x="676" y="600" width="93" height="22" rx="6" fill="#0068DB"/>
+    <ellipse cx="732" cy="720" rx="34" ry="25" transform="rotate(-22 732 720)" fill="#0068DB"/>
+    <rect x="757" y="600" width="11" height="120" rx="4" fill="#0068DB"/>
+    <ellipse cx="494" cy="420" rx="34" ry="25" transform="rotate(-22 494 420)" fill="#FFFFFF"/><rect x="520" y="300" width="11" height="120" rx="4" fill="#FFFFFF"/>
+    <rect x="5" y="5" width="1014" height="1014" rx="223" fill="none" stroke="url(#rim)" stroke-width="10"/>
+  </g>
+</svg>

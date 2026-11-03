@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Trumpetstar – Metronom</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A9BFF"/><stop offset=".45" stop-color="#0068DB"/><stop offset="1" stop-color="#0087FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".08" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+    <g id="glyph"><path fill="currentColor" d="M440 190 H584 C604 190 618 202 622 220 L776 784 C782 808 766 830 742 830 H282 C258 830 242 808 248 784 L402 220 C406 202 420 190 440 190 Z"/></g>
+    <mask id="gm"><g style="color:#FFFFFF"><use xlink:href="#glyph"/></g></mask>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <g style="color:#00285C" opacity=".38" filter="url(#drop)"><use xlink:href="#glyph" y="26"/></g>
+    <rect width="1024" height="1024" fill="url(#face)" mask="url(#gm)"/>
+    <path d="M462 290 H562 L660 660 H364 Z" fill="#0068DB"/>
+    <path d="M282 700 H742 L756 750 C766 790 750 830 726 830 H298 C274 830 258 790 268 750 Z" fill="#E74C3C"/>
+    <rect x="497" y="300" width="30" height="360" rx="15" fill="#FFFFFF" transform="rotate(-16 512 650)"/>
+    <rect x="466" y="400" width="92" height="60" rx="16" fill="#F5A623" transform="rotate(-16 512 650)"/>
+    <circle cx="512" cy="660" r="26" fill="#F5A623"/>
+    <rect x="5" y="5" width="1014" height="1014" rx="223" fill="none" stroke="url(#rim)" stroke-width="10"/>
+  </g>
+</svg>

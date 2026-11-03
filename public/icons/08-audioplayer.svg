@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Trumpetstar – Audioplayer</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A9BFF"/><stop offset=".45" stop-color="#0068DB"/><stop offset="1" stop-color="#0087FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".3" cy=".08" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCEBFF"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".7"/><stop offset=".35" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".8" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".25"/>
+    </linearGradient>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="150%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="228"/></clipPath>
+    <g id="glyph"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="64" d="M262 600 V510 A250 250 0 0 1 762 510 V600"/>
+    <rect fill="currentColor" x="196" y="540" width="160" height="270" rx="60"/>
+    <rect fill="currentColor" x="668" y="540" width="160" height="270" rx="60"/></g>
+    <mask id="gm"><g style="color:#FFFFFF"><use xlink:href="#glyph"/></g></mask>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <g style="color:#00285C" opacity=".38" filter="url(#drop)"><use xlink:href="#glyph" y="26"/></g>
+    <rect width="1024" height="1024" fill="url(#face)" mask="url(#gm)"/>
+    <rect x="236" y="590" width="80" height="170" rx="40" fill="#E74C3C"/>
+    <rect x="708" y="590" width="80" height="170" rx="40" fill="#E74C3C"/>
+    <rect x="420" y="600" width="28" height="140" rx="14" fill="#FFFFFF"/>
+    <rect x="476" y="550" width="28" height="240" rx="14" fill="#F5A623"/>
+    <rect x="532" y="620" width="28" height="100" rx="14" fill="#FFFFFF"/>
+    <rect x="588" y="580" width="28" height="180" rx="14" fill="#FFFFFF"/>
+    <rect x="5" y="5" width="1014" height="1014" rx="223" fill="none" stroke="url(#rim)" stroke-width="10"/>
+  </g>
+</svg>
