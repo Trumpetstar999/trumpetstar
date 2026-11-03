@@ -86,6 +86,56 @@ export type Database = {
           },
         ]
       }
+      app_update_reads: {
+        Row: {
+          read_at: string
+          update_id: string
+          user_id: string
+        }
+        Insert: {
+          read_at?: string
+          update_id: string
+          user_id: string
+        }
+        Update: {
+          read_at?: string
+          update_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_update_reads_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "app_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      app_updates: {
+        Row: {
+          body_i18n: Json
+          created_at: string
+          id: string
+          link: string | null
+          title_i18n: Json
+        }
+        Insert: {
+          body_i18n?: Json
+          created_at?: string
+          id?: string
+          link?: string | null
+          title_i18n?: Json
+        }
+        Update: {
+          body_i18n?: Json
+          created_at?: string
+          id?: string
+          link?: string | null
+          title_i18n?: Json
+        }
+        Relationships: []
+      }
       app_welcome_vouchers: {
         Row: {
           brevo_message_id: string | null
@@ -3367,6 +3417,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_products: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          image_url: string | null
+          is_new: boolean
+          name: string
+          order_url: string
+          price: number | null
+          sort_override: number | null
+          synced_at: string | null
+          visible: boolean
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id: string
+          image_url?: string | null
+          is_new?: boolean
+          name: string
+          order_url: string
+          price?: number | null
+          sort_override?: number | null
+          synced_at?: string | null
+          visible?: boolean
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          image_url?: string | null
+          is_new?: boolean
+          name?: string
+          order_url?: string
+          price?: number | null
+          sort_override?: number | null
+          synced_at?: string | null
+          visible?: boolean
+        }
+        Relationships: []
       }
       teacher_assignments: {
         Row: {

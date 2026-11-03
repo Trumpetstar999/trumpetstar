@@ -785,6 +785,24 @@
     "lang": "Idioma",
     "locked": "Requiere inicio de sesión",
     "openTuner": "Abrir afinador",
-    "not": "Partituras"
+    "not": "Partituras",
+    "newsEmpty": "Aún no hay novedades.",
+    "newsMore": "Más información",
+    "shopNew": "Nuevo en la tienda",
+    "shopAll": "Todos",
+    "shopBuy": "Comprar",
+    "shopBadge": "NUEVO",
+    "shopEmpty": "No hay productos disponibles ahora.",
+    "myRec": "Mis grabaciones",
+    "openProfile": "Abrir perfil",
+    "logout": "Cerrar sesión",
+    "levelLabel": "Nivel",
+    "lvlBeginner": "Principiante",
+    "lvlIntermediate": "Avanzado",
+    "griffHint": "Toca una nota para ver su digitación.",
+    "griffOpen": "Al aire – sin pistón",
+    "griffPress": "Pulsa el pistón {{valves}}",
+    "valve": "Pistón {{n}}",
+    "playTone": "Reproducir tono"
   }
 }

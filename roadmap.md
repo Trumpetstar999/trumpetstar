@@ -36,6 +36,8 @@
 - [ ] Bestehende Modulinhalte auf helles Design umstellen
 - [x] Metronom und Audioplayer hell gestaltet, vier Sprachen, goldene Wiedergabe, zugängliche Buttons; echte Metronom- und Audiowiedergabe (56 Titel nach Anmeldung), Transposition und Loop getestet, Phone/Tablet ohne seitliches Überlaufen. 18 Zugriffs-/Checkout-/Recovery-Tests bestanden; keine Laufzeitfehler, Build OK. Audio-Engines und Zahlpläne unverändert.
 - [ ] Audioplayer-Gastkatalog: Seite öffnet, liefert aber ohne Anmeldung keine Titel (bestehende Zugriffssperre); Freigabe benötigt separat geprüfte öffentliche Katalog-/Dateiregeln, nicht durch das reine Design ändern.
-- [ ] Etappe 4: Neuigkeiten-Glocke (app_updates), Profil-Sheet
-- [ ] Etappe 5: Shop-Karussell + /shop (alle Digistore24-Produkte)
-- [ ] Etappe 6–8: Grifftabelle, Rhythmus-Baukasten, Beginnerkurs & Noten-Tabelle
+- [x] Etappe 4: Neuigkeiten-Glocke (Zähler, Gäste lokal/Konto), Profil-Fenster, Admin „Neuigkeiten & Shop“
+- [x] Etappe 5: Shop-Karussell + /shop; stündlicher Digistore24-Abgleich, 7 Produkte freigegeben
+- [ ] Shop: Cover-Bilder und PRO-/Playbook-Preise im Admin pflegen (Digistore24 liefert keine Preise/Bilder)
+- [x] Etappe 6: Interaktive Grifftabelle (31 Töne, Ton abspielen)
+- [ ] Etappe 7–8: Rhythmus-Baukasten, Beginnerkurs & Noten-Tabelle

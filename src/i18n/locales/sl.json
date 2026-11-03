@@ -785,6 +785,24 @@
     "lang": "Jezik",
     "locked": "Potrebna prijava",
     "openTuner": "Odpri uglaševalec",
-    "not": "Note"
+    "not": "Note",
+    "newsEmpty": "Še ni novic.",
+    "newsMore": "Več",
+    "shopNew": "Novo v trgovini",
+    "shopAll": "Vse",
+    "shopBuy": "Kupi",
+    "shopBadge": "NOVO",
+    "shopEmpty": "Trenutno ni izdelkov.",
+    "myRec": "Moji posnetki",
+    "openProfile": "Odpri profil",
+    "logout": "Odjava",
+    "levelLabel": "Stopnja",
+    "lvlBeginner": "Začetnik",
+    "lvlIntermediate": "Napredni",
+    "griffHint": "Tapni noto, da vidiš prijem.",
+    "griffOpen": "Prazno – brez ventila",
+    "griffPress": "Pritisni ventil {{valves}}",
+    "valve": "Ventil {{n}}",
+    "playTone": "Predvajaj ton"
   }
 }

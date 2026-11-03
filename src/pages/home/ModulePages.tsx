@@ -7,6 +7,9 @@ import { ModuleShell } from '@/components/home/ModuleShell';
 import { RequireAuth } from '@/components/home/RequireAuth';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
 import { TabId } from '@/types';
+import { FingeringChart } from '@/components/home/FingeringChart';
+import { ShopProductCard } from '@/components/home/ShopCarousel';
+import { useShopProducts } from '@/hooks/useShopProducts';
 
 const LevelsPage = lazy(() => import('../LevelsPage').then((m) => ({ default: m.LevelsPage })));
 const PdfsPage = lazy(() => import('../PdfsPage').then((m) => ({ default: m.PdfsPage })));
@@ -58,7 +61,19 @@ export const FeedbackModule = () => <RequireAuth><Module route="/feedback" tab="
 export const AudioModule = () => <Module route="/audio" tab="audios" surface="light"><AudiosPage /></Module>;
 export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs"><PdfsPage /></Module></RequireAuth>;
 export const TunerModulePage = () => <Module route="/tuner" surface="light"><TunerModule /></Module>;
-export const GriffModule = () => <Module route="/grifftabelle" surface="light"><ComingSoon /></Module>;
+export const GriffModule = () => <Module route="/grifftabelle" surface="light"><FingeringChart /></Module>;
+function ShopGrid() {
+  const { t } = useLanguage();
+  const { products, loading } = useShopProducts();
+  if (loading) return <Fallback />;
+  if (!products.length) return <p className="p-8 text-center text-ts-muted">{t('home.shopEmpty')}</p>;
+  return (
+    <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      {products.map((p) => <ShopProductCard key={p.id} p={p} />)}
+    </div>
+  );
+}
+export const ShopModule = () => <Module route="/shop" surface="light"><ShopGrid /></Module>;
 export const ProfileModule = () => (
   <RequireAuth>
     <Module route="/profil" tab="profile">

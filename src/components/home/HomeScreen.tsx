@@ -11,7 +11,10 @@ import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { setZoomOrigin } from './zoomOrigin';
 import { LoginSheet } from './LoginSheet';
 import { LanguageSheet, HOME_LANGUAGES } from './LanguageSheet';
-import { BottomSheet } from './BottomSheet';
+import { NewsSheet } from './NewsSheet';
+import { ProfileSheet } from './ProfileSheet';
+import { ShopCarousel } from './ShopCarousel';
+import { useAppUpdates } from '@/hooks/useAppUpdates';
 
 interface HomeScreenProps {
   /** When set, the login sheet opens immediately (guest hit a locked URL). */
@@ -28,6 +31,8 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
   const [langOpen, setLangOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
   const [stars, setStars] = useState(0);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const news = useAppUpdates();
 
   useEffect(() => {
     if (lockedNext && !user) { setLoginNext(lockedNext); setLoginOpen(true); }
@@ -58,7 +63,7 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
 
   const openProfile = () => {
     if (!user) { setLoginNext(PROFILE_ROUTE); setLoginOpen(true); return; }
-    navigate(PROFILE_ROUTE);
+    setProfileOpen(true);
   };
 
   const flag = HOME_LANGUAGES.find((l) => l.code === language)?.flag ?? '🇩🇪';
@@ -102,8 +107,10 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
         <header className="flex items-center justify-between">
           <img src="/logo_trumpetstar.png" alt="Trumpetstar" className="h-[60px] w-auto" />
           <div className="flex items-center gap-2">
-            <button className={glassBtn} aria-label={t('home.news')} onClick={() => setNewsOpen(true)}>
-              <Bell className="w-5 h-5" />
+            <button className={glassBtn} aria-label={t('home.news')} onClick={() => { setNewsOpen(true); news.markAllRead(); }}>
+              <span className="relative"><Bell className="w-5 h-5" />
+                {news.unread > 0 && <span className="absolute -top-3 -right-3 min-w-5 h-5 px-1 rounded-full bg-ts-red text-ts-on text-[11px] font-bold flex items-center justify-center">{news.unread > 9 ? '9+' : news.unread}</span>}
+              </span>
             </button>
             <button className={glassBtn} aria-label={t('home.lang')} onClick={() => setLangOpen(true)}>
               <span className="text-xl leading-none">{flag}</span>
@@ -131,6 +138,7 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
         <nav className="mt-7 grid grid-cols-4 gap-x-3 gap-y-6">
           {HOME_APPS.slice(0, 8).map(tile)}
         </nav>
+        <ShopCarousel />
         <nav className="mt-8 grid grid-cols-4 gap-x-3 gap-y-6">
           {HOME_APPS.slice(8).map(tile)}
         </nav>
@@ -138,9 +146,8 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
 
       <LoginSheet open={loginOpen} next={loginNext} onClose={() => setLoginOpen(false)} />
       <LanguageSheet open={langOpen} onClose={() => setLangOpen(false)} />
-      <BottomSheet open={newsOpen} onClose={() => setNewsOpen(false)} title={t('home.news')}>
-        <p className="text-ts-muted pb-2">{t('home.soonP')}</p>
-      </BottomSheet>
+      <NewsSheet open={newsOpen} onClose={() => setNewsOpen(false)} updates={news.updates} />
+      {user && <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} name={name} stars={stars} />}
 
       {user && (
         <>
