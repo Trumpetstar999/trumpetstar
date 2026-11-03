@@ -16,3 +16,4 @@
 - Migrate existing modules to light surfaces explicitly through ModuleShell's surface prop and scoped semantic tokens; leave unmigrated modules on their original theme to avoid unreadable legacy controls. Keep practice-tool translations in a shared locale dictionary consumed through the active language hook.
 
 - Serve homescreen shop items only from the cached shop table refreshed at most hourly by a public server function; provider sync inserts new products hidden and never overwrites admin-curated price, cover, order or visibility fields.
+- Import original shop covers into the app asset store and cache verified provider prices; subscription cards reuse PLAN_INFO terms and the verified checkout registry so introductory prices never hide recurring charges or select another payment plan.

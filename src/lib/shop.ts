@@ -1,3 +1,5 @@
+import { getCheckoutUrl, validateCheckoutUrl } from './checkout';
+
 export interface ShopProduct {
   id: string;
   name: string;
@@ -35,11 +37,20 @@ export function sortShopProducts<T extends Pick<ShopProduct, 'sort_override' | '
 export function isSafeShopOrderUrl(raw: string): boolean {
   try {
     const u = new URL(raw);
-    return u.protocol === 'https:' && ['www.digistore24.com', 'www.checkout-ds24.com'].includes(u.hostname)
-      && /^\/product\/\d+\/?$/.test(u.pathname);
+    return u.protocol === 'https:' && !u.username && !u.password && !u.port && !u.hash
+      && ['www.digistore24.com', 'www.checkout-ds24.com'].includes(u.hostname)
+      && /^\/product\/\d+\/?$/.test(u.pathname)
+      && (u.search === '' || validateCheckoutUrl(raw) !== null);
   } catch {
     return false;
   }
+}
+
+/** Subscription cards always select the same verified monthly plan as pricing. */
+export function shopCheckoutUrl(p: Pick<ShopProduct, 'id' | 'order_url'>): string | null {
+  if (p.id === '575565') return getCheckoutUrl('PRO', 'monthly');
+  if (p.id === '346007') return getCheckoutUrl('BASIC', 'monthly');
+  return isSafeShopOrderUrl(p.order_url) ? p.order_url : null;
 }
 
 export function formatPrice(price: number | null, currency: string, locale: string): string {

@@ -3,24 +3,30 @@ import { Link } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useShopProducts } from '@/hooks/useShopProducts';
-import { formatPrice, isNewProduct, ShopProduct } from '@/lib/shop';
+import { formatPrice, isNewProduct, shopCheckoutUrl, ShopProduct } from '@/lib/shop';
+import { Button } from '@/components/ui/button';
+import { PLAN_INFO } from '@/types/plans';
 
 export function ShopProductCard({ p, className = '' }: { p: ShopProduct; className?: string }) {
   const { t, language } = useLanguage();
+  const planKey = p.id === '575565' ? 'PRO' : p.id === '346007' ? 'BASIC' : null;
+  const plan = planKey ? PLAN_INFO[planKey] : null;
+  const orderUrl = shopCheckoutUrl(p);
   return (
     <div className={`flex flex-col rounded-[20px] bg-ts-card overflow-hidden shadow-sm ${className}`}>
       <div className="relative aspect-square bg-ts-surface flex items-center justify-center">
         {p.image_url
-          ? <img src={p.image_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+          ? <img src={p.image_url} alt={p.name} className="w-full h-full object-contain p-2" loading="lazy" />
           : <img src="/logo_trumpetstar.png" alt="" className="w-2/3 opacity-80" loading="lazy" />}
         {isNewProduct(p) && <span className="absolute top-2 left-2 rounded-full bg-ts-red text-ts-on text-[11px] font-extrabold px-2 py-0.5">{t('home.shopBadge')}</span>}
       </div>
       <div className="flex flex-col flex-1 p-3 gap-1">
         <p className="text-sm font-bold text-ts-ink line-clamp-2 min-h-[2.5rem]">{p.name}</p>
-        <p className="text-sm text-ts-muted min-h-5">{formatPrice(p.price, p.currency, language)}</p>
-        <a href={p.order_url} target="_blank" rel="noopener noreferrer" className="mt-auto rounded-full bg-ts-gold text-ts-ink text-sm font-extrabold text-center py-2 active:scale-95 transition">
-          {t('home.shopBuy')}
-        </a>
+        <p className="text-base font-bold text-ts-ink min-h-5">{formatPrice(plan ? plan.introductoryPrice ?? plan.monthlyPrice ?? null : p.price, p.currency, language)}</p>
+        {plan && <p className="text-xs leading-relaxed text-ts-ink">{t(`pricing_table.${planKey === 'PRO' ? 'proMonthlyTerms' : 'monthlyTerms'}`, { price: plan.monthlyPrice ?? 0, intro: plan.introductoryPrice ?? 0, months: plan.minimumTermMonths ?? 6 })}</p>}
+        {orderUrl && <Button asChild className="mt-auto rounded-full bg-ts-gold hover:bg-ts-gold/90 text-ts-ink text-sm font-extrabold active:scale-95 transition">
+          <a href={orderUrl} target="_blank" rel="noopener noreferrer">{t('home.shopBuy')}</a>
+        </Button>}
       </div>
     </div>
   );
