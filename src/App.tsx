@@ -168,7 +168,7 @@ const App = () => (
                         <Route path="/qr/:code" element={<QRRedirectPage />} />
 
                         {/* Common URL redirects */}
-                        <Route path="/shop" element={<Navigate to="/pricing" replace />} />
+                        <Route path="/shop" element={<M.ShopModule />} />
                         <Route path="/levels" element={<Navigate to="/videos" replace />} />
                         <Route path="/dashboard" element={<Navigate to="/" replace />} />
                         <Route path="/register" element={<Navigate to="/signup" replace />} />

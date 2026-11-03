@@ -8,7 +8,7 @@ import { BottomSheet } from './BottomSheet';
 interface Props { open: boolean; onClose: () => void; name: string; stars: number }
 
 export function ProfileSheet({ open, onClose, name, stars }: Props) {
-  const { t, skillLevel } = useLanguage() as ReturnType<typeof useLanguage> & { skillLevel?: string };
+  const { t, skillLevel } = useLanguage();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const go = () => { onClose(); navigate(PROFILE_ROUTE); };
