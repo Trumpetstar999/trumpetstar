@@ -174,7 +174,7 @@ export function RhythmBuilder() {
         <label className="flex flex-1 min-w-48 items-center gap-3 text-sm font-semibold">
           {c.tempo}
           <input type="range" min={40} max={200} value={bpm} onChange={(e) => setBpm(Number(e.target.value))} className="flex-1 accent-[hsl(var(--ts-deep))]" />
-          <span className="w-16 tabular-nums">{bpm} BPM</span>
+          <span className="whitespace-nowrap tabular-nums">{bpm} BPM</span>
         </label>
       </section>
     </div>

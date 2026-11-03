@@ -42,4 +42,4 @@
 - [x] Etappe 5: Shop-Karussell + /shop; stündlicher Digistore24-Abgleich, 7 Produkte freigegeben
 - [x] Shop: getProduct liefert image_url/paymentplans: sieben Original-Cover in App-Assets übernommen; Preise 35/39/29/24/29 €, PRO erster Monat 1 €, danach 59 €/Monat (6 Monate), Playbook 17 €. Vorhandene Pflege bewahrt, PRO nutzt verifizierten Monatsplan; Cache überschreibt keine gepflegten Preise. Shop-Funktion deployed; 22 Tests bestanden, sieben Bilder über echte Asset-Auslieferung geprüft, Desktop/Handy ohne Überlauf oder Laufzeitfehler.
 - [x] Etappe 6: Interaktive Grifftabelle (31 Töne, Ton abspielen)
-- [ ] Etappe 7–8: Rhythmus-Baukasten, Beginnerkurs & Noten-Tabelle
+- [x] Etappe 7–8: Rhythmus-Baukasten, Beginnerkurs (Lektionen im Admin), Noten nach Level gruppiert
