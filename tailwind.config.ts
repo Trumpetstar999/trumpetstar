@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       colors: {
+        'tuner-tuned': 'hsl(var(--tuner-tuned))',
         ts: {
           sky: "hsl(var(--ts-sky))",
           deep: "hsl(var(--ts-deep))",
