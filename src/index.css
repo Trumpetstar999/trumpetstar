@@ -633,3 +633,34 @@ input[type="range"]:focus {
   .ts-glass { background: hsl(0 0% 100% / .9); }
 }
 .ts-system-font { font-family: -apple-system, "SF Pro Text", Roboto, Arial, sans-serif; }
+
+/* Scoped light tokens: legacy modules and the admin theme remain unchanged. */
+.ts-light-module {
+  --background: var(--ts-surface);
+  --foreground: var(--ts-ink);
+  --card: var(--ts-card);
+  --card-foreground: var(--ts-ink);
+  --popover: var(--ts-card);
+  --popover-foreground: var(--ts-ink);
+  --primary: var(--ts-deep);
+  --primary-foreground: var(--ts-on-gradient);
+  --secondary: 210 60% 91%;
+  --secondary-foreground: var(--ts-ink);
+  --muted: 213 35% 92%;
+  --muted-foreground: var(--ts-ink-muted);
+  --border: 213 30% 84%;
+  --input: 213 30% 84%;
+  --ring: var(--ts-deep);
+  --gold: var(--ts-gold);
+  --gold-foreground: var(--ts-ink);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+/* Radix menus are portalled outside the module surface. */
+body:has(.ts-light-module) [data-radix-popper-content-wrapper] {
+  --popover: var(--ts-card);
+  --popover-foreground: var(--ts-ink);
+  --accent: 210 60% 91%;
+  --accent-foreground: var(--ts-ink);
+  --border: 213 30% 84%;
+}
