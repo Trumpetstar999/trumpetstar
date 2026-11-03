@@ -14,12 +14,13 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Button } from '@/components/ui/button';
-import { GripVertical, RotateCcw, Pencil, X, Crown, Scale } from 'lucide-react';
+import { GripVertical, RotateCcw, Pencil, X, Crown, Scale, Settings } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDashboardLayout, WidgetId } from '@/hooks/useDashboardLayout';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useMembership } from '@/hooks/useMembership';
+import { useUserRole } from '@/hooks/useUserRole';
 import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
@@ -59,6 +60,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
 export function ProfilePage() {
   const { t } = useLanguage();
   const { planKey } = useMembership();
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const { isEnabled } = useFeatureFlags();
   const {
@@ -131,10 +133,16 @@ export function ProfilePage() {
       </div>
 
       {/* Language Selector + Upgrade Button */}
-      <div className="mb-6 flex items-center gap-4">
+      <div className="mb-6 flex flex-wrap items-center gap-4">
         <div className="max-w-xs">
           <LanguageSelector />
         </div>
+        {isAdmin && !roleLoading && (
+          <Button onClick={() => navigate('/app/admin')} size="sm" className="max-w-full h-auto min-h-9 whitespace-normal">
+            <Settings className="w-4 h-4" />
+            {t('home.adminArea')}
+          </Button>
+        )}
         {upgradeText && (
           <Button
             onClick={() => navigate('/pricing')}
