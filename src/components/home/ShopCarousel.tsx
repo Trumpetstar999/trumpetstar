@@ -15,13 +15,17 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
   const plan = planKey ? PLAN_INFO[planKey] : null;
   const orderUrl = shopCheckoutUrl(p);
   const price = formatPrice(plan ? plan.introductoryPrice ?? plan.monthlyPrice ?? null : p.price, p.currency, language);
-  const terms = plan ? t(`pricing_table.${planKey === 'PRO' ? 'proMonthlyTerms' : 'monthlyTerms'}`, { price: plan.monthlyPrice ?? 0, intro: plan.introductoryPrice ?? 0, months: plan.minimumTermMonths ?? 6 }) : undefined;
   if (compact) {
     const content = <>
-      <span className="block text-sm font-bold text-ts-ink break-words">{p.name}</span>
-      <span className="block mt-2 text-base font-bold text-ts-ink tabular-nums">{price}</span>
+      <span className="block aspect-square bg-ts-surface w-full">
+        <img src={p.image_url || '/logo_trumpetstar.png'} alt="" className="w-full h-full object-contain p-2" loading="lazy" />
+      </span>
+      <span className="block p-3">
+        <span className="block text-sm font-bold text-ts-ink break-words">{p.name}</span>
+        <span className="block mt-2 text-base font-bold text-ts-ink tabular-nums">{price}</span>
+      </span>
     </>;
-    const compactClassName = `block rounded-lg bg-ts-card p-3 shadow-sm ${className}`;
+    const compactClassName = `block rounded-lg bg-ts-card p-0 overflow-hidden shadow-sm ${className}`;
     return <>
       <Button variant="ghost" onClick={() => setPurchaseOpen(true)} className={`${compactClassName} h-auto whitespace-normal text-left hover:bg-ts-surface`} aria-label={[p.name, price].join('. ')}>{content}</Button>
       {purchaseOpen && <ShopPurchaseDialog product={p} onClose={() => setPurchaseOpen(false)} />}
