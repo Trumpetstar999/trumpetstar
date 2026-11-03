@@ -85,6 +85,13 @@
       "when": 1793709067934,
       "tag": "0011_app_updates_and_shop_products",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793714929217,
+      "tag": "0012_beginner_lessons",
+      "breakpoints": true
     }
   ]
 }

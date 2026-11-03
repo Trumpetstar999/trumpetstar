@@ -8,6 +8,8 @@ import { RequireAuth } from '@/components/home/RequireAuth';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
 import { TabId } from '@/types';
 import { FingeringChart } from '@/components/home/FingeringChart';
+import { RhythmBuilder } from '@/components/home/RhythmBuilder';
+import { BeginnerCourse } from '@/components/home/BeginnerCourse';
 import { ShopProductCard } from '@/components/home/ShopCarousel';
 import { useShopProducts } from '@/hooks/useShopProducts';
 
@@ -51,15 +53,15 @@ function TunerModule() {
   return <TunerPopup isOpen={open} onClose={() => { setOpen(false); navigate('/'); }} />;
 }
 
-export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surface="light"><ComingSoon /></Module></RequireAuth>;
+export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surface="light"><BeginnerCourse /></Module></RequireAuth>;
 export const VideosModule = () => <RequireAuth><Module route="/videos" tab="levels"><LevelsPage onStarEarned={() => {}} /></Module></RequireAuth>;
-export const RhythmusModule = () => <Module route="/rhythmus" surface="light"><ComingSoon /></Module>;
+export const RhythmusModule = () => <Module route="/rhythmus" surface="light"><RhythmBuilder /></Module>;
 export const GamesModule = () => <RequireAuth><Module route="/games" tab="game"><GamePage /></Module></RequireAuth>;
 export const MetronomModule = () => <Module route="/metronom" tab="metronome" surface="light"><MetronomePage /></Module>;
 export const PlaylistsModule = () => <RequireAuth><Module route="/playlists" tab="practice"><PracticePage /></Module></RequireAuth>;
 export const FeedbackModule = () => <RequireAuth><Module route="/feedback" tab="chats"><ChatsPage /></Module></RequireAuth>;
 export const AudioModule = () => <Module route="/audio" tab="audios" surface="light"><AudiosPage /></Module>;
-export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs"><PdfsPage /></Module></RequireAuth>;
+export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs" surface="light"><PdfsPage /></Module></RequireAuth>;
 export const TunerModulePage = () => <Module route="/tuner" surface="light"><TunerModule /></Module>;
 export const GriffModule = () => <Module route="/grifftabelle" surface="light"><FingeringChart /></Module>;
 function ShopGrid() {

@@ -407,6 +407,39 @@ export type Database = {
         }
         Relationships: []
       }
+      beginner_lessons: {
+        Row: {
+          active: boolean
+          cover_url: string | null
+          created_at: string
+          id: string
+          playalong_url: string | null
+          sort_order: number
+          title_i18n: Json
+          video_url: string | null
+        }
+        Insert: {
+          active?: boolean
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          playalong_url?: string | null
+          sort_order?: number
+          title_i18n?: Json
+          video_url?: string | null
+        }
+        Update: {
+          active?: boolean
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          playalong_url?: string | null
+          sort_order?: number
+          title_i18n?: Json
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       brevo_contact_state: {
         Row: {
           brevo_contact_id: number | null
