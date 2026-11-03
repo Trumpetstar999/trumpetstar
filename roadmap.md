@@ -30,3 +30,10 @@
 - [x] Show all books (locked with buy link) to free users.
 - [x] Use the Trumpetstar logo for WhatsApp link previews (takes effect on the live site after publishing).
 - [x] Replace the level sidebar with a complete thumbnail tile overview and verify navigation (49 levels, selection and return checked signed in).- [x] October 30 24h welcome-voucher follow-up: migration, hourly scheduler, admin test delivered once to schulterm@me.com, second run alreadySent; first production reminder due ~Nov 1 13:14–15:14 Vienna (unobserved).
+
+## Redesign „iPhone-Home“
+- [x] Etappe 1–3: heller Homescreen, Start ohne Login, Module eingehängt
+- [ ] Bestehende Modulinhalte auf helles Design umstellen
+- [ ] Etappe 4: Neuigkeiten-Glocke (app_updates), Profil-Sheet
+- [ ] Etappe 5: Shop-Karussell + /shop (alle Digistore24-Produkte)
+- [ ] Etappe 6–8: Grifftabelle, Rhythmus-Baukasten, Beginnerkurs & Noten-Tabelle
