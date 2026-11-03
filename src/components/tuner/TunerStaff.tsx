@@ -21,8 +21,9 @@ export function TunerStaff({ note, label }: { note: ReturnType<typeof writtenTun
       if (note.accidental) n.addModifier(new Accidental(note.accidental));
       n.setStyle({ fillStyle: ink, strokeStyle: ink });
       n.setStave(stave).setContext(context);
-      new TickContext().addTickable(n).preFormat().setX(0);
-      n.setXShift(180 - n.getNoteHeadBeginX() - n.getGlyph().getWidth() / 2);
+      const tick = new TickContext().addTickable(n).preFormat().setX(0);
+      // Move the shared anchor so accidentals travel with the centered notehead.
+      tick.setX(180 - n.getNoteHeadBeginX() - n.getGlyph().getWidth() / 2);
       n.draw();
     }
     const svg = el.querySelector('svg');
