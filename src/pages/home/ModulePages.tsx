@@ -49,7 +49,7 @@ function TunerModule() {
 }
 
 export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surface="light"><ComingSoon /></Module></RequireAuth>;
-export const VideosModule = () => <RequireAuth><Module route="/videos" tab="levels"><LevelsPage /></Module></RequireAuth>;
+export const VideosModule = () => <RequireAuth><Module route="/videos" tab="levels"><LevelsPage onStarEarned={() => {}} /></Module></RequireAuth>;
 export const RhythmusModule = () => <Module route="/rhythmus" surface="light"><ComingSoon /></Module>;
 export const GamesModule = () => <RequireAuth><Module route="/games" tab="game"><GamePage /></Module></RequireAuth>;
 export const MetronomModule = () => <Module route="/metronom" tab="metronome"><MetronomePage /></Module>;

@@ -2,6 +2,10 @@ import { ReactNode, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { useAuth } from '@/hooks/useAuth';
+import { HOME_APPS, PROFILE_ROUTE } from '@/config/apps';
+
+// The new homescreen and its modules work on every device size.
+const HOME_ROUTES = ['/', PROFILE_ROUTE, ...HOME_APPS.map((a) => a.route)];
 
 // Routes that are allowed on mobile (auth, onboarding, mobile routes)
 const MOBILE_ALLOWED_PREFIXES = [
@@ -53,7 +57,7 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
 
     if (isMiniMode && user) {
       // On mobile + logged in: redirect desktop routes to mobile
-      const isOnMobileRoute = MOBILE_ALLOWED_PREFIXES.some(r => path === r || path.startsWith(r));
+      const isOnMobileRoute = HOME_ROUTES.includes(path) || MOBILE_ALLOWED_PREFIXES.some(r => path === r || path.startsWith(r));
       const isAuthRoute = path === '/auth';
 
       if (!isOnMobileRoute && !isAuthRoute) {
@@ -68,7 +72,7 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
     } else if (!isMiniMode && user) {
       // On desktop: redirect mobile routes back to main app
       if (path.startsWith('/mobile/')) {
-        navigate('/app', { replace: true });
+        navigate('/', { replace: true });
       }
     }
   }, [isMiniMode, user, loading, location.pathname, navigate]);
