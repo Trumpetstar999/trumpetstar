@@ -769,7 +769,7 @@
     "home": "Domov",
     "hiGuest": "Živjo! 👋",
     "hiGuestP": "Začni svojo trobentaško pustolovščino.",
-    "hiUser": "Živjo {name}! 🎺",
+    "hiUser": "Živjo {{name}}! 🎺",
     "hiUserP": "Nadaljuj svojo trobentaško pustolovščino.",
     "stars": "zvezdic",
     "lockT": "Prijavi se",

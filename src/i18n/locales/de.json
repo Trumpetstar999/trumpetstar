@@ -769,7 +769,7 @@
     "home": "Home",
     "hiGuest": "Servus! 👋",
     "hiGuestP": "Starte dein Trompetenabenteuer.",
-    "hiUser": "Hallo {name}! 🎺",
+    "hiUser": "Hallo {{name}}! 🎺",
     "hiUserP": "Weiter geht’s mit deinem Trompetenabenteuer.",
     "stars": "Stars",
     "lockT": "Einloggen & loslegen",

@@ -769,7 +769,7 @@
     "home": "Inicio",
     "hiGuest": "¡Hola! 👋",
     "hiGuestP": "Empieza tu aventura con la trompeta.",
-    "hiUser": "¡Hola {name}! 🎺",
+    "hiUser": "¡Hola {{name}}! 🎺",
     "hiUserP": "Sigue con tu aventura con la trompeta.",
     "stars": "estrellas",
     "lockT": "Inicia sesión",

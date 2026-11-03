@@ -769,7 +769,7 @@
     "home": "Home",
     "hiGuest": "Hi there! 👋",
     "hiGuestP": "Start your trumpet adventure.",
-    "hiUser": "Hi {name}! 🎺",
+    "hiUser": "Hi {{name}}! 🎺",
     "hiUserP": "Let’s continue your trumpet adventure.",
     "stars": "stars",
     "lockT": "Log in & get started",
