@@ -1,1283 +1,283 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserRole } from '@/hooks/useUserRole';
+import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
+import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useAuth } from '@/hooks/useAuth';
-import { usePdfCache, PdfDiagnostics } from '@/hooks/usePdfCache';
-import { PdfDebugPanel } from './PdfDebugPanel';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCcw,
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  X,
-  ChevronDown,
-  Music,
-  Pencil,
-  Highlighter,
-  Eraser,
-  Undo2,
-  Trash2,
-  RefreshCw,
-  AlertTriangle,
-  Save,
-  Circle,
-  Loader2,
-  Printer
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { PanelLeft, Search, ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut, Maximize, Hand, Pencil, Highlighter, Signature, Eraser, Undo2, Redo2, Trash2, Save, Printer, Loader2, Play, Pause, SkipBack, SkipForward, Music, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { PDF_COPY } from '@/i18n/pdf-viewer';
+import { buildCurrentPagePrint, clampPage, findTextMatches, EMPTY_MARKS, type PageMarks, type MarkTool, type InkColor } from '@/lib/pdf-viewer';
+import { PdfThumbnail } from './PdfThumbnail';
+import { PdfInk } from './PdfInk';
 
-interface PdfDocument {
-  id: string;
-  title: string;
-  pdf_file_url: string;
-  page_count: number;
-}
-
-interface AudioTrack {
-  id: string;
-  title: string;
-  audio_url: string;
-  page_number: number;
-  duration: number | null;
-}
-
+interface AudioTrack { id: string; title: string; audio_url: string; page_number: number; duration: number | null }
 interface PdfViewerProps {
-  pdf: PdfDocument;
-  pdfBlobUrl: string;
-  pdfBlob?: Blob | null;
-  currentPage: number;
-  onPageChange: (page: number) => void;
-  audioTracks: AudioTrack[];
-  onClose: () => void;
-  onRetry?: () => void;
+  pdf: { id: string; title: string; pdf_file_url: string; page_count: number };
+  pdfBlobUrl: string; pdfBlob?: Blob | null; currentPage: number; onPageChange: (page: number) => void;
+  audioTracks: AudioTrack[]; onClose: () => void; onRetry?: () => void;
 }
-
-// Brush colors
-const BRUSH_COLORS = [
-  { name: 'Schwarz', value: '#1a1a2e' },
-  { name: 'Blau', value: '#2563eb' },
-  { name: 'Rot', value: '#dc2626' },
-  { name: 'Grün', value: '#16a34a' },
-  { name: 'Orange', value: '#ea580c' },
-  { name: 'Lila', value: '#9333ea' },
-];
-
-// Highlighter colors
-const HIGHLIGHTER_COLORS = [
-  { name: 'Gelb', value: 'rgba(255, 230, 0, 0.4)' },
-  { name: 'Grün', value: 'rgba(34, 197, 94, 0.4)' },
-  { name: 'Blau', value: 'rgba(59, 130, 246, 0.4)' },
-  { name: 'Pink', value: 'rgba(236, 72, 153, 0.4)' },
-  { name: 'Orange', value: 'rgba(249, 115, 22, 0.4)' },
-];
-
-// Brush sizes
-const BRUSH_SIZES = [2, 4, 6, 8, 12];
-const HIGHLIGHTER_SIZES = [12, 20, 28, 36];
+interface SearchHit { page: number; snippet: string }
+interface TextBox { text: string; left: number; top: number; width: number; height: number }
 
 export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange, audioTracks, onClose, onRetry }: PdfViewerProps) {
-  const [searchParams] = useSearchParams();
-  const { isAdmin } = useUserRole();
-  const { user } = useAuth();
-  const { runDiagnostics, diagnostics } = usePdfCache();
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [pdfDoc, setPdfDoc] = useState<any>(null);
-  const [zoom, setZoom] = useState(1);
-  const [isDiagnosing, setIsDiagnosing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Show debug panel if ?debug=1 or admin
-  const showDebug = searchParams.get('debug') === '1' || isAdmin;
-  
-  // Audio state
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [selectedTrack, setSelectedTrack] = useState<AudioTrack | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audioProgress, setAudioProgress] = useState(0);
-  const [audioDuration, setAudioDuration] = useState(0);
-  const [audioSignedUrl, setAudioSignedUrl] = useState<string | null>(null);
-  const [playbackRate, setPlaybackRate] = useState(100);
+  const { language } = useLanguage(); const copy = PDF_COPY[language]; const { user } = useAuth();
+  const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
+  const [loading, setLoading] = useState(true); const [error, setError] = useState(false);
+  const [sidebar, setSidebar] = useState(() => window.innerWidth >= 900);
+  const [searchOpen, setSearchOpen] = useState(false); const [query, setQuery] = useState('');
+  const [hits, setHits] = useState<SearchHit[]>([]); const [hitIndex, setHitIndex] = useState(0); const [searching, setSearching] = useState(false);
+  const [boxes, setBoxes] = useState<TextBox[]>([]);
+  const [tool, setTool] = useState<MarkTool | 'hand'>('hand'); const [color, setColor] = useState<InkColor>('ink'); const [width, setWidth] = useState(4);
+  const [marks, setMarks] = useState<Record<number, PageMarks>>({});
+  const marksRef = useRef(marks); marksRef.current = marks;
+  const [dirty, setDirty] = useState<Set<number>>(new Set()); const [saving, setSaving] = useState(false); const [annotationsReady, setAnnotationsReady] = useState(false);
+  const [history, setHistory] = useState<Record<number, PageMarks[]>>({}); const [future, setFuture] = useState<Record<number, PageMarks[]>>({});
+  const [size, setSize] = useState({ width: 600, height: 800 }); const [area, setArea] = useState({ width: 800, height: 900 }); const [scale, setScale] = useState(1);
+  const areaRef = useRef<HTMLDivElement>(null); const canvasRef = useRef<HTMLCanvasElement>(null); const inkRef = useRef<HTMLCanvasElement>(null); const transformRef = useRef<ReactZoomPanPinchRef>(null);
+  const textCache = useRef(new Map<number, string>());
+  const pageCount = doc?.numPages || pdf.page_count;
+  const pageMarks = marks[currentPage] || EMPTY_MARKS;
+  const changePage = useCallback((page: number) => { onPageChange(clampPage(page, pageCount)); }, [onPageChange, pageCount]);
+  const close = useCallback(() => { if (dirty.size && !window.confirm(copy.discard)) return; onClose(); }, [dirty, copy.discard, onClose]);
 
-  // Enhanced drawing state
-  type DrawingTool = 'none' | 'pencil' | 'highlighter' | 'eraser';
-  const [activeTool, setActiveTool] = useState<DrawingTool>('none');
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingHistory, setDrawingHistory] = useState<Map<number, ImageData[]>>(new Map());
-  const [savedAnnotations, setSavedAnnotations] = useState<Map<number, string>>(new Map());
-  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-  
-  // Brush settings
-  const [pencilColor, setPencilColor] = useState(BRUSH_COLORS[0].value);
-  const [pencilSize, setPencilSize] = useState(4);
-  const [highlighterColor, setHighlighterColor] = useState(HIGHLIGHTER_COLORS[0].value);
-  const [highlighterSize, setHighlighterSize] = useState(20);
-  const [eraserSize, setEraserSize] = useState(25);
-
-  // Get audio tracks for current page
-  const currentPageTracks = audioTracks.filter(t => t.page_number === currentPage);
-  const hasMultipleTracks = currentPageTracks.length > 1;
-
-  // Auto-select first track when page changes
   useEffect(() => {
-    if (currentPageTracks.length > 0) {
-      setSelectedTrack(currentPageTracks[0]);
-    } else {
-      setSelectedTrack(null);
-      setAudioSignedUrl(null);
-      setIsPlaying(false);
-    }
-  }, [currentPage, audioTracks]);
-
-  // Load saved annotations when page changes
+    const old = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = old; };
+  }, []);
   useEffect(() => {
-    if (!user || !pdf.id) return;
-    
-    const loadAnnotations = async () => {
-      const { data, error } = await supabase
-        .from('pdf_user_annotations')
-        .select('annotations_json')
-        .eq('pdf_document_id', pdf.id)
-        .eq('user_id', user.id)
-        .eq('page_number', currentPage)
-        .maybeSingle();
-      
-      if (data?.annotations_json) {
-        const annotationData = data.annotations_json as { imageData?: string };
-        if (annotationData.imageData) {
-          setSavedAnnotations(prev => {
-            const newMap = new Map(prev);
-            newMap.set(currentPage, annotationData.imageData as string);
-            return newMap;
-          });
-        }
-      }
-    };
-    
-    loadAnnotations();
-  }, [user, pdf.id, currentPage]);
-
-  // Handle diagnostics
-  const handleRunDiagnostics = useCallback(async () => {
-    setIsDiagnosing(true);
-    try {
-      await runDiagnostics(pdf.id, pdf.pdf_file_url);
-    } finally {
-      setIsDiagnosing(false);
-    }
-  }, [pdf.id, pdf.pdf_file_url, runDiagnostics]);
-
-  // Handle retry: if parent provides onRetry (clears cache + re-downloads),
-  // use that. Otherwise fall back to closing so the user can manually reopen.
-  const handleRetry = useCallback(() => {
-    setLoadError(null);
-    setIsLoading(true);
-    setPdfDoc(null);
-    if (onRetry) {
-      onRetry();
-    } else {
-      onClose();
-    }
-  }, [onRetry, onClose]);
-
-  // Load PDF document from blob URL or blob
+    const el = areaRef.current; if (!el) return;
+    const observer = new ResizeObserver(([entry]) => setArea({ width: entry.contentRect.width, height: entry.contentRect.height }));
+    observer.observe(el); return () => observer.disconnect();
+  }, []);
   useEffect(() => {
-    const hasSource = pdfBlob || pdfBlobUrl;
-    console.log('PdfViewer: source changed:', pdfBlob ? 'blob' : pdfBlobUrl ? 'blobUrl' : 'null');
-    
-    if (!hasSource) {
-      console.log('PdfViewer: No PDF source provided');
-      return;
-    }
-
-    // Reset state when source changes
-    setPdfDoc(null);
-    setIsLoading(true);
-    setLoadError(null);
-
-    const loadPdf = async () => {
-      console.log('PdfViewer: Starting PDF load...');
-      
+    let cancelled = false; let task: ReturnType<typeof import('pdfjs-dist')['getDocument']> | undefined;
+    setLoading(true); setError(false); textCache.current.clear();
+    void (async () => {
       try {
-        let arrayBuffer: ArrayBuffer;
-        
-        if (pdfBlob) {
-          // Use blob directly - no fetch needed (Safari-safe)
-          console.log('PdfViewer: Using blob directly, size:', pdfBlob.size);
-          arrayBuffer = await pdfBlob.arrayBuffer();
-        } else {
-          // Fallback: fetch from blob URL
-          console.log('PdfViewer: Fetching from blob URL:', pdfBlobUrl);
-          const response = await fetch(pdfBlobUrl);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch blob: HTTP ${response.status}`);
-          }
-          arrayBuffer = await response.arrayBuffer();
-        }
-        console.log('PdfViewer: Got ArrayBuffer, size:', arrayBuffer.byteLength);
-        
-        if (arrayBuffer.byteLength < 1000) {
-          throw new Error(`File too small to be a valid PDF (${arrayBuffer.byteLength} bytes)`);
-        }
-        
-        // Verify PDF header
-        const header = new Uint8Array(arrayBuffer.slice(0, 5));
-        const headerStr = String.fromCharCode(...header);
-        console.log('PdfViewer: PDF header check:', headerStr);
-        
-        if (!headerStr.startsWith('%PDF-')) {
-          throw new Error(`Invalid PDF header: "${headerStr}" - File may be corrupted or not a PDF`);
-        }
-        
-        // Load PDF.js with explicit worker configuration
-        const pdfjsLib = await import('pdfjs-dist');
-        
-        // Use local worker file - Vite plugin ensures version matches pdfjs-dist
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
-        console.log('PdfViewer: using pdfjs-dist version', pdfjsLib.version);
+        const bytes = new Uint8Array(await (pdfBlob ? pdfBlob.arrayBuffer() : fetch(pdfBlobUrl).then(r => { if (!r.ok) throw new Error(); return r.arrayBuffer(); })));
+        if (String.fromCharCode(...bytes.slice(0, 5)) !== '%PDF-') throw new Error('Invalid PDF');
+        const lib = await import('pdfjs-dist'); if (cancelled) return;
+        lib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+        task = lib.getDocument({ data: bytes }); const loaded = await task.promise;
+        if (!cancelled) { setDoc(loaded); onPageChange(clampPage(currentPage, loaded.numPages)); }
+      } catch { if (!cancelled) { setError(true); setLoading(false); } }
+    })();
+    return () => { cancelled = true; void task?.destroy(); };
+  }, [pdfBlob, pdfBlobUrl]);
 
-        console.log('PdfViewer: pdfjs-dist loaded, loading document from ArrayBuffer...');
-        
-        // Use ArrayBuffer directly - more reliable than blob URL
-        const loadingTask = pdfjsLib.getDocument({ 
-          data: arrayBuffer,
-          // iPad Safari optimizations
-          disableAutoFetch: false,
-          disableStream: false,
-        });
-        
-        loadingTask.onProgress = (progress: { loaded: number; total: number }) => {
-          if (progress.total > 0) {
-            console.log('PdfViewer: Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
-          }
-        };
-        
-        const doc = await loadingTask.promise;
-        console.log('PdfViewer: PDF document loaded successfully, pages:', doc.numPages);
-        setPdfDoc(doc);
-        setLoadError(null);
-      } catch (error) {
-        console.error('Error loading PDF:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
-        setLoadError(errorMessage);
-        toast.error('PDF konnte nicht geladen werden');
-        setIsLoading(false);
-      }
-    };
-
-    loadPdf();
-  }, [pdfBlobUrl, pdfBlob]);
-
-  // Render current page
   useEffect(() => {
-    if (!pdfDoc) return;
+    if (!user) return;
+    let cancelled = false; setAnnotationsReady(false);
+    void supabase.from('pdf_user_annotations').select('page_number,annotations_json').eq('pdf_document_id', pdf.id).eq('user_id', user.id).then(({ data, error: loadError }) => {
+      if (cancelled) return;
+      if (loadError) { toast.error(copy.annotationError); return; }
+      const loaded: Record<number, PageMarks> = {};
+      for (const row of data || []) {
+        const raw = row.annotations_json as unknown as PageMarks;
+        loaded[row.page_number] = { strokes: Array.isArray(raw?.strokes) ? raw.strokes : [], ...(typeof raw?.imageData === 'string' ? { imageData: raw.imageData } : {}) };
+      }
+      setMarks(loaded); setAnnotationsReady(true);
+    });
+    return () => { cancelled = true; };
+  }, [pdf.id, user?.id]);
 
-    const renderPage = async () => {
-      setIsLoading(true);
-      
+  useEffect(() => {
+    if (!doc) return;
+    let cancelled = false; let render: RenderTask | undefined;
+    setLoading(true); setBoxes([]);
+    void (async () => {
       try {
-        const page = await pdfDoc.getPage(currentPage);
-        const canvas = canvasRef.current;
-        const container = containerRef.current;
-        
-        if (!canvas || !container) {
-          console.log('Canvas or container not ready');
-          // Retry after a short delay
-          setTimeout(() => setIsLoading(true), 100);
-          return;
+        const page = await doc.getPage(currentPage); if (cancelled) return;
+        const viewport = page.getViewport({ scale: 1 }); setSize({ width: viewport.width, height: viewport.height });
+        const canvas = canvasRef.current; const ctx = canvas?.getContext('2d'); if (!canvas || !ctx) return;
+        const display = page.getViewport({ scale: Math.min(1800 / viewport.width, 2.5) });
+        canvas.width = Math.ceil(display.width); canvas.height = Math.ceil(display.height);
+        render = page.render({ canvasContext: ctx, viewport: display }); await render.promise;
+        if (cancelled) return;
+        const content = await page.getTextContent(); const lib = await import('pdfjs-dist');
+        const textBoxes: TextBox[] = [];
+        for (const item of content.items) {
+          if (!('str' in item)) continue;
+          const t = lib.Util.transform(viewport.transform, item.transform);
+          const height = Math.hypot(t[2], t[3]);
+          textBoxes.push({ text: item.str, left: t[4] / viewport.width * 100, top: (t[5] - height) / viewport.height * 100, width: item.width / viewport.width * 100, height: height / viewport.height * 100 });
         }
+        textCache.current.set(currentPage, content.items.map(i => 'str' in i ? i.str : '').join(' '));
+        if (!cancelled) { setBoxes(textBoxes); setLoading(false); }
+      } catch { if (!cancelled) { setError(true); setLoading(false); } }
+    })();
+    return () => { cancelled = true; render?.cancel(); };
+  }, [doc, currentPage]);
+  useEffect(() => { transformRef.current?.resetTransform(0); setScale(1); }, [currentPage, area.width, area.height]);
 
-        const containerWidth = container.clientWidth - 48;
-        const containerHeight = container.clientHeight - 48;
-        
-        // Wait for container to have dimensions
-        if (containerWidth <= 0 || containerHeight <= 0) {
-          console.log('Container dimensions not ready, retrying...');
-          setTimeout(() => {
-            // Trigger re-render by toggling loading state
-            setIsLoading(false);
-            setTimeout(() => setIsLoading(true), 50);
-          }, 100);
-          return;
-        }
-
-        const context = canvas.getContext('2d');
-        if (!context) {
-          console.log('Could not get canvas context');
-          setIsLoading(false);
-          return;
-        }
-
-        // Calculate scale to fit container
-        const viewport = page.getViewport({ scale: 1 });
-        
-        const scaleX = containerWidth / viewport.width;
-        const scaleY = containerHeight / viewport.height;
-        const baseScale = Math.min(scaleX, scaleY, 1.5);
-        const scale = baseScale * zoom;
-        
-        const scaledViewport = page.getViewport({ scale });
-
-        canvas.height = scaledViewport.height;
-        canvas.width = scaledViewport.width;
-
-        console.log('Rendering page', currentPage, 'at scale', scale, 'canvas size:', canvas.width, 'x', canvas.height);
-
-        await page.render({
-          canvasContext: context,
-          viewport: scaledViewport,
-        }).promise;
-
-        console.log('Page rendered successfully');
-
-        // Setup drawing canvas to match PDF canvas
-        const drawingCanvas = drawingCanvasRef.current;
-        if (drawingCanvas) {
-          drawingCanvas.width = canvas.width;
-          drawingCanvas.height = canvas.height;
-          
-          const drawCtx = drawingCanvas.getContext('2d');
-          if (drawCtx) {
-            // First try to restore from saved annotations (from database)
-            const savedData = savedAnnotations.get(currentPage);
-            if (savedData) {
-              const img = new Image();
-              img.onload = () => {
-                drawCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              };
-              img.src = savedData;
-            } else {
-              // Fall back to in-memory history
-              const pageHistory = drawingHistory.get(currentPage);
-              if (pageHistory && pageHistory.length > 0) {
-                drawCtx.putImageData(pageHistory[pageHistory.length - 1], 0, 0);
-              }
-            }
-          }
-        }
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error rendering PDF page:', error);
-        toast.error('Seite konnte nicht gerendert werden');
-        setIsLoading(false);
-      }
-    };
-
-    renderPage();
-  }, [pdfDoc, currentPage, zoom, drawingHistory, savedAnnotations]);
-
-  // Get signed URL for selected audio track
   useEffect(() => {
-    if (!selectedTrack) {
-      setAudioSignedUrl(null);
-      return;
-    }
+    if (!doc || !query.trim()) { setHits([]); setSearching(false); return; }
+    let cancelled = false; setSearching(true);
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        try {
+          const results: SearchHit[] = [];
+          for (let n = 1; n <= doc.numPages; n++) {
+            if (cancelled) return;
+            let text = textCache.current.get(n);
+            if (text === undefined) { const page = await doc.getPage(n); const content = await page.getTextContent(); text = content.items.map(i => 'str' in i ? i.str : '').join(' '); textCache.current.set(n, text); }
+            for (const at of findTextMatches(text, query)) results.push({ page: n, snippet: text.slice(Math.max(0, at - 25), at + query.trim().length + 45) });
+          }
+          if (!cancelled) { setHits(results); setHitIndex(0); setSearching(false); if (results[0]) changePage(results[0].page); }
+        } catch { if (!cancelled) { setSearching(false); toast.error(copy.searchError); } }
+      })();
+    }, 300);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [doc, query]);
 
-    const getAudioUrl = async () => {
-      const urlParts = selectedTrack.audio_url.split('/pdf-audio/');
-      const filePath = urlParts[urlParts.length - 1];
-
-      if (!filePath) return;
-
-      const { data } = await supabase.storage
-        .from('pdf-audio')
-        .createSignedUrl(filePath, 3600);
-
-      if (data?.signedUrl) {
-        setAudioSignedUrl(data.signedUrl);
-        setAudioProgress(0);
-        setAudioDuration(0);
-      }
-    };
-
-    getAudioUrl();
-  }, [selectedTrack?.id]);
-
-  // Audio controls
-  const togglePlayPause = useCallback(() => {
-    if (!audioRef.current) return;
-    
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  }, [isPlaying]);
-
-  const handleTimeUpdate = useCallback(() => {
-    if (!audioRef.current) return;
-    setAudioProgress(audioRef.current.currentTime);
-  }, []);
-
-  const handleLoadedMetadata = useCallback(() => {
-    if (!audioRef.current) return;
-    setAudioDuration(audioRef.current.duration);
-    audioRef.current.playbackRate = playbackRate / 100;
-  }, [playbackRate]);
-
-  const handleSeek = useCallback((value: number[]) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = value[0];
-    setAudioProgress(value[0]);
-  }, []);
-
-  const skipSeconds = useCallback((seconds: number) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.currentTime + seconds, audioDuration));
-  }, [audioDuration]);
-
-  const handleSpeedChange = useCallback((value: number[]) => {
-    const speed = value[0];
-    setPlaybackRate(speed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed / 100;
-    }
-  }, []);
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const commit = (next: PageMarks) => {
+    setHistory(h => ({ ...h, [currentPage]: [...(h[currentPage] || []), pageMarks].slice(-40) }));
+    setFuture(f => ({ ...f, [currentPage]: [] })); setMarks(m => ({ ...m, [currentPage]: next }));
+    setDirty(d => new Set(d).add(currentPage));
   };
-
-  // Navigation
-  const goToPreviousPage = useCallback(() => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  }, [currentPage, onPageChange]);
-
-  const goToNextPage = useCallback(() => {
-    if (currentPage < pdf.page_count) {
-      onPageChange(currentPage + 1);
-    }
-  }, [currentPage, pdf.page_count, onPageChange]);
-
-  const handleZoomIn = () => setZoom(z => Math.min(z + 0.25, 3));
-  const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.5));
-  const handleResetZoom = () => setZoom(1);
-
-  // Print current page only – uses a hidden iframe so the dialog opens directly
-  const handlePrintCurrentPage = useCallback(() => {
-    const pdfCanvas = canvasRef.current;
-    const drawingCanvas = drawingCanvasRef.current;
-
-    if (!pdfCanvas) {
-      toast.error('Seite konnte nicht gedruckt werden');
-      return;
-    }
-
-    // Merge PDF canvas + annotation canvas
-    const printCanvas = document.createElement('canvas');
-    printCanvas.width = pdfCanvas.width;
-    printCanvas.height = pdfCanvas.height;
-    const ctx = printCanvas.getContext('2d');
-
-    if (!ctx) {
-      toast.error('Druckfehler');
-      return;
-    }
-
-    ctx.drawImage(pdfCanvas, 0, 0);
-    if (drawingCanvas) {
-      ctx.drawImage(drawingCanvas, 0, 0);
-    }
-
-    const imageData = printCanvas.toDataURL('image/png', 1.0);
-
-    // Build HTML for the iframe
-    const html = `<!DOCTYPE html>
-<html>
-  <head>
-    <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      @page { size: A4 portrait; margin: 0; }
-      html, body { width: 210mm; height: 297mm; background: white; }
-      img { width: 210mm; height: 297mm; object-fit: contain; display: block; }
-    </style>
-  </head>
-  <body>
-    <img src="${imageData}" alt="Seite ${currentPage}" />
-  </body>
-</html>`;
-
-    // Remove any existing print iframe
-    const existing = document.getElementById('pdf-print-frame');
-    if (existing) existing.remove();
-
-    const iframe = document.createElement('iframe');
-    iframe.id = 'pdf-print-frame';
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:210mm;height:297mm;border:none;';
-    document.body.appendChild(iframe);
-
-    const iframeDoc = iframe.contentWindow?.document;
-    if (!iframeDoc) {
-      toast.error('Druckfehler');
-      return;
-    }
-
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-
-    // Wait for image to load, then print
-    iframe.onload = () => {
-      setTimeout(() => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        // Clean up after print dialog closes
-        setTimeout(() => iframe.remove(), 2000);
-      }, 200);
-    };
-  }, [currentPage]);
-
-  // Drawing functions
-  const getCanvasCoordinates = useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    const canvas = drawingCanvasRef.current;
-    if (!canvas) return null;
-    
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
-    let clientX: number, clientY: number;
-    
-    if ('touches' in e) {
-      if (e.touches.length === 0) return null;
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    
-    return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
-    };
-  }, []);
-
-  const startDrawing = useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    if (activeTool === 'none') return;
-    e.preventDefault();
-    
-    const point = getCanvasCoordinates(e);
-    if (!point) return;
-    
-    setIsDrawing(true);
-    lastPointRef.current = point;
-  }, [activeTool, getCanvasCoordinates]);
-
-  const draw = useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDrawing || activeTool === 'none') return;
-    e.preventDefault();
-    
-    const canvas = drawingCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx || !lastPointRef.current) return;
-    
-    const point = getCanvasCoordinates(e);
-    if (!point) return;
-    
-    ctx.beginPath();
-    ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
-    ctx.lineTo(point.x, point.y);
-    
-    if (activeTool === 'pencil') {
-      ctx.strokeStyle = pencilColor;
-      ctx.lineWidth = pencilSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalCompositeOperation = 'source-over';
-    } else if (activeTool === 'highlighter') {
-      ctx.strokeStyle = highlighterColor;
-      ctx.lineWidth = highlighterSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalCompositeOperation = 'multiply';
-    } else if (activeTool === 'eraser') {
-      ctx.strokeStyle = 'rgba(0,0,0,1)';
-      ctx.lineWidth = eraserSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalCompositeOperation = 'destination-out';
-    }
-    
-    ctx.stroke();
-    lastPointRef.current = point;
-  }, [isDrawing, activeTool, getCanvasCoordinates, pencilColor, pencilSize, highlighterColor, highlighterSize, eraserSize]);
-
-  const stopDrawing = useCallback(() => {
-    if (!isDrawing) return;
-    
-    setIsDrawing(false);
-    lastPointRef.current = null;
-    setHasUnsavedChanges(true);
-    
-    // Save current state to history
-    const canvas = drawingCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (canvas && ctx) {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      setDrawingHistory(prev => {
-        const newHistory = new Map(prev);
-        const pageHistory = newHistory.get(currentPage) || [];
-        newHistory.set(currentPage, [...pageHistory, imageData]);
-        return newHistory;
-      });
-    }
-  }, [isDrawing, currentPage]);
-
-  const undoDrawing = useCallback(() => {
-    const canvas = drawingCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-    
-    const pageHistory = drawingHistory.get(currentPage) || [];
-    if (pageHistory.length <= 1) {
-      // Clear canvas if only one or no history
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      setDrawingHistory(prev => {
-        const newHistory = new Map(prev);
-        newHistory.delete(currentPage);
-        return newHistory;
-      });
-      return;
-    }
-    
-    // Remove last state and restore previous
-    const newHistory = pageHistory.slice(0, -1);
-    const previousState = newHistory[newHistory.length - 1];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.putImageData(previousState, 0, 0);
-    
-    setDrawingHistory(prev => {
-      const updated = new Map(prev);
-      updated.set(currentPage, newHistory);
-      return updated;
-    });
-  }, [currentPage, drawingHistory]);
-
-  const clearDrawings = useCallback(() => {
-    const canvas = drawingCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    setDrawingHistory(prev => {
-      const newHistory = new Map(prev);
-      newHistory.delete(currentPage);
-      return newHistory;
-    });
-    setHasUnsavedChanges(true);
-  }, [currentPage]);
-
-  // Save annotations to database
-  const saveAnnotations = useCallback(async () => {
-    if (!user) {
-      toast.error('Bitte melde dich an, um Notizen zu speichern');
-      return;
-    }
-
-    const canvas = drawingCanvasRef.current;
-    if (!canvas) return;
-
-    setIsSaving(true);
+  const undo = () => {
+    const past = history[currentPage] || []; const previous = past.at(-1); if (!previous) return;
+    setFuture(f => ({ ...f, [currentPage]: [...(f[currentPage] || []), pageMarks] }));
+    setHistory(h => ({ ...h, [currentPage]: past.slice(0, -1) })); setMarks(m => ({ ...m, [currentPage]: previous })); setDirty(d => new Set(d).add(currentPage));
+  };
+  const redo = () => {
+    const stack = future[currentPage] || []; const next = stack.at(-1); if (!next) return;
+    setHistory(h => ({ ...h, [currentPage]: [...(h[currentPage] || []), pageMarks] })); setFuture(f => ({ ...f, [currentPage]: stack.slice(0, -1) })); setMarks(m => ({ ...m, [currentPage]: next })); setDirty(d => new Set(d).add(currentPage));
+  };
+  const save = useCallback(async () => {
+    if (!user || !annotationsReady || saving) return;
+    setSaving(true); const snapshot = marksRef.current; const pending = [...dirty];
     try {
-      // Get all pages with drawings
-      const pagesToSave = new Set(drawingHistory.keys());
-      
-      for (const pageNum of pagesToSave) {
-        // Get the image data as base64
-        const pageHistory = drawingHistory.get(pageNum);
-        if (!pageHistory || pageHistory.length === 0) continue;
-
-        // Create a temporary canvas to get the data URL
-        const tempCanvas = document.createElement('canvas');
-        const lastImageData = pageHistory[pageHistory.length - 1];
-        tempCanvas.width = lastImageData.width;
-        tempCanvas.height = lastImageData.height;
-        const tempCtx = tempCanvas.getContext('2d');
-        if (!tempCtx) continue;
-        
-        tempCtx.putImageData(lastImageData, 0, 0);
-        const dataUrl = tempCanvas.toDataURL('image/png');
-
-        // Upsert to database
-        const { error } = await supabase
-          .from('pdf_user_annotations')
-          .upsert({
-            pdf_document_id: pdf.id,
-            user_id: user.id,
-            page_number: pageNum,
-            annotations_json: { imageData: dataUrl },
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'pdf_document_id,user_id,page_number'
-          });
-
-        if (error) throw error;
+      for (const n of pending) {
+        const page = snapshot[n] || EMPTY_MARKS;
+        const { error: saveError } = await supabase.from('pdf_user_annotations').upsert({ user_id: user.id, pdf_document_id: pdf.id, page_number: n, annotations_json: JSON.parse(JSON.stringify(page)), updated_at: new Date().toISOString() }, { onConflict: 'pdf_document_id,user_id,page_number' });
+        if (saveError) throw saveError;
+        setDirty(d => { const next = new Set(d); if (marksRef.current[n] === snapshot[n]) next.delete(n); return next; });
       }
-
-      setHasUnsavedChanges(false);
-      toast.success('Notizen gespeichert');
-    } catch (error) {
-      console.error('Error saving annotations:', error);
-      toast.error('Fehler beim Speichern der Notizen');
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user, pdf.id, drawingHistory]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        goToPreviousPage();
-      } else if (e.key === 'ArrowRight') {
-        goToNextPage();
-      } else if (e.key === 'Escape') {
-        onClose();
-      } else if (e.key === ' ' && audioSignedUrl) {
-        e.preventDefault();
-        togglePlayPause();
-      } else if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-        e.preventDefault();
-        saveAnnotations();
-      }
+      toast.success(copy.saved);
+    } catch { toast.error(copy.saveError); } finally { setSaving(false); }
+  }, [user, annotationsReady, saving, dirty, pdf.id, copy]);
+  const print = () => {
+    const page = canvasRef.current; if (!page || loading || error) return;
+    const merged = document.createElement('canvas'); merged.width = page.width; merged.height = page.height;
+    const ctx = merged.getContext('2d'); if (!ctx) return;
+    ctx.drawImage(page, 0, 0); if (inkRef.current) ctx.drawImage(inkRef.current, 0, 0, page.width, page.height);
+    document.getElementById('pdf-print-frame')?.remove();
+    const frame = document.createElement('iframe'); frame.id = 'pdf-print-frame'; frame.className = 'pdf-print-frame'; frame.title = copy.print;
+    frame.onload = () => {
+      const img = frame.contentDocument?.querySelector('img');
+      const run = () => { frame.contentWindow?.focus(); frame.contentWindow?.print(); };
+      frame.contentWindow?.addEventListener('afterprint', () => frame.remove(), { once: true });
+      if (img?.complete) run(); else img?.addEventListener('load', run, { once: true });
     };
+    frame.srcdoc = buildCurrentPagePrint(merged.toDataURL('image/png'), page.width, page.height); document.body.appendChild(frame);
+  };
+  const selectHit = (index: number) => { if (!hits.length) return; const n = (index + hits.length) % hits.length; setHitIndex(n); changePage(hits[n].page); };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToPreviousPage, goToNextPage, onClose, audioSignedUrl, togglePlayPause, saveAnnotations]);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const tracks = audioTracks.filter(t => t.page_number === currentPage);
+  const [trackId, setTrackId] = useState(''); const track = tracks.find(t => t.id === trackId) || tracks[0];
+  const [audioUrl, setAudioUrl] = useState(''); const [playing, setPlaying] = useState(false); const [progress, setProgress] = useState(0); const [duration, setDuration] = useState(0); const [tempo, setTempo] = useState(100);
+  useEffect(() => {
+    let cancelled = false; setAudioUrl(''); setPlaying(false); setProgress(0);
+    if (track) {
+      const path = track.audio_url.split('/pdf-audio/').pop()?.split('?')[0];
+      if (path) void supabase.storage.from('pdf-audio').createSignedUrl(decodeURIComponent(path), 3600).then(({ data }) => { if (!cancelled && data) setAudioUrl(data.signedUrl); });
+    }
+    return () => { cancelled = true; };
+  }, [track?.id]);
+  const play = async () => { const audio = audioRef.current; if (!audio) return; if (playing) { audio.pause(); setPlaying(false); } else { try { await audio.play(); setPlaying(true); } catch { setPlaying(false); } } };
+  const seek = (n: number) => { if (audioRef.current) { audioRef.current.currentTime = Math.max(0, Math.min(duration, n)); setProgress(audioRef.current.currentTime); } };
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLElement && (e.target.matches('input,textarea') || e.target.isContentEditable)) return;
+      if (e.key === 'ArrowLeft') changePage(currentPage - 1);
+      if (e.key === 'ArrowRight') changePage(currentPage + 1);
+      if (e.key === 'Escape') close();
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); void save(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') { e.preventDefault(); setSearchOpen(true); }
+    };
+    window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler);
+  }, [currentPage, changePage, close, save]);
 
-  return (
-    <div className="fixed inset-0 z-[100] flex flex-col animate-fade-in bg-white">
-      {/* Minimal header bar */}
-      <div className="shrink-0 flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200">
-        {/* Left: Zoom controls */}
-        <div className="flex items-center gap-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleZoomOut}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <span className="text-xs font-medium text-gray-600 w-10 text-center">
-            {Math.round(zoom * 100)}%
-          </span>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleZoomIn}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleResetZoom}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Center: Title */}
-        <h2 className="text-sm font-medium text-gray-800 truncate max-w-md mx-4">
-          {pdf.title}
-        </h2>
-
-        {/* Right: Drawing tools */}
-        <div className="flex items-center gap-1">
-          {/* Pencil with color/size picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'pencil' && setActiveTool('pencil')}
-                className={cn(
-                  "h-8 w-8 transition-all relative",
-                  activeTool === 'pencil' 
-                    ? "bg-gray-900 text-white hover:bg-gray-800" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Pencil className="w-4 h-4" />
-                <span 
-                  className="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-white"
-                  style={{ backgroundColor: pencilColor }}
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="end">
-              <div className="space-y-3">
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Farbe</span>
-                  <div className="flex gap-1 flex-wrap">
-                    {BRUSH_COLORS.map(color => (
-                      <button
-                        key={color.value}
-                        onClick={() => { setPencilColor(color.value); setActiveTool('pencil'); }}
-                        className={cn(
-                          "w-7 h-7 rounded-full border-2 transition-all",
-                          pencilColor === color.value ? "border-gray-900 scale-110" : "border-transparent hover:scale-105"
-                        )}
-                        style={{ backgroundColor: color.value }}
-                        title={color.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                  <div className="flex gap-2 items-center">
-                    {BRUSH_SIZES.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => { setPencilSize(size); setActiveTool('pencil'); }}
-                        className={cn(
-                          "rounded-full transition-all flex items-center justify-center",
-                          pencilSize === size ? "bg-gray-900" : "bg-gray-300 hover:bg-gray-400"
-                        )}
-                        style={{ width: size + 12, height: size + 12 }}
-                      >
-                        <Circle className="w-full h-full" style={{ width: size, height: size }} fill="currentColor" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Highlighter with color/size picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'highlighter' && setActiveTool('highlighter')}
-                className={cn(
-                  "h-8 w-8 transition-all",
-                  activeTool === 'highlighter' 
-                    ? "bg-yellow-400 text-black hover:bg-yellow-500" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Highlighter className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-3" align="end">
-              <div className="space-y-3">
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Farbe</span>
-                  <div className="flex gap-1 flex-wrap">
-                    {HIGHLIGHTER_COLORS.map(color => (
-                      <button
-                        key={color.value}
-                        onClick={() => { setHighlighterColor(color.value); setActiveTool('highlighter'); }}
-                        className={cn(
-                          "w-7 h-7 rounded-full border-2 transition-all",
-                          highlighterColor === color.value ? "border-gray-900 scale-110" : "border-transparent hover:scale-105"
-                        )}
-                        style={{ backgroundColor: color.value.replace('0.4', '0.8') }}
-                        title={color.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                  <div className="flex gap-2 items-center">
-                    {HIGHLIGHTER_SIZES.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => { setHighlighterSize(size); setActiveTool('highlighter'); }}
-                        className={cn(
-                          "h-6 rounded transition-all",
-                          highlighterSize === size ? "bg-yellow-400" : "bg-yellow-200 hover:bg-yellow-300"
-                        )}
-                        style={{ width: size }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Eraser */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => activeTool !== 'eraser' && setActiveTool('eraser')}
-                className={cn(
-                  "h-8 w-8 transition-all",
-                  activeTool === 'eraser' 
-                    ? "bg-gray-200 text-gray-900" 
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-                )}
-              >
-                <Eraser className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-3" align="end">
-              <div>
-                <span className="text-xs font-medium text-gray-500 mb-2 block">Größe</span>
-                <Slider
-                  value={[eraserSize]}
-                  min={10}
-                  max={50}
-                  step={5}
-                  onValueChange={([val]) => { setEraserSize(val); setActiveTool('eraser'); }}
-                  className="w-full"
-                />
-                <span className="text-xs text-gray-500 mt-1 block text-center">{eraserSize}px</span>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={undoDrawing}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <Undo2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={clearDrawings}
-            className="h-8 w-8 text-gray-600 hover:text-red-600 hover:bg-gray-200"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          {/* Save button */}
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={saveAnnotations}
-            disabled={isSaving || !hasUnsavedChanges}
-            className={cn(
-              "h-8 px-3 gap-1.5",
-              hasUnsavedChanges 
-                ? "text-green-600 hover:text-green-700 hover:bg-green-50" 
-                : "text-gray-400"
-            )}
-          >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            <span className="text-xs">Speichern</span>
-          </Button>
-
-          {/* Print current page button */}
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={handlePrintCurrentPage}
-            disabled={isLoading || !!loadError}
-            className="h-8 px-3 gap-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <Printer className="w-4 h-4" />
-            <span className="text-xs">Drucken</span>
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-1" />
-
-          {/* Close button */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            className="h-8 w-8 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
+  const fit = Math.max(0.1, Math.min((area.width - 40) / size.width, (area.height - 40) / size.height));
+  const icon = (label: string, glyph: React.ReactNode, action: () => void, disabled = false, selected = false) => <Button size="icon" variant="ghost" aria-label={label} title={label} disabled={disabled} onClick={action} aria-pressed={selected || undefined} className={cn('shrink-0 text-muted-foreground', selected && 'bg-secondary text-primary')}>{glyph}</Button>;
+  return <div className="pdf-workspace ts-light-module ts-system-font fixed inset-0 z-[100] flex flex-col" role="dialog" aria-modal="true" aria-label={pdf.title}>
+    <header className="pdf-topbar flex shrink-0 items-center gap-2 border-b border-border bg-card px-3">
+      {icon(copy.pages, <PanelLeft />, () => setSidebar(s => !s), false, sidebar)}
+      <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">{pdf.title}</h2>
+      {icon(copy.search, <Search />, () => setSearchOpen(s => !s), !doc, searchOpen)}
+      {icon(copy.print, <Printer />, print, loading || error)}
+      {icon(copy.close, <X />, close)}
+    </header>
+    {searchOpen && <div className="flex shrink-0 items-center gap-1 border-b border-border bg-card px-3 py-2">
+      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <Input autoFocus aria-label={copy.search} placeholder={copy.search} value={query} onChange={e => setQuery(e.target.value)} className="h-9 min-w-0 flex-1 border-0 bg-muted shadow-none" />
+      <span className="text-xs text-muted-foreground whitespace-nowrap" role="status">{searching ? copy.searching : query ? hits.length ? `${hitIndex + 1}/${hits.length}` : copy.noResults : ''}</span>
+      {icon(copy.previousResult, <ChevronLeft />, () => selectHit(hitIndex - 1), !hits.length)}
+      {icon(copy.nextResult, <ChevronRight />, () => selectHit(hitIndex + 1), !hits.length)}
+    </div>}
+    <div className="relative flex min-h-0 flex-1 overflow-hidden">
+      {sidebar && <aside aria-label={copy.pages} className="pdf-sidebar z-20 flex w-40 shrink-0 flex-col border-r border-border bg-background md:w-44">
+        <div className="flex items-center justify-between px-3 py-2"><span className="text-xs font-semibold text-muted-foreground">{copy.pages}</span>{icon(copy.close, <X />, () => setSidebar(false))}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{doc && Array.from({ length: doc.numPages }, (_, i) => <PdfThumbnail key={i} doc={doc} page={i + 1} selected={i + 1 === currentPage} label={copy.page} onSelect={() => { changePage(i + 1); if (window.innerWidth < 640) setSidebar(false); }} />)}</div>
+      </aside>}
+      <div ref={areaRef} className="relative min-w-0 flex-1 overflow-hidden bg-muted/50">
+        <TransformWrapper ref={transformRef} minScale={0.6} maxScale={5} centerOnInit centerZoomedOut limitToBounds panning={{ excluded: tool === 'hand' ? [] : ['pdf-mark-surface'] }} wheel={{ step: 0.06 }} doubleClick={{ disabled: tool !== 'hand', mode: 'toggle', step: 1 }} onTransformed={(_, state) => setScale(state.scale)}>
+          <TransformComponent wrapperClass="pdf-zoom-viewport" contentClass="pdf-zoom-content">
+            <div className="pdf-paper relative shrink-0" style={{ width: size.width * fit, height: size.height * fit }}>
+              <canvas ref={canvasRef} className="block h-full w-full" aria-label={`${copy.page} ${currentPage}`} />
+              {query.trim() && boxes.filter(b => findTextMatches(b.text, query).length).map((b, i) => <div key={i} className="pdf-search-match pointer-events-none absolute" style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${b.width}%`, height: `${b.height}%` }} />)}
+              <PdfInk key={currentPage} marks={pageMarks} tool={tool} color={color} width={width} ratio={size.height / size.width} canvasRef={inkRef} onCommit={commit} disabled={loading || !annotationsReady || saving} />
+            </div>
+          </TransformComponent>
+        </TransformWrapper>
+        {loading && !error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/90"><Loader2 className="h-7 w-7 animate-spin text-primary" /><span className="text-sm text-muted-foreground">{copy.loading}</span></div>}
+        {error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background px-6 text-center"><AlertCircle className="h-8 w-8 text-destructive" /><p>{copy.error}</p><Button onClick={() => onRetry ? onRetry() : close()}>{copy.retry}</Button></div>}
       </div>
-
-      {/* PDF Canvas Area - maximized */}
-      <div 
-        ref={containerRef}
-        className="flex-1 min-h-0 flex items-center justify-center p-2 bg-gray-50 relative overflow-auto"
-      >
-        {/* Error overlay */}
-        {loadError && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 bg-white">
-            <div className="flex flex-col items-center gap-6 max-w-md text-center px-4">
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">PDF konnte nicht geladen werden</h3>
-                <p className="text-gray-600 text-sm mb-4">{loadError}</p>
-              </div>
-              <div className="flex gap-3">
-                <Button onClick={handleRetry}>
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Erneut versuchen
-                </Button>
-                <Button variant="outline" onClick={onClose}>
-                  Schließen
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Loading overlay */}
-        {isLoading && !loadError && (
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/80">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-              <span className="text-gray-600">Seite wird geladen...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Canvas container for both PDF and drawing */}
-        <div className="relative shadow-lg" style={{ maxWidth: '100%', maxHeight: '100%' }}>
-          {/* PDF Canvas */}
-          <canvas
-            ref={canvasRef}
-            className={cn(
-              "transition-opacity duration-300 bg-white",
-              isLoading ? "opacity-0" : "opacity-100"
-            )}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-            }}
-          />
-          
-          {/* Drawing Canvas (overlay) */}
-          <canvas
-            ref={drawingCanvasRef}
-            className={cn(
-              "absolute inset-0 transition-opacity duration-300",
-              isLoading ? "opacity-0" : "opacity-100",
-              activeTool !== 'none' ? "cursor-crosshair touch-none" : "pointer-events-none"
-            )}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-            }}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            onTouchStart={startDrawing}
-            onTouchMove={draw}
-            onTouchEnd={stopDrawing}
-            onTouchCancel={stopDrawing}
-          />
-        </div>
-
-        {/* Page Navigation Arrows - subtle */}
-        <button
-          onClick={goToPreviousPage}
-          disabled={currentPage <= 1}
-          className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md transition-all",
-            currentPage <= 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-100"
-          )}
-        >
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
-        </button>
-
-        <button
-          onClick={goToNextPage}
-          disabled={currentPage >= pdf.page_count}
-          className={cn(
-            "absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md transition-all",
-            currentPage >= pdf.page_count ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-100"
-          )}
-        >
-          <ChevronRight className="w-5 h-5 text-gray-700" />
-        </button>
-      </div>
-
-      {/* Compact bottom bar */}
-      <div className="shrink-0 z-[105] bg-gray-100 border-t border-gray-200 px-4 py-1.5">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left: Page navigation */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={goToPreviousPage}
-              disabled={currentPage <= 1}
-              className={cn(
-                "p-1.5 rounded transition-all",
-                currentPage <= 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-200"
-              )}
-            >
-              <ChevronLeft className="w-4 h-4 text-gray-700" />
-            </button>
-            <span className="text-sm text-gray-700 font-medium min-w-[80px] text-center">
-              {currentPage} / {pdf.page_count}
-            </span>
-            <button
-              onClick={goToNextPage}
-              disabled={currentPage >= pdf.page_count}
-              className={cn(
-                "p-1.5 rounded transition-all",
-                currentPage >= pdf.page_count ? "opacity-30 cursor-not-allowed" : "hover:bg-gray-200"
-              )}
-            >
-              <ChevronRight className="w-4 h-4 text-gray-700" />
-            </button>
-          </div>
-
-          {/* Center: Audio Player (if tracks available) */}
-          {audioSignedUrl && selectedTrack ? (
-            <div className="flex items-center gap-3 flex-1 max-w-xl mx-4">
-              <audio
-                ref={audioRef}
-                src={audioSignedUrl}
-                onTimeUpdate={handleTimeUpdate}
-                onLoadedMetadata={handleLoadedMetadata}
-                onEnded={() => setIsPlaying(false)}
-              />
-              
-              <button
-                onClick={togglePlayPause}
-                className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all shrink-0 flex items-center justify-center"
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
-              </button>
-              
-              <button
-                onClick={() => skipSeconds(-10)}
-                className="p-1 rounded text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-all"
-              >
-                <SkipBack className="w-4 h-4" />
-              </button>
-              
-              <span className="text-xs text-gray-600 font-mono w-10 text-right">
-                {formatTime(audioProgress)}
-              </span>
-              
-              <Slider
-                value={[audioProgress]}
-                min={0}
-                max={audioDuration || 100}
-                step={0.1}
-                onValueChange={handleSeek}
-                className="flex-1 min-w-[80px]"
-              />
-              
-              <span className="text-xs text-gray-600 font-mono w-10">
-                {formatTime(audioDuration)}
-              </span>
-              
-              <button
-                onClick={() => skipSeconds(10)}
-                className="p-1 rounded text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-all"
-              >
-                <SkipForward className="w-4 h-4" />
-              </button>
-
-              {hasMultipleTracks && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-600 hover:bg-gray-200 transition-all">
-                      <Music className="w-3 h-3" />
-                      <ChevronDown className="w-3 h-3" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    {currentPageTracks.map((track) => (
-                      <DropdownMenuItem
-                        key={track.id}
-                        onClick={() => setSelectedTrack(track)}
-                        className={cn(
-                          "cursor-pointer text-sm",
-                          track.id === selectedTrack.id && "bg-blue-50 text-blue-600"
-                        )}
-                      >
-                        <Music className="w-3 h-3 mr-2" />
-                        {track.title}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-
-              <div className="flex items-center gap-1 pl-2 border-l border-gray-300">
-                <span className="text-xs text-gray-500">{playbackRate}%</span>
-                <Slider
-                  value={[playbackRate]}
-                  min={50}
-                  max={150}
-                  step={5}
-                  onValueChange={handleSpeedChange}
-                  className="w-16"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex-1 text-center">
-              <span className="text-xs text-gray-400">Kein Audio für diese Seite</span>
-            </div>
-          )}
-
-          {/* Right: Unsaved indicator */}
-          <div className="flex items-center gap-2">
-            {hasUnsavedChanges && (
-              <span className="text-xs text-orange-600">Ungespeicherte Änderungen</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Debug Panel - only visible to admins or with ?debug=1 */}
-      {showDebug && (
-        <PdfDebugPanel
-          diagnostics={diagnostics}
-          onRunDiagnostics={handleRunDiagnostics}
-          onRetry={handleRetry}
-          isLoading={isDiagnosing}
-        />
-      )}
     </div>
-  );
+    <div className="pdf-markbar shrink-0 border-t border-border bg-card">
+      <div className="flex items-center justify-center gap-1 overflow-x-auto px-2 py-1">
+        {icon(copy.hand, <Hand />, () => setTool('hand'), false, tool === 'hand')}
+        {icon(copy.pencil, <Pencil />, () => setTool('pencil'), !annotationsReady, tool === 'pencil')}
+        {icon(copy.highlight, <Highlighter />, () => setTool('highlight'), !annotationsReady, tool === 'highlight')}
+        {icon(copy.signature, <Signature />, () => { setTool('signature'); setColor('ink'); setWidth(3); }, !annotationsReady, tool === 'signature')}
+        {icon(copy.eraser, <Eraser />, () => setTool('eraser'), !annotationsReady, tool === 'eraser')}
+        <span className="mx-1 h-6 w-px shrink-0 bg-border" />
+        {icon(copy.undo, <Undo2 />, undo, !history[currentPage]?.length || saving)}
+        {icon(copy.redo, <Redo2 />, redo, !future[currentPage]?.length || saving)}
+        {icon(copy.clear, <Trash2 />, () => { if (window.confirm(copy.clearConfirm)) commit(EMPTY_MARKS); }, !annotationsReady || saving)}
+        {icon(saving ? copy.saving : copy.save, saving ? <Loader2 className="animate-spin" /> : dirty.size ? <Save /> : <Check />, () => void save(), !dirty.size || saving)}
+      </div>
+      {tool !== 'hand' && <div className="flex items-center justify-center gap-3 border-t border-border/60 px-3 py-1">
+        <div role="group" aria-label={copy.colors} className="flex gap-1">{(['ink', 'blue', 'red', 'green', 'gold'] as InkColor[]).map(c => <Button key={c} variant="ghost" size="icon" className="h-9 w-9" title={copy[c]} aria-label={copy[c]} aria-pressed={color === c} onClick={() => { setColor(c); if (tool === 'highlight') setTool('pencil'); }}><span className={cn('pdf-swatch', `pdf-swatch-${c}`, color === c && 'ring-2 ring-primary ring-offset-2 ring-offset-card')} /></Button>)}</div>
+        <Slider aria-label={copy.width} value={[width]} min={2} max={12} step={1} onValueChange={([value]) => setWidth(value)} className="w-24" />
+      </div>}
+    </div>
+    <footer className="pdf-footer shrink-0 border-t border-border bg-card px-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">{icon(copy.previous, <ChevronLeft />, () => changePage(currentPage - 1), currentPage <= 1)}
+          <Input aria-label={copy.page} type="number" min={1} max={pageCount} key={currentPage} defaultValue={currentPage} onBlur={e => changePage(Number(e.target.value))} onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }} className="h-8 w-14 text-center tabular-nums" />
+          <span className="text-xs tabular-nums text-muted-foreground">/ {pageCount}</span>{icon(copy.next, <ChevronRight />, () => changePage(currentPage + 1), currentPage >= pageCount)}
+        </div>
+        <span className="hidden text-xs text-muted-foreground md:block" role="status">{dirty.size ? copy.unsaved : annotationsReady ? copy.saved : ''}</span>
+        <div className="flex items-center gap-0">{icon(copy.zoomOut, <ZoomOut />, () => transformRef.current?.zoomOut(0.25), !doc)}<span className="w-11 text-center text-xs tabular-nums text-muted-foreground">{Math.round(scale * 100)}%</span>{icon(copy.zoomIn, <ZoomIn />, () => transformRef.current?.zoomIn(0.25), !doc)}{icon(copy.fit, <Maximize />, () => transformRef.current?.resetTransform(), !doc)}</div>
+      </div>
+      {audioUrl && track && <div className="flex flex-wrap items-center gap-2 border-t border-border py-2">
+        <audio ref={audioRef} src={audioUrl} onTimeUpdate={() => setProgress(audioRef.current?.currentTime || 0)} onLoadedMetadata={() => { setDuration(audioRef.current?.duration || 0); if (audioRef.current) audioRef.current.playbackRate = tempo / 100; }} onEnded={() => setPlaying(false)} />
+        {icon(playing ? copy.pause : copy.play, playing ? <Pause /> : <Play />, () => void play())}
+        {icon(copy.back, <SkipBack />, () => seek(progress - 10))}
+        <Slider aria-label={copy.seek} value={[progress]} min={0} max={duration || 1} step={0.1} onValueChange={([n]) => seek(n)} className="min-w-16 flex-1" />
+        {icon(copy.forward, <SkipForward />, () => seek(progress + 10))}
+        <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={copy.audio} title={track.title}><Music /></Button></DropdownMenuTrigger><DropdownMenuContent>{tracks.map(t => <DropdownMenuItem key={t.id} onClick={() => setTrackId(t.id)}>{t.title}</DropdownMenuItem>)}</DropdownMenuContent></DropdownMenu>
+        <span className="text-xs tabular-nums">{tempo}%</span><Slider aria-label={copy.tempo} value={[tempo]} min={50} max={150} step={5} onValueChange={([n]) => { setTempo(n); if (audioRef.current) audioRef.current.playbackRate = n / 100; }} className="w-20" />
+      </div>}
+    </footer>
+  </div>;
 }
