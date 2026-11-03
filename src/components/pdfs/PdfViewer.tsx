@@ -232,7 +232,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
         <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">{doc && Array.from({ length: doc.numPages }, (_, i) => <PdfThumbnail key={i} doc={doc} page={i + 1} selected={i + 1 === currentPage} label={copy.page} onSelect={() => { changePage(i + 1); if (window.innerWidth < 640) setSidebar(false); }} />)}</div>
       </aside>}
       <div ref={areaRef} className="relative min-w-0 flex-1 overflow-hidden bg-muted/50">
-        <TransformWrapper ref={transformRef} minScale={0.6} maxScale={5} centerOnInit centerZoomedOut limitToBounds panning={{ excluded: tool === 'hand' ? [] : ['pdf-mark-surface'] }} wheel={{ step: 0.06 }} doubleClick={{ disabled: tool !== 'hand', mode: 'toggle', step: 1 }} onTransform={(_, state) => setScale(state.scale)}>
+        <TransformWrapper ref={transformRef} minScale={0.6} maxScale={5} centerOnInit centerZoomedOut limitToBounds panning={{ excluded: tool === 'hand' ? [] : ['pdf-mark-surface'] }} wheel={{ step: 0.002 }} doubleClick={{ disabled: tool !== 'hand', mode: 'toggle', step: 1 }} onTransform={(_, state) => setScale(state.scale)}>
           <TransformComponent wrapperClass="pdf-zoom-viewport" contentClass="pdf-zoom-content">
             <div className="pdf-paper relative shrink-0" style={{ width: size.width * fit, height: size.height * fit }}>
               <canvas ref={canvasRef} className="block h-full w-full" aria-label={`${copy.page} ${currentPage}`} />
