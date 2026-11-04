@@ -27,7 +27,7 @@ const Fallback = () => (
   <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin" /></div>
 );
 
-function Module({ route, tab, children, surface }: { route: string; tab?: TabId; children: ReactNode; surface?: 'gradient' | 'light' }) {
+function Module({ route, tab, children, surface = 'gradient' }: { route: string; tab?: TabId; children: ReactNode; surface?: 'gradient' | 'light' }) {
   const { t } = useLanguage();
   const app = getAppByRoute(route);
   return (
