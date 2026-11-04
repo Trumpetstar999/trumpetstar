@@ -1,0 +1,25 @@
+/* Semantic defaults also support opening the standalone page directly. */
+:root {
+  --ts-sky: 207 100% 50%; --ts-deep: 211 100% 43%; --ts-bright: 207 100% 49%;
+  --ts-gold: 37 91% 55%; --ts-red: 6 78% 57%; --tuner-tuned: 151 70% 30%;
+  --ts-ink: 214 70% 18%; --ts-ink-muted: 214 17% 43%; --ts-surface: 214 50% 96%;
+  --ts-card: 0 0% 100%; --ts-on-gradient: 0 0% 100%;
+  --sky: hsl(var(--ts-sky)); --deep: hsl(var(--ts-deep)); --bright: hsl(var(--ts-bright));
+  --gold: hsl(var(--ts-gold)); --red: hsl(var(--ts-red)); --green: hsl(var(--tuner-tuned));
+  --ink: hsl(var(--ts-ink)); --muted: hsl(var(--ts-ink-muted)); --paper: hsl(var(--ts-surface));
+  --linie: hsl(var(--ts-ink)); --griff-linie: hsl(var(--ts-ink)); --marker: hsl(var(--ts-gold)); --haken: hsl(var(--tuner-tuned));
+  --grad: linear-gradient(180deg, hsl(var(--ts-sky)), hsl(var(--ts-deep)) 40%, hsl(var(--ts-bright)));
+}
+* { letter-spacing: 0 !important; }
+.kopf, .zurueck { color: hsl(var(--ts-on-gradient)); }
+.karte, .rh-stein, .ton-chip, .rund, .stepper, .kapsel.hell { background: hsl(var(--ts-card)); }
+.karte { border-radius: 8px; box-shadow: none; }
+.silben span { font-size: 16px; }
+.jubel p { font-size: 24px; }
+.sterne i { font-size: 64px; }
+.sterne i:nth-child(2) { font-size: 80px; }
+.kapsel.gold, .los { color: hsl(var(--ts-ink)); }
+.kapsel.gold svg.trompete { filter: none; }
+.kapsel { white-space: normal; text-align: center; line-height: 1.15; }
+svg.trompete, .minigriff, .griff { background-image: var(--trumpet-image); }
+button[aria-label] { touch-action: manipulation; }

@@ -23,5 +23,5 @@ export function RhythmusWerkstatt() {
     window.addEventListener('message', receive);
     return () => window.removeEventListener('message', receive);
   }, [navigate]);
-  return <div className="ts-light-module fixed inset-0"><iframe ref={frame} key={language} title={t('home.apps.rhythm')} src={`/rhythmus-werkstatt/index.html?lang=${language}`} allow="microphone; autoplay" onLoad={sendTheme} className="block h-[100dvh] w-full border-0" /></div>;
+  return <div className="ts-light-module fixed inset-0"><iframe ref={frame} key={language} title={t('home.rhy')} src={`/rhythmus-werkstatt/index.html?lang=${language}`} allow="microphone; autoplay" onLoad={sendTheme} className="block h-[100dvh] w-full border-0" /></div>;
 }
