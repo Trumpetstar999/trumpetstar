@@ -1,4 +1,5 @@
 # Architecture rules
+- Keep legal pages public and localized through shared legal copy; mount external video engines only after session-scoped explicit permission and unmount them on withdrawal to prevent pre-consent provider requests.
 - Derive descending flat-spelled fingerings from the ascending pitch/valve registry so enharmonic notation cannot change playback or grips.
 - Keep app welcome delivery in the authenticated contact-sync function with a service-only unique user/email ledger and atomic stage claims; stop ambiguous provider outcomes and unsent legacy offers for reconciliation to prevent duplicate vouchers, mismatched discount emails or mail, and isolate the singleton admin test from production identities.
 - Request login and recovery emails through the managed auth client, never the legacy SMTP relay or privileged link generator; keep verification URLs intact and return callbacks to public auth pages.

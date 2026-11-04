@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { HowToSchema } from "@/components/SEO/HowToSchema";
 import { FAQSchema } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
@@ -66,14 +67,14 @@ export default function TrompeteAnsatzAtmungPage() {
           <AnimatedSection direction="up" delay={200}>
             <div className="max-w-3xl mx-auto mb-10">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                <iframe
+                <ExternalMediaGate><iframe
                   src="https://player.vimeo.com/video/1025864403?h=6b28cdec78&title=0&byline=0&portrait=0&dnt=1"
                   className="absolute inset-0 w-full h-full"
                   frameBorder="0"
                   allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                   allowFullScreen
                   title="Trompete Ansatz und Atmung"
-                />
+                /></ExternalMediaGate>
               </div>
             </div>
           </AnimatedSection>

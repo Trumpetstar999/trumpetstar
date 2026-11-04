@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { FAQSchema } from "@/components/SEO/FAQSchema";
 import { HowToSchema } from "@/components/SEO/HowToSchema";
 import { Button } from "@/components/ui/button";
@@ -80,12 +81,12 @@ export default function TrompeteLernenPage() {
         {/* Video */}
         <AnimatedSection direction="up" className="mb-16">
           <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
-            <iframe
+            <ExternalMediaGate><iframe
               src="https://player.vimeo.com/video/995373130"
               className="w-full h-full"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
-            />
+            /></ExternalMediaGate>
           </div>
         </AnimatedSection>
 

@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Pause, Maximize2, Minimize2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
@@ -10,7 +11,7 @@ interface SessionVideoPlayerProps {
   startFullscreen?: boolean;
 }
 
-export function SessionVideoPlayer({ vimeoVideoId, title, onEnded, startFullscreen }: SessionVideoPlayerProps) {
+function SessionVideoPlayerContent({ vimeoVideoId, title, onEnded, startFullscreen }: SessionVideoPlayerProps) {
   const [isFullscreen, setIsFullscreen] = useState(startFullscreen || false);
   const [isLoading, setIsLoading] = useState(true);
   const [playerReady, setPlayerReady] = useState(false);
@@ -288,4 +289,8 @@ export function SessionVideoPlayer({ vimeoVideoId, title, onEnded, startFullscre
       </div>
     </div>
   );
+}
+
+export function SessionVideoPlayer(props: SessionVideoPlayerProps) {
+  return <ExternalMediaGate><SessionVideoPlayerContent {...props} /></ExternalMediaGate>;
 }
