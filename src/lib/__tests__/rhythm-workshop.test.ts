@@ -1,4 +1,4 @@
-// @vitest-environment node
+// @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { Window } from 'happy-dom';
