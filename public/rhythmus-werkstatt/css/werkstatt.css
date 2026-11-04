@@ -1,0 +1,284 @@
+/* werkstatt.css — Rhythmus-Werkstatt im Stil des Trumpetstar-App-Redesigns
+ * (»iPhone-Home«, 03.11.2026): Modulseite mit Kopf im Signature-Verlauf,
+ * grossem Titel, Inhalt auf #F2F6FB, weisse Karten, Glas fuer schwebende
+ * Leisten, iOS-Kurve. Tippflaechen mindestens 44 px. */
+:root {
+  --sky: #008CFD; --deep: #0068DB; --bright: #0087FA;
+  --gold: #F5A623; --gold2: #FFD700; --red: #E74C3C; --green: #27AE60;
+  --ink: #0E2A4F; --muted: #5B6B80; --paper: #F2F6FB; --ice: #D5E8F0;
+  --grad: linear-gradient(180deg, #008CFD 0%, #0068DB 40%, #0087FA 100%);
+  --glass: rgba(255, 255, 255, .62);
+  --hair: rgba(255, 255, 255, .85);
+  --ease: cubic-bezier(.32, .72, 0, 1);
+  --karte-schatten: 0 1px 3px rgba(0, 40, 100, .06), 0 6px 18px rgba(0, 60, 140, .06);
+  --knopf-schatten: 0 1px 2px rgba(0, 40, 100, .12), 0 4px 14px rgba(0, 60, 140, .10);
+
+  /* vom Notensatz und Griffbild gelesen */
+  --linie: #222222;
+  --marker: #F5A623;
+  --haken: #27AE60;
+  --loch-offen: #FFFFFF;
+  --griff-linie: #222222;
+  --ventil-schaft: #9AA7B4;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 100%/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none; user-select: none;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 12px; }
+[hidden] { display: none !important; }
+
+.bildschirm { min-height: 100dvh; display: flex; flex-direction: column; }
+.inhalt {
+  flex: 1; width: 100%; max-width: 1100px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px 16px 104px;          /* Platz fuer die schwebende Leiste */
+}
+
+/* ---- Kopf: Signature-Verlauf, Zurueck, App-Icon, grosser Titel ---- */
+.kopf {
+  background: var(--grad); color: #fff;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 18px;
+}
+.kopf .nav { display: flex; align-items: center; justify-content: space-between; min-height: 44px; max-width: 1100px; margin: 0 auto; }
+.kopf h1 {
+  max-width: 1100px; margin: 4px auto 0;
+  font-size: 32px; line-height: 1.05; font-weight: 800; letter-spacing: -.02em;
+}
+.zurueck {
+  display: flex; align-items: center; gap: 2px; min-height: 44px; padding-right: 10px;
+  color: #fff; font-size: 17px; font-weight: 500; letter-spacing: -.01em;
+  transition: opacity .12s ease-out;
+}
+.zurueck:active { opacity: .55; transition: none; }
+.zurueck svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.app-icon { width: 40px; height: 40px; border-radius: 22.5%; box-shadow: 0 4px 10px rgba(0, 30, 90, .3); }
+
+/* ---- Werkzeugleiste ---- */
+.werkzeuge { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.werkzeuge.mitte { justify-content: center; }
+.werkzeuge .luecke { flex: 1; }
+
+/* Segmented Control wie iOS: Spur in Grau, gewaehlt als weisse Pille */
+.segment {
+  display: inline-flex; padding: 3px; gap: 2px;
+  background: #E3E8EF; border-radius: 12px;
+}
+.segment > button, .segment > .opt {
+  min-width: 52px; min-height: 44px; padding: 0 12px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted); font-size: 15px; font-weight: 600;
+  transition: background .25s var(--ease), color .25s var(--ease), box-shadow .25s var(--ease), opacity .25s, transform .1s ease-out;
+}
+.segment > button:active { transform: scale(.96); transition: transform 0s; }
+.segment > button.an {
+  background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(0, 0, 0, .12), 0 0 0 .5px rgba(0, 0, 0, .04);
+}
+.segment > button.gesperrt { opacity: .4; }
+.bruch { display: flex; flex-direction: column; align-items: center; line-height: .82; }
+.bruch b { font: 800 17px/.9 Arial, sans-serif; }
+.segment.breit > button { min-width: 140px; padding: 0 18px; }
+.segment svg.trompete { width: 44px; height: 22px; flex: none; }
+
+/* Klang: ein Knopf, zwei Felder — das gewaehlte ist die weisse Pille */
+.segment.klang:active .opt { transform: scale(.96); transition: transform 0s; }
+.segment.klang .opt svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.segment.klang .opt svg.trompete { width: 44px; height: 22px; }
+.segment.klang:not(.trompete) .hand,
+.segment.klang.trompete .horn { background: #fff; color: var(--deep); box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.segment.klang:not(.trompete) .horn,
+.segment.klang.trompete .hand { opacity: .5; }
+
+/* Ton: Kapsel mit farbigem Tonkreis und Ventilgriff */
+.ton-chip {
+  display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 4px 12px 4px 5px;
+  background: #fff; border-radius: 99px; box-shadow: var(--knopf-schatten);
+  transition: transform .1s ease-out;
+}
+.ton-chip:active { transform: scale(.96); transition: transform 0s; }
+.tonkreis {
+  width: 40px; height: 40px; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  color: #fff; font: 800 20px/1 -apple-system, Arial, sans-serif;
+  background: var(--deep); box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+.minigriff { width: 64px; height: 32px; }
+
+/* Runde Werkzeugknoepfe, 44 px */
+.rund-gruppe { display: flex; gap: 8px; }
+.rund {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #fff; border: 1px solid var(--hair); box-shadow: var(--knopf-schatten);
+  color: var(--deep);
+  transition: transform .1s ease-out, background .1s;
+}
+.rund:active { transform: scale(.9); background: #EAF2FD; transition: transform 0s, background 0s; }
+.rund svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.rund .rot { stroke: var(--red); }
+.rund .punkt { fill: currentColor; stroke: none; }
+
+/* ---- Karten ---- */
+.karte { background: #fff; border-radius: 18px; box-shadow: var(--karte-schatten); }
+.notenkarte { flex: 1 1 auto; min-height: 220px; padding: 14px 16px 8px; display: flex; }
+.notenfeld { position: relative; flex: 1; min-height: 190px; }
+.notenfeld > svg { position: absolute; inset: 0; width: 100%; height: 86%; }
+.silben { position: absolute; inset: 0; pointer-events: none; }
+.silben span {
+  position: absolute; transform: translateX(-50%);
+  font-size: clamp(13px, 1.8vw, 18px); font-weight: 700; color: var(--deep); white-space: nowrap; letter-spacing: -.01em;
+}
+.leer {
+  position: absolute; inset: 0; margin: auto; height: fit-content; max-width: 26em; padding: 0 12px;
+  text-align: center; color: var(--muted); font-size: 17px;
+}
+
+/* ---- Schlag-Kaestchen ---- */
+.schlaege { display: flex; justify-content: center; gap: clamp(8px, 2.4vw, 24px); flex-wrap: wrap; }
+.rh-takt { display: flex; gap: 5px; padding: 6px 8px; background: #E3E8EF; border-radius: 12px; }
+.rh-takt i { width: clamp(20px, 3vw, 30px); height: clamp(20px, 3vw, 30px); border-radius: 7px; background: #fff; transition: background .25s var(--ease); }
+.rh-takt i.voll { background: var(--grad); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35); }
+
+/* ---- Bausteine ---- */
+.bausteine { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .bausteine { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } }
+.rh-stein {
+  border-radius: 18px; background: #fff; box-shadow: var(--karte-schatten);
+  aspect-ratio: 1.3; padding: 8px 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  transition: transform .1s ease-out, opacity .25s var(--ease), box-shadow .1s;
+}
+.rh-stein:active { transform: scale(.95); box-shadow: 0 0 0 2px var(--sky); transition: transform 0s, box-shadow 0s; }
+.rh-stein svg { width: 92%; flex: 1; }
+.rh-stein b { font-size: clamp(14px, 1.7vw, 17px); font-weight: 700; color: var(--deep); letter-spacing: -.01em; }
+.rh-stein.passt-nicht { opacity: .35; }
+
+/* ---- Schwebende Leiste unten: Glas ---- */
+.leiste-unten {
+  position: fixed; left: 50%; bottom: calc(12px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  width: min(calc(100% - 24px), 720px);
+  display: flex; align-items: center; gap: 10px; padding: 8px;
+  background: var(--glass); border: 1px solid var(--hair); border-radius: 26px;
+  -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: 0 12px 30px rgba(0, 60, 140, .16);
+  z-index: 5;
+}
+.leiste-unten.mitte { justify-content: space-between; }
+
+.kapsel {
+  flex: 1; min-height: 52px; border-radius: 18px; padding: 0 16px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 17px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap;
+  transition: transform .1s ease-out, filter .1s;
+}
+.kapsel:active { transform: scale(.97); filter: brightness(.94); transition: transform 0s, filter 0s; }
+.kapsel.gold { background: var(--gold); color: #fff; box-shadow: 0 6px 16px rgba(245, 166, 35, .35); }
+.kapsel.gold svg.trompete { width: 48px; height: 24px; flex: none; filter: brightness(0) invert(1); }
+.kapsel.hell { background: #fff; color: var(--deep); box-shadow: var(--knopf-schatten); }
+.kapsel svg.dreieck, .kapsel svg.quadrat { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.kapsel .quadrat, .kapsel .text-aus { display: none; }
+.kapsel.laeuft .dreieck, .kapsel.laeuft .text-an { display: none; }
+.kapsel.laeuft .quadrat, .kapsel.laeuft .text-aus { display: inline; }
+.kapsel.laeuft { color: var(--red); }
+
+.stepper {
+  display: flex; align-items: center; background: #fff; border-radius: 18px; box-shadow: var(--knopf-schatten);
+  min-height: 52px;
+}
+.stepper button { width: 44px; height: 52px; display: grid; place-items: center; color: var(--deep); border-radius: 18px; transition: background .1s; }
+.stepper button:active { background: #EAF2FD; transition: none; }
+.stepper svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.stepper span { min-width: 48px; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.stepper b { font-size: 20px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.stepper small { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .02em; margin-top: 2px; }
+@media (max-width: 480px) {
+  /* Handy: Anhoeren nur als Symbol, damit »Selbst spielen« ganz lesbar bleibt */
+  .leiste-unten { gap: 6px; padding: 6px; }
+  .kapsel { min-width: 0; padding: 0 10px; font-size: 16px; }
+  .kapsel.hell { flex: 0 0 52px; padding: 0; }
+  .kapsel.hell span { display: none !important; }
+  .kapsel.gold svg.trompete { display: none; }
+  .stepper button { width: 36px; }
+}
+
+/* Grosser Los-Knopf beim Selbst-Spielen */
+.los {
+  width: 76px; height: 76px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--gold); color: #fff;
+  box-shadow: 0 8px 20px rgba(245, 166, 35, .45), inset 0 1px 0 rgba(255, 255, 255, .45);
+  transition: transform .1s ease-out;
+}
+.los:active { transform: scale(.92); transition: transform 0s; }
+.los svg { width: 34px; height: 34px; fill: currentColor; }
+.los svg.dreieck { margin-left: 4px; }
+.los .quadrat { display: none; }
+.los.laeuft .dreieck { display: none; }
+.los.laeuft .quadrat { display: block; }
+.tempo-pill {
+  width: 112px; text-align: center; padding: 10px 0; border-radius: 99px;
+  background: #fff; box-shadow: var(--knopf-schatten); color: var(--muted); font-size: 13px; font-weight: 600;
+}
+.tempo-pill b { color: var(--ink); font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tempo-pill.platzhalter { visibility: hidden; }
+
+/* ---- Selbst spielen ---- */
+.punkte { display: flex; justify-content: center; gap: 14px; min-height: 24px; }
+.punkte i { width: 20px; height: 20px; border-radius: 50%; background: #DCE3EC; transition: transform .12s var(--ease), background .12s; }
+.punkte i.an { background: var(--gold); transform: scale(1.25); }
+.punkte i.los { background: var(--green); transform: scale(1.45); }
+
+.griffkarte { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 12px 18px; }
+.griff { width: clamp(120px, 22vw, 200px); height: clamp(64px, 11vw, 100px); }
+.griffinfo { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.tonkreis.gross { width: 56px; height: 56px; font-size: 26px; }
+.hinweis { color: var(--muted); font-size: 14px; max-width: 18em; text-align: center; }
+
+/* Erfolg: Karte auf abgedunkeltem Grund, Sterne in Gold */
+.jubel {
+  position: fixed; inset: 0; display: grid; place-items: center; z-index: 10;
+  background: rgba(10, 25, 50, .35);
+  animation: einblenden .3s var(--ease) both;
+}
+.jubel-karte {
+  background: rgba(255, 255, 255, .96); border-radius: 36px; padding: 26px 34px 30px; text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 30, 80, .25);
+  animation: auftauchen .5s var(--ease) both;
+}
+.jubel p { color: var(--ink); font-size: clamp(20px, 3.4vw, 28px); font-weight: 800; letter-spacing: -.02em; margin: 6px 0 0; }
+.sterne i { font-style: normal; font-size: clamp(48px, 9vw, 80px); color: var(--gold2); text-shadow: 0 3px 0 #D88A0B; display: inline-block; animation: stern .6s var(--ease) both; }
+.sterne i:nth-child(2) { animation-delay: .12s; font-size: clamp(62px, 11vw, 100px); }
+.sterne i:nth-child(3) { animation-delay: .24s; }
+@keyframes stern { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes einblenden { from { opacity: 0; } }
+@keyframes auftauchen { from { transform: scale(.85); opacity: 0; } }
+
+.wackelt { animation: wackeln .35s; }
+@keyframes wackeln { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+
+/* Gezeichnete Trompete hinter den Ventilen, wie in der Trompeten-App */
+svg.trompete, .minigriff, .griff {
+  background: url("../img/trompete-gold.png") no-repeat center / contain;
+}
+
+/* ---- Zugaenglichkeit ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .jubel, .jubel-karte { animation: einblenden .2s ease both !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .leiste-unten { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  .segment { background: #C9D2DE; }
+  .rund, .ton-chip, .stepper, .kapsel.hell { border: 1.5px solid var(--deep); }
+}
