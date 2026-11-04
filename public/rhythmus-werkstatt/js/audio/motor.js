@@ -480,6 +480,17 @@
     if (this.knoten && this.knoten.port) { this.knoten.port.postMessage('reset'); }
   };
 
+  Motor.prototype.mikrofonStoppen = function () {
+    if (this.strom) this.strom.getTracks().forEach(function (track) { track.stop(); });
+    if (this.stromQuelle) { try { this.stromQuelle.disconnect(); } catch (_) {} }
+    if (this.knoten) { try { this.knoten.disconnect(); } catch (_) {} }
+    this.strom = null;
+    this.stromQuelle = null;
+    this.knoten = null;
+    this.mikrofonLaeuft = false;
+    this.aufFrames = null;
+  };
+
   function hole(url) {
     return new Promise(function (aufl, ab) {
       var x = new XMLHttpRequest();

@@ -513,6 +513,7 @@
     W.klangStarten().then(function () {
       return W.motor.mikrofonStarten(function (buf) { selbst._frames(buf); });
     }).then(function () {
+      if (!selbst.offen) { W.motor.mikrofonStoppen(); return; }
       selbst.mikrofon = true;
       $('ue-hinweis').textContent = '';
     }, function () {
@@ -527,6 +528,8 @@
 
   Ueben.prototype.schliessen = function () {
     this.stop();
+    W.motor.mikrofonStoppen();
+    this.mikrofon = false;
     this.offen = false;
     this.phase = 'aus';
     $('ueben').hidden = true;
@@ -745,6 +748,7 @@
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { W.baukasten.stop(); if (W.ueben.offen) { W.ueben.stop(); } }
     });
+    root.addEventListener('pagehide', function () { W.motor.allesStoppen(); W.motor.mikrofonStoppen(); });
   }
 
   fetch('data/toene.json').then(function (r) { return r.json(); }).then(aufbauen);
