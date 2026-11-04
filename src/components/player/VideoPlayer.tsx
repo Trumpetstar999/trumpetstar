@@ -11,6 +11,7 @@ import { RecordingOverlay } from './RecordingOverlay';
 import { toast } from 'sonner';
 import { useLanguage } from '@/hooks/useLanguage';
 import { BEGINNER_COPY } from '@/i18n/beginner';
+import { vimeoPlayerUrl } from '@/lib/vimeo-player-url';
 
 interface VideoPlayerProps {
   video: Video;
@@ -83,7 +84,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
     }
   }, [user, video.id, playbackSpeed]);
 
-  const vimeoUrl = `https://player.vimeo.com/video/${video.vimeoId}?autoplay=1&muted=0&playsinline=1&transparent=0&dnt=1&title=0&byline=0&portrait=0&controls=1`;
+  const vimeoUrl = vimeoPlayerUrl(video.vimeoId, video.vimeoPlayerUrl);
 
   // Load saved playback speed and create progress entry on mount
   useEffect(() => {
