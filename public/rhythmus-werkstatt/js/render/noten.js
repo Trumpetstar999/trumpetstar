@@ -62,7 +62,7 @@
   var RAND_RECHTS = 0.9;
 
   /* Schwarzer Notensatz: ein Schalter fuer die App, im Buch immer an. */
-  var EINFARBIG = false;
+  var EINFARBIG = true;
   function tonFarbe(ton) { return EINFARBIG ? 'var(--linie)' : ton.farbe; }
   function tonRand(ton) { return EINFARBIG ? 'var(--linie)' : ton.farbeRand; }
 
