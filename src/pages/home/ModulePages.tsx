@@ -8,7 +8,7 @@ import { RequireAuth } from '@/components/home/RequireAuth';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
 import { TabId } from '@/types';
 import { FingeringChart } from '@/components/home/FingeringChart';
-import { RhythmBuilder } from '@/components/home/RhythmBuilder';
+import { RhythmusWerkstatt } from '@/components/home/RhythmusWerkstatt';
 import { BeginnerCourse } from '@/components/home/BeginnerCourse';
 import { ShopProductCard } from '@/components/home/ShopCarousel';
 import { useShopProducts } from '@/hooks/useShopProducts';
@@ -55,7 +55,7 @@ function TunerModule() {
 
 export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surface="light"><BeginnerCourse /></Module></RequireAuth>;
 export const VideosModule = () => <RequireAuth><Module route="/videos" tab="levels"><LevelsPage onStarEarned={() => {}} /></Module></RequireAuth>;
-export const RhythmusModule = () => <Module route="/rhythmus" surface="light"><RhythmBuilder /></Module>;
+export const RhythmusModule = () => <RhythmusWerkstatt />;
 export const GamesModule = () => <RequireAuth><Module route="/games" tab="game"><GamePage /></Module></RequireAuth>;
 export const MetronomModule = () => <Module route="/metronom" tab="metronome" surface="light"><MetronomePage /></Module>;
 export const PlaylistsModule = () => <RequireAuth><Module route="/playlists" tab="practice"><PracticePage /></Module></RequireAuth>;

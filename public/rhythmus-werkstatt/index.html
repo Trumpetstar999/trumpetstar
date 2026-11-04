@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#008CFD">
+<title>Rhythmus · Trumpetstar</title>
+<link rel="stylesheet" href="css/werkstatt.css">
+<link rel="stylesheet" href="css/app-theme.css">
+</head>
+<body>
+
+<!-- ============ Baukasten ============ -->
+<main id="werkstatt" class="bildschirm">
+  <header class="kopf">
+    <div class="nav">
+      <button id="rh-haus" class="zurueck" aria-label="Zurück zum Home-Bildschirm">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5L7.5 12 15 19.5"/></svg>Home
+      </button>
+      <img class="app-icon" src="/icons/03-rhythmus.svg" alt="">
+    </div>
+    <h1>Rhythmus</h1>
+  </header>
+
+  <div class="inhalt">
+    <div class="werkzeuge">
+      <div class="segment" id="rh-taktart" role="radiogroup" aria-label="Taktart">
+        <button data-taktart="4/4" role="radio" aria-label="Vier-Viertel-Takt"><span class="bruch"><b>4</b><b>4</b></span></button>
+        <button data-taktart="3/4" role="radio" aria-label="Drei-Viertel-Takt"><span class="bruch"><b>3</b><b>4</b></span></button>
+      </div>
+
+      <button id="rh-ton" class="ton-chip" aria-label="Ton wechseln">
+        <span id="rh-ton-kreis" class="tonkreis">g</span>
+        <svg id="rh-ton-griff" class="minigriff" aria-hidden="true"></svg>
+      </button>
+
+      <button id="rh-klang" class="segment klang" aria-label="Anhören als Klatschen oder auf der Trompete">
+        <span class="opt hand" title="Klatschen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5.5a1.5 1.5 0 013 0V11m0-1V4a1.5 1.5 0 013 0v7m0-5.5a1.5 1.5 0 013 0V12m0-3.5a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-1.5a6 6 0 01-4.6-2.2L4.3 14.6a1.5 1.5 0 012.3-1.9L8 14.5"/></svg>
+        </span>
+        <span class="opt horn" title="Trompete"><svg class="trompete" aria-hidden="true"></svg></span>
+      </button>
+
+      <span class="luecke"></span>
+
+      <div class="rund-gruppe">
+        <button id="rh-wuerfel" class="rund" aria-label="Würfeln">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle class="punkt" cx="8.5" cy="8.5" r="1.4"/><circle class="punkt" cx="15.5" cy="8.5" r="1.4"/><circle class="punkt" cx="12" cy="12" r="1.4"/><circle class="punkt" cx="8.5" cy="15.5" r="1.4"/><circle class="punkt" cx="15.5" cy="15.5" r="1.4"/></svg>
+        </button>
+        <button id="rh-zurueck" class="rund" aria-label="Letzten Baustein löschen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5H20v13H9.5L3.5 12z"/><path class="rot" d="M12.5 9.5l5 5m0-5l-5 5"/></svg>
+        </button>
+        <button id="rh-leeren" class="rund" aria-label="Alles löschen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10.5 11v5.5m3-5.5v5.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <section class="karte notenkarte">
+      <div id="rh-notenfeld" class="notenfeld">
+        <svg id="rh-noten" aria-hidden="true"></svg>
+        <div id="rh-silben" class="silben"></div>
+        <p id="rh-leer" class="leer">Tipp unten auf die Bausteine und bau dir deinen Rhythmus!</p>
+      </div>
+    </section>
+
+    <div id="rh-schlaege" class="schlaege" aria-hidden="true"></div>
+
+    <section id="rh-bausteine" class="bausteine" aria-label="Rhythmus-Bausteine"></section>
+  </div>
+
+  <footer class="leiste-unten">
+    <div class="stepper" aria-label="Tempo">
+      <button id="tempo-minus" aria-label="Langsamer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+      <span><b id="tempo-wert">60</b><small>BPM</small></span>
+      <button id="tempo-plus" aria-label="Schneller"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M12 6v12"/></svg></button>
+    </div>
+    <button id="rh-hoeren" class="kapsel hell" aria-label="Anhören">
+      <svg class="dreieck" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+      <svg class="quadrat" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5"/></svg>
+      <span class="text-an">Anhören</span><span class="text-aus">Stopp</span>
+    </button>
+    <button id="rh-selbst" class="kapsel gold" aria-label="Selbst spielen">
+      <svg class="trompete" aria-hidden="true"></svg>
+      <span>Selbst spielen</span>
+    </button>
+  </footer>
+</main>
+
+<!-- ============ Selbst spielen ============ -->
+<main id="ueben" class="bildschirm" hidden>
+  <header class="kopf">
+    <div class="nav">
+      <button id="ue-zurueck" class="zurueck" aria-label="Zurück zum Baukasten">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5L7.5 12 15 19.5"/></svg>Baukasten
+      </button>
+      <img class="app-icon" src="/icons/03-rhythmus.svg" alt="">
+    </div>
+    <h1>Selbst spielen</h1>
+  </header>
+
+  <div class="inhalt">
+    <div class="werkzeuge mitte">
+      <div class="segment breit" role="radiogroup" aria-label="Wer spielt?">
+        <button id="ue-mit" role="radio" aria-label="Mitspielen: die Trompete spielt mit">
+          <svg class="trompete" aria-hidden="true"></svg><span>Mitspielen</span>
+        </button>
+        <button id="ue-solo" role="radio" aria-label="Solo: du spielst allein">
+          <svg class="trompete" aria-hidden="true"></svg><span>Solo</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="ue-punkte" class="punkte" aria-hidden="true"></div>
+
+    <section class="karte notenkarte">
+      <div id="ue-notenfeld" class="notenfeld">
+        <svg id="ue-noten" aria-hidden="true"></svg>
+        <div id="ue-silben" class="silben"></div>
+      </div>
+    </section>
+
+    <section class="karte griffkarte">
+      <svg id="ue-griff" class="griff" aria-hidden="true"></svg>
+      <div class="griffinfo">
+        <span id="ue-tonname" class="tonkreis gross">g</span>
+        <span id="ue-hinweis" class="hinweis"></span>
+      </div>
+    </section>
+  </div>
+
+  <footer class="leiste-unten mitte">
+    <span class="tempo-pill"><b id="ue-tempo">60</b> BPM</span>
+    <button id="ue-start" class="los" aria-label="Los">
+      <svg class="dreieck" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+      <svg class="quadrat" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5"/></svg>
+    </button>
+    <span class="tempo-pill platzhalter" aria-hidden="true"></span>
+  </footer>
+
+  <div id="ue-jubel" class="jubel" hidden>
+    <div class="jubel-karte">
+      <div class="sterne"><i>★</i><i>★</i><i>★</i></div>
+      <p>Super – du bist ein Star!</p>
+    </div>
+  </div>
+</main>
+
+<script src="js/audio/dsp.js"></script>
+<script src="js/audio/sampler.js"></script>
+<script src="js/audio/tracker.js"></script>
+<script src="js/audio/motor.js"></script>
+<script src="js/melodie.js"></script>
+<script src="js/render/glyphen.js"></script>
+<script src="js/render/noten.js"></script>
+<script src="js/render/griff.js"></script>
+<script src="js/werkstatt.js"></script>
+<script src="js/app-bridge.js"></script>
+</body>
+</html>

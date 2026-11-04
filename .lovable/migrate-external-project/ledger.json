@@ -1,0 +1,55 @@
+{
+  "source": "Trumpetstar-Rhythmus-Lovable.zip",
+  "scope": "Replace only the rhythm module",
+  "capabilities": [
+    {
+      "capability": "code and route",
+      "source": "static HTML/CSS/JS and iframe wrapper",
+      "outcome": "preserve at /rhythmus",
+      "status": "verified",
+      "next_action": null
+    },
+    {
+      "capability": "notation and rhythm building",
+      "source": "four bars, 3/4 and 4/4, eleven blocks, pitch/valves",
+      "outcome": "preserve original engine",
+      "status": "verified",
+      "next_action": null
+    },
+    {
+      "capability": "audio and microphone feedback",
+      "source": "sampler, DSP, tracker, worklet fallback, play-along and solo",
+      "outcome": "preserve original engine",
+      "status": "partially_verified",
+      "next_action": "Physical trumpet/Apple mobile microphone feedback acceptance still needed. Sampler decoded actual hosted bytes, play-along and AudioWorklet microphone startup/cleanup passed with browser synthetic microphone; scored solo accuracy not reverified."
+    },
+    {
+      "capability": "browser persistence",
+      "source": "trumpetstar.rhythmus.v1",
+      "outcome": "retain local storage",
+      "status": "verified",
+      "next_action": null
+    },
+    {
+      "capability": "assets",
+      "source": "trumpet image and audio sprite",
+      "outcome": "asset-store URLs, local executable code",
+      "status": "verified",
+      "next_action": "Hosted assets fetched successfully; local browser test served these exact fetched bytes because localhost has no asset gateway."
+    },
+    {
+      "capability": "languages and theme",
+      "source": "German-only imported UI",
+      "outcome": "DE/EN/ES/SL and app semantic palette",
+      "status": "verified",
+      "next_action": null
+    },
+    {
+      "capability": "database, auth, providers, schedules, commerce",
+      "source": "none detected in inspected standalone module",
+      "outcome": "existing app services unchanged",
+      "status": "not_applicable",
+      "next_action": null
+    }
+  ]
+}
