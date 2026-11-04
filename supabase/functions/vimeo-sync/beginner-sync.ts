@@ -30,23 +30,31 @@ export async function syncBeginnerShowcases(db: SupabaseClient, token: string) {
         if (error) throw error;
         levelId = data.id;
       }
-      const { data: saved, error: readError } = await db.from('videos').select('id,vimeo_video_id').eq('level_id', levelId);
-      if (readError) throw readError;
-      const map = new Map((saved ?? []).map(v => [v.vimeo_video_id, v.id]));
       const ids: string[] = [];
       for (const [index, video] of ordered.entries()) {
         const vimeoId = video.uri.match(/^\/videos\/(\d+)/)?.[1];
         if (!vimeoId) throw new Error('Invalid Vimeo video identity');
-        ids.push(vimeoId);
         const thumbnail = [...(video.pictures?.sizes ?? [])].sort((a, b) => b.width - a.width)[0]?.link ?? null;
         const row = { level_id: levelId, vimeo_video_id: vimeoId, title: video.name, language, sort_order: index, duration_seconds: video.duration, thumbnail_url: thumbnail, vimeo_player_url: video.player_embed_url, is_active: true, last_synced_at: new Date().toISOString() };
-        const id = map.get(vimeoId);
-        const { error } = id ? await db.from('videos').update(row).eq('id', id) : await db.from('videos').insert(row);
+        // Vimeo identities are globally unique. Link shared videos without moving them
+        // out of existing levels or altering their established section/order/language.
+        const { data: known, error: knownError } = await db.from('videos').select('id').eq('vimeo_video_id', vimeoId).maybeSingle();
+        if (knownError) throw knownError;
+        let id = known?.id;
+        if (!id) {
+          const { data: created, error } = await db.from('videos').insert(row).select('id').single();
+          if (error) throw error;
+          id = created.id;
+        }
+        const { error } = await db.from('beginner_showcase_videos').upsert({ showcase_id: showcaseId, video_id: id, sort_order: index }, { onConflict: 'showcase_id,video_id' });
         if (error) throw error;
+        ids.push(id);
       }
-      for (const row of saved ?? []) {
-        if (!ids.includes(row.vimeo_video_id)) {
-          const { error } = await db.from('videos').update({ is_active: false }).eq('id', row.id);
+      const { data: memberships, error: membershipError } = await db.from('beginner_showcase_videos').select('video_id').eq('showcase_id', showcaseId);
+      if (membershipError) throw membershipError;
+      for (const row of memberships ?? []) {
+        if (!ids.includes(row.video_id)) {
+          const { error } = await db.from('beginner_showcase_videos').delete().eq('showcase_id', showcaseId).eq('video_id', row.video_id);
           if (error) throw error;
         }
       }

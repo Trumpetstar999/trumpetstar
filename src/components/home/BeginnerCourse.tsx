@@ -66,12 +66,17 @@ export function BeginnerCourse() {
       const ids = beginnerShowcases(language);
       const { data: levels, error: levelError } = await supabase.from('levels').select('id,title,vimeo_showcase_id').in('vimeo_showcase_id', [...ids]).eq('is_active', true);
       if (levelError || !levels?.length) throw new Error('Missing beginner showcases');
-      const { data: rows, error: videoError } = await supabase.from('videos').select('id,level_id,title,vimeo_video_id,vimeo_player_url,thumbnail_url,duration_seconds,sort_order').in('level_id', levels.map(l => l.id)).eq('is_active', true);
+      const { data: memberships, error: membershipError } = await supabase.from('beginner_showcase_videos').select('showcase_id,video_id,sort_order').in('showcase_id', [...ids]);
+      if (membershipError || !memberships?.length) throw new Error('Missing beginner video memberships');
+      const { data: rows, error: videoError } = await supabase.from('videos').select('id,title,vimeo_video_id,vimeo_player_url,thumbnail_url,duration_seconds').in('id', memberships.map(m => m.video_id)).eq('is_active', true);
       if (videoError) throw videoError;
       const courses = ids.flatMap(showcaseId => {
         const level = levels.find(l => l.vimeo_showcase_id === showcaseId);
         if (!level) return [];
-        return [{ id: level.id, title: level.title, showcaseId, videos: orderedBeginnerVideos((rows ?? []).filter(v => v.level_id === level.id)).map(v => ({ id: v.id, title: v.title, vimeoId: v.vimeo_video_id, vimeoPlayerUrl: v.vimeo_player_url ?? undefined, thumbnail: v.thumbnail_url ?? '', duration: v.duration_seconds ?? 0, completions: 0 })) }];
+        return [{ id: level.id, title: level.title, showcaseId, videos: orderedBeginnerVideos(memberships.filter(m => m.showcase_id === showcaseId)).flatMap(m => {
+          const v = rows?.find(row => row.id === m.video_id);
+          return v ? [{ id: v.id, title: v.title, vimeoId: v.vimeo_video_id, vimeoPlayerUrl: v.vimeo_player_url ?? undefined, thumbnail: v.thumbnail_url ?? '', duration: v.duration_seconds ?? 0, completions: 0 }] : [];
+        }) }];
       });
       if (courses.length !== ids.length || courses.some(s => !s.videos.length)) throw new Error('Incomplete beginner catalog');
       if (!cancelled) setCatalog({ language, courses });
