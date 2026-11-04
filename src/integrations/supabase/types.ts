@@ -440,6 +440,32 @@ export type Database = {
         }
         Relationships: []
       }
+      beginner_showcase_videos: {
+        Row: {
+          showcase_id: string
+          sort_order: number
+          video_id: string
+        }
+        Insert: {
+          showcase_id: string
+          sort_order?: number
+          video_id: string
+        }
+        Update: {
+          showcase_id?: string
+          sort_order?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beginner_showcase_videos_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brevo_contact_state: {
         Row: {
           brevo_contact_id: number | null

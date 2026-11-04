@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useDailyUsage } from '@/hooks/useDailyUsage';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { DailyLimitOverlay } from '@/components/usage/DailyLimitOverlay';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { Button } from '@/components/ui/button';
 import { BEGINNER_COPY } from '@/i18n/beginner';
 import { beginnerShowcases, orderedBeginnerVideos } from '@/lib/beginner-course';

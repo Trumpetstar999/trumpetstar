@@ -92,6 +92,13 @@
       "when": 1793714929217,
       "tag": "0012_beginner_lessons",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793825030324,
+      "tag": "0013_beginner_showcase_video_membership",
+      "breakpoints": true
     }
   ]
 }
