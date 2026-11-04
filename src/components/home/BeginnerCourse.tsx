@@ -1,80 +1,106 @@
-import { useEffect, useState } from 'react';
-import { ChevronLeft, Loader2, Play } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, Loader2, Play, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
-import { STAGE_COPY } from '@/i18n/stage-copy';
-import { pickLocalized } from '@/lib/news';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
+import { VideoPlayer } from '@/components/player/VideoPlayer';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
+import { Button } from '@/components/ui/button';
+import { BEGINNER_COPY } from '@/i18n/beginner';
+import { beginnerShowcases, orderedBeginnerVideos } from '@/lib/beginner-course';
+import type { Video } from '@/types';
 
-export interface BeginnerLesson {
-  id: string; sort_order: number; title_i18n: Record<string, string>;
-  video_url: string | null; playalong_url: string | null; cover_url: string | null; active: boolean;
-}
+type Course = { id: string; title: string; showcaseId: string; videos: Video[] };
 
-/** Embed Vimeo/YouTube links, play direct files natively. */
-export function LessonVideo({ url, title }: { url: string; title: string }) {
-  const vimeo = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-  const yt = url.match(/(?:youtu\.be\/|v=)([\w-]{11})/);
-  const src = vimeo ? `https://player.vimeo.com/video/${vimeo[1]}` : yt ? `https://www.youtube-nocookie.com/embed/${yt[1]}` : null;
+function Showcase({ course, playingId, onPlay, disabled }: { course: Course; playingId: string | null; onPlay: (video: Video) => void; disabled: boolean }) {
+  const { language } = useLanguage();
+  const c = BEGINNER_COPY[language];
+  const [selectedId, setSelectedId] = useState(course.videos[0]?.id);
+  const strip = useRef<HTMLDivElement>(null);
+  const active = course.videos.find(v => v.id === selectedId) ?? course.videos[0];
+  const complete = useCallback(() => window.dispatchEvent(new CustomEvent('stars-updated')), []);
+  if (!active) return null;
   return (
-    <div className="aspect-video w-full overflow-hidden rounded-[18px] bg-ts-ink">
-      {src ? <iframe src={src} title={title} className="h-full w-full" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
-        : <video src={url} controls playsInline className="h-full w-full" />}
-    </div>
+    <section className="min-w-0 space-y-3" data-showcase={course.showcaseId}>
+      <h2 className="break-words text-xl font-bold text-foreground">{course.title}</h2>
+      {playingId === active.id ? <VideoPlayer key={active.id} video={active} levelId={course.id} levelTitle={course.title} inline onClose={() => {}} onComplete={complete} /> : (
+        <Button variant="ghost" disabled={disabled} onClick={() => onPlay(active)} aria-label={`${c.play}: ${active.title}`} className="relative block h-auto w-full overflow-hidden rounded-lg bg-muted p-0 hover:bg-muted">
+          <div className="aspect-video w-full">
+            {active.thumbnail && <img src={active.thumbnail} alt={active.title} className="h-full w-full object-contain" />}
+            <span className="absolute inset-0 flex items-center justify-center"><span className="flex h-14 w-14 items-center justify-center rounded-full bg-ts-gold text-ts-ink shadow-lg"><Play className="h-6 w-6" /></span></span>
+          </div>
+        </Button>
+      )}
+      <p className="break-words text-sm font-semibold text-foreground">{active.title}</p>
+      <div className="flex min-w-0 items-center gap-1">
+        <Button size="icon" variant="ghost" className="shrink-0" aria-label={c.previous} title={c.previous} onClick={() => strip.current?.scrollBy({ left: -400, behavior: 'smooth' })}><ChevronLeft /></Button>
+        <div ref={strip} className="flex min-w-0 flex-1 snap-x gap-3 overflow-x-auto pb-2">
+          {course.videos.map((video, index) => <Button key={video.id} variant="ghost" aria-pressed={active.id === video.id} onClick={() => { setSelectedId(video.id); onPlay(video); }} disabled={disabled} className={`h-auto w-40 shrink-0 snap-start flex-col items-stretch gap-0 overflow-hidden whitespace-normal rounded-lg border-2 p-0 text-left sm:w-48 ${active.id === video.id ? 'border-primary bg-secondary hover:bg-secondary' : 'border-border bg-card hover:bg-accent'}`}>
+            <div className="aspect-video w-full bg-muted">{video.thumbnail && <img src={video.thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />}</div>
+            <span className="flex min-h-14 items-start gap-2 p-2 text-sm"><span className="shrink-0 text-muted-foreground">{index + 1}.</span><span className="line-clamp-2 break-words">{video.title}</span></span>
+          </Button>)}
+        </div>
+        <Button size="icon" variant="ghost" className="shrink-0" aria-label={c.next} title={c.next} onClick={() => strip.current?.scrollBy({ left: 400, behavior: 'smooth' })}><ChevronRight /></Button>
+      </div>
+    </section>
   );
 }
 
 export function BeginnerCourse() {
-  const { t, language } = useLanguage();
-  const c = STAGE_COPY[language] ?? STAGE_COPY.de;
-  const [lessons, setLessons] = useState<BeginnerLesson[] | null>(null);
-  const [open, setOpen] = useState<BeginnerLesson | null>(null);
-  const [mode, setMode] = useState<'video' | 'playalong'>('video');
-
+  const { language } = useLanguage();
+  const c = BEGINNER_COPY[language];
+  const usage = useDailyUsage();
+  const [catalog, setCatalog] = useState<{ language: string; courses: Course[] } | null>(null);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [mode, setMode] = useState<'video' | 'feedback'>('video');
+  const [playing, setPlaying] = useState<{ language: string; id: string } | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [limit, setLimit] = useState(false);
+  const languageRef = useRef(language);
+  languageRef.current = language;
   useEffect(() => {
-    supabase.from('beginner_lessons').select('*').eq('active', true).order('sort_order')
-      .then(({ data }) => setLessons((data as BeginnerLesson[]) ?? []));
-  }, []);
-
-  if (!lessons) return <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin" /></div>;
-  if (!lessons.length) return (
-    <div className="m-4 rounded-[18px] bg-ts-card p-8 text-center shadow-sm">
-      <p className="text-2xl font-extrabold text-ts-ink">{t('home.soon')}</p>
-      <p className="mt-2 text-ts-muted">{t('home.soonP')}</p>
-    </div>
-  );
-
-  if (open) {
-    const title = pickLocalized(open.title_i18n, language);
-    const url = mode === 'playalong' && open.playalong_url ? open.playalong_url : open.video_url;
-    return (
-      <div className="mx-auto max-w-4xl space-y-4 p-4 text-ts-ink">
-        <button onClick={() => { setOpen(null); setMode('video'); }} className="inline-flex items-center gap-1 text-sm font-semibold text-ts-deep">
-          <ChevronLeft className="h-4 w-4" />{c.back}
-        </button>
-        <h2 className="text-2xl font-extrabold">{title}</h2>
-        {url && <LessonVideo key={url} url={url} title={title} />}
-        <div className="flex flex-wrap gap-2">
-          {open.video_url && <button onClick={() => setMode('video')} aria-pressed={mode === 'video'} className={`rounded-full px-5 py-3 font-bold ${mode === 'video' ? 'bg-ts-deep text-ts-on' : 'bg-ts-card'}`}>{c.video}</button>}
-          {open.playalong_url && <button onClick={() => setMode('playalong')} aria-pressed={mode === 'playalong'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 font-bold ${mode === 'playalong' ? 'bg-ts-gold text-ts-ink' : 'bg-ts-card'}`}><Play className="h-4 w-4" />{c.playalong}</button>}
-        </div>
-      </div>
-    );
-  }
-
+    let cancelled = false;
+    setPlaying(null); setError(false);
+    async function load() {
+      const ids = beginnerShowcases(language);
+      const { data: levels, error: levelError } = await supabase.from('levels').select('id,title,vimeo_showcase_id').in('vimeo_showcase_id', [...ids]).eq('is_active', true);
+      if (levelError || !levels?.length) throw new Error('Missing beginner showcases');
+      const { data: memberships, error: membershipError } = await supabase.from('beginner_showcase_videos').select('showcase_id,video_id,sort_order').in('showcase_id', [...ids]);
+      if (membershipError || !memberships?.length) throw new Error('Missing beginner video memberships');
+      const { data: rows, error: videoError } = await supabase.from('videos').select('id,title,vimeo_video_id,vimeo_player_url,thumbnail_url,duration_seconds').in('id', memberships.map(m => m.video_id)).eq('is_active', true);
+      if (videoError) throw videoError;
+      const courses = ids.flatMap(showcaseId => {
+        const level = levels.find(l => l.vimeo_showcase_id === showcaseId);
+        if (!level) return [];
+        return [{ id: level.id, title: level.title, showcaseId, videos: orderedBeginnerVideos(memberships.filter(m => m.showcase_id === showcaseId)).flatMap(m => {
+          const v = rows?.find(row => row.id === m.video_id);
+          return v ? [{ id: v.id, title: v.title, vimeoId: v.vimeo_video_id, vimeoPlayerUrl: v.vimeo_player_url ?? undefined, thumbnail: v.thumbnail_url ?? '', duration: v.duration_seconds ?? 0, completions: 0 }] : [];
+        }) }];
+      });
+      if (courses.length !== ids.length || courses.some(s => !s.videos.length)) throw new Error('Incomplete beginner catalog');
+      if (!cancelled) setCatalog({ language, courses });
+    }
+    load().catch(() => { if (!cancelled) setError(true); });
+    return () => { cancelled = true; };
+  }, [language, retry]);
+  const play = async (video: Video) => {
+    if (starting || usage.isLoading || playing?.id === video.id && playing.language === language) return;
+    const requestedLanguage = language;
+    setStarting(true);
+    try {
+      if (!usage.canStartVideo() || !await usage.recordVideoStart()) { setLimit(true); return; }
+      if (languageRef.current === requestedLanguage) setPlaying({ language: requestedLanguage, id: video.id });
+    } finally { setStarting(false); }
+  };
   return (
-    <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-4">
-      {lessons.map((l, i) => (
-        <button key={l.id} onClick={() => setOpen(l)} className="overflow-hidden rounded-[18px] bg-ts-card text-left text-ts-ink shadow-sm">
-          <div className="aspect-video bg-muted">
-            {l.cover_url ? <img src={l.cover_url} alt="" className="h-full w-full object-cover" loading="lazy" />
-              : <div className="flex h-full items-center justify-center text-3xl font-extrabold text-ts-deep">{i + 1}</div>}
-          </div>
-          <div className="p-3">
-            <p className="text-xs font-semibold text-ts-muted">{c.lesson} {i + 1}</p>
-            <p className="font-bold leading-tight">{pickLocalized(l.title_i18n, language)}</p>
-          </div>
-        </button>
-      ))}
+    <div className="space-y-8 px-3 py-4 text-foreground sm:px-6">
+      <div className="grid grid-cols-2 gap-2 border-b border-border pb-3" role="tablist">
+        <Button role="tab" aria-selected={mode === 'video'} variant={mode === 'video' ? 'default' : 'outline'} onClick={() => setMode('video')} className="h-auto min-h-11 whitespace-normal py-2"><Play />{c.video}</Button>
+        <Button role="tab" aria-selected={mode === 'feedback'} variant={mode === 'feedback' ? 'default' : 'outline'} onClick={() => { setMode('feedback'); setPlaying(null); }} className="h-auto min-h-11 whitespace-normal py-2"><MessageCircle /><span>{c.feedback}<span className="block text-xs opacity-80">{c.soon}</span></span></Button>
+      </div>
+      {mode === 'feedback' ? <div className="flex flex-col items-center gap-3 py-16"><MessageCircle className="h-10 w-10 text-primary" /><h2 className="text-xl font-bold">{c.soon}</h2></div> : error ? <div className="py-12 text-center"><p className="mb-4">{c.unavailable}</p><Button onClick={() => setRetry(n => n + 1)}>{c.retry}</Button></div> : catalog?.language !== language ? <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 animate-spin" /></div> : catalog.courses.map(course => <Showcase key={`${language}:${course.id}`} course={course} playingId={playing?.language === language ? playing.id : null} onPlay={play} disabled={starting || usage.isLoading} />)}
+      <DailyLimitOverlay open={limit} type="video" onClose={() => setLimit(false)} />
     </div>
   );
 }

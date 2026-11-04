@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { syncBeginnerShowcases } from './beginner-sync.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -113,7 +114,12 @@ Deno.serve(async (req) => {
     const { action, showcaseUrl, levelId } = await req.json();
     console.log(`Vimeo sync action: ${action}`, { showcaseUrl, levelId });
 
-    if (action === 'list-showcases') {
+    if (action === 'beginner-sync') {
+      const results = await syncBeginnerShowcases(supabase, VIMEO_TOKEN);
+      return new Response(JSON.stringify({ success: true, results }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } else if (action === 'list-showcases') {
       // Fetch all showcases from Vimeo
       console.log('Fetching all showcases from Vimeo...');
       let allShowcases: VimeoShowcase[] = [];

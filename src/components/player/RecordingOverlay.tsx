@@ -1,6 +1,7 @@
 import { Video, Square, AlertCircle, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface RecordingOverlayProps {
   isRecording: boolean;
@@ -11,6 +12,7 @@ interface RecordingOverlayProps {
   onStart: () => void;
   onStop: () => void;
   onClearError: () => void;
+  light?: boolean;
 }
 
 export function RecordingOverlay({
@@ -22,7 +24,15 @@ export function RecordingOverlay({
   onStart,
   onStop,
   onClearError,
+  light = false,
 }: RecordingOverlayProps) {
+  const { language } = useLanguage();
+  const copy = {
+    de: { record: 'Aufnahme', stop: 'Stoppen', start: 'Starte …', stopping: 'Stoppe …', settings: 'Einstellungen', close: 'Schließen', permission: 'Bitte erlaube Kamera und Mikrofon in den Browser-Einstellungen.' },
+    en: { record: 'Record', stop: 'Stop', start: 'Starting …', stopping: 'Stopping …', settings: 'Settings', close: 'Close', permission: 'Please allow camera and microphone access in your browser settings.' },
+    es: { record: 'Grabar', stop: 'Parar', start: 'Iniciando …', stopping: 'Deteniendo …', settings: 'Ajustes', close: 'Cerrar', permission: 'Permite el acceso a la cámara y al micrófono en los ajustes del navegador.' },
+    sl: { record: 'Snemanje', stop: 'Ustavi', start: 'Zaganjanje …', stopping: 'Ustavljanje …', settings: 'Nastavitve', close: 'Zapri', permission: 'V nastavitvah brskalnika dovoli dostop do kamere in mikrofona.' },
+  }[language];
   // Format duration as MM:SS
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -38,7 +48,7 @@ export function RecordingOverlay({
       navigator.permissions.query({ name: 'camera' as PermissionName }).catch(() => {});
     }
     // Show a hint to the user
-    alert('Bitte öffne die Browser-Einstellungen oder App-Einstellungen und erlaube den Kamera- und Mikrofonzugriff.');
+    alert(copy.permission);
   };
 
   // Error display
@@ -58,7 +68,7 @@ export function RecordingOverlay({
                   className="gap-1.5 text-xs"
                 >
                   <Settings className="w-3.5 h-3.5" />
-                  Einstellungen
+                  {copy.settings}
                 </Button>
                 <Button
                   size="sm"
@@ -66,7 +76,7 @@ export function RecordingOverlay({
                   onClick={onClearError}
                   className="text-xs text-destructive-foreground/80 hover:text-destructive-foreground"
                 >
-                  Schließen
+                  {copy.close}
                 </Button>
               </div>
             </div>
@@ -91,9 +101,11 @@ export function RecordingOverlay({
       <Button
         onClick={isRecording ? onStop : onStart}
         disabled={isStarting || isStopping}
+        aria-label={isRecording ? copy.stop : copy.record}
+        title={isRecording ? copy.stop : copy.record}
         className={cn(
           "gap-2 rounded-full transition-all",
-          isRecording
+          light ? (isRecording ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' : 'border border-border bg-secondary text-secondary-foreground hover:bg-accent') : isRecording
             ? "bg-red-600 hover:bg-red-700 text-white"
             : "bg-white/20 hover:bg-white/30 text-white border border-white/30",
           (isStarting || isStopping) && "opacity-70 cursor-not-allowed"
@@ -103,22 +115,22 @@ export function RecordingOverlay({
         {isStarting ? (
           <>
             <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-            <span className="hidden sm:inline">Starte...</span>
+            <span className="hidden sm:inline">{copy.start}</span>
           </>
         ) : isStopping ? (
           <>
             <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-            <span className="hidden sm:inline">Stoppe...</span>
+            <span className="hidden sm:inline">{copy.stopping}</span>
           </>
         ) : isRecording ? (
           <>
             <Square className="w-4 h-4 fill-current" />
-            <span className="hidden sm:inline">Stoppen</span>
+            <span className="hidden sm:inline">{copy.stop}</span>
           </>
         ) : (
           <>
             <Video className="w-4 h-4" />
-            <span className="hidden sm:inline">Aufnahme</span>
+            <span className="hidden sm:inline">{copy.record}</span>
           </>
         )}
       </Button>
