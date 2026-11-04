@@ -122,7 +122,7 @@
     var selbst = this;
     if (!root.Sampler) { this.fehler = 'kein-sampler'; return Promise.resolve(null); }
     this.sampler = new root.Sampler({
-      ctx: this.ctx, url: this.basis + 'audio/trumpet-sprite.m4a'
+      ctx: this.ctx, url: '/__l5e/assets-v1/8b990670-f0e0-4254-9041-b4d1703bb24e/rhythmus-trumpet-sprite.m4a'
     });
     return this.sampler.laden().catch(function () {
       selbst.fehler = 'klang-fehlt';

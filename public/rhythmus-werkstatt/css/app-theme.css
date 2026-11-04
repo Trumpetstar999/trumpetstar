@@ -1,5 +1,6 @@
 /* Semantic defaults also support opening the standalone page directly. */
 :root {
+  --trumpet-image: url("/__l5e/assets-v1/6e60af2c-03f3-4c34-a88f-c666f439bfeb/rhythmus-trompete.png");
   --ts-sky: 207 100% 50%; --ts-deep: 211 100% 43%; --ts-bright: 207 100% 49%;
   --ts-gold: 37 91% 55%; --ts-red: 6 78% 57%; --tuner-tuned: 151 70% 30%;
   --ts-ink: 214 70% 18%; --ts-ink-muted: 214 17% 43%; --ts-surface: 214 50% 96%;
