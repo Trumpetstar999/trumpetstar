@@ -494,7 +494,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
           <span className="text-xs font-medium">{copy.tempo}</span>
           <Slider aria-label={copy.tempo} value={[playbackSpeed]} min={40} max={120} step={1} onValueChange={handleSpeedChange} className="w-24" />
           <span className="w-10 text-xs font-bold tabular-nums">{playbackSpeed}%</span>
-          <RecordingOverlay isRecording={recorder.isRecording} isStarting={recorder.isStarting} isStopping={recorder.isStopping} duration={recorder.duration} error={null} onStart={handleStartRecording} onStop={handleStopRecording} onClearError={recorder.clearError} />
+          <RecordingOverlay light isRecording={recorder.isRecording} isStarting={recorder.isStarting} isStopping={recorder.isStopping} duration={recorder.duration} error={null} onStart={handleStartRecording} onStop={handleStopRecording} onClearError={recorder.clearError} />
         </div>
       </div>
     </div>
