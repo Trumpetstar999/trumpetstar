@@ -14,6 +14,7 @@ export default function ImpressumPage() {
       <p>{copy.company}</p>
       <p>Mogersdorf 253<br />8382 Mogersdorf, Österreich / Austria</p>
       <p>Firmenbuch / Company register: FN 633951g</p>
+      <p>Landesgericht Eisenstadt<br />Wienerstraße 9, 7000 Eisenstadt<br /><a className="underline" href="tel:+432682701">+43 2682 701</a></p>
       <p>UID (AT): ATU81038878 · UID (DE): DE442429470</p>
     </section>
     <section className="space-y-2">
