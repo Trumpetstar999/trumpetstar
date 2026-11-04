@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { PricingTable } from '@/components/pricing/PricingTable';
 import { FAQSchema } from '@/components/SEO';
 import { Card, CardContent } from '@/components/ui/card';
@@ -72,13 +73,13 @@ export function PricingPage() {
               Was unsere Schüler:innen sagen
             </h3>
             <div className="rounded-xl overflow-hidden shadow-2xl border border-white/10 aspect-video">
-              <iframe
+              <ExternalMediaGate><iframe
                 src="https://player.vimeo.com/video/1150310181?badge=0&autopause=0&player_id=0"
                 className="w-full h-full"
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 title="Trumpetstar Testimonial"
-              />
+              /></ExternalMediaGate>
             </div>
           </div>
 

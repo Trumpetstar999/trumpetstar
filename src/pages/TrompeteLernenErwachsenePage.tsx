@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { FAQSchema } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -155,13 +156,13 @@ export default function TrompeteLernenErwachsenePage() {
         <AnimatedSection direction="up" className="mb-16">
           <h2 className="text-3xl font-bold text-white mb-6 text-center">Sieh selbst – so funktioniert es</h2>
           <div className="rounded-2xl overflow-hidden shadow-2xl aspect-video">
-            <iframe
+            <ExternalMediaGate><iframe
               src="https://player.vimeo.com/video/1150310181"
               className="w-full h-full"
               allow="autoplay; fullscreen; picture-in-picture"
               allowFullScreen
               title="Trompete lernen als Erwachsener"
-            />
+            /></ExternalMediaGate>
           </div>
         </AnimatedSection>
 

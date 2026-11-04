@@ -11,7 +11,7 @@ afterEach(() => { cleanup(); setMediaPermission(false); });
 describe('external media permission', () => {
   it('does not initialize external media before an explicit grant', () => {
     const initialize = vi.fn();
-    function Media() { useEffect(initialize, []); return <iframe title="external video" />; }
+    function Media() { useEffect(initialize, []); return <div />; }
     render(<MemoryRouter><ExternalMediaGate><Media /></ExternalMediaGate></MemoryRouter>);
     expect(initialize).toHaveBeenCalledTimes(0);
     fireEvent.click(screen.getByRole('button'));
@@ -19,7 +19,7 @@ describe('external media permission', () => {
   });
   it('unmounts external media immediately on withdrawal', () => {
     const stop = vi.fn();
-    function Media() { useEffect(() => stop, []); return <iframe title="external video" />; }
+    function Media() { useEffect(() => stop, []); return <div />; }
     setMediaPermission(true);
     render(<MemoryRouter><ExternalMediaGate><Media /></ExternalMediaGate></MemoryRouter>);
     expect(stop).toHaveBeenCalledTimes(0);

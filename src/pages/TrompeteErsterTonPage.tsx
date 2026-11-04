@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -36,14 +37,14 @@ const TrompeteErsterTonPage = () => {
           <AnimatedSection direction="up" delay={150}>
             <div className="max-w-3xl mx-auto mb-10">
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                <iframe
+                <ExternalMediaGate><iframe
                   src="https://player.vimeo.com/video/955857757?title=0&byline=0&portrait=0&dnt=1"
                   className="absolute inset-0 w-full h-full"
                   frameBorder="0"
                   allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
                   allowFullScreen
                   title="Erster Ton auf der Trompete"
-                />
+                /></ExternalMediaGate>
               </div>
             </div>
           </AnimatedSection>

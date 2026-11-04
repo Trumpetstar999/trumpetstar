@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -577,7 +578,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="relative w-full rounded-xl overflow-hidden border border-white/10 shadow-xl" style={{ aspectRatio: '16 / 9' }}>
-              <iframe
+              <ExternalMediaGate><iframe
                 src="https://player.vimeo.com/video/737651716?title=0&byline=0&portrait=0"
                 title="Trumpetstar bei 2 Minuten 2 Millionen"
                 className="absolute inset-0 w-full h-full"
@@ -585,7 +586,7 @@ export default function LandingPage() {
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 loading="lazy"
-              />
+              /></ExternalMediaGate>
             </div>
           </div>
         </section>

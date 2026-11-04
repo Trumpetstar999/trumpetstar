@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { FAQSchema } from "@/components/SEO/FAQSchema";
 import lernweltImg from "@/assets/trumpetstar-lernwelt.jpg";
 import { Button } from "@/components/ui/button";
@@ -142,14 +143,14 @@ export default function TrompeteLernenKinderPage() {
           </div>
 
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl mt-6">
-            <iframe
+            <ExternalMediaGate><iframe
               src="https://player.vimeo.com/video/469638164?title=0&byline=0&portrait=0&dnt=1"
               className="absolute inset-0 w-full h-full"
               frameBorder="0"
               allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
               allowFullScreen
               title="Kornett oder Trompete für Kinder"
-            />
+            /></ExternalMediaGate>
           </div>
 
           <div className="glass rounded-xl p-5 mt-6">
