@@ -8,9 +8,9 @@ import { TUNER_COPY } from '@/i18n/tuner';
 import { tuningDirection, writtenTunerNote } from '@/lib/tuner-note';
 import { TunerStaff } from './TunerStaff';
 
-interface TunerPopupProps { isOpen: boolean; onClose: () => void; }
+interface TunerPopupProps { isOpen: boolean; onClose: () => void; inline?: boolean; }
 
-export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
+export function TunerPopup({ isOpen, onClose, inline = false }: TunerPopupProps) {
   const { language } = useLanguage();
   const copy = TUNER_COPY[language];
   const [referenceA4, setReferenceA4] = useState(440);
@@ -33,16 +33,14 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
   const color = !active ? 'text-muted-foreground' : direction === 'tuned' ? 'text-tuner-tuned' : 'text-destructive';
   const status = active ? copy[direction] : isListening ? copy.waiting : copy.ready;
 
-  return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent aria-describedby="tuner-instrument" className="ts-light-module ts-tuner w-[calc(100vw-24px)] max-w-[480px] max-h-[calc(100dvh-24px)] overflow-y-auto rounded-lg border-0 p-0 gap-0 [&>button]:hidden">
-        <header className="ts-gradient flex items-center justify-between px-5 py-4">
+  const content = <>
+        {!inline && <header className="ts-gradient flex items-center justify-between px-5 py-4">
           <div>
             <DialogTitle className="text-xl font-bold text-ts-on">{copy.title}</DialogTitle>
             <DialogDescription id="tuner-instrument" className="mt-1 text-sm text-ts-on">{trumpet ? copy.instrument : copy.concert}</DialogDescription>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label={copy.close} title={copy.close} className="text-ts-on hover:bg-ts-on/20 hover:text-ts-on"><X /></Button>
-        </header>
+        </header>}
         <div className="min-w-0 px-5 pt-4 pb-5 sm:px-7">
           <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
             {[true, false].map(mode => <Button key={String(mode)} size="sm" variant={trumpet === mode ? 'secondary' : 'ghost'} aria-pressed={trumpet === mode} onClick={() => setTrumpet(mode)} className={trumpet === mode ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground'}>{mode ? copy.instrument : copy.concert}</Button>)}
@@ -84,6 +82,14 @@ export function TunerPopup({ isOpen, onClose }: TunerPopupProps) {
             </div>
           </div>
         </div>
+      </>;
+
+  if (inline) return <section aria-label={copy.title} className="ts-tuner mx-auto w-full max-w-[480px] py-4 sm:py-6">{content}</section>;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent aria-describedby="tuner-instrument" className="ts-light-module ts-tuner w-[calc(100vw-24px)] max-w-[480px] max-h-[calc(100dvh-24px)] overflow-y-auto rounded-lg border-0 p-0 gap-0 [&>button]:hidden">
+        {content}
       </DialogContent>
     </Dialog>
   );

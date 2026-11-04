@@ -1,5 +1,5 @@
 import { lazy, ReactNode, Suspense, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { getAppByRoute, safeNextPath } from '@/config/apps';
@@ -48,9 +48,7 @@ function ComingSoon() {
 }
 
 function TunerModule() {
-  const [open, setOpen] = useState(true);
-  const navigate = useNavigate();
-  return <TunerPopup isOpen={open} onClose={() => { setOpen(false); navigate('/'); }} />;
+  return <TunerPopup inline isOpen onClose={() => {}} />;
 }
 
 export const BeginnerModule = () => <RequireAuth><Module route="/beginner" surface="light"><BeginnerCourse /></Module></RequireAuth>;
