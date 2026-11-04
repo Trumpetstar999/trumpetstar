@@ -1,0 +1,13 @@
+{
+  "source": "Trumpetstar-Rhythmus-Lovable.zip",
+  "scope": "Replace only the rhythm module",
+  "capabilities": [
+    {"capability":"code and route", "source":"static HTML/CSS/JS and iframe wrapper", "outcome":"preserve at /rhythmus", "status":"in_progress", "next_action":"Import inspected source and replace old module"},
+    {"capability":"notation and rhythm building", "source":"four bars, 3/4 and 4/4, eleven blocks, pitch/valves", "outcome":"preserve original engine", "status":"in_progress", "next_action":"Verify controls and capacity"},
+    {"capability":"audio and microphone feedback", "source":"sampler, DSP, tracker, worklet fallback, play-along and solo", "outcome":"preserve original engine", "status":"in_progress", "next_action":"Verify playback and microphone with synthetic input; hardware remains separate"},
+    {"capability":"browser persistence", "source":"trumpetstar.rhythmus.v1", "outcome":"retain local storage", "status":"in_progress", "next_action":"Verify reload readback"},
+    {"capability":"assets", "source":"trumpet image and audio sprite", "outcome":"asset-store URLs, local executable code", "status":"in_progress", "next_action":"Register uploaded media and verify loading"},
+    {"capability":"languages and theme", "source":"German-only imported UI", "outcome":"DE/EN/ES/SL and app semantic palette", "status":"in_progress", "next_action":"Add locale/theme bridge without replacing audio recognition"},
+    {"capability":"database, auth, providers, schedules, commerce", "source":"none detected in inspected standalone module", "outcome":"existing app services unchanged", "status":"not_applicable", "next_action":null}
+  ]
+}
