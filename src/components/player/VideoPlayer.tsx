@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause, Maximize } from 'lucide-react';
 import { Video } from '@/types';
@@ -33,7 +34,7 @@ interface VimeoErrorLog {
   timestamp: string;
 }
 
-export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, hideCloseButton, inline = false }: VideoPlayerProps) {
+function VideoPlayerContent({ video, levelId, levelTitle, onClose, onComplete, hideCloseButton, inline = false }: VideoPlayerProps) {
   const { language } = useLanguage();
   const copy = BEGINNER_COPY[language];
   const containerRef = useRef<HTMLDivElement>(null);
@@ -709,4 +710,8 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
       </div>
     </div>
   );
+}
+
+export function VideoPlayer(props: VideoPlayerProps) {
+  return <ExternalMediaGate><VideoPlayerContent {...props} /></ExternalMediaGate>;
 }

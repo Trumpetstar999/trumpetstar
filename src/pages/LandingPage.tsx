@@ -261,12 +261,6 @@ export default function LandingPage() {
         }]).then(() => {});
         navigate('/app', { replace: true });
       } else {
-        supabase.from('landing_page_views').insert([{
-          path: window.location.pathname,
-          referrer: document.referrer || null,
-          user_agent: navigator.userAgent.slice(0, 200),
-          language: navigator.language || null,
-        }]).then(() => {});
         setChecking(false);
       }
     });

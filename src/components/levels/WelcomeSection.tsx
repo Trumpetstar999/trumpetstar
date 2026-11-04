@@ -1,3 +1,4 @@
+import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -185,7 +186,7 @@ export function WelcomeSection() {
           <div className="flex-1 p-4">
             {activeVideo && (
               <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
-                <iframe
+                <ExternalMediaGate><iframe
                   src={activeVideo.vimeo_player_url || `https://player.vimeo.com/video/${activeVideo.vimeo_video_id}?autoplay=0`}
                   className="absolute inset-0 w-full h-full"
                   allow="autoplay; fullscreen; picture-in-picture"
@@ -194,7 +195,7 @@ export function WelcomeSection() {
                     // Mark as watched when the video loads/plays
                     if (activeVideo) markWatched(activeVideo.id);
                   }}
-                />
+                /></ExternalMediaGate>
               </div>
             )}
           </div>

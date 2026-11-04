@@ -14,6 +14,7 @@ import { LanguageSheet, HOME_LANGUAGES } from './LanguageSheet';
 import { NewsSheet } from './NewsSheet';
 import { ProfileSheet } from './ProfileSheet';
 import { ShopCarousel } from './ShopCarousel';
+import { LegalLinks } from '@/components/legal/LegalLinks';
 import { useAppUpdates } from '@/hooks/useAppUpdates';
 
 interface HomeScreenProps {
@@ -142,6 +143,7 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
         <nav className="mt-8 grid grid-cols-4 gap-x-3 gap-y-6">
           {HOME_APPS.slice(8).map(tile)}
         </nav>
+        <footer className="mt-8 border-t border-ts-ink/15 pt-4 text-ts-ink"><LegalLinks /></footer>
       </div>
 
       <LoginSheet open={loginOpen} next={loginNext} onClose={() => setLoginOpen(false)} />

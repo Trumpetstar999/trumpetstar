@@ -1,108 +1,34 @@
-import { SEOPageLayout } from '@/components/seo/SEOPageLayout';
+import { useEffect } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { LEGAL_COPY } from '@/i18n/legal';
+import { LegalPage } from '@/components/legal/LegalPage';
+import { setMediaPermission } from '@/components/legal/ExternalMediaGate';
+import { Button } from '@/components/ui/button';
+import { ShieldCheck, Mail } from 'lucide-react';
 
 export default function DatenschutzPage() {
-  return (
-    <SEOPageLayout
-      title="Datenschutzerklärung – Trumpetstar"
-      description="Datenschutzerklärung der Trumpetstar GmbH gemäß DSGVO."
-    >
-      <section className="max-w-3xl mx-auto px-4 py-16">
-        <h1 className="text-3xl font-bold text-white mb-8">Datenschutzerklärung</h1>
-
-        <div className="space-y-8 text-white/80 leading-relaxed">
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">1. Verantwortlicher</h2>
-            <p>Trumpetstar GmbH</p>
-            <p>Inhaber: Mario Schulter</p>
-            <p>E-Mail: <a href="mailto:info@trumpetstar.com" className="underline hover:text-white transition-colors">info@trumpetstar.com</a></p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">2. Erhobene Daten</h2>
-            <p>
-              Bei der Nutzung unserer App werden folgende personenbezogene Daten erhoben und verarbeitet:
-            </p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Name und E-Mail-Adresse (bei Registrierung)</li>
-              <li>Nutzungsdaten (besuchte Seiten, Übungsfortschritt, Spielstände)</li>
-              <li>Technische Daten (IP-Adresse, Browser-Typ, Geräteinformationen)</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">3. Rechtsgrundlage</h2>
-            <p>
-              Die Verarbeitung erfolgt auf Basis von Art. 6 Abs. 1 lit. a (Einwilligung),
-              lit. b (Vertragserfüllung) und lit. f (berechtigtes Interesse) der DSGVO.
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">4. Drittanbieter und Auftragsverarbeiter</h2>
-            <p>Wir nutzen folgende Dienste zur Bereitstellung unserer App:</p>
-            <ul className="list-disc list-inside mt-2 space-y-2">
-              <li>
-                <strong className="text-white">Supabase (USA/EU)</strong> – Datenspeicherung, Authentifizierung und Backend-Funktionen.
-                Supabase verarbeitet Ihre Daten gemäß deren{' '}
-                <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Datenschutzerklärung</a>.
-              </li>
-              <li>
-                <strong className="text-white">Vimeo (USA)</strong> – Video-Streaming für Lernvideos.
-                Beim Abspielen von Videos werden Daten an Vimeo übermittelt. Details in der{' '}
-                <a href="https://vimeo.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Vimeo-Datenschutzerklärung</a>.
-              </li>
-              <li>
-                <strong className="text-white">Google Sign-In</strong> – Optional für die Anmeldung. Bei Nutzung werden Daten gemäß der{' '}
-                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Google-Datenschutzerklärung</a> verarbeitet.
-              </li>
-              <li>
-                <strong className="text-white">Apple Sign-In</strong> – Optional für die Anmeldung. Bei Nutzung gelten die{' '}
-                <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">Apple-Datenschutzrichtlinien</a>.
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">5. Cookies</h2>
-            <p>
-              Wir verwenden technisch notwendige Cookies für die Authentifizierung und Sitzungsverwaltung.
-              Diese sind für den Betrieb der App erforderlich und können nicht deaktiviert werden.
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">6. Ihre Rechte</h2>
-            <p>Sie haben gemäß DSGVO folgende Rechte:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Recht auf Auskunft (Art. 15 DSGVO)</li>
-              <li>Recht auf Berichtigung (Art. 16 DSGVO)</li>
-              <li>Recht auf Löschung (Art. 17 DSGVO)</li>
-              <li>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)</li>
-              <li>Recht auf Datenübertragbarkeit (Art. 20 DSGVO)</li>
-              <li>Widerspruchsrecht (Art. 21 DSGVO)</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">7. Kontakt für Datenschutzanfragen</h2>
-            <p>
-              Für Fragen zum Datenschutz oder zur Ausübung Ihrer Rechte wenden Sie sich bitte an:{' '}
-              <a href="mailto:info@trumpetstar.com" className="underline hover:text-white transition-colors">info@trumpetstar.com</a>
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-2">8. Beschwerderecht</h2>
-            <p>
-              Sie haben das Recht, sich bei der zuständigen Aufsichtsbehörde zu beschweren.
-              In Österreich ist dies die{' '}
-              <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer" className="underline hover:text-white transition-colors">
-                Österreichische Datenschutzbehörde
-              </a>.
-            </p>
-          </div>
-        </div>
-      </section>
-    </SEOPageLayout>
-  );
+  const { language } = useLanguage();
+  const copy = LEGAL_COPY[language];
+  useEffect(() => {
+    document.title = `${copy.privacy} – Trumpetstar`;
+    if (window.location.hash === '#settings') document.getElementById('settings')?.scrollIntoView();
+  }, [copy.privacy]);
+  return <LegalPage title={copy.privacy}>
+    <p>{copy.intro}</p>
+    <section id="settings" className="scroll-mt-4 space-y-3 border-b border-ts-ink/15 pb-6">
+      <h2 className="text-xl font-bold">{copy.settings}</h2>
+      <Button variant="outline" onClick={() => setMediaPermission(false)} className="h-auto min-h-11 whitespace-normal border-ts-ink/20 bg-ts-card text-ts-ink hover:bg-ts-surface"><ShieldCheck />{copy.reset}</Button>
+      <p className="text-sm">{copy.blocked}</p>
+    </section>
+    {copy.sections.map(([heading, body]) => <section key={heading} className="space-y-2">
+      <h2 className="text-xl font-bold">{heading}</h2><p>{body}</p>
+    </section>)}
+    <a className="inline-flex min-h-11 items-center gap-2 underline" href="mailto:info@trumpetstar.com"><Mail className="h-4 w-4" />{copy.rights}</a>
+    <p className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+      <a className="underline" href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer">Datenschutzbehörde (AT)</a>
+      <a className="underline" href="https://vimeo.com/privacy" target="_blank" rel="noopener noreferrer">Vimeo</a>
+      <a className="underline" href="https://www.digistore24.com/page/privacy" target="_blank" rel="noopener noreferrer">Digistore24</a>
+      <a className="underline" href="https://www.brevo.com/legal/privacypolicy/" target="_blank" rel="noopener noreferrer">Brevo</a>
+    </p>
+  </LegalPage>;
 }

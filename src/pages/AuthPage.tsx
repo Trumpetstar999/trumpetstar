@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { LegalLinks } from '@/components/legal/LegalLinks';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMiniMode } from '@/hooks/useMiniMode';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -15,7 +16,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 import { shouldRouteToRecovery } from '@/lib/recovery';
 import { requestAuthEmail } from '@/lib/auth-email';
-const VIMEO_HLS_URL = 'https://player.vimeo.com/external/1182895999.m3u8?s=79486abc8212f3e32ae79db02772c8c750c1f891&logging=false';
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,34 +34,6 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // HLS video setup - lazy load hls.js only on desktop
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    // Only load HLS on screens wide enough to show the video column
-    if (window.innerWidth < 1024) return;
-
-    let hlsInstance: any = null;
-
-    // Safari supports HLS natively
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = VIMEO_HLS_URL;
-      video.addEventListener('loadedmetadata', () => { video.play().catch(() => {}); });
-    } else {
-      // Dynamically import hls.js (234KB saved from initial bundle)
-      import('hls.js').then(({ default: Hls }) => {
-        if (!Hls.isSupported() || !video) return;
-        hlsInstance = new Hls({ enableWorker: true });
-        hlsInstance.loadSource(VIMEO_HLS_URL);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
-      });
-    }
-
-    return () => { if (hlsInstance) hlsInstance.destroy(); };
-  }, []);
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(window.location.search);
@@ -221,14 +193,6 @@ export default function AuthPage() {
         src="/images/auth-fallback.jpg"
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
-      />
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
       />
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -485,20 +449,7 @@ export default function AuthPage() {
               </Tabs>
             </div>
 
-            {/* Footer */}
-            <p
-              className="text-center text-white/40 text-sm mt-6"
-              style={{ opacity: 0, filter: 'blur(8px)', transform: 'translateY(8px)', animation: 'fadeSlideIn 0.5s ease-out 0.4s forwards' }}
-            >
-              {language === 'de' ? 'Mit der Anmeldung akzeptierst du unsere ' : 'By signing up you agree to our '}
-              <a href="/impressum" className="underline hover:text-white/60 transition-colors">
-                {language === 'de' ? 'Nutzungsbedingungen' : 'Terms of Service'}
-              </a>
-              {language === 'de' ? ' und ' : ' and '}
-              <a href="/datenschutz" className="underline hover:text-white/60 transition-colors">
-                {language === 'de' ? 'Datenschutzerklärung' : 'Privacy Policy'}
-              </a>.
-            </p>
+            <footer className="mt-6 text-primary-foreground"><LegalLinks /></footer>
           </div>
         </div>
       </div>
