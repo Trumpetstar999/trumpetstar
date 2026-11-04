@@ -53,17 +53,17 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient',
       >
         <header className="ts-gradient sticky top-0 z-30" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
           <div className="mx-auto max-w-[1100px] px-4 pt-2 pb-3">
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-[90px_minmax(0,1fr)_90px] sm:grid-cols-[120px_minmax(0,1fr)_120px] items-center">
               <Button variant="ghost"
                 onClick={() => navigate('/')}
-                className="flex items-center min-h-11 -ml-2 pr-3 text-[17px] font-medium text-ts-on hover:bg-ts-on/10 hover:text-ts-on [&_svg]:size-7"
+                className="flex items-center justify-self-start min-h-11 -ml-2 pr-3 text-[17px] font-medium text-ts-on hover:bg-ts-on/10 hover:text-ts-on [&_svg]:size-7"
                 aria-label={t('home.home')}
               >
                 <ChevronLeft className="w-7 h-7" /> {t('home.home')}
               </Button>
-              {icon && <img src={icon} alt="" className="w-10 h-10" />}
+              <h1 className="min-w-0 text-center text-[20px] sm:text-[32px] font-extrabold leading-tight text-ts-on break-words">{title}</h1>
+              {icon && <img src={icon} alt="" className="w-10 h-10 justify-self-end" />}
             </div>
-            <h1 className="text-[32px] font-extrabold leading-tight text-ts-on mt-1">{title}</h1>
           </div>
         </header>
         <main className="mx-auto max-w-[1100px] px-0 pb-[calc(env(safe-area-inset-bottom)+24px)]">{children}</main>
