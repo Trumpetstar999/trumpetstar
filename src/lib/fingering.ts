@@ -4,6 +4,7 @@ export interface FingeringNote {
   /** VexFlow key, e.g. "f#/3" */
   key: string;
   sharp: boolean;
+  flat?: boolean;
   /** Written MIDI number */
   midi: number;
   valves: number[];
@@ -39,6 +40,20 @@ function parse(name: string, fingering: string): FingeringNote {
 }
 
 export const FINGERINGS: FingeringNote[] = RAW.map(([n, f]) => parse(n, f));
+
+/** Descending enharmonic spelling; pitch and valve combinations stay unchanged. */
+export const DESCENDING_FINGERINGS: FingeringNote[] = [...FINGERINGS].reverse().map((note) => {
+  if (!note.sharp) return { ...note, valves: [...note.valves] };
+  const [pitch, octave] = note.key.split('/');
+  const flats: Record<string, [string, string]> = {
+    'c#': ['des', 'db'], 'd#': ['es', 'eb'], 'f#': ['ges', 'gb'],
+    'g#': ['as', 'ab'], 'a#': ['b', 'bb'],
+  };
+  const spelling = flats[pitch];
+  if (!spelling) return { ...note, valves: [...note.valves] };
+  return { ...note, name: spelling[0] + "'".repeat(Number(octave) - 3),
+    key: `${spelling[1]}/${octave}`, sharp: false, flat: true, valves: [...note.valves] };
+});
 
 /** Bb trumpet sounds a major second below written pitch. */
 export function soundingFrequency(writtenMidi: number): number {
