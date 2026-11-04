@@ -13,6 +13,14 @@
 }
 * { letter-spacing: 0 !important; }
 .kopf, .zurueck { color: hsl(var(--ts-on-gradient)); }
+.kopf .nav { display: grid; grid-template-columns: 120px minmax(0, 1fr) 120px; align-items: center; }
+.kopf h1 { min-width: 0; margin: 0; text-align: center; overflow-wrap: anywhere; }
+.kopf .zurueck { justify-self: start; }
+.kopf .app-icon { justify-self: end; }
+@media (max-width: 639px) {
+  .kopf .nav { grid-template-columns: 90px minmax(0, 1fr) 90px; }
+  .kopf h1 { font-size: 20px; }
+}
 .karte, .rh-stein, .ton-chip, .rund, .stepper, .kapsel.hell { background: hsl(var(--ts-card)); }
 .karte { border-radius: 8px; box-shadow: none; }
 .silben span { font-size: 16px; }
