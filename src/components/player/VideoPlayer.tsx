@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause } from 'lucide-react';
+import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause, Maximize } from 'lucide-react';
 import { Video } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,8 @@ import { useVideoRecorder } from '@/hooks/useVideoRecorder';
 import { useRecordings } from '@/hooks/useRecordings';
 import { RecordingOverlay } from './RecordingOverlay';
 import { toast } from 'sonner';
+import { useLanguage } from '@/hooks/useLanguage';
+import { BEGINNER_COPY } from '@/i18n/beginner';
 
 interface VideoPlayerProps {
   video: Video;
@@ -17,6 +19,7 @@ interface VideoPlayerProps {
   onClose: () => void;
   onComplete: () => void;
   hideCloseButton?: boolean;
+  inline?: boolean;
 }
 
 type VimeoError = 'embed_blocked' | 'csp_blocked' | 'network_error' | 'unknown';
@@ -29,7 +32,10 @@ interface VimeoErrorLog {
   timestamp: string;
 }
 
-export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, hideCloseButton }: VideoPlayerProps) {
+export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, hideCloseButton, inline = false }: VideoPlayerProps) {
+  const { language } = useLanguage();
+  const copy = BEGINNER_COPY[language];
+  const containerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const recorder = useVideoRecorder();
   const { saveRecording } = useRecordings();
@@ -227,7 +233,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
   // Listen for Vimeo player events via postMessage
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== 'https://player.vimeo.com') return;
+      if (event.origin !== 'https://player.vimeo.com' || event.source !== iframeRef.current?.contentWindow) return;
       
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
@@ -345,7 +351,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
         methods.forEach(method => {
           iframeRef.current?.contentWindow?.postMessage(
             JSON.stringify({ method: 'addEventListener', value: method }),
-            '*'
+            'https://player.vimeo.com'
           );
         });
       }
@@ -395,6 +401,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (inline && !containerRef.current?.contains(document.activeElement)) return;
       if (e.key === 'Escape') {
         handleClose();
       }
@@ -406,7 +413,7 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleClose, togglePlayPause]);
+  }, [handleClose, togglePlayPause, inline]);
 
   const handleIframeError = () => {
     logVimeoError('csp_blocked', 'iFrame konnte nicht geladen werden. Mögliches CSP-Problem.');
@@ -461,12 +468,37 @@ export function VideoPlayer({ video, levelId, levelTitle, onClose, onComplete, h
 
   // Toggle orientation lock: landscape for fullscreen video, re-lock to portrait on close
   useEffect(() => {
+    if (inline) return;
     const so = (screen as any).orientation;
     try { so?.lock?.('landscape').catch(() => {}); } catch { /* ignored */ }
     return () => {
       try { so?.lock?.('portrait').catch(() => {}); } catch { /* ignored */ }
     };
-  }, []);
+  }, [inline]);
+
+  if (inline) return (
+    <div ref={containerRef} className="beginner-player overflow-hidden rounded-lg bg-card text-foreground" tabIndex={-1}>
+      <div className="relative aspect-video bg-muted">
+        <iframe ref={iframeRef} src={vimeoUrl} className="absolute inset-0 h-full w-full" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowFullScreen title={video.title} onError={handleIframeError} />
+        {isLoading && !error && <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-muted"><span className="flex items-center gap-2 text-sm"><RefreshCw className="h-5 w-5 animate-spin" />{copy.loading}</span></div>}
+        {error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-card p-4 text-center"><AlertTriangle className="h-7 w-7 text-destructive" /><p>{copy.unavailable}</p><Button onClick={handleRetry}><RefreshCw />{copy.retry}</Button></div>}
+        {recorder.error && <RecordingOverlay isRecording={false} isStarting={false} isStopping={false} duration={0} error={recorder.error} onStart={handleStartRecording} onStop={handleStopRecording} onClearError={recorder.clearError} />}
+      </div>
+      <div className="flex flex-wrap items-center gap-2 border-t border-border px-2 py-2 sm:px-3">
+        <Button size="icon" onClick={togglePlayPause} aria-label={isPlaying ? copy.pause : copy.play} title={isPlaying ? copy.pause : copy.play} className="bg-ts-gold text-ts-ink hover:bg-ts-gold/90">{isPlaying ? <Pause /> : <Play />}</Button>
+        <span className="text-xs tabular-nums">{formatTime(currentTime)}</span>
+        <Slider aria-label={video.title} value={[currentTime]} min={0} max={duration || video.duration || 100} step={1} onValueChange={handleSeek} className="min-w-16 flex-1" />
+        <span className="text-xs tabular-nums">{formatTime(duration || video.duration)}</span>
+        <Button size="icon" variant="ghost" title={copy.fullscreen} aria-label={copy.fullscreen} onClick={() => containerRef.current?.requestFullscreen?.()}><Maximize /></Button>
+        <div className="flex w-full items-center gap-2 border-t border-border pt-2 sm:ml-2 sm:w-auto sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0">
+          <span className="text-xs font-medium">{copy.tempo}</span>
+          <Slider aria-label={copy.tempo} value={[playbackSpeed]} min={40} max={120} step={1} onValueChange={handleSpeedChange} className="w-24" />
+          <span className="w-10 text-xs font-bold tabular-nums">{playbackSpeed}%</span>
+          <RecordingOverlay isRecording={recorder.isRecording} isStarting={recorder.isStarting} isStopping={recorder.isStopping} duration={recorder.duration} error={null} onStart={handleStartRecording} onStop={handleStopRecording} onClearError={recorder.clearError} />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div 
