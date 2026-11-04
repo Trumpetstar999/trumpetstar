@@ -33,7 +33,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
           <motion.div
             role="dialog"
             aria-modal="true"
-            className="ts-system-font fixed z-[61] left-2 right-2 mx-auto max-w-[560px] rounded-[36px] bg-ts-card text-ts-ink p-6 pt-3 shadow-2xl"
+            className="ts-system-font ts-light-module fixed z-[61] left-2 right-2 mx-auto max-w-[560px] rounded-[36px] text-ts-ink p-6 pt-3 shadow-2xl"
             style={{ bottom: 'calc(8px + env(safe-area-inset-bottom))' }}
             initial={reduced ? { opacity: 0 } : { y: '110%' }}
             animate={reduced ? { opacity: 1 } : { y: 0 }}

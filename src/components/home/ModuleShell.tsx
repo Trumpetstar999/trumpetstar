@@ -24,7 +24,7 @@ interface ModuleShellProps {
   children: ReactNode;
 }
 
-export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient', children }: ModuleShellProps) {
+export function ModuleShell({ title, icon, tab = 'levels', surface = 'light', children }: ModuleShellProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const reduced = useReducedMotion();
@@ -45,7 +45,7 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient',
   return (
     <TabNavigationProvider activeTab={tab} onTabChange={onTabChange}>
       <motion.div
-        className={`ts-system-font fixed inset-0 overflow-y-auto overflow-x-hidden ${surface === 'gradient' ? 'ts-gradient' : 'ts-light-module'}`}
+        className="ts-system-font ts-light-module ts-module-wall fixed inset-0 overflow-y-auto overflow-x-hidden"
         style={{ transformOrigin: '0 0' }}
         initial={initial}
         animate={{ opacity: 1, x: 0, y: 0, scaleX: 1, scaleY: 1, borderRadius: 0 }}
@@ -66,7 +66,7 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'gradient',
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-[1100px] px-0 pb-[calc(env(safe-area-inset-bottom)+24px)]">{children}</main>
+        <main className={`mx-auto max-w-[1100px] px-0 pb-[calc(env(safe-area-inset-bottom)+24px)] ${surface === 'gradient' ? 'ts-legacy-light' : ''}`}>{children}</main>
       </motion.div>
     </TabNavigationProvider>
   );

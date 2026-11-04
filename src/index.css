@@ -609,7 +609,7 @@ input[type="range"]:focus {
   --tuner-tuned: 151 70% 30%;
   --ts-ink: 214 70% 18%;
   --ts-ink-muted: 214 17% 43%;
-  --ts-surface: 214 50% 96%;
+  --ts-surface: 209 100% 95%;
   --ts-card: 0 0% 100%;
   --ts-on-gradient: 0 0% 100%;
   --ts-gradient: linear-gradient(180deg, hsl(var(--ts-sky)) 0%, hsl(var(--ts-deep)) 40%, hsl(var(--ts-bright)) 100%);
@@ -654,9 +654,27 @@ input[type="range"]:focus {
   --ring: var(--ts-deep);
   --gold: var(--ts-gold);
   --gold-foreground: var(--ts-ink);
-  background: hsl(var(--background));
+  --accent: 210 60% 91%;
+  --accent-foreground: var(--ts-ink);
+  background: var(--ts-wall);
+  background-attachment: fixed;
   color: hsl(var(--foreground));
 }
+.ts-light-module .ts-light-module:not([role="dialog"]) { background: transparent; }
+/* Legacy module chrome only; media labels retain their own dark backing. */
+.ts-legacy-light :is(.glass, .glass-strong, .card-glass) {
+  background: hsl(var(--ts-card) / .85);
+  border-color: hsl(var(--border));
+  color: hsl(var(--ts-ink));
+}
+.ts-legacy-light [class*="text-white"]:not([class*="bg-black"]):not([class*="bg-black"] *):not([class*="bg-slate-8"] *):not([class*="bg-slate-9"] *):not([class*="bg-primary"]):not([class*="bg-primary"] *):not([class*="bg-accent-red"]):not([class*="bg-gradient"]):not([class*="bg-brand"]):not([class*="bg-brand"] *) {
+  color: hsl(var(--ts-ink));
+}
+.ts-legacy-light :is([class*="text-white/40"], [class*="text-white/50"], [class*="text-white/60"], [class*="text-white/70"]):not([class*="bg-black"] *):not([class*="bg-slate-8"] *):not([class*="bg-slate-9"] *):not([class*="bg-primary"] *) {
+  color: hsl(var(--ts-ink-muted));
+}
+.ts-legacy-light :is([class*="bg-white/5"], [class*="bg-white/10"], [class*="bg-white/15"], [class*="bg-white/20"]) { background-color: hsl(var(--ts-card) / .8); }
+.ts-legacy-light [class*="border-white/"] { border-color: hsl(var(--border)); }
 /* Audio controls must keep dark text in selected and hover states. */
 .ts-light-module.ts-audio-player {
   --primary: 211 85% 34%;
