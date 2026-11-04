@@ -45,6 +45,9 @@ export async function syncBeginnerShowcases(db: SupabaseClient, token: string) {
           const { data: created, error } = await db.from('videos').insert(row).select('id').single();
           if (error) throw error;
           id = created.id;
+        } else {
+          const { error } = await db.from('videos').update({ thumbnail_url: thumbnail, duration_seconds: video.duration, vimeo_player_url: video.player_embed_url }).eq('id', id);
+          if (error) throw error;
         }
         const { error } = await db.from('beginner_showcase_videos').upsert({ showcase_id: showcaseId, video_id: id, sort_order: index }, { onConflict: 'showcase_id,video_id' });
         if (error) throw error;
