@@ -8,7 +8,8 @@
   --sky: hsl(var(--ts-sky)); --deep: hsl(var(--ts-deep)); --bright: hsl(var(--ts-bright));
   --gold: hsl(var(--ts-gold)); --red: hsl(var(--ts-red)); --green: hsl(var(--tuner-tuned));
   --ink: hsl(var(--ts-ink)); --muted: hsl(var(--ts-ink-muted)); --paper: hsl(var(--ts-surface));
-  --linie: hsl(var(--ts-ink)); --griff-linie: hsl(var(--ts-ink)); --marker: hsl(var(--ts-gold)); --haken: hsl(var(--tuner-tuned));
+  --notation-ink: 0 0% 0%;
+  --linie: hsl(var(--notation-ink)); --griff-linie: hsl(var(--ts-ink)); --marker: hsl(var(--ts-gold)); --haken: hsl(var(--tuner-tuned));
   --grad: linear-gradient(180deg, hsl(var(--ts-sky)), hsl(var(--ts-deep)) 40%, hsl(var(--ts-bright)));
 }
 * { letter-spacing: 0 !important; }
