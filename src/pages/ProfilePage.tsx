@@ -30,6 +30,7 @@ import { RecordingsWidget } from '@/components/dashboard/widgets/RecordingsWidge
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
+import { MyPurchases } from '@/components/profile/MyPurchases';
 
 const KNOWN_WIDGET_IDS: WidgetId[] = [
   'profile', 'calendar', 'recordings', 'classroom', 'review',
@@ -174,6 +175,8 @@ export function ProfilePage() {
           </div>
         </SortableContext>
       </DndContext>
+
+      <MyPurchases />
 
       <p className="text-center text-white/40 text-xs mt-8">{t('profile.premiumHint')}</p>
 

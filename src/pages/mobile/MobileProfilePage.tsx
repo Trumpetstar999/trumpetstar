@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES, PlanKey } from '@/types/plans';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { MyPurchases } from '@/components/profile/MyPurchases';
 
 interface Profile {
   id: string;
@@ -210,6 +211,8 @@ export default function MobileProfilePage() {
               ))}
             </div>
           </div>
+
+          <MyPurchases />
 
           {/* Sign out */}
           <button
