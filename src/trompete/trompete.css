@@ -1,0 +1,406 @@
+/* trompete.css — das Aussehen der Uebungen.
+ *
+ * Alles steht unter .tp-uebung und reicht nicht hinaus: der Rest der
+ * Seite bleibt, wie er ist. Die Farben sind Variablen (--tp-…); thema.ts
+ * belegt sie aus dem Theme des Projekts (shadcn: --primary, --card …).
+ * Die Werte hier gelten nur, wenn es kein Theme gibt.
+ *
+ * Der Notensatz und das Griffbild lesen ihre Farben aus --linie,
+ * --marker, --haken … (so heissen sie in der App).
+ *
+ * Die Uebung fuellt die Hoehe, die man ihr gibt (Voreinstellung siehe
+ * --tp-hoehe), und richtet sich nach ihrer eigenen Breite: unter 640 px
+ * stehen Noten und Griff untereinander.
+ */
+
+.tp-uebung {
+  --tp-flaeche: #fff;
+  --tp-text: #1c1c1e;
+  --tp-text-2: #6e6e73;
+  --tp-rand: rgba(60, 60, 67, 0.18);
+  --tp-fuellung: rgba(120, 120, 128, 0.14);
+  --tp-segment-an: #fff;
+  --tp-tint: #0071e3;
+  --tp-auf-tint: #fff;
+  --tp-tint-zart: rgba(0, 113, 227, 0.12);
+  --tp-stopp: #d70015;
+  --tp-auf-stopp: #fff;
+  --tp-rund: 0.75rem;
+  --tp-gruen: #248a3d;
+  --tp-gruen-zart: rgba(52, 199, 89, 0.18);
+  --tp-gruen-schalter: #34c759;
+  --tp-orange: #ff9500;
+  --tp-orange-zart: rgba(255, 149, 0, 0.18);
+  --tp-orange-text: #8f4a00;
+  --tp-schatten: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  /* fuer noten.js und griff.js */
+  --linie: var(--tp-text);
+  --linie-zart: var(--tp-text-2);
+  --marker: var(--tp-tint);
+  --haken: var(--tp-gruen);
+  --daneben: #c2560a;
+  --ventil-an: var(--tp-tint);
+  --ventil-zahl: var(--tp-auf-tint);
+  --griff-linie: var(--tp-text-2);
+  --loch-offen: transparent;
+
+  container-type: inline-size;
+  position: relative;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: var(--tp-hoehe, min(46rem, calc(100dvh - 2rem)));
+  min-height: 26rem;
+  color: var(--tp-text);
+  line-height: 1.35;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+/* Grundwerte mit :where() — ohne Gewicht, damit jede Regel weiter unten
+   sie ueberschreibt. */
+:where(.tp-uebung) *, :where(.tp-uebung) *::before, :where(.tp-uebung) *::after { box-sizing: border-box; }
+.tp-uebung [hidden] { display: none !important; }
+:where(.tp-uebung) button {
+  border: 0; background: none; padding: 0; margin: 0;
+  font: inherit; color: inherit; cursor: pointer;
+}
+:where(.tp-uebung) button:disabled { cursor: default; }
+.tp-uebung button:focus-visible, .tp-uebung select:focus-visible {
+  outline: 3px solid var(--tp-tint); outline-offset: 2px;
+}
+
+/* Farbige Noten sind fuer weisses Papier gemischt — das Blatt bleibt
+   dann auch im Dunkelmodus hell. */
+.tp-uebung.farbnoten .tp-notenfeld {
+  --linie: #1c1c1e; --linie-zart: #6e6e73; --marker: #0071e3; --haken: #248a3d; --daneben: #c2560a;
+  background: #fff;
+}
+
+/* ================= Aufteilung ================= */
+
+/* Das Raster sitzt IN der Wurzel, nicht auf ihr: die Wurzel ist der
+   Container, nach dessen Breite unten gefragt wird — und eine
+   Container-Abfrage kann nur gestalten, was darin liegt. */
+.tp-raster { display: grid; gap: 0.6rem; height: 100%; min-height: 0; }
+
+/* Toene: Noten links, rechts was zum Ton gehoert, darunter der Status. */
+.tp-uebung[data-art="toene"] .tp-raster {
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 32%);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.tp-uebung[data-art="toene"] .tp-leiste     { grid-area: 1 / 1 / 2 / 3; }
+.tp-uebung[data-art="toene"] .tp-notenfeld  { grid-area: 2 / 1 / 3 / 2; }
+.tp-uebung[data-art="toene"] .tp-infofeld   { grid-area: 2 / 2 / 3 / 3; }
+.tp-uebung[data-art="toene"] .tp-status     { grid-area: 3 / 1 / 4 / 3; }
+.tp-uebung[data-art="toene"] .tp-fusszeile,
+.tp-uebung[data-art="toene"] .tp-punkte { display: none; }
+
+/* Melodie: alles untereinander — hier zaehlt die Breite der Notenzeile. */
+.tp-uebung[data-art="melodie"] .tp-raster {
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+.tp-uebung[data-art="melodie"] .tp-leiste    { grid-area: 1 / 1 / 2 / 3; }
+.tp-uebung[data-art="melodie"] .tp-notenfeld { grid-area: 2 / 1 / 3 / 3; }
+.tp-uebung[data-art="melodie"] .tp-infofeld  { grid-area: 3 / 1 / 4 / 2; }
+.tp-uebung[data-art="melodie"] .tp-status    { grid-area: 3 / 2 / 4 / 3; }
+.tp-uebung[data-art="melodie"] .tp-fusszeile { grid-area: 4 / 1 / 5 / 3; }
+
+/* ================= Leiste ================= */
+
+.tp-leiste {
+  display: flex; align-items: center; gap: 0.6rem; min-width: 0; flex-wrap: wrap;
+  position: relative; z-index: 40;            /* ueber der Sperre waehrend einer Rueckmeldung */
+}
+.tp-titelzeile {
+  flex: 1 1 4rem; min-width: 0; text-align: center;
+  font-size: 1.06rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tp-zurueck {
+  display: inline-flex; align-items: center; gap: 0.1rem; min-height: 44px;
+  color: var(--tp-tint); font-size: 1.02rem; white-space: nowrap;
+}
+.tp-zurueck svg, .tp-kapsel svg {
+  width: 1.3rem; height: 1.3rem; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+}
+.tp-zurueck:active { opacity: .5; }
+
+.tp-kapsel {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  min-height: 44px; min-width: 44px; padding: 0 0.85rem;
+  border-radius: 999px; background: var(--tp-flaeche); color: var(--tp-text);
+  border: 1px solid var(--tp-rand); box-shadow: var(--tp-schatten);
+  font-size: 0.92rem; font-weight: 600; white-space: nowrap;
+}
+.tp-kapsel svg { color: var(--tp-tint); stroke-width: 1.9; }
+.tp-kapsel:active { opacity: .6; }
+.tp-zahnrad { padding: 0; width: 44px; }
+
+.tp-spielknopf {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  min-height: 44px; min-width: 6.6rem; padding: 0 1.2rem;
+  border-radius: 999px; background: var(--tp-tint); color: var(--tp-auf-tint);
+  font-size: 1rem; font-weight: 600; white-space: nowrap;
+  transition: filter .15s, transform .15s;
+}
+.tp-spielknopf svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+.tp-spielknopf .ikon-stop { display: none; }
+.tp-spielknopf.laeuft { background: var(--tp-stopp); color: var(--tp-auf-stopp); }
+.tp-spielknopf.laeuft .ikon-play { display: none; }
+.tp-spielknopf.laeuft .ikon-stop { display: block; }
+.tp-spielknopf:active { filter: brightness(0.9); transform: scale(0.97); }
+
+/* Segment-Schalter: eines von wenigen */
+.tp-segmente {
+  display: flex; flex: 0 0 auto; padding: 2px; gap: 0;
+  background: var(--tp-fuellung); border-radius: calc(var(--tp-rund) - 2px);
+}
+.tp-segmente button {
+  flex: 1 1 0; min-height: 40px; padding: 0 0.85rem;
+  border-radius: calc(var(--tp-rund) - 4px);
+  font-size: 0.88rem; font-weight: 500; white-space: nowrap;
+  transition: background-color .2s, box-shadow .2s;
+}
+.tp-segmente button.an {
+  background: var(--tp-segment-an); font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.tp-segmente button:not(.an):active { opacity: .5; }
+
+/* Die Schlaege des Takts. Im Vorzaehler leuchten sie nacheinander auf. */
+.tp-punkte { display: flex; gap: 0.4rem; align-items: center; flex: 0 0 auto; padding: 0 0.2rem; }
+.tp-punkte.aus { display: none; }
+.tp-punkte .punkt {
+  width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--tp-fuellung);
+  transition: background-color .08s linear, transform .08s linear;
+}
+.tp-punkte .punkt.an { background: var(--tp-orange); transform: scale(1.35); }
+.tp-punkte .punkt.los { background: var(--tp-gruen-schalter); transform: scale(1.6); }
+
+/* ================= Felder ================= */
+
+.tp-notenfeld, .tp-infofeld, .tp-status {
+  background: var(--tp-flaeche); border: 1px solid var(--tp-rand);
+  border-radius: calc(var(--tp-rund) + 4px); box-shadow: var(--tp-schatten);
+}
+/* Das SVG haengt absolut im Feld: mit fester Hoehe im Fluss wuerde es
+   die Gitterzeile aufblaehen, aus der es seine Groesse bezieht. */
+.tp-notenfeld { position: relative; overflow: hidden; min-width: 0; min-height: 0; }
+.tp-noten { display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+.tp-infofeld { display: flex; min-width: 0; min-height: 0; }
+.tp-tonname { font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.tp-toninfo { display: flex; flex-direction: column; color: var(--tp-text-2); }
+.tp-ton-griff { color: var(--tp-text); font-weight: 600; }
+.tp-griff { display: block; width: 100%; height: 100%; }
+.tp-uebung .ventil-knopf { transition: fill .12s, stroke .12s; }
+
+/* Toene: gross, untereinander, mit Stimmgeraet */
+.tp-uebung[data-art="toene"] .tp-infofeld {
+  flex-direction: column; justify-content: center; gap: 1rem; padding: 1rem 1.2rem;
+}
+.tp-uebung[data-art="toene"] .tp-tonkopf { text-align: center; }
+.tp-uebung[data-art="toene"] .tp-tonname { font-size: clamp(2.6rem, 9cqi, 5rem); margin-bottom: 0.45rem; }
+.tp-uebung[data-art="toene"] .tp-toninfo { align-items: center; gap: 0.1rem; }
+.tp-uebung[data-art="toene"] .tp-grifffeld { height: clamp(3rem, 11cqi, 6rem); }
+
+/* Melodie: eine schmale Zeile links unter den Noten */
+.tp-uebung[data-art="melodie"] .tp-infofeld { align-items: center; gap: 0.8rem; padding: 0.35rem 1rem; }
+.tp-uebung[data-art="melodie"] .tp-tonkopf { display: flex; align-items: center; gap: 0.7rem; }
+.tp-uebung[data-art="melodie"] .tp-tonname { font-size: 1.8rem; min-width: 3.2rem; text-align: center; }
+.tp-uebung[data-art="melodie"] .tp-toninfo { font-size: 0.8rem; line-height: 1.3; white-space: nowrap; }
+.tp-uebung[data-art="melodie"] .tp-grifffeld { width: 7rem; height: 2.6rem; }
+.tp-uebung[data-art="melodie"] .tp-stimmung { display: none; }
+
+/* "Schau auf den Griff": die Ventile melden sich. */
+.tp-grifffeld.pulsiert .ventil-knopf {
+  transform-box: fill-box; transform-origin: center;
+  animation: tp-pulsieren 1.5s ease-in-out infinite;
+}
+@keyframes tp-pulsieren { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.12); opacity: .7; } }
+
+/* Stimmgeraet */
+.tp-stimmung { opacity: .5; transition: opacity .2s; }
+.tp-stimmung.an { opacity: 1; }
+.tp-uebung .stimm-skala { position: relative; height: 1.4rem; border-radius: 0.7rem; background: var(--tp-fuellung); }
+.tp-uebung .stimm-gut { position: absolute; left: 35%; width: 30%; top: 0; bottom: 0; background: var(--tp-gruen-zart); }
+.tp-uebung .stimm-mitte {
+  position: absolute; left: 50%; top: 0.3rem; bottom: 0.3rem; width: 2px; margin-left: -1px;
+  background: var(--tp-text-2); opacity: .5; border-radius: 1px;
+}
+.tp-uebung .stimm-zeiger {
+  position: absolute; left: 50%; top: 50%; width: 1.1rem; height: 1.1rem; border-radius: 50%;
+  transform: translate(-50%, -50%); background: var(--tp-orange); border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); transition: left .09s linear, background-color .15s;
+}
+.tp-stimmung.gut .stimm-zeiger { background: var(--tp-gruen-schalter); }
+.tp-stimmung:not(.an) .stimm-zeiger { background: var(--tp-text-2); opacity: .5; box-shadow: none; }
+.tp-uebung .stimm-zeile {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: 0.4rem; font-size: 0.78rem; color: var(--tp-text-2);
+}
+.tp-uebung .stimm-zeile b { font-size: 1rem; font-weight: 600; color: var(--tp-text); font-variant-numeric: tabular-nums; }
+
+/* Statuszeile: was ist gerade, was wurde gehoert */
+.tp-status {
+  display: flex; align-items: center; min-height: 3rem; min-width: 0;
+  padding: 0.45rem 1rem; font-size: 1rem; line-height: 1.3;
+  transition: background-color .2s, color .2s;
+}
+.tp-status.aktiv   { background: var(--tp-tint-zart); box-shadow: none; }
+.tp-status.gut     { background: var(--tp-gruen-zart); box-shadow: none; color: var(--tp-gruen); font-weight: 600; }
+.tp-status.achtung { background: var(--tp-orange-zart); box-shadow: none; color: var(--tp-orange-text); }
+
+/* ================= Fusszeile: Tempo, Hilfen, naechste Uebung ================= */
+
+.tp-fusszeile { display: flex; align-items: center; gap: 0.9rem; min-width: 0; position: relative; z-index: 40; flex-wrap: wrap; }
+.tp-tempofeld { display: flex; align-items: center; gap: 0.45rem; flex: 1 1 18rem; min-width: 0; }
+.tp-tempofeld.aus { display: none; }
+.tp-tempofeld.gesperrt { opacity: .4; pointer-events: none; }
+.tp-feldname { font-size: 0.82rem; color: var(--tp-text-2); margin-right: 0.2rem; }
+.tp-rund {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--tp-flaeche); color: var(--tp-tint);
+  border: 1px solid var(--tp-rand); box-shadow: var(--tp-schatten);
+  font-size: 1.45rem; line-height: 1;
+}
+.tp-rund:active { opacity: .6; }
+.tp-rund:disabled { color: var(--tp-text-2); opacity: .5; }
+.tp-tempozahl { min-width: 2.6rem; text-align: center; font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tp-tempobahn { position: relative; flex: 1 1 auto; min-width: 5rem; max-width: 20rem; height: 44px; margin: 0 0.8rem; touch-action: none; }
+.tp-tempospur {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--tp-tint) calc(var(--anteil, 0) * 100%),
+                                        var(--tp-fuellung) calc(var(--anteil, 0) * 100%));
+}
+.tp-tempogriff {
+  position: absolute; top: 50%; width: 26px; height: 26px; border-radius: 50%;
+  transform: translate(-50%, -50%); background: #fff;
+  box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12);
+  transition: left .09s ease-out;
+}
+
+.tp-hilfen { display: flex; gap: 0.45rem; flex: 0 0 auto; }
+.tp-hilfen button {
+  display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px; padding: 0 0.9rem;
+  border-radius: 999px; background: var(--tp-flaeche); color: var(--tp-text-2);
+  border: 1px solid var(--tp-rand); font-size: 0.88rem; font-weight: 500; white-space: nowrap;
+}
+.tp-hilfen button::before {
+  content: ""; width: 0.9rem; height: 0.9rem; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--tp-text-2);
+}
+.tp-hilfen button.an { background: var(--tp-tint-zart); border-color: transparent; color: var(--tp-tint); font-weight: 600; }
+.tp-hilfen button.an::before { box-shadow: none; background: var(--tp-tint); }
+
+.tp-umblaettern svg { width: 1rem; height: 1rem; stroke-width: 2.4; }
+.tp-umblaettern.lockt { background: var(--tp-tint); color: var(--tp-auf-tint); border-color: transparent; }
+.tp-umblaettern.lockt svg { color: var(--tp-auf-tint); }
+
+/* Waehrend einer Rueckmeldung sperrt die Buehne alle Eingaben — ausser
+   Leiste und Fusszeile (Zurueck und Stopp wirken immer). */
+.tp-buehne { position: absolute; inset: 0; pointer-events: none; z-index: 30; }
+.tp-buehne.sperrt { pointer-events: auto; }
+
+/* ================= Was sich im Notenbild bewegt ================= */
+
+.tp-uebung .marker-ring { animation: tp-blinken .55s ease-in-out infinite alternate; }
+@keyframes tp-blinken { from { opacity: .4; } to { opacity: 1; } }
+.tp-uebung .haken { transform-box: fill-box; transform-origin: center; animation: tp-haken .3s cubic-bezier(.2, 1.4, .4, 1) 1; }
+@keyframes tp-haken { 0% { transform: scale(0.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.tp-uebung .leuchtet { transform-box: fill-box; transform-origin: center; animation: tp-leuchten 1.05s ease-in-out 2; }
+@keyframes tp-leuchten { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+.tp-uebung .hof { transform-box: fill-box; transform-origin: center; animation: tp-hof 1.05s ease-in-out 2; }
+@keyframes tp-hof { 0%, 100% { opacity: 0; transform: scale(0.9); } 50% { opacity: .5; transform: scale(1.9); } }
+
+/* ================= Einstellungsmenue ================= */
+
+.tp-menue {
+  position: absolute; inset: 0; z-index: 60;
+  display: flex; justify-content: flex-end;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: calc(var(--tp-rund) + 4px);
+}
+.tp-menue-blatt {
+  width: min(26rem, 100%); height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 0 1.1rem 1.5rem;
+  background: var(--tp-flaeche); border-left: 1px solid var(--tp-rand);
+  border-radius: calc(var(--tp-rund) + 4px);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+  -webkit-user-select: text; user-select: text;
+}
+.tp-menue-kopf {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 3.4rem; background: var(--tp-flaeche);
+}
+.tp-menue h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+.tp-menue h3 { margin: 1.4rem 0.2rem 0.5rem; font-size: 1rem; font-weight: 700; }
+.tp-textaktion { min-height: 44px; color: var(--tp-tint); font-weight: 600; }
+.tp-gruppe { border: 1px solid var(--tp-rand); border-radius: var(--tp-rund); overflow: hidden; }
+.tp-zeile {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  width: 100%; min-height: 44px; padding: 0.5rem 0.9rem; font-size: 0.95rem; text-align: left;
+}
+.tp-zeile + .tp-zeile { border-top: 1px solid var(--tp-rand); }
+.tp-uebung button.tp-zeile:active { background: var(--tp-fuellung); }
+.tp-zeile.tp-aktion { color: var(--tp-tint); justify-content: flex-start; }
+.tp-zeile.tp-aktion:disabled { color: var(--tp-text-2); opacity: .6; }
+.tp-zeile select {
+  font: inherit; color: var(--tp-tint); background: transparent; border: 0;
+  max-width: 60%; text-align: right; cursor: pointer;
+}
+.tp-hinweis { margin: 0.45rem 0.4rem 0; font-size: 0.8rem; line-height: 1.4; color: var(--tp-text-2); }
+.tp-segmente.tp-breit { flex-wrap: wrap; }
+.tp-segmente.tp-breit button { padding: 0 0.5rem; font-size: 0.82rem; }
+.tp-abstand { margin-top: 0.7rem; }
+.tp-schalter {
+  position: relative; flex: 0 0 auto; width: 46px; height: 28px; border-radius: 14px;
+  background: var(--tp-fuellung); transition: background-color .2s;
+}
+.tp-schalter::after {
+  content: ""; position: absolute; left: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18); transition: transform .2s;
+}
+.tp-zeile.an .tp-schalter { background: var(--tp-gruen-schalter); }
+.tp-zeile.an .tp-schalter::after { transform: translateX(18px); }
+
+/* ================= Schmal ================= */
+
+@container (max-width: 760px) {
+  .tp-spielknopf span, .tp-zurueck span, .tp-feldname, .tp-umblaettern span { display: none; }
+  .tp-spielknopf { min-width: 3.2rem; padding: 0 1rem; }
+  .tp-segmente button { padding: 0 0.6rem; font-size: 0.82rem; }
+  .tp-uebung[data-art="melodie"] .tp-toninfo { display: none; }
+  .tp-tempobahn { margin: 0 0.4rem; }
+}
+/* Hochkant oder schmal: Noten oben, alles zum Ton darunter. */
+@container (max-width: 640px) {
+  .tp-uebung[data-art="toene"] .tp-raster {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+  .tp-uebung[data-art="toene"] .tp-leiste    { grid-area: 1 / 1 / 2 / 2; }
+  .tp-uebung[data-art="toene"] .tp-notenfeld { grid-area: 2 / 1 / 3 / 2; }
+  .tp-uebung[data-art="toene"] .tp-infofeld  { grid-area: 3 / 1 / 4 / 2; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .tp-uebung[data-art="toene"] .tp-status    { grid-area: 4 / 1 / 5 / 2; }
+  .tp-uebung[data-art="toene"] .tp-tonname   { font-size: 2.6rem; }
+  .tp-uebung[data-art="toene"] .tp-grifffeld { height: 3rem; flex: 1 1 8rem; }
+  .tp-uebung[data-art="toene"] .tp-stimmung  { flex: 1 1 100%; }
+  .tp-uebung[data-art="melodie"] .tp-raster { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto auto; }
+  .tp-uebung[data-art="melodie"] .tp-leiste    { grid-area: 1 / 1 / 2 / 2; }
+  .tp-uebung[data-art="melodie"] .tp-notenfeld { grid-area: 2 / 1 / 3 / 2; }
+  .tp-uebung[data-art="melodie"] .tp-infofeld  { grid-area: 3 / 1 / 4 / 2; }
+  .tp-uebung[data-art="melodie"] .tp-status    { grid-area: 4 / 1 / 5 / 2; }
+  .tp-uebung[data-art="melodie"] .tp-fusszeile { grid-area: 5 / 1 / 6 / 2; }
+  .tp-hilfen button { padding: 0 0.6rem; font-size: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-uebung .marker-ring, .tp-uebung .haken, .tp-uebung .leuchtet, .tp-uebung .hof,
+  .tp-grifffeld.pulsiert .ventil-knopf { animation: none !important; }
+}
