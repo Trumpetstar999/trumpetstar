@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can create their own teacher assignment" ON public.teacher_assignments;
