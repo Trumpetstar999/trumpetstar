@@ -21,7 +21,14 @@ export function useAudioInput() {
     setError(null);
     try {
       const ios = isIOS();
-      const stream = await navigator.mediaDevices.getUserMedia({
+      if (!navigator.mediaDevices?.getUserMedia) throw Object.assign(new Error("no-microphone"), { name: "NotSupportedError" });
+      // Create and resume the AudioContext inside the user gesture, before awaiting the
+      // permission prompt — otherwise iOS Safari keeps it suspended and no samples arrive.
+      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new AC();
+      const resumed = ctx.state === "suspended" ? ctx.resume().catch(() => {}) : Promise.resolve();
+      let stream: MediaStream;
+      try { stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
@@ -30,13 +37,14 @@ export function useAudioInput() {
           channelCount: 1,
           sampleRate: 48000,
         } as MediaTrackConstraints,
-      });
-      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AC();
-      // iOS starts the AudioContext suspended until a user gesture resumes it.
-      if (ctx.state === "suspended") {
-        try { await ctx.resume(); } catch { /* ignore */ }
+      }); } catch (e) {
+        if ((e as Error).name === "NotAllowedError" || (e as Error).name === "PermissionDeniedError") { ctx.close().catch(() => {}); throw e; }
+        // Older Android/desktop devices reject the detailed constraints — retry with defaults.
+        try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+        catch (e2) { ctx.close().catch(() => {}); throw e2; }
       }
+      await resumed;
+      if (ctx.state === "suspended") { try { await ctx.resume(); } catch { /* ignore */ } }
       const src = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 2048;

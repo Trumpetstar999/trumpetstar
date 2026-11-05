@@ -61,6 +61,9 @@
     if (!motor.knoten) { return motor.mikrofonStarten(aufFrames); }
     return root.navigator.mediaDevices.getUserMedia({
       audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false
+    }).catch(function (e) {
+      if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) { throw e; }
+      return root.navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     }).then(function (strom) {
       motor.strom = strom;
       motor.stromQuelle = motor.ctx.createMediaStreamSource(strom);

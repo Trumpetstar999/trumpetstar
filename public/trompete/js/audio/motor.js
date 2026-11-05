@@ -417,6 +417,9 @@
         noiseSuppression: false,
         autoGainControl: false
       }, video: false
+    }).catch(function (e) {
+      if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) { throw e; }
+      return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     }).then(function (strom) {
       selbst.strom = strom;
       selbst.stromQuelle = selbst.ctx.createMediaStreamSource(strom);
