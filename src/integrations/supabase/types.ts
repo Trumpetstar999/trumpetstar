@@ -4278,6 +4278,12 @@ export type Database = {
         Args: { p_token: string }
         Returns: boolean
       }
+      feedback_inbox: { Args: never; Returns: Json }
+      feedback_pair_allowed: { Args: { p_chat: string }; Returns: boolean }
+      feedback_thread: {
+        Args: { p_before?: string; p_content?: string; p_student: string }
+        Returns: Json
+      }
       finalize_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
       get_friends_star_ranking: {
         Args: { _user_id: string }
