@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Play, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/hooks/useLanguage';
@@ -11,6 +11,7 @@ import { beginnerShowcases, orderedBeginnerVideos } from '@/lib/beginner-course'
 import type { Video } from '@/types';
 
 type Course = { id: string; title: string; showcaseId: string; videos: Video[] };
+const BeginnerFeedback = lazy(() => import('./BeginnerFeedback'));
 
 function Showcase({ course, playingId, onPlay, disabled }: { course: Course; playingId: string | null; onPlay: (video: Video) => void; disabled: boolean }) {
   const { language } = useLanguage();
@@ -97,9 +98,9 @@ export function BeginnerCourse() {
     <div className="space-y-8 px-3 py-4 text-foreground sm:px-6">
       <div className="grid grid-cols-2 gap-2 border-b border-border pb-3" role="tablist">
         <Button role="tab" aria-selected={mode === 'video'} variant={mode === 'video' ? 'default' : 'outline'} onClick={() => setMode('video')} className="h-auto min-h-11 whitespace-normal py-2"><Play />{c.video}</Button>
-        <Button role="tab" aria-selected={mode === 'feedback'} variant={mode === 'feedback' ? 'default' : 'outline'} onClick={() => { setMode('feedback'); setPlaying(null); }} className="h-auto min-h-11 whitespace-normal py-2"><MessageCircle /><span>{c.feedback}<span className="block text-xs opacity-80">{c.soon}</span></span></Button>
+        <Button role="tab" aria-selected={mode === 'feedback'} variant={mode === 'feedback' ? 'default' : 'outline'} onClick={() => { setMode('feedback'); setPlaying(null); }} className="h-auto min-h-11 whitespace-normal py-2"><MessageCircle /><span>{c.feedback}</span></Button>
       </div>
-      {mode === 'feedback' ? <div className="flex flex-col items-center gap-3 py-16"><MessageCircle className="h-10 w-10 text-primary" /><h2 className="text-xl font-bold">{c.soon}</h2></div> : error ? <div className="py-12 text-center"><p className="mb-4">{c.unavailable}</p><Button onClick={() => setRetry(n => n + 1)}>{c.retry}</Button></div> : catalog?.language !== language ? <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 animate-spin" /></div> : catalog.courses.map(course => <Showcase key={`${language}:${course.id}`} course={course} playingId={playing?.language === language ? playing.id : null} onPlay={play} disabled={starting || usage.isLoading} />)}
+      {mode === 'feedback' ? <Suspense fallback={<div className="flex justify-center py-16"><Loader2 className="h-7 w-7 animate-spin" /></div>}><BeginnerFeedback /></Suspense> : error ? <div className="py-12 text-center"><p className="mb-4">{c.unavailable}</p><Button onClick={() => setRetry(n => n + 1)}>{c.retry}</Button></div> : catalog?.language !== language ? <div className="flex justify-center py-16"><Loader2 className="h-7 w-7 animate-spin" /></div> : catalog.courses.map(course => <Showcase key={`${language}:${course.id}`} course={course} playingId={playing?.language === language ? playing.id : null} onPlay={play} disabled={starting || usage.isLoading} />)}
       <DailyLimitOverlay open={limit} type="video" onClose={() => setLimit(false)} />
     </div>
   );
