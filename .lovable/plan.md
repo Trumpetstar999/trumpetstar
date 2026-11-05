@@ -9,7 +9,7 @@
 
 ## Sicherheit und technische Umsetzung
 - Eine angemeldete, serverseitig geprüfte Sitzung bestimmt die Käuferidentität. Die Anfrage darf weder eine fremde E-Mail noch eine fremde Nutzer-ID auswählen.
-- Vorhandene Digistore24-Kaufdaten werden mit der verifizierten Käufer-E-Mail abgefragt; verfügbare Anbieterabfragen ergänzen die Übersicht ausschließlich lesend. Keine Nachverarbeitung von Käufen und keine automatische Freischaltung.
+- Vorhandene Digistore24-Kaufdaten werden über eine geprüfte, serverseitige Käuferzuordnung abgefragt; bestehende unveränderliche Bestellzuordnungen haben Vorrang. Verfügbare Anbieterabfragen ergänzen die Übersicht ausschließlich lesend. Keine Nachverarbeitung von Käufen und keine automatische Freischaltung.
 - Nur die nötigen Produktdaten werden ausgegeben, keine vollständigen Kaufdaten oder Zugangsdaten. Links müssen gültige HTTPS-Adressen sein und zur eigenen Bestellung gehören; für erstattete Käufe werden keine Downloads angeboten.
 - Ladezustand, leere Kaufübersicht, Fehler und erneutes Laden werden berücksichtigt.
 
