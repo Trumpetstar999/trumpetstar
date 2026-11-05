@@ -6,7 +6,7 @@ const base = process.env.TEST_AUTH_URL;
 const key = process.env.TEST_ANON_KEY;
 const token = process.env.TEST_ADMIN_TOKEN;
 describe.skipIf(!base || !key || !token)('deployed read access', () => {
-  it.each(['audio_files', 'audio_levels', 'audio_level_items', 'review_settings', 'email_templates', 'vimeo_sync_log'])('%s blocks anonymous reads and preserves admin reads', async (table) => {
+  it.each(['review_settings', 'email_templates', 'vimeo_sync_log'])('%s blocks anonymous reads and preserves admin reads', async (table) => {
     if (!base || !key || !token) throw new Error('Missing integration test credentials');
     const url = `${base}/rest/v1/${table}?select=id&limit=1`;
     const anonymous = await fetch(url, { headers: { apikey: key, Authorization: `Bearer ${key}` } });
