@@ -1,12 +1,14 @@
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SnowtoneGame } from './SnowtoneGame';
 
 const usage = vi.hoisted(() => ({ recordGameStart: vi.fn() }));
 vi.mock('@/hooks/useDailyUsage', () => ({ useDailyUsage: () => usage }));
 vi.mock('@/hooks/useLanguage', () => ({ useLanguage: () => ({ language: 'de' }) }));
 vi.mock('@/components/premium/DailyLimitOverlay', () => ({ DailyLimitOverlay: () => null }));
-afterEach(() => { cleanup(); vi.clearAllMocks(); });
+const fakeWindow = { postMessage: vi.fn() };
+beforeEach(() => { vi.spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get').mockReturnValue(fakeWindow as unknown as Window); });
+afterEach(() => { cleanup(); vi.clearAllMocks(); vi.restoreAllMocks(); });
 
 describe('Snowtone shared game allowance', () => {
   it('checks each of three free starts and denies the fourth', async () => {
