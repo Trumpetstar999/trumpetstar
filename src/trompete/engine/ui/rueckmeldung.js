@@ -7,7 +7,7 @@
  * richtige Ton noch einmal) und was sich dazu bewegt (die Note
  * leuchtet auf, die Ventile pulsieren).
  *
- * Es gibt weder einen Summer noch eine Fanfare. "Falsch" heisst immer:
+ * Ein Treffer spielt das Happybeginners-Lobmotiv. "Falsch" heisst immer:
  * der gesuchte Ton erklingt noch einmal, und dazu steht da, was
  * stattdessen zu hoeren war.
  *
@@ -39,6 +39,7 @@
         if (selbst.nr === nr) {
           selbst.laeuft = false;
           selbst.buehne.classList.remove('sperrt');
+          selbst.buehne.replaceChildren();
         }
         aufl();
       }, ms);
@@ -52,11 +53,26 @@
     this.laeuft = false;
     this.buehne.classList.remove('sperrt');
     this.grifffeld.classList.remove('pulsiert');
+    this.buehne.replaceChildren();
   };
 
-  /** Getroffen: eine kurze Atempause, in der das Ergebnis zu lesen ist. */
+  /** Happybeginners bird and original sampled trumpet celebration. */
   Rueckmeldung.prototype.treffer = function (ms) {
-    return this._sperren(ms || 1300);
+    this.buehne.replaceChildren();
+    var img = document.createElement('img');
+    img.src = '/trompete/img/vogel-froh.png';
+    img.className = 'tp-jubel';
+    img.alt = '';
+    this.buehne.appendChild(img);
+    for (var i = 0; i < 7; i++) {
+      var n = document.createElement('i');
+      n.className = 'tp-jubelnote';
+      n.style.setProperty('--weit', ((i - 3) * 2.5) + 'rem');
+      n.style.animationDelay = (Math.abs(i - 3) * 0.04) + 's';
+      this.buehne.appendChild(n);
+    }
+    var dauer = this.motor.spieleLob() || 1.79;
+    return this._sperren(Math.max(ms || 0, dauer * 1000 + 250));
   };
 
   /** Ueberblasen oder ungenau: der Zielton kommt leise noch einmal —

@@ -1,4 +1,4 @@
-import trumpetSprite from '@/assets/beginner-trumpet-sprite.m4a.asset.json';
+import { TRUMPET_SPRITE_URL } from '@/lib/trumpetSound';
 /* Kopie aus der App "Trompete fuer Erwachsene" (app/js/audio/motor.js), gebaut von
  * tools/mach-lovable.js. Bitte nicht hier aendern, sondern dort. */
 /* motor.js — alles, was mit Web Audio zu tun hat.
@@ -42,7 +42,11 @@ import trumpetSprite from '@/assets/beginner-trumpet-sprite.m4a.asset.json';
 
   Motor.prototype.starten = function () {
     var selbst = this;
-    if (this.ctx) { return this._aufwecken(); }
+    if (this.ctx) {
+      return this._aufwecken().then(function () {
+        return selbst._klaengeLaden();
+      }).then(function () { selbst.bereit = true; selbst.fehler = null; return selbst; });
+    }
     var AC = root.AudioContext || root.webkitAudioContext;
     if (!AC) { this.fehler = 'kein-webaudio'; return Promise.reject(new Error('kein-webaudio')); }
     this.ctx = new AC();
@@ -94,13 +98,14 @@ import trumpetSprite from '@/assets/beginner-trumpet-sprite.m4a.asset.json';
 
   Motor.prototype._klaengeLaden = function () {
     var selbst = this;
-    if (!root.Sampler) { this.fehler = 'kein-sampler'; return Promise.resolve(null); }
-    this.sampler = new root.Sampler({
-      ctx: this.ctx, url: trumpetSprite.url
+    if (!root.Sampler) { this.fehler = 'kein-sampler'; return Promise.reject(new Error('kein-sampler')); }
+    this.sampler = this.sampler || new root.Sampler({
+      ctx: this.ctx, url: TRUMPET_SPRITE_URL
     });
-    return this.sampler.laden().catch(function () {
+    return this.sampler.laden().catch(function (error) {
       selbst.fehler = 'klang-fehlt';
-      return null;
+      selbst.bereit = false;
+      throw error;
     });
   };
 
@@ -138,6 +143,17 @@ import trumpetSprite from '@/assets/beginner-trumpet-sprite.m4a.asset.json';
 
     this.spieltBis = Math.max(this.spieltBis, wann + dauer + this.sampler.ausklang());
     return wann;
+  };
+
+  /** Original Happybeginners success motif, using real trumpet samples. */
+  Motor.prototype.spieleLob = function () {
+    if (!this.ctx || !this.sampler || !this.sampler.bereit()) { return 0; }
+    var start = this.ctx.currentTime + 0.05;
+    var ids = ['g1', 'h1', 'd2', 'c2', 'd2'];
+    for (var i = 0; i < ids.length; i++) {
+      this.spieleTon(ids[i], { wann: start + i * 0.16, dauer: i === 4 ? 0.8 : 0.176, lautstaerke: 0.95 });
+    }
+    return 1.44 + this.sampler.ausklang();
   };
 
   /** Spielt eine ganze Uebung im gewuenschten Tempo. */
