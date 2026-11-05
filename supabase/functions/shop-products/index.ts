@@ -27,9 +27,26 @@ Deno.serve(async (req) => {
   if (!url || !serviceKey) return json({ refreshed: false, reason: 'not_configured' }, 503);
   const db = createClient(url, serviceKey);
 
+  let reconcile = false;
+  if (req.method === 'POST') {
+    let input: unknown;
+    try { input = await req.json(); } catch { return json({ error: 'Invalid request' }, 400); }
+    if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(k => k !== 'reconcile') || ('reconcile' in input && typeof input.reconcile !== 'boolean')) return json({ error: 'Invalid request' }, 400);
+    reconcile = 'reconcile' in input && input.reconcile === true;
+  }
+  // Only a verified admin may intentionally republish the existing catalog.
+  if (reconcile) {
+    const bearer = req.headers.get('Authorization');
+    if (!bearer?.startsWith('Bearer ')) return json({ error: 'Unauthorized' }, 401);
+    const { data: auth, error } = await db.auth.getUser(bearer.slice(7));
+    if (error || !auth.user) return json({ error: 'Unauthorized' }, 401);
+    const { data: role } = await db.from('user_roles').select('role').eq('user_id', auth.user.id).eq('role', 'admin').maybeSingle();
+    if (!role) return json({ error: 'Forbidden' }, 403);
+  }
+
   const { data: latest } = await db.from('shop_products').select('synced_at').order('synced_at', { ascending: false, nullsFirst: false }).limit(1).maybeSingle();
   const last = latest?.synced_at ? Date.parse(latest.synced_at) : 0;
-  if (Date.now() - last < CACHE_MS) return json({ refreshed: false });
+  if (!reconcile && Date.now() - last < CACHE_MS) return json({ refreshed: false });
 
   const key = Deno.env.get('DIGISTORE24_API_KEY');
   if (!key) return json({ refreshed: false, reason: 'not_configured' });
@@ -39,7 +56,7 @@ Deno.serve(async (req) => {
     });
     const body = await res.json();
     if (body?.result !== 'success') return json({ refreshed: false, reason: 'provider_error' });
-    const raw = body.data?.products ?? body.data?.items ?? body.data ?? [];
+    const raw = body.data?.products ?? body.data?.product_list ?? body.data?.items ?? body.data ?? [];
     const list: Record<string, unknown>[] = Array.isArray(raw) ? raw : Object.values(raw);
     const now = new Date().toISOString();
 
@@ -57,12 +74,15 @@ Deno.serve(async (req) => {
       if (known.has(id)) {
         const patch: Record<string, unknown> = { name, created_at: created, synced_at: now };
         if (price != null && existing?.find((r) => r.id === id)?.price == null) patch.price = price;
-        await db.from('shop_products').update(patch).eq('id', id);
+        if (reconcile) patch.visible = active;
+        const { error } = await db.from('shop_products').update(patch).eq('id', id);
+        if (error) throw new Error('cache_write_failed');
       } else {
-        await db.from('shop_products').insert({
+        const { error } = await db.from('shop_products').insert({
           id, name, price, currency: String(p.currency ?? 'EUR'), created_at: created,
           order_url: `https://www.digistore24.com/product/${id}`, visible: active, synced_at: now,
         });
+        if (error) throw new Error('cache_write_failed');
       }
     }
     // Mark sync time even when nothing changed so the hourly gate holds.
