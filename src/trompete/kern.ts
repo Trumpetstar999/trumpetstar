@@ -9,6 +9,7 @@
  * Komponenten und in trompete.css.
  */
 import './engine/audio/dsp.js';
+import './trumpet.css';
 import './engine/audio/sampler.js';
 import './engine/audio/tracker.js';
 import './engine/audio/motor.js';

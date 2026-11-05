@@ -1,6 +1,6 @@
 .tp-trumpet {
   --griff-linie: hsl(var(--ts-ink));
-  --ventil-an: hsl(var(--ts-blue));
+  --ventil-an: hsl(var(--primary));
   --ventil-zahl: hsl(var(--ts-card));
   --loch-offen: hsl(var(--ts-card));
   aspect-ratio: 2 / 1;
