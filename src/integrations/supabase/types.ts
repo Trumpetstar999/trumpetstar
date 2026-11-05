@@ -4278,6 +4278,7 @@ export type Database = {
         Args: { p_token: string }
         Returns: boolean
       }
+      feedback_access_allowed: { Args: never; Returns: boolean }
       feedback_inbox: { Args: never; Returns: Json }
       feedback_pair_allowed: { Args: { p_chat: string }; Returns: boolean }
       feedback_thread: {
