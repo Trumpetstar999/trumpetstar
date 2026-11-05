@@ -59,13 +59,6 @@ const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const ImpressumPage = lazy(() => import("./pages/ImpressumPage"));
 const DatenschutzPage = lazy(() => import("./pages/DatenschutzPage"));
 
-// Mobile Mini-Mode pages
-const MobileHomePage = lazy(() => import("./pages/mobile/MobileHomePage"));
-const MobilePlanPage = lazy(() => import("./pages/mobile/MobilePlanPage"));
-const MobileHelpPage = lazy(() => import("./pages/mobile/MobileHelpPage"));
-const MobileProfilePage = lazy(() => import("./pages/mobile/MobileProfilePage"));
-const MobileLockedPage = lazy(() => import("./pages/mobile/MobileLockedPage"));
-
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
@@ -122,12 +115,8 @@ const App = () => (
                         <Route path="/signup" element={<AuthPage />} />
                         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                        {/* Mobile Mini-Mode Routes */}
-                        <Route path="/mobile/home" element={<MobileHomePage />} />
-                        <Route path="/mobile/plan" element={<MobilePlanPage />} />
-                        <Route path="/mobile/help" element={<MobileHelpPage />} />
-                        <Route path="/mobile/profile" element={<MobileProfilePage />} />
-                        <Route path="/mobile/locked" element={<MobileLockedPage />} />
+                        {/* Legacy phone links are redirected before mounting old content. */}
+                        <Route path="/mobile/*" element={null} />
 
                         {/* Protected App Routes */}
                         <Route path="/app" element={<M.AppEntryRedirect />} />

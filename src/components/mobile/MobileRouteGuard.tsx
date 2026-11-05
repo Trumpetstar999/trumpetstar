@@ -12,36 +12,6 @@ const LEGACY_MOBILE_DESTINATIONS: Record<string, string> = {
   '/mobile/locked': '/',
 };
 
-// Routes that are allowed on mobile (auth, onboarding, mobile routes)
-const MOBILE_ALLOWED_PREFIXES = [
-  '/auth',
-  '/login',
-  '/signup',
-  '/reset-password',
-  '/mobile/',
-  '/mobile/home',
-  '/mobile/plan',
-  '/mobile/help',
-  '/mobile/profile',
-  '/mobile/locked',
-  '/pricing',
-  '/snowtone',
-  '/app/game/',
-  '/qr/',
-];
-
-// Desktop app routes that should redirect to locked on mobile
-const DESKTOP_ROUTES = [
-  '/',
-  '/admin',
-  '/chats',
-  '/classroom',
-  '/pricing',
-  '/musicxml',
-  '/game/play',
-  '/practice/',
-];
-
 interface MobileRouteGuardProps {
   children: ReactNode;
 }
