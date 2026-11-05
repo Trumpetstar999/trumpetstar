@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Snowtone</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Music&display=swap" rel="stylesheet">
+
+<style>@font-face{font-family:"Noto Music";src:url("/__l5e/assets-v1/efed0bf8-36db-4fe4-89c0-40f1ad1045cc/snowtone-notation.ttf");font-display:swap}</style>
 <style>
   :root{
     --ice:#1f5f99; --ice-dark:#123c63; --orange:#ff7a1a; --panel:rgba(255,255,255,.92);
@@ -16,7 +16,7 @@
   canvas#c{display:block;position:fixed;inset:0}
   .hidden{display:none !important}
   .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(30,70,120,.18)}
-  .panel{background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:24px;box-shadow:0 20px 60px rgba(20,50,90,.35);padding:28px 30px;width:min(580px,100%);max-height:calc(100vh - 32px);overflow:auto}
+  .panel{background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:24px;box-shadow:0 20px 60px rgba(20,50,90,.35);padding:28px 30px;width:min(580px,100%);max-height:calc(100dvh - 32px);overflow:auto}
   h1{margin:0;font-size:52px;line-height:1;color:var(--ice);letter-spacing:.5px;text-shadow:0 3px 0 #cfe6fa;text-wrap:balance}
   h1 span{color:var(--orange)}
   h1 .logo{display:none;width:100%;max-width:460px;height:auto;margin:-10px auto -4px}
@@ -97,6 +97,7 @@
   @media (orientation: portrait) and (max-width: 700px){ .turn{display:block} }
   @media (prefers-reduced-motion: reduce){ .big,.life,.hint{transition:none} }
 </style>
+<script src="./locale.js"></script>
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -111,7 +112,7 @@
 
 <div id="menu" class="overlay">
   <div class="panel">
-    <h1 id="title"><img class="logo" id="logoImg" src="logo.webp" alt="Snowtone"><span class="logotext">Snow<span>tone</span></span></h1>
+    <h1 id="title"><img class="logo" id="logoImg" src="/__l5e/assets-v1/0605fc81-aca9-44d5-9e1a-10919d9c2c2d/snowtone-logo.webp" alt="Snowtone"><span class="logotext">Snow<span>tone</span></span></h1>
     <p class="sub">Spiel den richtigen Ton und schmilz die Schneemänner!</p>
     <p class="welcome hidden" id="welcome"></p>
     <div class="row">
@@ -198,6 +199,8 @@
 
 <script>
 'use strict';
+const tr = window.snowtoneTranslate;
+window.snowtoneTranslateDom();
 // ================= Helpers =================
 const TAU = Math.PI * 2;
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -208,7 +211,7 @@ const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 };
-const TEST = new URLSearchParams(location.search).has('test');
+const TEST = false; // Production input is microphone-only.
 const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function mk(w, h) { const c = document.createElement('canvas'); c.width = Math.max(1, Math.ceil(w)); c.height = Math.max(1, Math.ceil(h)); return c; }
@@ -217,7 +220,7 @@ function easeOutBack(x) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.
 
 // ================= Notes & instruments =================
 const SPELL = [[0,0],[0,1],[1,0],[2,-1],[2,0],[3,0],[3,1],[4,0],[4,1],[5,0],[6,-1],[6,0]];
-const DE = ['C','Cis','D','Es','E','F','Fis','G','Gis','A','B','H'];
+const DE = window.snowtoneLanguage === 'de' ? ['C','Cis','D','Es','E','F','Fis','G','Gis','A','B','H'] : ['C','C♯','D','E♭','E','F','F♯','G','G♯','A','B♭','B'];
 const SUP = ['', '¹', '²', '³', '⁴'];
 function helm(m) {
   const o = Math.floor(m / 12) - 1, n = DE[m % 12];
@@ -248,7 +251,8 @@ for (const k in INST) {
   INST[k].minHz = Math.max(35, hz(all[0]) * 0.8);
   INST[k].maxHz = Math.min(3300, hz(all[all.length - 1]) * 1.3);
 }
-const DIFFN = { easy: 'Leicht', mid: 'Mittel', hard: 'Schwer' };
+const DIFFN = { easy: tr('Leicht'), mid: tr('Mittel'), hard: tr('Schwer') };
+for (const instrument of Object.values(INST)) instrument.name = tr(instrument.name);
 
 // ================= Canvas & coordinates =================
 const VW = 1280, VH = 720;
@@ -619,7 +623,7 @@ let layerB = null, layerC = null, frostL = null;
 const BG = new Image();
 let bgReady = false;
 BG.onload = () => { bgReady = true; buildLayers(); };
-BG.src = 'bg.webp';
+BG.crossOrigin = 'anonymous'; BG.src = '/__l5e/assets-v1/fa92d650-1d04-4835-9ec2-f2eb854588a5/snowtone-winter.webp';
 function drawBgImage(g) {
   const w = VH * BG.width / BG.height, x0 = VW / 2 - w / 2, iw = BG.width, ih = BG.height;
   const avg = sy => { const c = mk(1, 1), x = c.getContext('2d'); x.drawImage(BG, 0, sy, iw, 3, 0, 0, 1, 1); const d = x.getImageData(0, 0, 1, 1).data; return `rgb(${d[0]},${d[1]},${d[2]})`; };
@@ -719,17 +723,37 @@ function detectPitch(b, sr, minHz, maxHz) {
   return sr / bt;
 }
 function ensureAudioCtx() {
-  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-  if (actx.state === 'suspended') actx.resume();
+  if (!actx || actx.state === 'closed') actx = new (window.AudioContext || window.webkitAudioContext)();
+  return actx.state === 'suspended' ? actx.resume() : Promise.resolve();
 }
+let disposed = false, micEpoch = 0;
+function stopMic() {
+  micEpoch++;
+  if (micStream) micStream.getTracks().forEach(track => track.stop());
+  micStream = null; analyser = null; tbuf = null;
+}
+function disposeAudio() {
+  disposed = true; stopMic();
+  melodyTimers.forEach(clearTimeout);
+  if (actx && actx.state !== 'closed') actx.close().catch(() => {});
+}
+addEventListener('pagehide', disposeAudio);
 async function startMic() {
-  ensureAudioCtx();
+  await ensureAudioCtx();
   if (analyser && micStream) return;
-  analyser = actx.createAnalyser(); analyser.fftSize = 4096; tbuf = new Float32Array(analyser.fftSize);
+  if (!navigator.mediaDevices?.getUserMedia) throw new Error('microphone unavailable');
+  const epoch = micEpoch;
+  let stream;
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-    actx.createMediaStreamSource(micStream).connect(analyser);
-  } catch (e) { if (!TEST) { analyser = null; throw e; } }
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  } catch (error) {
+    if (!['OverconstrainedError', 'ConstraintNotSatisfiedError', 'NotSupportedError'].includes(error.name)) throw error;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  }
+  if (disposed || epoch !== micEpoch) { stream.getTracks().forEach(track => track.stop()); throw new Error('cancelled'); }
+  micStream = stream;
+  analyser = actx.createAnalyser(); analyser.fftSize = 4096; tbuf = new Float32Array(analyser.fftSize);
+  actx.createMediaStreamSource(micStream).connect(analyser);
 }
 const ear = { midi: null, cents: 0, hold: 0, level: 0, lock: null, unlockT: 0, rawCents: 0 };
 function sensThreshold() { return 0.05 * Math.pow(0.6, (+$('sens').value) - 1); }
@@ -794,7 +818,7 @@ function params() {
   return { fire: Math.max(3.2, 9.5 - (L - 1) * 0.55), spawn: Math.max(0.9, 4.2 - (L - 1) * 0.32), max: Math.min(SLOTS.length, 1 + Math.floor(L / 2)) };
 }
 function newGame() {
-  Object.assign(G, { state: 'playing', score: 0, lives: 5, level: 1, melted: 0, spawnT: 0.8, snowmen: [], balls: [], splats: [], parts: [], debris: [], puddles: [], banner: { text: "Los geht's!", t: 0 }, lastNote: null,
+  Object.assign(G, { state: 'playing', score: 0, lives: 5, level: 1, melted: 0, spawnT: 0.8, snowmen: [], balls: [], splats: [], parts: [], debris: [], puddles: [], banner: { text: tr("Los geht's!"), t: 0 }, lastNote: null,
     melody: [], stats: {}, rescues: 0, firstDone: false, silentT: 0, sinceHit: 9, frost: 0 });
   ear.lock = null; gun.target = null;
   $('instLbl').textContent = INST[cfg.inst].name + ' · ' + DIFFN[cfg.diff];
@@ -850,7 +874,7 @@ function hit(sm) {
       const p = ballPos(b), bonus = 50 * G.level;
       G.score += bonus; G.rescues++;
       for (let i = 0; i < 26; i++) G.parts.push({ k: 'steam', x: p.x + rand(-1, 1) * p.r, y: p.y + rand(-1, 1) * p.r, vx: rand(-80, 80), vy: rand(-140, -30), r: rand(0.25, 0.5) * p.r + 6, life: 1.1, max: 1.1 });
-      G.parts.push({ k: 'text', text: 'Gerettet! +' + bonus, x: p.x, y: p.y - 30, vx: 0, vy: -70, life: 1.4, max: 1.4, col: '#1e9e5a' });
+      G.parts.push({ k: 'text', text: tr('Gerettet! +') + bonus, x: p.x, y: p.y - 30, vx: 0, vy: -70, life: 1.4, max: 1.4, col: '#1e9e5a' });
       sfx.rescue();
     }
   }
@@ -905,14 +929,14 @@ function nearMiss(m, cents) {
   if (!alive.length) return;
   const exact = alive.find(s => s.midi === m);
   if (exact) {
-    if (Math.abs(cents) > 45) { showHint(`Fast! Dein ${helm(m)} ist etwas zu ${cents > 0 ? 'hoch' : 'tief'}.`); }
+    if (Math.abs(cents) > 45) { showHint(tr(`Fast! Dein ${helm(m)} ist etwas zu ${cents > 0 ? 'hoch' : 'tief'}.`)); }
     return;
   }
   const t = alive.slice().sort((a, b) => Math.abs(a.midi - m) - Math.abs(b.midi - m))[0];
   const d = m - t.midi;
   let msg = null;
-  if (d % 12 === 0) msg = `Richtiger Ton, aber eine Oktave zu ${d > 0 ? 'hoch' : 'tief'}: gesucht ist ${helm(t.midi)}.`;
-  else if (Math.abs(d) <= 2) msg = `Knapp! Du spielst ${helm(m)}, gesucht ist ${helm(t.midi)}.`;
+  if (d % 12 === 0) msg = tr(`Richtiger Ton, aber eine Oktave zu ${d > 0 ? 'hoch' : 'tief'}: gesucht ist ${helm(t.midi)}.`);
+  else if (Math.abs(d) <= 2) msg = tr(`Knapp! Du spielst ${helm(m)}, gesucht ist ${helm(t.midi)}.`);
   if (msg) {
     if (msg !== lastHint || performance.now() - lastHintAt > 2500) statFor(t.midi).near++;
     showHint(msg);
@@ -1169,7 +1193,7 @@ function drawSnowman(sm, t) {
 }
 function drawBubble(sm) {
   const silent = G.silentT > 8;
-  const lines = silent ? ['Ich höre dich noch nicht.', 'Mikrofon erlaubt? Etwas lauter?'] : [`Spiel mein ${helm(sm.midi)}!`, 'Ich warte auf dich.'];
+  const lines = silent ? [tr('Ich höre dich noch nicht.'), tr('Mikrofon erlaubt? Etwas lauter?')] : [tr(`Spiel mein ${helm(sm.midi)}!`), tr('Ich warte auf dich.')];
   ctx.font = '600 19px Fredoka, sans-serif';
   const w = Math.max(...lines.map(l => ctx.measureText(l).width)) + 28, h = 58;
   const bx = clamp(sm.x + 40 * sm.s, 20 + w / 2, VW - 20 - w / 2), by = sm.y - 375 * sm.s;
@@ -1481,9 +1505,9 @@ function render(t) {
 let lastLives = -1, lastScore = -1, lastHeard = '';
 function updateHud(force) {
   if (force || lastLives !== G.lives) { $('lives').innerHTML = Array.from({ length: 5 }, (_, i) => `<div class="life${i >= G.lives ? ' lost' : ''}"></div>`).join(''); lastLives = G.lives; }
-  if (force || lastScore !== G.score) { $('score').textContent = G.score.toLocaleString('de-DE'); lastScore = G.score; }
+  if (force || lastScore !== G.score) { $('score').textContent = G.score.toLocaleString(window.snowtoneLocale); lastScore = G.score; }
   $('lvl').textContent = 'Level ' + G.level;
-  $('hsTop').textContent = Math.max(G.score, ...loadHs().map(h => h.score), 0).toLocaleString('de-DE');
+  $('hsTop').textContent = Math.max(G.score, ...loadHs().map(h => h.score), 0).toLocaleString(window.snowtoneLocale);
 }
 function updateEarHud() {
   const txt = ear.midi === null ? '–' : helm(ear.midi);
@@ -1511,19 +1535,22 @@ function renderWelcome() {
   const list = Object.entries(tricky).map(([m, w]) => [+m, w]).filter(([m, w]) => w >= 1 && pool.includes(m)).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([m]) => helm(m));
   const el = $('welcome');
   if (!name && !list.length) { el.classList.add('hidden'); return; }
-  let html = name ? `Willkommen zurück, <b>${esc(name)}</b>!` : 'Schön, dass du wieder da bist!';
+  let html = name ? tr(`Willkommen zurück, <b>${esc(name)}</b>!`) : tr('Schön, dass du wieder da bist!');
   if (list.length) html += ` <b>${list.join('</b> und <b>')}</b> ${list.length > 1 ? 'kommen' : 'kommt'} heute etwas öfter, ${list.length > 1 ? 'die waren' : 'der war'} letztes Mal knifflig.`;
   el.innerHTML = html; el.classList.remove('hidden');
 }
 
 // ================= Highscores =================
 const HS_KEY = 'snowtone_highscores';
-function loadHs() { const v = store.get(HS_KEY, []); return Array.isArray(v) ? v : []; }
+function loadHs() {
+  const v = store.get(HS_KEY, []);
+  return Array.isArray(v) ? v.filter(h => h && typeof h.name === 'string' && Number.isSafeInteger(h.score) && h.score >= 0 && Number.isSafeInteger(h.level) && h.level > 0 && INST[h.inst] && DIFFN[h.diff]).slice(0, 10) : [];
+}
 function qualifies(score) { const hs = loadHs(); return score > 0 && (hs.length < 10 || score > hs[hs.length - 1].score); }
 function renderHs(el, highlight) {
   const hs = loadHs();
   if (!hs.length) { el.innerHTML = '<li class="empty" style="list-style:none;margin-left:-26px">Noch keine Einträge. Sei der Erste!</li>'; return; }
-  el.innerHTML = hs.map(h => `<li class="${highlight && h.ts === highlight.ts ? 'me' : ''}"><span class="pts">${h.score.toLocaleString('de-DE')}</span> · ${esc(h.name)} <span class="meta">${esc((INST[h.inst] || {}).name || '')}, ${DIFFN[h.diff] || ''}, Level ${h.level}</span></li>`).join('');
+  el.innerHTML = hs.map(h => `<li class="${highlight && h.ts === highlight.ts ? 'me' : ''}"><span class="pts">${h.score.toLocaleString(window.snowtoneLocale)}</span> · ${esc(h.name)} <span class="meta">${esc((INST[h.inst] || {}).name || '')}, ${DIFFN[h.diff] || ''}, Level ${h.level}</span></li>`).join('');
 }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
@@ -1586,17 +1613,17 @@ function playMelody() {
   melodyTimers.push(setTimeout(() => drawMelody(-1), (t0 + notes.length * step - actx.currentTime) * 1000 + 200));
 }
 function reportText() {
-  const name = store.get('snowtone_name', '') || 'Ohne Namen';
+  const name = store.get('snowtone_name', '') || tr('Ohne Namen');
   const { fast, tough } = summary(), d = new Date();
   const lines = [
-    'Snowtone – Ergebnis',
+    tr('Snowtone – Ergebnis'),
     `${name} · ${INST[cfg.inst].name} · ${DIFFN[cfg.diff]}`,
-    `Punkte: ${G.score.toLocaleString('de-DE')} · Level ${G.level} · ${G.melted} Schneemänner geschmolzen`,
+    tr(`Punkte: ${G.score.toLocaleString(window.snowtoneLocale)} · Level ${G.level} · ${G.melted} Schneemänner geschmolzen`),
   ];
-  if (fast.length) lines.push('Sicher: ' + fast.map(r => `${helm(r.m)} (Ø ${sec(r.avg)})`).join(', '));
-  if (tough.length) lines.push('Üben: ' + tough.map(r => `${helm(r.m)} (${r.throws} ${r.throws === 1 ? 'Schneeball' : 'Schneebälle'}, ${r.near}× knapp daneben)`).join(', '));
-  if (G.melody.length) lines.push('Melodie: ' + G.melody.slice(-16).map(helm).join(' '));
-  lines.push(`Gespielt am ${d.toLocaleDateString('de-DE')} mit Snowtone`);
+  if (fast.length) lines.push(tr('Sicher: ') + fast.map(r => `${helm(r.m)} (Ø ${sec(r.avg)})`).join(', '));
+  if (tough.length) lines.push(tr('Üben: ') + tough.map(r => `${helm(r.m)} (${r.throws} ${r.throws === 1 ? 'Schneeball' : 'Schneebälle'}, ${r.near}× knapp daneben)`).join(', '));
+  if (G.melody.length) lines.push(tr('Melodie: ') + G.melody.slice(-16).map(helm).join(' '));
+  lines.push(tr(`Gespielt am ${d.toLocaleDateString(window.snowtoneLocale)} mit Snowtone`));
   return lines.join('\n');
 }
 
@@ -1606,11 +1633,12 @@ function show(id) {
   $('hud').classList.toggle('hidden', id !== 'hud');
 }
 function gameOver() {
+  stopMic();
   G.state = 'over';
   $('hint').classList.add('hidden');
   saveTricky();
-  $('finalScore').textContent = G.score.toLocaleString('de-DE');
-  $('overTitle').textContent = G.melted >= 10 ? 'Stark gespielt!' : 'Eingeschneit!';
+  $('finalScore').textContent = G.score.toLocaleString(window.snowtoneLocale);
+  $('overTitle').textContent = G.melted >= 10 ? tr('Stark gespielt!') : tr('Eingeschneit!');
   $('overSub').textContent = `${G.melted} ${G.melted === 1 ? 'Schneemann' : 'Schneemänner'} geschmolzen · Level ${G.level}`;
   const q = qualifies(G.score);
   $('hsEntry').classList.toggle('hidden', !q);
@@ -1618,13 +1646,13 @@ function gameOver() {
   renderPraise();
   $('melodyBox').classList.toggle('hidden', G.melody.length === 0);
   if (G.melody.length) drawMelody(-1);
-  $('reportTa').classList.add('hidden'); $('copyBtn').textContent = 'Ergebnis für den Lehrer kopieren';
+  $('reportTa').classList.add('hidden'); $('copyBtn').textContent = tr('Ergebnis für den Lehrer kopieren');
   renderHs($('hsOver'));
   show('over');
   if (q) setTimeout(() => $('nameIn').focus(), 50);
 }
 function saveScore() {
-  const name = ($('nameIn').value.trim() || 'Anonym').slice(0, 16);
+  const name = ($('nameIn').value.trim() || tr('Anonym')).slice(0, 16);
   store.set('snowtone_name', name);
   const entry = { name, score: G.score, inst: cfg.inst, diff: cfg.diff, level: G.level, ts: Date.now() };
   const hs = loadHs(); hs.push(entry); hs.sort((a, b) => b.score - a.score);
@@ -1634,18 +1662,18 @@ function saveScore() {
 }
 async function copyReport() {
   const txt = reportText();
-  try { await navigator.clipboard.writeText(txt); $('copyBtn').textContent = 'Kopiert ✓ Jetzt einfach einfügen'; }
-  catch (e) { const ta = $('reportTa'); ta.value = txt; ta.classList.remove('hidden'); ta.focus(); ta.select(); $('copyBtn').textContent = 'Text unten markiert: jetzt kopieren'; }
+  try { await navigator.clipboard.writeText(txt); $('copyBtn').textContent = tr('Kopiert ✓ Jetzt einfach einfügen'); }
+  catch (e) { const ta = $('reportTa'); ta.value = txt; ta.classList.remove('hidden'); ta.focus(); ta.select(); $('copyBtn').textContent = tr('Text unten markiert: jetzt kopieren'); }
 }
 function pauseGame() { if (G.state !== 'playing') return; G.state = 'paused'; $('pause').classList.remove('hidden'); }
 function resumeGame() { if (G.state !== 'paused') return; G.state = 'playing'; $('pause').classList.add('hidden'); }
-function toMenu() { G.state = 'menu'; G.snowmen = []; G.balls = []; G.splats = []; G.parts = []; G.debris = []; G.puddles = []; G.banner = null; renderHs($('hsMenu')); renderWelcome(); show('menu'); }
+function toMenu() { stopMic(); melodyTimers.forEach(clearTimeout); G.state = 'menu'; G.snowmen = []; G.balls = []; G.splats = []; G.parts = []; G.debris = []; G.puddles = []; G.banner = null; renderHs($('hsMenu')); renderWelcome(); show('menu'); }
 
 function readCfg() {
   cfg.inst = $('inst').value; cfg.diff = $('diff').value; cfg.names = $('names').checked;
   store.set('snowtone_cfg', { inst: cfg.inst, diff: cfg.diff, names: cfg.names, sfx: $('sfx').checked, sens: $('sens').value });
   const pool = INST[cfg.inst].pools[cfg.diff];
-  $('rangeNote').textContent = `Töne ${helm(pool[0])} bis ${helm(pool[pool.length - 1])} (${pool.length} Töne, notiert${curClef() === 'f' ? ', Bassschlüssel' : ''})`;
+  $('rangeNote').textContent = tr(`Töne ${helm(pool[0])} bis ${helm(pool[pool.length - 1])} (${pool.length} Töne, notiert${curClef() === 'f' ? ', Bassschlüssel' : ''})`);
   renderWelcome();
 }
 (function initCfg() {
@@ -1659,15 +1687,40 @@ function readCfg() {
   readCfg();
 })();
 for (const id of ['inst', 'diff', 'names', 'sfx', 'sens']) $(id).addEventListener('change', readCfg);
-$('startBtn').addEventListener('click', async () => {
+let starting = false;
+function requestStart() {
+  if (parent === window) return Promise.resolve(false);
+  const id = crypto.randomUUID();
+  return new Promise(resolve => {
+    const done = allowed => { clearTimeout(timer); removeEventListener('message', receive); resolve(allowed); };
+    const receive = event => {
+      if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'snowtone-start-result' || event.data.id !== id) return;
+      done(event.data.allowed === true);
+    };
+    const timer = setTimeout(() => done(false), 30000);
+    addEventListener('message', receive);
+    parent.postMessage({ type: 'snowtone-start', id }, location.origin);
+  });
+}
+async function beginGame() {
+  if (starting || disposed) return;
+  starting = true; $('startBtn').disabled = $('againBtn').disabled = true;
   readCfg(); $('micErr').textContent = '';
-  try { await startMic(); newGame(); }
-  catch (e) { $('micErr').textContent = 'Das Mikrofon ist nicht freigegeben. Erlaube den Zugriff in der Adresszeile des Browsers und tippe dann noch einmal auf „Los geht\'s!“.'; }
-});
+  try {
+    // Unlock audio inside the click before waiting for microphone or quota.
+    await startMic();
+    if (await requestStart()) { if (!disposed) newGame(); }
+    else { stopMic(); toMenu(); $('micErr').textContent = tr('Zum Weiterspielen ist ein Upgrade erforderlich.'); }
+  } catch (error) {
+    stopMic(); toMenu();
+    if (!disposed) $('micErr').textContent = tr('Das Mikrofon ist nicht freigegeben. Erlaube den Zugriff in der Adresszeile des Browsers und tippe dann noch einmal auf „Los geht\'s!“.');
+  } finally { starting = false; $('startBtn').disabled = $('againBtn').disabled = false; }
+}
+$('startBtn').addEventListener('click', beginGame);
 $('pauseBtn').addEventListener('click', pauseGame);
 $('resumeBtn').addEventListener('click', resumeGame);
 $('quitBtn').addEventListener('click', toMenu);
-$('againBtn').addEventListener('click', () => { readCfg(); newGame(); });
+$('againBtn').addEventListener('click', beginGame);
 $('menuBtn').addEventListener('click', toMenu);
 $('saveBtn').addEventListener('click', saveScore);
 $('playMel').addEventListener('click', playMelody);
@@ -1695,9 +1748,15 @@ function frame(now) {
   update(dt, t);
   render(t);
   if (G.state !== 'menu') updateEarHud();
-  requestAnimationFrame(frame);
+  if (!disposed) requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+if (!disposed) requestAnimationFrame(frame);
 </script>
-</body>
+<script>
+if (parent !== window) {
+  const style = parent.getComputedStyle(parent.document.documentElement);
+  const token = name => 'hsl(' + style.getPropertyValue(name).trim() + ')';
+  for (const [key,value] of Object.entries({'--ice':token('--ts-deep'),'--ice-dark':token('--ts-ink'),'--text':token('--ts-ink'),'--muted':token('--ts-ink-muted'),'--soft':token('--ts-surface')})) document.documentElement.style.setProperty(key,value);
+}
+</script></body>
 </html>
