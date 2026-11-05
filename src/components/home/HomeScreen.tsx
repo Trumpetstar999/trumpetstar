@@ -175,11 +175,11 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
           )}
         </section>
 
-        <nav className="mt-7 grid grid-cols-4 gap-x-3 gap-y-6">
+        <nav className="mt-7 grid grid-cols-1 gap-x-3 gap-y-6 sm:grid-cols-4">
           {HOME_APPS.slice(0, 8).map(tile)}
         </nav>
         <ShopCarousel />
-        <nav className="mt-8 grid grid-cols-4 gap-x-3 gap-y-6">
+        <nav className="mt-8 grid grid-cols-1 gap-x-3 gap-y-6 sm:grid-cols-4">
           {HOME_APPS.slice(8).map(tile)}
         </nav>
         <footer className="mt-8 border-t border-ts-ink/15 pt-4 text-ts-ink"><LegalLinks /></footer>
