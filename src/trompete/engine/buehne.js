@@ -270,9 +270,16 @@
         });
         return;
       }
-      g.motor.aufwecken();
-      g.motor.aufFrames = aufFrames;
-      drueckeStart();
+      startet = true;
+      g.motor.aufwecken().then(function () {
+        startet = false;
+        if (!gebunden) { return; }
+        g.motor.aufFrames = aufFrames;
+        drueckeStart();
+      }, function () {
+        startet = false;
+        if (gebunden) { k.status(T('lov.ohneTon', 'Dieser Browser kann keinen Ton erzeugen.'), 'achtung'); }
+      });
     }
     function drueckeStart() {
       var laeuft = k.spielknopf.classList.contains('laeuft');

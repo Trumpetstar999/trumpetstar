@@ -88,7 +88,8 @@
       xhr.responseType = 'arraybuffer';
       xhr.onload = function () {
         if (xhr.status !== 200 && xhr.status !== 0) { ab(new Error(selbst.url + ' ' + xhr.status)); return; }
-        function fertig(b) { selbst._blenden(b); selbst.puffer = b; aufl(b); }
+        var dekodiert = false;
+        function fertig(b) { if (dekodiert) { return; } dekodiert = true; selbst._blenden(b); selbst.puffer = b; aufl(b); }
         // Alte Safari-Versionen kennen nur die Callback-Form.
         var ergebnis = selbst.ctx.decodeAudioData(xhr.response, fertig,
           function (e) { ab(e || new Error('decode sprite')); });
@@ -97,6 +98,7 @@
       xhr.onerror = function () { ab(new Error('netz ' + selbst.url)); };
       xhr.send();
     });
+    this.laedt = this.laedt.catch(function (error) { selbst.laedt = null; throw error; });
     return this.laedt;
   };
 

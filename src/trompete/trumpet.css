@@ -1,0 +1,14 @@
+.tp-trumpet {
+  --griff-linie: hsl(var(--ts-ink));
+  --ventil-an: hsl(var(--primary));
+  --ventil-zahl: hsl(var(--ts-card));
+  --loch-offen: hsl(var(--ts-card));
+  aspect-ratio: 2 / 1;
+  background: url('/trompete/img/trompete-gold.png') center / contain no-repeat;
+}
+.tp-trumpet .ventil { transition: transform 55ms cubic-bezier(.3, .9, .4, 1); }
+.tp-trumpet .ventil.gedrueckt { transform: translateY(96px); }
+.tp-trumpet .ventil-knopf { transition: fill 55ms linear, stroke 55ms linear; }
+@media (prefers-reduced-motion: reduce) {
+  .tp-trumpet .ventil { transition: none; }
+}
