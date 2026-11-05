@@ -118,7 +118,7 @@ export default function GamePlayPage() {
   const handleBack = useCallback(() => {
     stopListening();
     stopGame();
-    navigate('/app', { state: { activeTab: 'game' } });
+    navigate('/games');
   }, [navigate, stopListening, stopGame]);
 
   const handleTogglePause = useCallback(() => {

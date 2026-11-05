@@ -457,7 +457,7 @@ export default function ToneForcePlayPage() {
     <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,#3a1b7a_0%,#0c0524_70%)] text-white overflow-hidden">
       {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2 flex items-center justify-between text-sm bg-black/40 backdrop-blur-sm border-b border-white/10">
-        <button onClick={() => navigate('/app', { state: { activeTab: 'game', game: 'toneforce' } })} className="text-white/70 text-xs hover:text-white">
+        <button onClick={() => navigate('/games', { state: { game: 'toneforce' } })} className="text-white/70 text-xs hover:text-white">
           {t('common.menu')}
         </button>
         <div className="flex items-center gap-3 text-xs">
@@ -607,7 +607,7 @@ export default function ToneForcePlayPage() {
                       {t('game.restart')}
                     </button>
                     <button
-                      onClick={() => navigate('/app', { state: { activeTab: 'game', game: 'toneforce', toneForceView: 'highscores' } })}
+                      onClick={() => navigate('/games', { state: { game: 'toneforce', toneForceView: 'highscores' } })}
                       className="flex-1 rounded-xl bg-[#ffcc33] text-[#0c0524] px-4 py-3 font-bold hover:brightness-110 transition"
                     >
                       {t('game.highscores')}
