@@ -190,7 +190,7 @@
       });
     };
     k.notenfarbeAnwenden = function () {
-      var schwarz = g.fortschritt.notenfarbe() === 'schwarz';
+      var schwarz = true;
       root.Noten.einfarbig(schwarz);
       root.Griff.einfarbig(schwarz);
       wurzel.classList.toggle('farbnoten', !schwarz);
@@ -248,6 +248,7 @@
         startet = true;
         k.status(T('lov.startet', 'Einen Moment – Klang und Mikrofon werden eingeschaltet …'), 'aktiv');
         g.motor.starten().then(function () {
+          if (!gebunden) { return false; }
           return mikrofonAn(g.motor, aufFrames).then(null, function () {
             /* Ohne Mikrofon geht es trotzdem weiter: vorspielen und
              * mitlesen kann die Uebung auch so. */
@@ -256,7 +257,7 @@
           });
         }).then(function (mitMikro) {
           startet = false;
-          if (!gebunden) { return; }
+          if (!gebunden) { mikrofonAus(g.motor); g.motor.pausieren(); return; }
           wachHalten(true);
           g.tracker.reset();
           g.motor.erkennungZuruecksetzen();
@@ -264,6 +265,7 @@
           drueckeStart();
         }, function () {
           startet = false;
+          if (!gebunden) { return; }
           k.status(T('lov.ohneTon', 'Dieser Browser kann keinen Ton erzeugen.'), 'achtung');
         });
         return;
@@ -353,7 +355,7 @@
     /* Beim Ueben liegen die Haende am Instrument, nicht am Geraet. */
     function wachHalten(an) {
       if (an && root.navigator.wakeLock && !wachSperre) {
-        root.navigator.wakeLock.request('screen').then(function (s) { wachSperre = s; }, function () { /* egal */ });
+        root.navigator.wakeLock.request('screen').then(function (s) { if (!gebunden) { s.release(); return; } wachSperre = s; }, function () { /* egal */ });
       } else if (!an && wachSperre) {
         try { wachSperre.release(); } catch (e) { /* egal */ }
         wachSperre = null;

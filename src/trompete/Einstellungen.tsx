@@ -9,6 +9,7 @@
  * Schliessen wird die Uebung mit dem neuen Stand neu aufgeschlagen.
  */
 import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { gemeinsam, hoehen, t, tonarten, tonartToene, tonName, tx } from './kern';
 import type { Art } from './kern';
 
@@ -53,9 +54,9 @@ export function Einstellungen({ art, onSchliessen }: { art: Art; onSchliessen: (
       <div className="tp-menue-blatt">
         <div className="tp-menue-kopf">
           <h2>{t('einstellungen.titel', 'Einstellungen')}</h2>
-          <button type="button" className="tp-textaktion" onClick={() => onSchliessen(geaendert)}>
+          <Button variant="ghost" type="button" className="tp-textaktion" onClick={() => onSchliessen(geaendert)}>
             {t('allg.fertig', 'Fertig')}
-          </button>
+          </Button>
         </div>
 
         <h3>{t('material.titel', 'Tonmaterial')}</h3>
@@ -78,13 +79,13 @@ export function Einstellungen({ art, onSchliessen }: { art: Art; onSchliessen: (
               {zeilen.map((x) => <option key={x.id} value={x.notiertMidi}>{hoeheName(x.id)}</option>)}
             </select>
           </label>
-          <button type="button" className="tp-zeile tp-aktion" onClick={uebernehmen}>
+          <Button variant="ghost" type="button" className="tp-zeile tp-aktion" onClick={uebernehmen}>
             {t('material.setzen', 'Übernehmen')}
-          </button>
-          <button type="button" className="tp-zeile tp-aktion" disabled={!hand}
+          </Button>
+          <Button variant="ghost" type="button" className="tp-zeile tp-aktion" disabled={!hand}
                   onClick={() => { f.automatik(); neu(); }}>
             {t('material.automatik', 'Wieder automatisch erweitern')}
-          </button>
+          </Button>
         </div>
         <p className="tp-hinweis">
           {hand ? t('material.hand', 'Von Hand gewählt: {liste}.', { liste })
@@ -94,47 +95,40 @@ export function Einstellungen({ art, onSchliessen }: { art: Art; onSchliessen: (
         <h3>{t('strenge.titel', 'Wie streng zuhören?')}</h3>
         <div className="tp-segmente tp-breit">
           {STRENGE.map(([wert, schluessel, urtext]) => (
-            <button key={wert} type="button" className={f.schwierigkeit() === wert ? 'an' : ''}
+            <Button variant="ghost" key={wert} type="button" className={f.schwierigkeit() === wert ? 'an' : ''}
                     aria-pressed={f.schwierigkeit() === wert}
                     onClick={() => { f.setzeSchwierigkeit(wert); neu(); }}>
               {t(schluessel, urtext)}
-            </button>
+            </Button>
           ))}
         </div>
         <p className="tp-hinweis">
           {tx('Sehr nachsichtig ist die Voreinstellung. Sobald die Töne sicher kommen, eine Stufe weiter: Genau lässt 50 Cent zu, Streng noch 30.',
               'Very lenient is the default. Once the notes come reliably, go one step further: Exact allows 50 cents, Strict only 30.',
-              'Muy indulgente es lo predeterminado. Cuando las notas salgan seguras, un paso más: Exacto admite 50 cents, Estricto solo 30.')}
+              'Muy indulgente es lo predeterminado. Cuando las notas salgan seguras, un paso más: Exacto admite 50 cents, Estricto solo 30.',
+              'Privzeta nastavitev je zelo prizanesljiva. Ko tone zaigraš zanesljivo, izberi stopnjo strožje: Natančno dovoljuje 50 centov, Strogo 30.')}
         </p>
 
         <h3>{t('notenbild.titel', 'Notenbild')}</h3>
         <div className="tp-gruppe">
           {(['namen', 'zaehlen'] as const).map((name) => (
-            <button key={name} type="button" className={'tp-zeile' + (f.hilfe(name) ? ' an' : '')}
+            <Button variant="ghost" key={name} type="button" className={'tp-zeile' + (f.hilfe(name) ? ' an' : '')}
                     aria-pressed={f.hilfe(name)}
                     onClick={() => { f.setzeHilfe(name, !f.hilfe(name)); neu(); }}>
               <span>{name === 'namen' ? t('hilfen.namen', 'Notennamen unter den Noten')
                                       : t('hilfen.zaehlen', 'Zählzeiten unter den Noten')}</span>
               <i className="tp-schalter" />
-            </button>
+            </Button>
           ))}
         </div>
         {art === 'toene' && (
           <p className="tp-hinweis">
             {tx('Notennamen und Zählzeiten erscheinen bei den Melodien.',
                 'Note names and counting appear in the melodies.',
-                'Los nombres y el conteo aparecen en las melodías.')}
+                'Los nombres y el conteo aparecen en las melodías.', 'Imena tonov in štetje se prikažejo pri melodijah.')}
           </p>
         )}
-        <div className="tp-segmente tp-breit tp-abstand">
-          {(['schwarz', 'bunt'] as const).map((farbe) => (
-            <button key={farbe} type="button" className={f.notenfarbe() === farbe ? 'an' : ''}
-                    aria-pressed={f.notenfarbe() === farbe}
-                    onClick={() => { f.setzeNotenfarbe(farbe); neu(); }}>
-              {farbe === 'schwarz' ? t('notenbild.schwarz', 'Schwarze Noten') : t('notenbild.bunt', 'Farbige Noten')}
-            </button>
-          ))}
-        </div>
+
       </div>
     </div>
   );

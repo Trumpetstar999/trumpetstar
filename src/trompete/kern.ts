@@ -16,6 +16,7 @@ import './engine/generator.js';
 import './engine/bewertung.js';
 import './engine/sprachen.js';
 import './engine/fortschritt.js';
+import './engine/render/glyphen.js';
 import './engine/render/noten.js';
 import './engine/render/griff.js';
 import './engine/ui/rueckmeldung.js';
@@ -24,13 +25,14 @@ import './engine/ui/level1.js';
 import './engine/ui/level2.js';
 import './engine/ui/einstellungen.js';
 import './engine/buehne.js';
+import './slovenian';
 import toene from './daten/toene';
 import lieder from './daten/lieder';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const g = globalThis as any;
 
-export type Sprache = 'de' | 'en' | 'es';
+export type Sprache = 'de' | 'en' | 'es' | 'sl';
 export type Art = 'toene' | 'melodie';
 
 export interface Steuerung {
@@ -61,9 +63,9 @@ export function t(schluessel: string, urtext: string, werte?: Record<string, str
 }
 
 /** Text, den es in der App noch nicht gab: alle drei Sprachen hier. */
-export function tx(de: string, en: string, es: string): string {
+export function tx(de: string, en: string, es: string, sl: string): string {
   const jetzt = g.Sprachen.jetzt();
-  return jetzt === 'en' ? en : jetzt === 'es' ? es : de;
+  return jetzt === 'sl' ? sl : jetzt === 'en' ? en : jetzt === 'es' ? es : de;
 }
 
 export function setzeSprache(code: Sprache): void {
@@ -73,7 +75,7 @@ export function setzeSprache(code: Sprache): void {
 /** Die Sprache der Seite, wenn keine angegeben ist: <html lang="…">. */
 export function spracheDerSeite(): Sprache {
   const lang = (typeof document !== 'undefined' && document.documentElement.lang || '').slice(0, 2);
-  return lang === 'en' || lang === 'es' ? lang : 'de';
+  return lang === 'en' || lang === 'es' || lang === 'sl' ? lang : 'de';
 }
 
 /** Tonname wie in der App: c¹, fis² (deutsch) oder C4, F♯5. */

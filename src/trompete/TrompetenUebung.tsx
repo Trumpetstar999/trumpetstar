@@ -12,7 +12,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { anbinden, setzeSprache, spracheDerSeite, t, tx } from './kern';
 import type { Art, Sprache, Steuerung } from './kern';
-import { themaVariablen } from './thema';
+import { Button } from '@/components/ui/button';
 import { Einstellungen } from './Einstellungen';
 import './trompete.css';
 
@@ -44,7 +44,7 @@ export function TrompetenUebung({ art, sprache, basisUrl = '/trompete/', onZurue
   const steuerung = useRef<Steuerung | null>(null);
   const [takte, setzeTakte] = useState<2 | 4>(gemerkteTakte);
   const [menue, setzeMenue] = useState(false);
-  const thema = useMemo(themaVariablen, []);
+
 
   /* Anbinden, wenn das Geruest steht; loesen, wenn es geht. */
   useEffect(() => {
@@ -73,7 +73,7 @@ export function TrompetenUebung({ art, sprache, basisUrl = '/trompete/', onZurue
 
   return (
     <div ref={wurzel} className={'tp-uebung' + (className ? ' ' + className : '')} data-art={art}
-         lang={code} style={{ ...thema, ...style }}>
+         lang={code} style={style}>
       <Geruest key={code} art={art} takte={takte} zurueck={!!onZurueck}
                onZurueck={onZurueck} onTakte={waehleTakte} onMenue={oeffneMenue} />
       {menue && <Einstellungen art={art} onSchliessen={schliesseMenue} />}
@@ -96,10 +96,10 @@ const Geruest = memo(function Geruest({ art, takte, zurueck, onZurueck, onTakte,
     <div className="tp-raster">
       <div className="tp-leiste">
         {zurueck && (
-          <button type="button" className="tp-zurueck" onClick={onZurueck}>
+          <Button variant="ghost" type="button" className="tp-zurueck" onClick={onZurueck}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
             <span>{t('allg.zurueck', 'Zurück')}</span>
-          </button>
+          </Button>
         )}
         <div className="tp-titelzeile"><b data-tp="titel" /></div>
 
@@ -108,39 +108,39 @@ const Geruest = memo(function Geruest({ art, takte, zurueck, onZurueck, onTakte,
         </div>
 
         {melodie && (
-          <div className="tp-segmente" role="group" aria-label={tx('Länge', 'Length', 'Duración')}>
+          <div className="tp-segmente" role="group" aria-label={tx('Länge', 'Length', 'Duración', 'Dolžina')}>
             {([2, 4] as const).map((n) => (
-              <button key={n} type="button" className={takte === n ? 'an' : ''} aria-pressed={takte === n}
+              <Button variant="ghost" key={n} type="button" className={takte === n ? 'an' : ''} aria-pressed={takte === n}
                       onClick={() => onTakte(n)}>
                 {n === 2 ? t('rhythmus.takte2', '2 Takte') : t('rhythmus.takte4', '4 Takte')}
-              </button>
+              </Button>
             ))}
           </div>
         )}
 
         {melodie && (
           <div className="tp-segmente" role="group" aria-label={t('modus.aria', 'Wer spielt')}>
-            <button type="button" data-tp="modus-mit">{t('modus.mit', 'Mitspielen')}</button>
-            <button type="button" data-tp="modus-solo">{t('modus.solo', 'Solo')}</button>
+            <Button variant="ghost" type="button" data-tp="modus-mit">{t('modus.mit', 'Mitspielen')}</Button>
+            <Button variant="ghost" type="button" data-tp="modus-solo">{t('modus.solo', 'Solo')}</Button>
           </div>
         )}
 
-        <button type="button" className="tp-kapsel tp-zahnrad" onClick={onMenue}
+        <Button variant="ghost" type="button" className="tp-kapsel tp-zahnrad" onClick={onMenue}
                 aria-label={t('einstellungen.titel', 'Einstellungen')}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="6.4" /><circle cx="12" cy="12" r="2.3" />
             <path strokeWidth="3.3" strokeLinecap="butt"
                   d="M12 2.3v3.2M12 18.5v3.2M2.3 12h3.2M18.5 12h3.2M5.14 5.14l2.27 2.27M16.59 16.59l2.27 2.27M18.86 5.14l-2.27 2.27M7.41 16.59l-2.27 2.27" />
           </svg>
-        </button>
+        </Button>
 
-        <button type="button" data-tp="spielknopf" className="tp-spielknopf bereit" aria-label="Start">
+        <Button variant="ghost" type="button" data-tp="spielknopf" className="tp-spielknopf bereit" aria-label="Start">
           <svg viewBox="0 0 100 100" aria-hidden="true">
             <polygon className="ikon-play" points="26,14 88,50 26,86" />
             <rect className="ikon-stop" x="20" y="20" width="60" height="60" rx="12" />
           </svg>
           <span data-tp="spieltext">{t('leiste.start', 'Start')}</span>
-        </button>
+        </Button>
       </div>
 
       <div data-tp="notenfeld" className="tp-notenfeld">
@@ -176,22 +176,22 @@ const Geruest = memo(function Geruest({ art, takte, zurueck, onZurueck, onTakte,
       <div className="tp-fusszeile">
         <div data-tp="tempofeld" className="tp-tempofeld">
           <span className="tp-feldname">{t('tempo.titel', 'Tempo')}</span>
-          <button type="button" data-tp="tempo-minus" className="tp-rund" aria-label={t('tempo.langsamer', 'Langsamer')}>−</button>
+          <Button variant="ghost" type="button" data-tp="tempo-minus" className="tp-rund" aria-label={t('tempo.langsamer', 'Langsamer')}>−</Button>
           <b data-tp="tempozahl" className="tp-tempozahl">60</b>
-          <button type="button" data-tp="tempo-plus" className="tp-rund" aria-label={t('tempo.schneller', 'Schneller')}>+</button>
+          <Button variant="ghost" type="button" data-tp="tempo-plus" className="tp-rund" aria-label={t('tempo.schneller', 'Schneller')}>+</Button>
           <div data-tp="tempobahn" className="tp-tempobahn">
             <div className="tp-tempospur" />
             <div data-tp="tempogriff" className="tp-tempogriff" />
           </div>
         </div>
         <div className="tp-hilfen" role="group" aria-label={t('hilfen.aria', 'Hilfen im Notenbild')}>
-          <button type="button" data-tp="hilfe-namen">{t('hilfen.namen.kurz', 'Notennamen')}</button>
-          <button type="button" data-tp="hilfe-zaehlen">{t('hilfen.zaehlen.kurz', 'Zählzeiten')}</button>
+          <Button variant="ghost" type="button" data-tp="hilfe-namen">{t('hilfen.namen.kurz', 'Notennamen')}</Button>
+          <Button variant="ghost" type="button" data-tp="hilfe-zaehlen">{t('hilfen.zaehlen.kurz', 'Zählzeiten')}</Button>
         </div>
-        <button type="button" data-tp="umblaettern" className="tp-kapsel tp-umblaettern">
+        <Button variant="ghost" type="button" data-tp="umblaettern" className="tp-kapsel tp-umblaettern">
           <span>{t('leiste.naechste', 'Nächste Übung')}</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
-        </button>
+        </Button>
       </div>
 
       <div data-tp="buehne" className="tp-buehne" aria-hidden="true" />

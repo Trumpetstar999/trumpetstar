@@ -53,51 +53,9 @@
     return t;
   }
 
-  /* Violinschluessel — ein einziger durchgehender Strich.
-   *
-   * Der Weg ist als Punktfolge in Notenlinien-Einheiten beschrieben und
-   * wird zu einer weichen Kurve geglaettet. Der Mittelpunkt der
-   * Einrollung sitzt dadurch garantiert exakt auf der g-Linie (y = +1) —
-   * genau das macht den Schluessel ja aus.
-   *
-   * Reihenfolge des Strichs: unterer Haken → Hals nach oben → obere
-   * Schnecke → grosser Bogen links herunter → um die g-Linie herum →
-   * nach innen eingerollt.
-   */
-  var SCHLUESSEL_PUNKTE = [
-    [-0.40, 2.94], [-0.06, 3.06], [0.26, 2.86],
-    [0.40, 2.30], [0.42, 1.60], [0.36, 0.70],
-    [0.22, -0.30], [0.06, -1.30], [-0.04, -2.20],
-    [-0.05, -2.85], [0.10, -3.22], [0.36, -3.20],
-    [0.52, -2.92], [0.50, -2.50], [0.32, -2.04],
-    [0.02, -1.52], [-0.32, -0.94], [-0.66, -0.28],
-    [-0.90, 0.42], [-0.96, 1.10], [-0.78, 1.68],
-    [-0.42, 2.02], [0.06, 2.06], [0.52, 1.86],
-    [0.82, 1.48], [0.88, 1.04], [0.72, 0.66],
-    [0.38, 0.48], [0.06, 0.60], [-0.10, 0.88],
-    [-0.06, 1.16], [0.14, 1.28], [0.32, 1.18]
-  ];
-
-  /** Punktfolge → weiche Kurve (Catmull-Rom, in Bezier uebersetzt). */
-  function weichePfad(punkte) {
-    var d = ['M' + punkte[0][0].toFixed(3) + ',' + punkte[0][1].toFixed(3)];
-    for (var i = 0; i < punkte.length - 1; i++) {
-      var p0 = punkte[Math.max(0, i - 1)];
-      var p1 = punkte[i];
-      var p2 = punkte[i + 1];
-      var p3 = punkte[Math.min(punkte.length - 1, i + 2)];
-      var c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
-      var c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
-      d.push('C' + c1x.toFixed(3) + ',' + c1y.toFixed(3) +
-             ' ' + c2x.toFixed(3) + ',' + c2y.toFixed(3) +
-             ' ' + p2[0].toFixed(3) + ',' + p2[1].toFixed(3));
-    }
-    return d.join(' ');
-  }
-
-  function schluesselPfad() { return weichePfad(SCHLUESSEL_PUNKTE); }
-
-  var SCHLUESSEL = null;
+  var G = root.Glyphen;
+  function schluesselPfad() { return G.schluessel.d; }
+  var SCHLUESSEL = G.schluessel.d;
   /* Das Haekchen sitzt knapp ueber der obersten Linie — oder hoeher,
    * wenn in der Zeile Noten ueber dem System stehen. */
   var HAKEN_Y = -2.40;
@@ -111,9 +69,9 @@
   /* Hilfslinien: so weit reichen sie vom Kopf aus nach jeder Seite, und
    * so viel Luft bleibt mindestens zwischen zweien nebeneinander. */
   var HILFSLINIE = 0.92, HILFS_LUECKE = 0.34;
-  var HALS = 2.5;             // bewusst kuerzer als im Notensatz ueblich
-  var HALS_ACHTEL = 2.8;      // das Faehnchen braucht etwas mehr
-  var BALKEN_DICKE = 0.42;
+  var HALS = 3.0;             // bewusst kuerzer als im Notensatz ueblich
+  var HALS_ACHTEL = 3.0;      // das Faehnchen braucht etwas mehr
+  var BALKEN_DICKE = 0.45;
   var BALKEN_NEIGUNG = 0.6;   // hoechstens so viel Gefaelle ueber eine Gruppe
   var VZ_PLATZ = 0.95;        // Raum, den ein Vorzeichen vor der Note belegt
   var TAKTART_PLATZ = 1.75;
@@ -140,7 +98,7 @@
   var BE_LAGE = [0, -1.5, 0.5, -1, 1, -0.5, 1.5];
   var KREUZ_TOENE = [3, 0, 4, 1, 5, 2, 6];
   var BE_TOENE = [6, 2, 5, 1, 4, 0, 3];
-  var SCHLUESSEL_PLATZ = 2.45;
+  var SCHLUESSEL_PLATZ = G.schluessel.breite + 0.4;
   var STRICH_LUECKE = 0.62;
   var SCHLUSS_PLATZ = 0.55;
 
@@ -499,13 +457,13 @@
      *
      * Sein Pfad reicht von y = -3.22 bis +3.06, die Einrollung sitzt
      * auf der g-Linie (y = +1). Bei Massstab sk liegt sein oberer
-     * Punkt bei 1 - 4.22 sk, sein unterer bei 1 + 2.06 sk. Damit die
+     * Punkt bei 1 - (-G.schluessel.oben) sk, sein unterer bei 1 + G.schluessel.unten sk. Damit die
      * obere Schlaufe IMMER ueber die oberste Notenlinie (y = -2)
      * hinausragt, darf sk nie unter 0.71 fallen; die Untergrenze liegt
      * mit Reserve bei SK_MIN. */
     if (mitSchluessel) {
-      yOben = Math.min(yOben, 1 - 4.22 * SK_MIN - SK_RAND);
-      yUnten = Math.max(yUnten, 1 + 2.06 * SK_MIN + SK_RAND);
+      yOben = Math.min(yOben, 1 - (-G.schluessel.oben) * SK_MIN - SK_RAND);
+      yUnten = Math.max(yUnten, 1 + G.schluessel.unten * SK_MIN + SK_RAND);
     }
 
     /* Lieder: ueber jedem Zeilenanfang steht die Taktzahl. Sie braucht
@@ -591,15 +549,13 @@
         /* So gross wie moeglich, aber nie ueber den Rand der eigenen
          * Zeile hinaus. */
         var sk = Math.min(1,
-                          (1 - (obenClip + SK_RAND)) / 4.22,
-                          ((untenClip - SK_RAND) - 1) / 2.06);
+                          (1 - (obenClip + SK_RAND)) / (-G.schluessel.oben),
+                          ((untenClip - SK_RAND) - 1) / G.schluessel.unten);
         if (!(sk > SK_MIN)) { sk = SK_MIN; }
         g.appendChild(el('path', {
           d: SCHLUESSEL,
-          transform: 'translate(' + (x + 1.05 * sk) + ',' + (1 - sk) + ') scale(' + sk.toFixed(4) + ')',
-          fill: 'none', stroke: 'var(--linie)',
-          'stroke-width': (0.155 / sk).toFixed(4),
-          'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+          transform: 'translate(' + x + ',1) scale(' + sk.toFixed(4) + ')',
+          fill: 'var(--linie)', 'class': 'rhythm-clef'
         }));
         x += SCHLUESSEL_PLATZ * sk;
       }
@@ -1010,34 +966,10 @@
   /* Kreuz, Be, Aufloesungszeichen — gezeichnet, nicht gesetzt: auf
    * eine Musikschrift im Geraet ist kein Verlass. */
   function zeichneVorzeichen(g, ax, cy, art, zusatzKlasse) {
-    var duenn = { fill: 'none', stroke: 'var(--linie)', 'stroke-width': 0.085, 'stroke-linecap': 'butt' };
-    var dick = { fill: 'none', stroke: 'var(--linie)', 'stroke-width': 0.24, 'stroke-linecap': 'butt' };
-    function strich(attr, x1, y1, x2, y2, klasse) {
-      if (zusatzKlasse) { klasse = klasse.replace('vz', zusatzKlasse); }
-      var e = el('line', { x1: x1, y1: y1, x2: x2, y2: y2, 'class': klasse });
-      for (var k in attr) { e.setAttribute(k, attr[k]); }
-      g.appendChild(e);
-    }
-    if (art === 1) {                                   // Kreuz
-      strich(duenn, ax - 0.16, cy - 0.92, ax - 0.16, cy + 1.02, 'vz kreuz');
-      strich(duenn, ax + 0.16, cy - 1.02, ax + 0.16, cy + 0.92, 'vz');
-      strich(dick, ax - 0.40, cy - 0.24, ax + 0.40, cy - 0.44, 'vz');
-      strich(dick, ax - 0.40, cy + 0.44, ax + 0.40, cy + 0.24, 'vz');
-    } else if (art === -1) {                           // Be
-      strich(duenn, ax - 0.22, cy - 1.55, ax - 0.22, cy + 0.48, 'vz be');
-      g.appendChild(el('path', {
-        d: 'M' + (ax - 0.22) + ',' + (cy - 0.20) +
-           ' C' + (ax + 0.12) + ',' + (cy - 0.62) + ' ' + (ax + 0.52) + ',' + (cy - 0.18) +
-           ' ' + (ax - 0.22) + ',' + (cy + 0.48),
-        fill: 'none', stroke: 'var(--linie)', 'stroke-width': 0.15,
-        'stroke-linejoin': 'round', 'class': zusatzKlasse || 'vz'
-      }));
-    } else {                                           // Aufloesungszeichen
-      strich(duenn, ax - 0.17, cy - 1.0, ax - 0.17, cy + 0.42, 'vz aufloeser');
-      strich(duenn, ax + 0.17, cy - 0.42, ax + 0.17, cy + 1.0, 'vz');
-      strich(dick, ax - 0.17, cy - 0.26, ax + 0.17, cy - 0.42, 'vz');
-      strich(dick, ax - 0.17, cy + 0.42, ax + 0.17, cy + 0.26, 'vz');
-    }
+    var name = art === 1 ? 'kreuz' : art === -1 ? 'b' : 'aufloesung';
+    g.appendChild(el('path', { d: G[name].d,
+      transform: 'translate(' + (ax - G[name].breite / 2) + ',' + cy + ')',
+      fill: 'var(--linie)', 'class': zusatzKlasse || 'vz' }));
   }
 
   /* Hilfslinien fuer Noten ausserhalb des Systems: c1 traegt eine, das
@@ -1136,7 +1068,7 @@
     balkenLinie: balkenLinie,
     zaehlsilbe: zaehlsilbe,
     setzeMarker: setzeMarker,
-    einfarbig: function (an) { EINFARBIG = !!an; },
+    einfarbig: function (an) { EINFARBIG = true; },
     istEinfarbig: function () { return EINFARBIG; }
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

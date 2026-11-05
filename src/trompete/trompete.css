@@ -14,32 +14,30 @@
  */
 
 .tp-uebung {
-  --tp-flaeche: #fff;
-  --tp-text: #1c1c1e;
-  --tp-text-2: #6e6e73;
-  --tp-rand: rgba(60, 60, 67, 0.18);
-  --tp-fuellung: rgba(120, 120, 128, 0.14);
-  --tp-segment-an: #fff;
-  --tp-tint: #0071e3;
-  --tp-auf-tint: #fff;
-  --tp-tint-zart: rgba(0, 113, 227, 0.12);
-  --tp-stopp: #d70015;
-  --tp-auf-stopp: #fff;
-  --tp-rund: 0.75rem;
-  --tp-gruen: #248a3d;
-  --tp-gruen-zart: rgba(52, 199, 89, 0.18);
-  --tp-gruen-schalter: #34c759;
-  --tp-orange: #ff9500;
-  --tp-orange-zart: rgba(255, 149, 0, 0.18);
-  --tp-orange-text: #8f4a00;
-  --tp-schatten: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
-
-  /* fuer noten.js und griff.js */
-  --linie: var(--tp-text);
+  --tp-flaeche: hsl(var(--card));
+  --tp-text: hsl(var(--foreground));
+  --tp-text-2: hsl(var(--muted-foreground));
+  --tp-rand: hsl(var(--border));
+  --tp-fuellung: hsl(var(--muted));
+  --tp-segment-an: hsl(var(--card));
+  --tp-tint: hsl(var(--primary));
+  --tp-auf-tint: hsl(var(--primary-foreground));
+  --tp-tint-zart: hsl(var(--primary) / .12);
+  --tp-stopp: hsl(var(--destructive));
+  --tp-auf-stopp: hsl(var(--destructive-foreground));
+  --tp-rund: 0.5rem;
+  --tp-gruen: hsl(var(--tuner-tuned));
+  --tp-gruen-zart: hsl(var(--tuner-tuned) / .12);
+  --tp-gruen-schalter: hsl(var(--tuner-tuned));
+  --tp-orange: hsl(var(--ts-gold));
+  --tp-orange-zart: hsl(var(--ts-gold) / .16);
+  --tp-orange-text: hsl(var(--practice-warning));
+  --tp-schatten: var(--practice-shadow);
+  --linie: hsl(var(--notation-ink));
   --linie-zart: var(--tp-text-2);
   --marker: var(--tp-tint);
   --haken: var(--tp-gruen);
-  --daneben: #c2560a;
+  --daneben: var(--tp-orange-text);
   --ventil-an: var(--tp-tint);
   --ventil-zahl: var(--tp-auf-tint);
   --griff-linie: var(--tp-text-2);
@@ -69,13 +67,6 @@
 :where(.tp-uebung) button:disabled { cursor: default; }
 .tp-uebung button:focus-visible, .tp-uebung select:focus-visible {
   outline: 3px solid var(--tp-tint); outline-offset: 2px;
-}
-
-/* Farbige Noten sind fuer weisses Papier gemischt — das Blatt bleibt
-   dann auch im Dunkelmodus hell. */
-.tp-uebung.farbnoten .tp-notenfeld {
-  --linie: #1c1c1e; --linie-zart: #6e6e73; --marker: #0071e3; --haken: #248a3d; --daneben: #c2560a;
-  background: #fff;
 }
 
 /* ================= Aufteilung ================= */
@@ -167,7 +158,7 @@
 }
 .tp-segmente button.an {
   background: var(--tp-segment-an); font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--practice-shadow);
 }
 .tp-segmente button:not(.an):active { opacity: .5; }
 
@@ -185,7 +176,7 @@
 
 .tp-notenfeld, .tp-infofeld, .tp-status {
   background: var(--tp-flaeche); border: 1px solid var(--tp-rand);
-  border-radius: calc(var(--tp-rund) + 4px); box-shadow: var(--tp-schatten);
+  border-radius: var(--tp-rund); box-shadow: var(--tp-schatten);
 }
 /* Das SVG haengt absolut im Feld: mit fester Hoehe im Fluss wuerde es
    die Gitterzeile aufblaehen, aus der es seine Groesse bezieht. */
@@ -193,7 +184,7 @@
 .tp-noten { display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 
 .tp-infofeld { display: flex; min-width: 0; min-height: 0; }
-.tp-tonname { font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.tp-tonname { font-weight: 700; line-height: 1; letter-spacing: 0; }
 .tp-toninfo { display: flex; flex-direction: column; color: var(--tp-text-2); }
 .tp-ton-griff { color: var(--tp-text); font-weight: 600; }
 .tp-griff { display: block; width: 100%; height: 100%; }
@@ -204,7 +195,7 @@
   flex-direction: column; justify-content: center; gap: 1rem; padding: 1rem 1.2rem;
 }
 .tp-uebung[data-art="toene"] .tp-tonkopf { text-align: center; }
-.tp-uebung[data-art="toene"] .tp-tonname { font-size: clamp(2.6rem, 9cqi, 5rem); margin-bottom: 0.45rem; }
+.tp-uebung[data-art="toene"] .tp-tonname { font-size: 3.5rem; margin-bottom: 0.45rem; }
 .tp-uebung[data-art="toene"] .tp-toninfo { align-items: center; gap: 0.1rem; }
 .tp-uebung[data-art="toene"] .tp-grifffeld { height: clamp(3rem, 11cqi, 6rem); }
 
@@ -234,8 +225,8 @@
 }
 .tp-uebung .stimm-zeiger {
   position: absolute; left: 50%; top: 50%; width: 1.1rem; height: 1.1rem; border-radius: 50%;
-  transform: translate(-50%, -50%); background: var(--tp-orange); border: 2px solid #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); transition: left .09s linear, background-color .15s;
+  transform: translate(-50%, -50%); background: var(--tp-orange); border: 2px solid hsl(var(--ts-card));
+  box-shadow: var(--practice-shadow); transition: left .09s linear, background-color .15s;
 }
 .tp-stimmung.gut .stimm-zeiger { background: var(--tp-gruen-schalter); }
 .tp-stimmung:not(.an) .stimm-zeiger { background: var(--tp-text-2); opacity: .5; box-shadow: none; }
@@ -280,8 +271,8 @@
 }
 .tp-tempogriff {
   position: absolute; top: 50%; width: 26px; height: 26px; border-radius: 50%;
-  transform: translate(-50%, -50%); background: #fff;
-  box-shadow: 0 0.5px 4px rgba(0, 0, 0, 0.12), 0 6px 13px rgba(0, 0, 0, 0.12);
+  transform: translate(-50%, -50%); background: hsl(var(--ts-card));
+  box-shadow: var(--practice-shadow);
   transition: left .09s ease-out;
 }
 
@@ -322,15 +313,15 @@
 .tp-menue {
   position: absolute; inset: 0; z-index: 60;
   display: flex; justify-content: flex-end;
-  background: rgba(0, 0, 0, 0.28);
-  border-radius: calc(var(--tp-rund) + 4px);
+  background: var(--practice-scrim);
+  border-radius: var(--tp-rund);
 }
 .tp-menue-blatt {
   width: min(26rem, 100%); height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
   padding: 0 1.1rem 1.5rem;
   background: var(--tp-flaeche); border-left: 1px solid var(--tp-rand);
-  border-radius: calc(var(--tp-rund) + 4px);
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+  border-radius: var(--tp-rund);
+  box-shadow: var(--practice-shadow);
   -webkit-user-select: text; user-select: text;
 }
 .tp-menue-kopf {
@@ -364,7 +355,7 @@
 }
 .tp-schalter::after {
   content: ""; position: absolute; left: 2px; top: 2px; width: 24px; height: 24px; border-radius: 50%;
-  background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18); transition: transform .2s;
+  background: hsl(var(--ts-card)); box-shadow: var(--practice-shadow); transition: transform .2s;
 }
 .tp-zeile.an .tp-schalter { background: var(--tp-gruen-schalter); }
 .tp-zeile.an .tp-schalter::after { transform: translateX(18px); }
@@ -404,3 +395,7 @@
   .tp-uebung .marker-ring, .tp-uebung .haken, .tp-uebung .leuchtet, .tp-uebung .hof,
   .tp-grifffeld.pulsiert .ventil-knopf { animation: none !important; }
 }
+
+.tp-spielknopf.bereit { background: hsl(var(--ts-gold)); color: hsl(var(--ts-ink)); }
+.tp-uebung button { letter-spacing: 0; }
+.tp-segmente button { height: auto; }

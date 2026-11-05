@@ -1,3 +1,4 @@
+import trumpetSprite from '@/assets/beginner-trumpet-sprite.m4a.asset.json';
 /* Kopie aus der App "Trompete fuer Erwachsene" (app/js/audio/motor.js), gebaut von
  * tools/mach-lovable.js. Bitte nicht hier aendern, sondern dort. */
 /* motor.js — alles, was mit Web Audio zu tun hat.
@@ -95,7 +96,7 @@
     var selbst = this;
     if (!root.Sampler) { this.fehler = 'kein-sampler'; return Promise.resolve(null); }
     this.sampler = new root.Sampler({
-      ctx: this.ctx, url: this.basis + 'audio/trumpet-sprite.m4a'
+      ctx: this.ctx, url: trumpetSprite.url
     });
     return this.sampler.laden().catch(function () {
       selbst.fehler = 'klang-fehlt';
