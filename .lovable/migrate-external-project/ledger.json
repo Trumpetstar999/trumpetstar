@@ -51,5 +51,18 @@
       "status": "not_applicable",
       "next_action": null
     }
-  ]
+  ],
+  "beginner_feedback": {
+    "source": "trompete-lovable.zip",
+    "scope": "Beginnerkurs / Spielen mit Feedback only",
+    "capabilities": [
+      { "capability": "code", "source": "React 18 tones and melody exercises", "outcome": "integrate one mounted exercise at a time", "status": "pending", "next_action": "Import and verify" },
+      { "capability": "notation", "source": "SVG renderer", "outcome": "use Rhythmus Leland clef and notation glyphs with compatible exercise layout", "status": "pending", "next_action": "Adapt renderer" },
+      { "capability": "audio and microphone", "source": "sampler, DSP, worklet and feedback engine", "outcome": "preserve local-only analysis and cleanup", "status": "pending", "next_action": "Browser verification; physical trumpet acceptance" },
+      { "capability": "records", "source": "browser-local progress/settings", "outcome": "preserve storage keys", "status": "pending", "next_action": "Verify persistence" },
+      { "capability": "assets", "source": "trumpet-sprite.m4a", "outcome": "app asset pointer", "status": "pending", "next_action": "Import audio" },
+      { "capability": "languages and theme", "source": "DE/EN/ES", "outcome": "DE/EN/ES/SL and shared light theme", "status": "pending", "next_action": "Adapt" },
+      { "capability": "schema, auth identities, authorization, providers, endpoints, callbacks, webhooks, schedules, secrets, cutover", "source": "none in standalone source", "outcome": "existing authenticated beginner boundary and app services unchanged", "status": "not_applicable", "next_action": null }
+    ]
+  }
 }
