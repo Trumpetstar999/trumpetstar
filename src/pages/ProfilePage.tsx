@@ -26,21 +26,19 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
 import { WeeklyStarsWidget } from '@/components/dashboard/widgets/WeeklyStarsWidget';
-import { RecordingsWidget } from '@/components/dashboard/widgets/RecordingsWidget';
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 import { MyPurchases } from '@/components/profile/MyPurchases';
 
 const KNOWN_WIDGET_IDS: WidgetId[] = [
-  'profile', 'calendar', 'recordings', 'classroom', 'review',
+  'profile', 'calendar', 'classroom', 'review',
 ];
 
 function WidgetContent({ id }: { id: WidgetId }) {
   switch (id) {
     case 'profile':        return <ProfileWidget />;
     case 'calendar':       return <WeeklyStarsWidget />;
-    case 'recordings':     return <RecordingsWidget />;
     case 'classroom':      return <ClassroomWidget />;
     case 'review':         return <ReviewCard />;
     default:               return null;
