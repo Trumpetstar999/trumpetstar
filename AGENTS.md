@@ -1,4 +1,5 @@
 # Architecture rules
+- Keep profile purchase history in the read-only authenticated my-purchases function; derive buyer email from a confirmed server session, independently verify provider buyer matches, honor immutable order ownership and return only projected data and HTTPS Digistore24 links, never raw payloads or license credentials.
 - Keep legal pages public and localized through shared legal copy; mount external video engines only after session-scoped explicit permission and unmount them on withdrawal to prevent pre-consent provider requests.
 - Derive descending flat-spelled fingerings from the ascending pitch/valve registry so enharmonic notation cannot change playback or grips.
 - Keep app welcome delivery in the authenticated contact-sync function with a service-only unique user/email ledger and atomic stage claims; stop ambiguous provider outcomes and unsent legacy offers for reconciliation to prevent duplicate vouchers, mismatched discount emails or mail, and isolate the singleton admin test from production identities.

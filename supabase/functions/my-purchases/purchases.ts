@@ -20,14 +20,19 @@ export function safeOrderUrl(value: unknown): string | null {
 }
 export function summarizePurchases(rows: Raw[]): Purchase[] {
   const result = new Map<string, Purchase>();
-  for (const row of rows) {
+  const expanded = rows.flatMap(row => {
+    const items = row.items;
+    const list = Array.isArray(items) ? items : items && typeof items === 'object' ? Object.values(items) : [];
+    return list.length ? list.map(item => ({ ...row, ...(item as Raw), id: row.id, amount: null })) : [row];
+  });
+  for (const row of expanded) {
     const raw = (row.raw_data && typeof row.raw_data === 'object' ? row.raw_data : row) as Raw;
     const orderId = text(raw.order_id || raw.id || row.digistore_transaction_id);
     const productId = text(row.product_id || raw.product_id || raw.main_product_id);
     if (!orderId || !productId) continue;
     const id = `${orderId}:${productId}`;
     const statusText = normalized(row.status || raw.billing_status);
-    const refunded = !!row.refund_date || /refund|chargeback/.test(statusText) || /refund|chargeback/.test(normalized(raw.event));
+    const refunded = !!row.refund_date || /refund|chargeback/.test(statusText) || /refund|chargeback/.test(normalized(raw.event || raw.transaction_type));
     const status: Purchase['status'] = refunded ? 'refunded' : /cancel|abort/.test(statusText) ? 'cancelled' : /completed|paying|paid|payment|active/.test(statusText) ? 'paid' : 'pending';
     const value = row.amount ?? raw.amount ?? raw.amount_brutto;
     const amount = value == null || value === '' ? null : Number(value);
