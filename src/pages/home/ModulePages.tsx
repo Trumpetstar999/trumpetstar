@@ -65,18 +65,7 @@ export const NotenModule = () => <RequireAuth><Module route="/noten" tab="pdfs" 
 export const TunerModulePage = () => <Module route="/tuner" surface="light"><TunerModule /></Module>;
 export const GriffModule = () => <Module route="/grifftabelle" surface="light"><FingeringChart /></Module>;
 function ShopGrid() {
-  const { t, language } = useLanguage();
-  const { products, loading } = useShopProducts();
-  if (loading) return <Fallback />;
-  if (!products.length) return <p className="p-8 text-center text-ts-muted">{t('home.shopEmpty')}</p>;
-  return (
-    <div className="p-4">
-      <div className="flex justify-end mb-4"><Button asChild variant="outline"><Link to="/pricing">{shopCopy[language].pricing}</Link></Button></div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        {products.map((p) => <ShopProductCard key={p.id} p={p} />)}
-      </div>
-    </div>
-  );
+  return <ShopCatalog loadingFallback={<Fallback />} />;
 }
 export const ShopModule = () => <Module route="/shop" surface="light"><ShopGrid /></Module>;
 export const ProfileModule = () => (
