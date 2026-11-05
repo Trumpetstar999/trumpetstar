@@ -66,7 +66,7 @@ export function ModuleShell({ title, icon, tab = 'levels', surface = 'light', ch
             </div>
           </div>
         </header>
-        <main className={`mx-auto max-w-[1100px] px-0 pb-[calc(env(safe-area-inset-bottom)+24px)] ${surface === 'gradient' ? 'ts-legacy-light' : ''}`}>{children}</main>
+        <main className={`relative isolate z-0 mx-auto max-w-[1100px] px-0 pb-[calc(env(safe-area-inset-bottom)+24px)] ${surface === 'gradient' ? 'ts-legacy-light' : ''}`}>{children}</main>
       </motion.div>
     </TabNavigationProvider>
   );
