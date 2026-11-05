@@ -30,7 +30,9 @@ Deno.serve(async (req) => {
   let reconcile = false;
   if (req.method === 'POST') {
     let input: unknown;
-    try { input = await req.json(); } catch { return json({ error: 'Invalid request' }, 400); }
+    const raw = await req.text().catch(() => '');
+    if (!raw.trim()) input = {};
+    else { try { input = JSON.parse(raw); } catch { return json({ error: 'Invalid request' }, 400); } }
     if (!input || typeof input !== 'object' || Array.isArray(input) || Object.keys(input).some(k => k !== 'reconcile') || ('reconcile' in input && typeof input.reconcile !== 'boolean')) return json({ error: 'Invalid request' }, 400);
     reconcile = 'reconcile' in input && input.reconcile === true;
   }
