@@ -1,4 +1,5 @@
 # Architecture rules
+- Enforce usage quotas through the identity-bound atomic daily-usage RPC with a shared Vienna day boundary and no user counter writes; check feedback entitlements in its RPCs as well as the page to prevent client-only access bypasses.
 - Load Feedback with assignment-scoped feedback_inbox/feedback_thread RPCs, cache only per signed-in identity, paginate messages and derive sender roles server-side; teacher_chat writes require these RPCs to prevent peer messaging and duplicate inbox initialization.
 - Keep profile purchase history in the read-only authenticated my-purchases function; derive buyer email from a confirmed server session, independently verify provider buyer matches, honor immutable order ownership and return only projected data and HTTPS Digistore24 links, never raw payloads or license credentials.
 - Keep legal pages public and localized through shared legal copy; mount external video engines only after session-scoped explicit permission and unmount them on withdrawal to prevent pre-consent provider requests.
