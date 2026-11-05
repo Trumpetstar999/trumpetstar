@@ -1,98 +1,37 @@
-import { Gamepad2, Rocket, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
+import { gamesCopy } from '@/i18n/games';
 import noteRunnerPreview from '@/assets/noterunner-preview.png.asset.json';
 import toneForcePreview from '@/assets/toneforce-preview.png.asset.json';
+import snowtonePreview from '@/assets/snowtone/background.asset.json';
 
 interface Props {
-  onSelect: (game: 'noterunner' | 'toneforce' | 'happybeginners') => void;
+  onSelect: (game: 'noterunner' | 'toneforce' | 'happybeginners' | 'snowtone') => void;
 }
 
-const CARD =
-  'group relative flex-1 w-full overflow-hidden rounded-3xl glass p-6 text-left transition-transform hover:-translate-y-1';
-
 export function GameSelect({ onSelect }: Props) {
-  return (
-    <div className="h-full overflow-y-auto pb-20">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs text-white/70 mb-4">
-            <Gamepad2 className="w-3.5 h-3.5" />
-            TrumpetStar Games
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Wähle dein <span className="text-gold-gradient">Spiel</span>
-          </h1>
-          <p className="text-white/60 text-sm">Beide Spiele erkennen deine Trompetentöne in Echtzeit.</p>
+  const { language } = useLanguage();
+  const copy = gamesCopy[language];
+  const games = [
+    { id: 'noterunner' as const, name: 'NoteRunner', image: noteRunnerPreview.url },
+    { id: 'toneforce' as const, name: 'Tone Force', image: toneForcePreview.url },
+    { id: 'happybeginners' as const, name: 'Happy Beginners', image: '/trompete/img/vogel-froh.png' },
+    { id: 'snowtone' as const, name: 'Snowtone', image: snowtonePreview.url },
+  ];
+  return <div className="mx-auto max-w-4xl px-4 py-8 pb-20">
+    <h2 className="mb-6 text-center text-2xl font-bold text-ts-ink">{copy.choose}</h2>
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {games.map((game) => <Button key={game.id} variant="ghost" onClick={() => onSelect(game.id)}
+        className="group block h-auto min-w-0 overflow-hidden rounded-lg border border-border bg-ts-card p-0 text-left shadow-sm hover:bg-ts-card">
+        <div className="aspect-video overflow-hidden bg-ts-surface">
+          <img src={game.image} alt="" className={`h-full w-full ${game.id === 'happybeginners' ? 'object-contain p-4' : 'object-cover'} transition-transform motion-safe:group-hover:scale-[1.03]`} loading="lazy" />
         </div>
-
-        <div className="flex flex-col md:flex-row gap-5">
-          <button className={CARD} onClick={() => onSelect('noterunner')}>
-            <div className="h-40 mb-4 rounded-2xl bg-white/5 overflow-hidden">
-              <img
-                src={noteRunnerPreview.url}
-                alt="NoteRunner Screenshot"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                loading="lazy"
-              />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-1">
-              <span className="text-gold-gradient">Note</span>Runner
-            </h2>
-            <p className="text-white/60 text-sm mb-4">
-              Notenlesen trainieren: Noten wandern über das Notensystem – spiele sie richtig und baue deinen Streak aus.
-            </p>
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--reward-gold))]">
-              Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </button>
-
-          <button className={CARD} onClick={() => onSelect('toneforce')}>
-            <div className="h-40 mb-4 rounded-2xl bg-white/5 overflow-hidden">
-              <img
-                src={toneForcePreview.url}
-                alt="Tone Force Screenshot"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                loading="lazy"
-              />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-1">
-              <span className="text-gold-gradient">Tone</span> Force
-            </h2>
-            <p className="text-white/60 text-sm mb-4">
-              Weltraum-Shooter: Steuere dein Raumschiff mit einem Dreiklang – links, feuern, rechts.
-            </p>
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--reward-gold))]">
-              Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </button>
-
-          <button className={CARD} onClick={() => onSelect('happybeginners')}>
-            <div className="h-40 mb-4 rounded-2xl bg-[#FDF8EE] overflow-hidden flex items-center justify-center">
-              <img
-                src="/trompete/img/vogel-froh.png"
-                alt="Happy Beginners Screenshot"
-                className="h-32 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03]"
-                loading="lazy"
-              />
-            </div>
-            <h2 className="text-xl font-bold text-white mb-1">
-              <span className="text-gold-gradient">Happy</span> Beginners
-            </h2>
-            <p className="text-white/60 text-sm mb-4">
-              Wortloses Übe-Spiel für Kinder: Töne blasen, Griffe sehen, Rhythmus mitspielen – das Mikrofon hört zu.
-            </p>
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-[hsl(var(--reward-gold))]">
-              Starten <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </button>
+        <div className="flex items-center justify-between gap-3 p-4">
+          <span className="whitespace-normal text-xl font-bold text-ts-ink">{game.name}</span>
+          <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-ts-deep">{copy.start}<ChevronRight className="size-4" /></span>
         </div>
-
-        <div className="mt-8 text-center">
-          <Button variant="ghost" className="text-white/40 text-xs gap-2" disabled>
-            <Rocket className="w-3.5 h-3.5" /> Weitere Spiele folgen
-          </Button>
-        </div>
-      </div>
+      </Button>)}
     </div>
-  );
+  </div>;
 }
