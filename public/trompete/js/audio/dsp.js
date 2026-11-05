@@ -54,11 +54,9 @@
   /* YIN                                                                 */
   /* ------------------------------------------------------------------ */
   /* Der Suchbereich wird bewusst eng gefuehrt: die tiefste real
-   * klingende Frequenz ist B = 233 Hz (notiert c1 auf der B-Trompete),
-   * die hoechste der Nachbarteilton von d2 = 628 Hz. tauMax entspricht
-   * 200 Hz — tief genug, um ein um 80 Cent zu tief geblasenes c1
-   * (223 Hz) noch zu fassen, und hoch genug, dass YIN nicht in eine
-   * Unteroktave rutschen kann.
+   * klingende Frequenz ist e = 165 Hz (notiert fis auf der B-Trompete),
+   * die hoechste der Nachbarteilton von a2 = 882 Hz. Die Grenzen dazu
+   * stehen in toene.json (fMinHz, fMaxHz).
    *
    * Die Vorgaben unten sind nur der Rueckfall. Verbindlich sind die
    * Werte aus toene.json; optionenAus() rechnet sie um, und sowohl der
@@ -141,8 +139,8 @@
   /* ------------------------------------------------------------------ */
   /* Einsatz-Erkennung (Energieanstieg auf der dB-Huellkurve)            */
   /* ------------------------------------------------------------------ */
-  /* Ein fester Millisekunden-Blick zurueck reicht nicht: ein Kind, das
-   * die Zunge noch nicht gebraucht, blaest den Ton langsam an statt ihn
+  /* Ein fester Millisekunden-Blick zurueck reicht nicht: wer die Zunge
+   * noch nicht gebraucht, blaest den Ton langsam an statt ihn
    * anzustossen. Wir suchen deshalb im Rueckblickfenster das Minimum
    * und datieren den Einsatz dorthin zurueck, wo der Anstieg begonnen
    * hat. Bei sauberem Zungenstoss aendert das nichts — dort faellt das
@@ -200,13 +198,24 @@
     /* Zurueckdatieren: nicht auf das Minimum selbst — das liegt noch im
      * Atemgeraeusch vor dem Ton und ergaebe einen systematisch zu fruehen
      * Einsatz. Stattdessen auf den Punkt, an dem der Pegel die halbe
-     * Anstiegshoehe erreicht hat. Das liegt dicht am gehoerten Einsatz. */
+     * Anstiegshoehe erreicht hat. Das liegt dicht am gehoerten Einsatz.
+     *
+     * Gesucht wird dieser Punkt von JETZT aus rueckwaerts: der Anfang
+     * des zusammenhaengenden Stuecks ueber der Schwelle, das bis zum
+     * gegenwaertigen Hop reicht. Vom Minimum aus vorwaerts zu suchen
+     * ("der erste Hop ueber der Schwelle") trifft dagegen oft einen
+     * einzelnen lauteren Hop im Rauschen VOR dem Ton — das Rauschen
+     * schwankt um mehrere dB — und datiert den Einsatz dann um bis zu
+     * ein ganzes Rueckblickfenster zu frueh. Gemessen waren das 40 bis
+     * 70 ms; fuer "richtig oder falsch" ist das gleichgueltig, fuer die
+     * Auskunft "im Schnitt 40 ms zu spaet" nicht. */
     var schwelle = minDb + rise * 0.5;
-    var onsetHop = (this.hopIndex - 1) - minAge;
-    for (var zurueck = minAge; zurueck >= 1; zurueck--) {
+    var onsetHop = this.hopIndex - 1;
+    for (var zurueck = 1; zurueck < minAge; zurueck++) {
       var q = (this.hopIndex - 1 - zurueck) % (lb + 1);
       if (q < 0) { q += lb + 1; }
-      if (h[q] >= schwelle) { onsetHop = (this.hopIndex - 1) - zurueck; break; }
+      if (h[q] < schwelle) { break; }
+      onsetHop = (this.hopIndex - 1) - zurueck;
     }
     this.lastOnsetHop = this.hopIndex - 1;
     this.armed = false;
