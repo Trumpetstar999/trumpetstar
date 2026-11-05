@@ -19,6 +19,7 @@ import { useAppUpdates } from '@/hooks/useAppUpdates';
 import { useMembership } from '@/hooks/useMembership';
 import { Button } from '@/components/ui/button';
 import { homeMembershipCopy } from '@/i18n/home-membership';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface HomeScreenProps {
   /** When set, the login sheet opens immediately (guest hit a locked URL). */
@@ -36,10 +37,21 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
   const [newsOpen, setNewsOpen] = useState(false);
   const [stars, setStars] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [profileAvatar, setProfileAvatar] = useState<{ userId: string; url: string | null } | null>(null);
   const news = useAppUpdates();
   const { planKey, isLoading: membershipLoading } = useMembership();
   const membershipCopy = homeMembershipCopy[language];
   const paidMember = !!user && planKey !== 'FREE';
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    supabase.from('profiles').select('avatar_url').eq('id', user.id).maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setProfileAvatar({ userId: user.id, url: data?.avatar_url ?? null });
+      });
+    return () => { cancelled = true; };
+  }, [user?.id, profileOpen]);
 
   useEffect(() => {
     if (lockedNext && !user) { setLoginNext(lockedNext); setLoginOpen(true); }
@@ -133,13 +145,16 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
             <button className={glassBtn} aria-label={t('home.lang')} onClick={() => setLangOpen(true)}>
               <span className="text-xl leading-none">{flag}</span>
             </button>
-            <button className={glassBtn} aria-label={t('home.profile')} onClick={openProfile}>
+            <Button variant="ghost" size="icon" className={`${glassBtn} p-0 hover:bg-ts-surface hover:text-ts-deep`} aria-label={t('home.profile')} onClick={openProfile}>
               {user ? (
-                <span className="w-9 h-9 rounded-full ts-gradient flex items-center justify-center font-bold text-sm uppercase">{name.slice(0, 1) || '★'}</span>
+                <Avatar className="w-9 h-9">
+                  <AvatarImage src={profileAvatar?.userId === user.id ? profileAvatar.url ?? undefined : undefined} alt={t('home.profile')} className="object-cover" />
+                  <AvatarFallback className="ts-gradient font-bold text-sm uppercase">{name.slice(0, 1) || '★'}</AvatarFallback>
+                </Avatar>
               ) : (
                 <User className="w-5 h-5" />
               )}
-            </button>
+            </Button>
           </div>
         </header>
 
