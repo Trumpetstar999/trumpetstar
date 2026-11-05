@@ -1,0 +1,9 @@
+import type { Language } from '@/hooks/useLanguage';
+const de = { teacher: 'Dein Lehrer', students: 'Nachrichten', empty: 'Noch keine Nachrichten', noTeacher: 'Noch kein Lehrer zugewiesen', placeholder: 'Nachricht an deinen Lehrer …', send: 'Senden', search: 'Suchen', error: 'Nachrichten konnten nicht geladen werden.', retry: 'Erneut versuchen', older: 'Ältere Nachrichten', select: 'Unterhaltung wählen', back: 'Zurück', attachment: 'Anhang', failed: 'Nachricht nicht gesendet', compose: 'Nachricht …' };
+type Copy = typeof de;
+export const feedbackCopy: Record<Language, Copy> = {
+  de,
+  en: { teacher: 'Your teacher', students: 'Messages', empty: 'No messages yet', noTeacher: 'No teacher assigned yet', placeholder: 'Message your teacher …', send: 'Send', search: 'Search', error: 'Could not load messages.', retry: 'Try again', older: 'Older messages', select: 'Select a conversation', back: 'Back', attachment: 'Attachment', failed: 'Message not sent', compose: 'Message …' },
+  es: { teacher: 'Tu profesor', students: 'Mensajes', empty: 'Aún no hay mensajes', noTeacher: 'Aún no tienes profesor asignado', placeholder: 'Mensaje a tu profesor …', send: 'Enviar', search: 'Buscar', error: 'No se pudieron cargar los mensajes.', retry: 'Reintentar', older: 'Mensajes anteriores', select: 'Elige una conversación', back: 'Volver', attachment: 'Archivo adjunto', failed: 'Mensaje no enviado', compose: 'Mensaje …' },
+  sl: { teacher: 'Tvoj učitelj', students: 'Sporočila', empty: 'Še ni sporočil', noTeacher: 'Učitelj še ni dodeljen', placeholder: 'Sporočilo učitelju …', send: 'Pošlji', search: 'Iskanje', error: 'Sporočil ni bilo mogoče naložiti.', retry: 'Poskusi znova', older: 'Starejša sporočila', select: 'Izberi pogovor', back: 'Nazaj', attachment: 'Priloga', failed: 'Sporočilo ni poslano', compose: 'Sporočilo …' },
+};
