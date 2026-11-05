@@ -262,6 +262,7 @@ const VW = 1280, VH = 720;
 const cv = $('c'), ctx = cv.getContext('2d');
 let W, H, DPR, S, OX, OY, LDPR;
 let shakeX = 0, shakeY = 0;
+let layoutScene = () => {};
 function world() { ctx.setTransform(DPR * S, 0, 0, DPR * S, DPR * (OX + shakeX * S), DPR * (OY + shakeY * S)); }
 function screenT() { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
 let resizeTimer = 0;
@@ -273,6 +274,8 @@ function resize() {
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   S = Math.min(W / VW, H / VH);
   OX = (W - VW * S) / 2; OY = (H - VH * S) / 2;
+  if (W < 640 && H > W) OY = 0;
+  layoutScene();
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(buildLayers, layerB ? 150 : 0);
 }
@@ -813,6 +816,24 @@ const G = { state: 'menu', score: 0, lives: 5, level: 1, melted: 0, spawnT: 0, s
   melody: [], stats: {}, rescues: 0, firstDone: false, silentT: 0, sinceHit: 9, frost: 0 };
 const GUN_IDLE = -0.72;
 const gun = { x: 640, y: 692, ang: GUN_IDLE, flip: false, recoil: 0, pumpT: 0, press: 1, target: null };
+const desktopSlots = SLOTS.map(slot => ({ ...slot }));
+layoutScene = () => {
+  const portraitPhone = W < 640 && H > W;
+  if (portraitPhone) {
+    const size = 1.6;
+    const firstBase = Math.max(200 + 330 * size * S, H * 0.48);
+    const lastBase = Math.max(firstBase + 100, H - 125);
+    const middleBase = (firstBase + lastBase) / 2;
+    const positions = [[300, firstBase], [980, firstBase], [300, middleBase], [980, middleBase], [640, lastBase]];
+    SLOTS.forEach((slot, i) => Object.assign(slot, { x: positions[i][0], y: positions[i][1] / S, s: size }));
+    gun.y = H / S - 28;
+  } else {
+    SLOTS.forEach((slot, i) => Object.assign(slot, desktopSlots[i]));
+    gun.y = 692;
+  }
+  G.snowmen.forEach(sm => Object.assign(sm, SLOTS[sm.slot]));
+};
+layoutScene();
 let snowmanId = 0;
 const statFor = m => G.stats[m] || (G.stats[m] = { hits: 0, rt: 0, throws: 0, near: 0 });
 
@@ -1258,8 +1279,8 @@ function drawGun(t) {
   const pump = pumpOff();
   const hA = gunXf(-52, 60), hB = gunXf(118 + pump, 18);
   const [left, right] = hA.x < hB.x ? [hA, hB] : [hB, hA];
-  drawSleeve(left, { x: gun.x - 150, y: 900 });
-  drawSleeve(right, { x: gun.x + 150, y: 900 });
+  drawSleeve(left, { x: gun.x - 150, y: gun.y + 208 });
+  drawSleeve(right, { x: gun.x + 150, y: gun.y + 208 });
   const ca = Math.cos(gun.ang), sa = Math.sin(gun.ang);
   ctx.save(); ctx.translate(gun.x - ca * gun.recoil * 12 * 0.9, gun.y - sa * gun.recoil * 12 * 0.9); ctx.rotate(gun.ang); ctx.scale(0.9, gun.flip ? -0.9 : 0.9);
   // drop shadow
