@@ -19,6 +19,9 @@ import { useMembership } from '@/hooks/useMembership';
 import { Button } from '@/components/ui/button';
 import { homeMembershipCopy } from '@/i18n/home-membership';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ShopPurchaseDialog } from './ShopPurchaseDialog';
+import proCover from '@/assets/shop/cover-575565.asset.json';
+import { getCheckoutUrl } from '@/lib/checkout';
 
 interface HomeScreenProps {
   /** When set, the login sheet opens immediately (guest hit a locked URL). */
@@ -36,6 +39,7 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
   const [newsOpen, setNewsOpen] = useState(false);
   const [stars, setStars] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [proUpgradeOpen, setProUpgradeOpen] = useState(false);
   const [profileAvatar, setProfileAvatar] = useState<{ userId: string; url: string | null } | null>(null);
   const news = useAppUpdates();
   const { planKey, isLoading: membershipLoading } = useMembership();
@@ -130,7 +134,11 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
               disabled={!!user && membershipLoading}
               title={paidMember ? `${membershipCopy.status}: ${planKey}` : membershipCopy.upgrade}
               aria-label={user && membershipLoading ? membershipCopy.loading : paidMember ? `${membershipCopy.status}: ${planKey}` : membershipCopy.upgrade}
-              onClick={() => paidMember ? openProfile() : navigate('/pricing')}
+              onClick={() => {
+                if (user && planKey === 'BASIC') { setProUpgradeOpen(true); return; }
+                if (paidMember) { openProfile(); return; }
+                navigate('/pricing');
+              }}
               className="h-9 sm:h-11 rounded-full px-2 sm:px-3 bg-ts-gold text-ts-ink hover:bg-ts-gold/80 text-xs sm:text-sm font-bold"
             >
               {user && membershipLoading ? <Loader2 className="animate-spin" /> : <Crown aria-hidden="true" />}
@@ -181,6 +189,14 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
       <LanguageSheet open={langOpen} onClose={() => setLangOpen(false)} />
       <NewsSheet open={newsOpen} onClose={() => setNewsOpen(false)} updates={news.updates} />
       {user && <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} name={name} stars={stars} />}
+      {user && planKey === 'BASIC' && proUpgradeOpen && <ShopPurchaseDialog
+        onClose={() => setProUpgradeOpen(false)}
+        product={{
+          id: '575565', name: 'Trumpetstar PRO', image_url: proCover.url,
+          price: null, currency: 'EUR', order_url: getCheckoutUrl('PRO', 'monthly') ?? '',
+          created_at: '', is_new: false, sort_override: null, visible: true,
+        }}
+      />}
 
       {user && (
         <>
