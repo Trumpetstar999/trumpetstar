@@ -35,9 +35,9 @@
     return e;
   }
 
-  var W = 300, H = 110;
-  var VENTIL_X = [58, 150, 242];
-  var VENTIL_Y = 55, RADIUS = 38;
+  var W = 1774, H = 887;
+  var VENTIL_X = [717, 828, 939];
+  var zaehler = 0;
 
   /* Farbiges Griffbild — dieselbe Einstellung wie beim Notensatz. Ein
    * gedruecktes Ventil traegt dann die Farbe des Tons statt Schwarz. */
@@ -48,21 +48,31 @@
     while (svg.firstChild) { svg.removeChild(svg.firstChild); }
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    svg.classList.add('tp-trumpet');
+    var id = 'tp-ventilsicht-' + (++zaehler);
+    var defs = el('defs', {}), clip = el('clipPath', { id: id });
+    clip.appendChild(el('rect', { x: 0, y: 0, width: W, height: 309 }));
+    defs.appendChild(clip); svg.appendChild(defs);
+    var aussen = el('g', { 'clip-path': 'url(#' + id + ')' });
+    svg.appendChild(aussen);
 
     var teile = [];
     for (var i = 0; i < 3; i++) {
       var g = el('g', { 'class': 'ventil' });
+      var schaft = el('rect', { x: VENTIL_X[i] - 13, y: 202, width: 26, height: 138,
+        rx: 8, fill: 'var(--griff-linie)' });
       var knopf = el('circle', {
-        'class': 'ventil-knopf', cx: VENTIL_X[i], cy: VENTIL_Y, r: RADIUS, 'stroke-width': 4
+        'class': 'ventil-knopf', cx: VENTIL_X[i], cy: 183, r: 48, 'stroke-width': 5
       });
       var zahl = el('text', {
-        'class': 'ventil-zahl', x: VENTIL_X[i], y: VENTIL_Y + 14,
+        'class': 'ventil-zahl', x: VENTIL_X[i], y: 197,
         'text-anchor': 'middle', 'font-size': 40, 'font-weight': 700
       });
       zahl.textContent = String(i + 1);
+      g.appendChild(schaft);
       g.appendChild(knopf);
       g.appendChild(zahl);
-      svg.appendChild(g);
+      aussen.appendChild(g);
       teile.push({ gruppe: g, knopf: knopf, zahl: zahl });
     }
     svg.__ventile = teile;

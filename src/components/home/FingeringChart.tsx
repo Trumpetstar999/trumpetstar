@@ -5,6 +5,8 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { Button } from '@/components/ui/button';
 import { FINGERING_COPY } from '@/i18n/fingering';
 import { DESCENDING_FINGERINGS, FINGERINGS, soundingFrequency, type FingeringNote } from '@/lib/fingering';
+import { TrumpetSound } from '@/lib/trumpetSound';
+import { TrumpetFingering } from './TrumpetFingering';
 
 const SLOT = 46;
 const LEFT = 60;
@@ -12,19 +14,6 @@ const LEFT = 60;
 function cssColor(name: string) {
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return v ? `hsl(${v})` : '#000';
-}
-
-let ctx: AudioContext | null = null;
-function playTone(freq: number) {
-  try {
-    ctx = ctx ?? new AudioContext();
-    if (ctx.state === 'suspended') ctx.resume();
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = 'triangle'; o.frequency.value = freq;
-    const t = ctx.currentTime;
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.25, t + 0.03); g.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
-    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 1.15);
-  } catch { /* audio unavailable */ }
 }
 
 function FingeringRow({ notes: fingerings, selected, onChoose, label }: {
@@ -86,6 +75,14 @@ export function FingeringChart() {
   const { t, language } = useLanguage();
   const copy = FINGERING_COPY[language];
   const [note, setNote] = useState<FingeringNote | null>(null);
+  const sound = useRef<TrumpetSound | null>(null);
+  const [audioError, setAudioError] = useState(false);
+  useEffect(() => () => { sound.current?.dispose(); sound.current = null; }, []);
+  const playTone = (freq: number) => {
+    setAudioError(false);
+    sound.current ??= new TrumpetSound();
+    void sound.current.play(freq).catch(() => setAudioError(true));
+  };
   const choose = (next: FingeringNote) => { setNote(next); playTone(soundingFrequency(next.midi)); };
 
   return (
@@ -99,26 +96,14 @@ export function FingeringChart() {
         ) : (
           <>
             <p className="text-3xl font-extrabold text-ts-red">{note.name}</p>
-            <div className="flex justify-center gap-5 my-5" role="img" aria-label={note.valves.length ? t('home.griffPress', { valves: note.valves.join(' + ') }) : t('home.griffOpen')}>
-              {[1, 2, 3].map((v) => {
-                const down = note.valves.includes(v);
-                return (
-                  <div key={v} className="flex flex-col items-center gap-1">
-                    <div className="h-24 w-12 flex flex-col items-center justify-start">
-                      <span className={`w-7 rounded-t-md transition-all ${down ? 'h-4 mt-6 bg-ts-red' : 'h-10 bg-ts-muted/50'}`} />
-                      <span className={`w-12 h-12 rounded-full border-4 transition-colors ${down ? 'bg-ts-red border-ts-red' : 'bg-ts-surface border-ts-muted/40'}`} />
-                    </div>
-                    <span className="text-xs text-ts-muted">{t('home.valve', { n: v })}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <TrumpetFingering valves={note.valves} label={note.valves.length ? t('home.griffPress', { valves: note.valves.join(' + ') }) : t('home.griffOpen')} />
             <p className="font-bold text-ts-ink">{note.valves.length ? t('home.griffPress', { valves: note.valves.join(' + ') }) : t('home.griffOpen')}</p>
             <Button onClick={() => playTone(soundingFrequency(note.midi))} className="mt-3 inline-flex items-center gap-2 rounded-full bg-ts-gold text-ts-ink hover:bg-ts-gold/90 font-extrabold px-4 py-2">
               <Volume2 className="w-4 h-4" />{t('home.playTone')}
             </Button>
           </>
         )}
+        {audioError && <p role="alert" className="mt-2 text-destructive">{({ de: 'Ton konnte nicht geladen werden. Bitte erneut versuchen.', en: 'Sound could not load. Please try again.', es: 'No se pudo cargar el sonido. Inténtalo de nuevo.', sl: 'Zvoka ni bilo mogoče naložiti. Poskusite znova.' })[language]}</p>}
       </div>
     </div>
   );

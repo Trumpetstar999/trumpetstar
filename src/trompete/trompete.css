@@ -197,14 +197,14 @@
 .tp-uebung[data-art="toene"] .tp-tonkopf { text-align: center; }
 .tp-uebung[data-art="toene"] .tp-tonname { font-size: 3.5rem; margin-bottom: 0.45rem; }
 .tp-uebung[data-art="toene"] .tp-toninfo { align-items: center; gap: 0.1rem; }
-.tp-uebung[data-art="toene"] .tp-grifffeld { height: clamp(3rem, 11cqi, 6rem); }
+.tp-uebung[data-art="toene"] .tp-grifffeld { width: 100%; height: auto; aspect-ratio: 2 / 1; }
 
 /* Melodie: eine schmale Zeile links unter den Noten */
 .tp-uebung[data-art="melodie"] .tp-infofeld { align-items: center; gap: 0.8rem; padding: 0.35rem 1rem; }
 .tp-uebung[data-art="melodie"] .tp-tonkopf { display: flex; align-items: center; gap: 0.7rem; }
 .tp-uebung[data-art="melodie"] .tp-tonname { font-size: 1.8rem; min-width: 3.2rem; text-align: center; }
 .tp-uebung[data-art="melodie"] .tp-toninfo { font-size: 0.8rem; line-height: 1.3; white-space: nowrap; }
-.tp-uebung[data-art="melodie"] .tp-grifffeld { width: 7rem; height: 2.6rem; }
+.tp-uebung[data-art="melodie"] .tp-grifffeld { width: 10rem; height: 5rem; }
 .tp-uebung[data-art="melodie"] .tp-stimmung { display: none; }
 
 /* "Schau auf den Griff": die Ventile melden sich. */
@@ -296,6 +296,16 @@
    Leiste und Fusszeile (Zurueck und Stopp wirken immer). */
 .tp-buehne { position: absolute; inset: 0; pointer-events: none; z-index: 30; }
 .tp-buehne.sperrt { pointer-events: auto; }
+.tp-buehne { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.tp-jubel { width: min(14rem, 50%); aspect-ratio: 1; object-fit: contain; animation: tp-jubel 1.8s ease-out forwards; }
+.tp-jubelnote { position: absolute; width: 1.5rem; height: 1rem; border-radius: 50%; background: var(--linie); animation: tp-notenflug 1.5s ease-out forwards; }
+.tp-jubelnote::after { content: ''; position: absolute; right: 0; bottom: 45%; width: .2rem; height: 1.8rem; background: inherit; }
+@keyframes tp-jubel { 0% { transform: scale(.4) rotate(-9deg); opacity: 0; } 22% { transform: scale(1.1) rotate(4deg); opacity: 1; } 78% { transform: scale(1); opacity: 1; } 100% { opacity: 0; } }
+@keyframes tp-notenflug { 0% { transform: translate(0, 4rem) scale(.35); opacity: 0; } 16%, 72% { opacity: 1; } 100% { transform: translate(var(--weit), -12rem) rotate(-20deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .tp-jubel, .tp-jubelnote { animation: none; }
+  .tp-jubelnote { display: none; }
+}
 
 /* ================= Was sich im Notenbild bewegt ================= */
 
