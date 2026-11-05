@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit2, Settings, LogOut, UserPlus, Users } from 'lucide-react';
+import { Edit2, Settings, LogOut } from 'lucide-react';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
-import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
-import { SocialDialog } from '@/components/social/SocialDialog';
 import { MembershipStatusBadge } from '@/components/levels/MembershipStatusBadge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,8 +21,6 @@ export function ProfileWidget() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [socialDialogOpen, setSocialDialogOpen] = useState(false);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -66,26 +62,6 @@ export function ProfileWidget() {
       
       <MembershipStatusBadge />
       
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setSocialDialogOpen(true)}
-        className="w-full mt-3 text-white hover:text-white hover:bg-white/20 bg-white/10 gap-2"
-      >
-        <Users className="w-4 h-4" />
-        Freunde & Ranking ⭐
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setInviteDialogOpen(true)}
-        className="w-full mt-1 text-white hover:text-white hover:bg-white/20 bg-white/10 gap-2"
-      >
-        <UserPlus className="w-4 h-4" />
-        Freunde einladen
-      </Button>
-
       <div className="flex gap-2 mt-2 w-full">
         <Button
           variant="ghost"
@@ -128,15 +104,6 @@ export function ProfileWidget() {
         onOpenChange={setPasswordDialogOpen}
       />
 
-      <InviteFriendDialog
-        open={inviteDialogOpen}
-        onOpenChange={setInviteDialogOpen}
-      />
-
-      <SocialDialog
-        open={socialDialogOpen}
-        onOpenChange={setSocialDialogOpen}
-      />
     </div>
   );
 }

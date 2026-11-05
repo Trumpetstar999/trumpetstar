@@ -7,8 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
-import { InviteFriendDialog } from '@/components/profile/InviteFriendDialog';
-import { LogOut, Edit2, Lock, Scale, UserPlus, Star, Crown, Sparkles, ChevronRight } from 'lucide-react';
+import { LogOut, Edit2, Lock, Scale, Crown, Sparkles, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES, PlanKey } from '@/types/plans';
@@ -82,7 +81,6 @@ export default function MobileProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -177,30 +175,6 @@ export default function MobileProfilePage() {
               last
             />
           </div>
-
-          {/* Invite friends */}
-          <button
-            onClick={() => setInviteDialogOpen(true)}
-            className="w-full rounded-2xl p-4 flex items-center gap-4 shadow-xl transition-all active:scale-[0.98]"
-            style={{
-              background: 'linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(245,158,11,0.1) 100%)',
-              border: '1px solid rgba(234,179,8,0.25)',
-              backdropFilter: 'blur(20px)',
-            }}
-          >
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)' }}>
-              <UserPlus className="w-5 h-5 text-white" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-white font-semibold text-sm">{texts.invite}</p>
-              <p className="text-amber-300/70 text-xs mt-0.5">{texts.inviteDesc}</p>
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <Star className="w-3.5 h-3.5 text-amber-400/60 fill-amber-400/60" />
-            </div>
-          </button>
 
           {/* Language */}
           <div
@@ -314,7 +288,6 @@ export default function MobileProfilePage() {
         onUpdate={fetchProfile}
       />
       <ChangePasswordDialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen} />
-      <InviteFriendDialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} />
     </MobileLayout>
   );
 }
