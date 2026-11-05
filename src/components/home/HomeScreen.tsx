@@ -1,6 +1,6 @@
 import { MouseEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Lock, User } from 'lucide-react';
+import { Bell, Crown, Loader2, Lock, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
@@ -16,6 +16,9 @@ import { ProfileSheet } from './ProfileSheet';
 import { ShopCarousel } from './ShopCarousel';
 import { LegalLinks } from '@/components/legal/LegalLinks';
 import { useAppUpdates } from '@/hooks/useAppUpdates';
+import { useMembership } from '@/hooks/useMembership';
+import { Button } from '@/components/ui/button';
+import { homeMembershipCopy } from '@/i18n/home-membership';
 
 interface HomeScreenProps {
   /** When set, the login sheet opens immediately (guest hit a locked URL). */
@@ -34,6 +37,9 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
   const [stars, setStars] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
   const news = useAppUpdates();
+  const { planKey, isLoading: membershipLoading } = useMembership();
+  const membershipCopy = homeMembershipCopy[language];
+  const paidMember = !!user && planKey !== 'FREE';
 
   useEffect(() => {
     if (lockedNext && !user) { setLoginNext(lockedNext); setLoginOpen(true); }
@@ -97,7 +103,7 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
     );
   };
 
-  const glassBtn = 'ts-glass w-11 h-11 rounded-full flex items-center justify-center text-ts-deep active:scale-95 transition';
+  const glassBtn = 'ts-glass w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full flex items-center justify-center text-ts-deep active:scale-95 transition';
 
   return (
     <div className="ts-wall ts-system-font min-h-[100dvh] w-full">
@@ -105,9 +111,20 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
         className="mx-auto max-w-[720px] px-5"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 32px)' }}
       >
-        <header className="flex items-center justify-between">
-          <img src="/logo_trumpetstar.png" alt="Trumpetstar" className="h-[60px] w-auto" />
-          <div className="flex items-center gap-2">
+        <header className="flex flex-wrap items-center justify-between gap-2">
+          <img src="/logo_trumpetstar.png" alt="Trumpetstar" className="h-8 sm:h-[60px] w-auto" />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="ghost"
+              disabled={!!user && membershipLoading}
+              title={paidMember ? `${membershipCopy.status}: ${planKey}` : membershipCopy.upgrade}
+              aria-label={user && membershipLoading ? membershipCopy.loading : paidMember ? `${membershipCopy.status}: ${planKey}` : membershipCopy.upgrade}
+              onClick={() => paidMember ? openProfile() : navigate('/pricing')}
+              className="h-9 sm:h-11 rounded-full px-2 sm:px-3 bg-ts-gold text-ts-ink hover:bg-ts-gold/80 text-xs sm:text-sm font-bold"
+            >
+              {user && membershipLoading ? <Loader2 className="animate-spin" /> : <Crown aria-hidden="true" />}
+              {user && membershipLoading ? '…' : paidMember ? planKey : membershipCopy.upgrade}
+            </Button>
             <button className={glassBtn} aria-label={t('home.news')} onClick={() => { setNewsOpen(true); news.markAllRead(); }}>
               <span className="relative"><Bell className="w-5 h-5" />
                 {news.unread > 0 && <span className="absolute -top-3 -right-3 min-w-5 h-5 px-1 rounded-full bg-ts-red text-ts-on text-[11px] font-bold flex items-center justify-center">{news.unread > 9 ? '9+' : news.unread}</span>}
