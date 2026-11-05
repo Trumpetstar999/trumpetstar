@@ -1,48 +1,22 @@
 import { ReactNode, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMiniMode } from '@/hooks/useMiniMode';
 import { useAuth } from '@/hooks/useAuth';
-import { HOME_APPS, PROFILE_ROUTE } from '@/config/apps';
+import { PROFILE_ROUTE } from '@/config/apps';
 
 // The new homescreen and its modules work on every device size.
-const HOME_ROUTES = ['/', PROFILE_ROUTE, ...HOME_APPS.map((a) => a.route)];
-
-// Routes that are allowed on mobile (auth, onboarding, mobile routes)
-const MOBILE_ALLOWED_PREFIXES = [
-  '/auth',
-  '/login',
-  '/signup',
-  '/reset-password',
-  '/mobile/',
-  '/mobile/home',
-  '/mobile/plan',
-  '/mobile/help',
-  '/mobile/profile',
-  '/mobile/locked',
-  '/pricing',
-  '/snowtone',
-  '/app/game/',
-  '/qr/',
-];
-
-// Desktop app routes that should redirect to locked on mobile
-const DESKTOP_ROUTES = [
-  '/',
-  '/admin',
-  '/chats',
-  '/classroom',
-  '/pricing',
-  '/musicxml',
-  '/game/play',
-  '/practice/',
-];
+const LEGACY_MOBILE_DESTINATIONS: Record<string, string> = {
+  '/mobile/home': '/',
+  '/mobile/plan': '/pricing',
+  '/mobile/help': '/hilfe',
+  '/mobile/profile': PROFILE_ROUTE,
+  '/mobile/locked': '/',
+};
 
 interface MobileRouteGuardProps {
   children: ReactNode;
 }
 
 export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
-  const isMiniMode = useMiniMode();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,27 +31,11 @@ export function MobileRouteGuard({ children }: MobileRouteGuardProps) {
       return;
     }
 
-    if (isMiniMode && user) {
-      // On mobile + logged in: redirect desktop routes to mobile
-      const isOnMobileRoute = HOME_ROUTES.includes(path) || MOBILE_ALLOWED_PREFIXES.some(r => path === r || path.startsWith(r));
-      const isAuthRoute = path === '/auth';
-
-      if (!isOnMobileRoute && !isAuthRoute) {
-        // Check if it's the root route
-        if (path === '/') {
-          navigate('/mobile/home', { replace: true });
-        } else {
-          // Any other desktop route → locked
-          navigate('/mobile/locked', { replace: true });
-        }
-      }
-    } else if (!isMiniMode && user) {
-      // On desktop: redirect mobile routes back to main app
-      if (path.startsWith('/mobile/')) {
-        navigate('/', { replace: true });
-      }
+    if (path.startsWith('/mobile/')) {
+      const destination = LEGACY_MOBILE_DESTINATIONS[path.replace(/\/$/, '')] ?? '/';
+      navigate(`${destination}${location.search}${location.hash}`, { replace: true });
     }
-  }, [isMiniMode, user, loading, location.pathname, navigate]);
+  }, [user, loading, location.pathname, location.search, location.hash, navigate]);
 
   return <>{children}</>;
 }

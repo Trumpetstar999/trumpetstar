@@ -1,7 +1,6 @@
 import { LegalLinks } from '@/components/legal/LegalLinks';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMiniMode } from '@/hooks/useMiniMode';
 import { useLanguage } from '@/hooks/useLanguage';
 import type { Language } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +25,6 @@ export default function AuthPage() {
   const [displayName, setDisplayName] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
-  const isMiniMode = useMiniMode();
   const location = useLocation();
   const { t, language, setLanguage } = useLanguage();
   const { toast } = useToast();

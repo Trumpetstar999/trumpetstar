@@ -16,7 +16,7 @@ it('keeps authenticated mobile recovery on the public reset route', async () => 
   await waitFor(() => expect(currentPath).toBe('/reset-password'));
 });
 
-it.each(['/games', '/app/game/play', '/app/game/toneforce/play', '/app/game/happybeginners/play', '/snowtone'])('keeps smartphone gameplay at %s instead of legacy mobile', async (path) => {
+it.each(['/admin', '/admin/users', '/app/legacy', '/games', '/app/game/play', '/app/game/toneforce/play', '/app/game/happybeginners/play', '/snowtone'])('keeps smartphone page at %s instead of legacy mobile', async (path) => {
   let currentPath = '';
   function Capture() {
     currentPath = useLocation().pathname;
@@ -24,4 +24,11 @@ it.each(['/games', '/app/game/play', '/app/game/toneforce/play', '/app/game/happ
   }
   render(<MemoryRouter initialEntries={[path]}><MobileRouteGuard><Capture /></MobileRouteGuard></MemoryRouter>);
   await waitFor(() => expect(currentPath).toBe(path));
+});
+
+it.each([['/mobile/home', '/'], ['/mobile/plan', '/pricing'], ['/mobile/profile', '/profil'], ['/mobile/help', '/hilfe'], ['/mobile/locked', '/']])('replaces old link %s with %s', async (oldPath, destination) => {
+  let currentPath = '';
+  function Capture() { currentPath = useLocation().pathname; return null; }
+  render(<MemoryRouter initialEntries={[oldPath]}><MobileRouteGuard><Capture /></MobileRouteGuard></MemoryRouter>);
+  await waitFor(() => expect(currentPath).toBe(destination));
 });
