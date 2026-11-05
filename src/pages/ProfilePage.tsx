@@ -154,7 +154,7 @@ export function ProfilePage() {
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={visibleWidgets.map(w => w.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {visibleWidgets
               .filter(w => KNOWN_WIDGET_IDS.includes(w.id))
               .filter(w => w.id !== 'classroom' || isEnabled('menu_classroom'))
