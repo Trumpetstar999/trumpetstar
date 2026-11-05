@@ -820,9 +820,9 @@ const desktopSlots = SLOTS.map(slot => ({ ...slot }));
 layoutScene = () => {
   const portraitPhone = W < 640 && H > W;
   if (portraitPhone) {
-    const size = 1.6;
-    const firstBase = Math.max(200 + 330 * size * S, H * 0.48);
-    const lastBase = Math.max(firstBase + 100, H - 125);
+    const size = Math.min(1.6, Math.max(1.1, (H - 270) / (990 * S)));
+    const firstBase = 200 + 330 * size * S;
+    const lastBase = Math.max(firstBase + 100, H - 55);
     const middleBase = (firstBase + lastBase) / 2;
     const positions = [[300, firstBase], [980, firstBase], [300, middleBase], [980, middleBase], [640, lastBase]];
     SLOTS.forEach((slot, i) => Object.assign(slot, { x: positions[i][0], y: positions[i][1] / S, s: size }));
