@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const state = vi.hoisted(() => ({ plan: 'FREE', admin: false, loading: false, mounted: vi.fn() }));
 vi.mock('@/hooks/useMembership', () => ({ useMembership: () => ({ canAccessFeature: () => state.plan === 'PRO', isLoading: state.loading }) }));

@@ -5,8 +5,6 @@ import { Slider } from '@/components/ui/slider';
 import { useDailyUsage } from '@/hooks/useDailyUsage';
 import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/hooks/useLanguage';
-import { accessCopy } from '@/i18n/access';
 
 interface SessionVideoPlayerProps {
   vimeoVideoId: string;
@@ -298,7 +296,6 @@ function SessionVideoPlayerContent({ vimeoVideoId, title, onEnded, startFullscre
 
 export function SessionVideoPlayer(props: SessionVideoPlayerProps) {
   const { recordVideoStart } = useDailyUsage();
-  const { language } = useLanguage();
   const [allowed, setAllowed] = useState(false);
   const [limitOpen, setLimitOpen] = useState(false);
   const [checking, setChecking] = useState(false);

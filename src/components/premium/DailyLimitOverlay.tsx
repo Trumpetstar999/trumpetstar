@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Music, Gamepad2, Sparkles } from 'lucide-react';
+import { Music, Gamepad2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { accessCopy } from '@/i18n/access';
 

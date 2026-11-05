@@ -1,5 +1,4 @@
 import { FeedbackMessaging } from '@/components/chat/FeedbackMessaging';
-import { PremiumFeatureLock } from '@/components/premium/PremiumFeatureLock';
 import { useMembership } from '@/hooks/useMembership';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Loader2 } from 'lucide-react';
