@@ -588,13 +588,13 @@
        * Taktart rutschte damit sichtbar aus dem System. Times hat
        * Ziffern in Versalhoehe: 0,66 der Schriftgroesse. */
       if (mitTaktart && istErste) {
-        var tx = x + TAKTART_PLATZ / 2 - 0.1;
-        var ziffer = { 'font-weight': 700,
-                       'font-family': '"Times New Roman", Times, "Liberation Serif", "Noto Serif", serif',
-                       'font-variant-numeric': 'lining-nums',
-                       fill: 'var(--linie)', 'class': 'taktart' };
-        schrift(g, tx, -0.04, String(zaehler), 2.92, ziffer);
-        schrift(g, tx, 1.96, String(nenner), 2.92, ziffer);
+        [zaehler, nenner].forEach(function (value, index) {
+          var glyph = G['ziffer' + value];
+          if (!glyph) { return; }
+          g.appendChild(el('path', { d: glyph.d,
+            transform: 'translate(' + (x + (G.ziffer4.breite - glyph.breite) / 2) + ',' + (index ? 1 : -1) + ')',
+            fill: 'var(--linie)', 'class': 'taktart' }));
+        });
         x += TAKTART_PLATZ;
       }
 

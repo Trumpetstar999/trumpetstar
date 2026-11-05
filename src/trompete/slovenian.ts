@@ -12,6 +12,7 @@ const texts: Record<string, string> = {
   'modus.aria': 'Kdo igra', 'modus.mit': 'Ob spremljavi', 'modus.solo': 'Samostojno',
   'stimm.tief': 'prenizko', 'stimm.hoch': 'previsoko',
   'tempo.titel': 'Tempo', 'tempo.langsamer': 'Počasneje', 'tempo.schneller': 'Hitreje',
+  'einheit.cent': 'centov',
   'l1.bereit': 'Pritisni »Začni«: aplikacija zaigra ton, nato si na vrsti ti.',
   'l1.vorspielen': 'Poslušaj …', 'l1.hoeren': 'Na vrsti si: zaigraj {ton} in ga drži enakomerno.',
   'l1.treffer': 'Uspelo je – {ton}, {cent}.', 'cent.genau': 'dobro uglašeno',
