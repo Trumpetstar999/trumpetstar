@@ -1,4 +1,5 @@
 import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
+import { createPortal } from 'react-dom';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Star, AlertTriangle, WifiOff, RefreshCw, Play, Pause, Maximize } from 'lucide-react';
 import { Video } from '@/types';
@@ -523,7 +524,7 @@ function VideoPlayerContent({ video, levelId, levelTitle, onClose, onComplete, h
     </div>
   );
 
-  return (
+  return createPortal(
     <div 
       className="fixed inset-0 z-[100] flex flex-col animate-fade-in overflow-hidden video-player-fullscreen"
       style={{ 
@@ -730,7 +731,7 @@ function VideoPlayerContent({ video, levelId, levelTitle, onClose, onComplete, h
         </div>
       </div>
     </div>
-  );
+  , document.body);
 }
 
 export function VideoPlayer(props: VideoPlayerProps) {
