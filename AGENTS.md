@@ -33,3 +33,4 @@
 - Play drum loops through SoundTouch time stretching with a wrapping stereo source and unity pitch/rate; change tempo independently so live BPM edits cannot transpose drum sounds.
 - Reuse AudioPlayer for mobile and desktop audio surfaces; keep title search above level browsing and query the entire public audio library so search scope cannot diverge.
 - Keep PDF rendering in the shared PdfViewer with the existing local PDF.js worker and authenticated Blob access; use react-zoom-pan-pinch for gestures, normalized per-page strokes in the existing user annotation store, and print only one composite current-page image so zoom cannot move marks or expand print scope.
+- Preserve Snowtone's standalone canvas engine behind the authenticated Games route; a same-origin, source-validated bridge checks the shared daily quota on every start/restart, and teardown cancels pending microphone requests and releases audio resources.

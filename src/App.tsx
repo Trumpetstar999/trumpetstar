@@ -37,6 +37,7 @@ const MusicXMLPage = lazy(() => import("./pages/MusicXMLPage").then(m => ({ defa
 const MusicXMLViewerPage = lazy(() => import("./pages/MusicXMLViewerPage").then(m => ({ default: m.MusicXMLViewerPage })));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const GamePlayPage = lazy(() => import("./pages/GamePlayPage"));
+const Snowtone = lazy(() => import("./pages/Snowtone"));
 const ToneForcePlayPage = lazy(() => import("./pages/ToneForcePlayPage"));
 const HappyBeginnersPlayPage = lazy(() => import("./pages/HappyBeginnersPlayPage"));
 const SessionBuilderPage = lazy(() => import("./pages/SessionBuilderPage"));
@@ -96,6 +97,7 @@ const App = () => (
                         <Route path="/videos" element={<M.VideosModule />} />
                         <Route path="/rhythmus" element={<M.RhythmusModule />} />
                         <Route path="/games" element={<M.GamesModule />} />
+                        <Route path="/snowtone" element={<Snowtone />} />
                         <Route path="/metronom" element={<M.MetronomModule />} />
                         <Route path="/playlists" element={<M.PlaylistsModule />} />
                         <Route path="/feedback" element={<M.FeedbackModule />} />

@@ -106,5 +106,66 @@
         "next_action": null
       }
     ]
+  },
+  "snowtone": {
+    "source": "snowtone-lovable.zip",
+    "capabilities": [
+      {
+        "capability": "code/routes",
+        "source": "standalone HTML/canvas",
+        "outcome": "Preserve original engine; authenticated /snowtone",
+        "status": "verified",
+        "next_action": null
+      },
+      {
+        "capability": "audio/microphone",
+        "source": "YIN, effects and melody",
+        "outcome": "Preserve; improve mobile fallback and teardown",
+        "status": "partially_verified",
+        "next_action": "Physical iPhone/iPad/Android microphone acceptance remains; authenticated Chromium YIN detected concert B-flat as written C and melted a snowman. Menu/game-over release and restart verified."
+      },
+      {
+        "capability": "records",
+        "source": "browser-local highscores/config/name/tricky notes",
+        "outcome": "Preserve keys with validated score rendering",
+        "status": "verified",
+        "next_action": null
+      },
+      {
+        "capability": "assets",
+        "source": "winter background and logo",
+        "outcome": "App asset store",
+        "status": "verified",
+        "next_action": "Original imported bytes rendered through test-only localhost delivery; hosted asset gateway not directly exercised."
+      },
+      {
+        "capability": "authorization",
+        "source": "app Games boundary",
+        "outcome": "Shared quota before every start/restart",
+        "status": "verified",
+        "next_action": null
+      },
+      {
+        "capability": "languages/theme",
+        "source": "German winter game",
+        "outcome": "DE/EN/ES/SL and semantic app chrome",
+        "status": "verified",
+        "next_action": null
+      },
+      {
+        "capability": "schema/auth identities/providers/endpoints/callbacks/webhooks/schedules/secrets",
+        "source": "none detected",
+        "outcome": "Existing services unchanged",
+        "status": "not_applicable",
+        "next_action": null
+      },
+      {
+        "capability": "cutover/verification",
+        "source": "new Games entry",
+        "outcome": "Authenticated browser and rule tests",
+        "status": "verified",
+        "next_action": null
+      }
+    ]
   }
 }

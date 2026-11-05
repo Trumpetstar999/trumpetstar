@@ -38,6 +38,10 @@ export function GamePage() {
           navigate('/app/game/happybeginners/play');
           return;
         }
+        if (game === 'snowtone') {
+          navigate('/snowtone');
+          return;
+        }
         setSelected(game);
       }}
     />
