@@ -17,7 +17,7 @@ export default function HappyBeginnersPlayPage() {
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
       />
       <button
-        onClick={() => navigate("/app", { state: { activeTab: "game", game: "happybeginners" } })}
+        onClick={() => navigate("/games")}
         style={{
           position: "absolute",
           top: "8px",
