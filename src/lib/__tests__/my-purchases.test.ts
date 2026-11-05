@@ -17,6 +17,11 @@ describe('personal Digistore24 purchases', () => {
     expect(list).toHaveLength(1);
     expect(list[0].productId).toBe('346007');
   });
+  it('shows every item with the provider order amount, not a fabricated item price', () => {
+    const list = summarizePurchases([{ id: 'ORDER', amount: '35.00', billing_status: 'completed', items: [{ product_id: '1', product_name: 'Book' }, { product_id: '2', product_name: 'Audio' }] }]);
+    expect(list).toHaveLength(2);
+    expect(list.map(p => p.amount)).toEqual([35, 35]);
+  });
   it('does not offer downloads for refunded purchases even after a later payment row', () => {
     const rows = [
       { product_id: '123', status: 'refunded', raw_data: { order_id: 'ORDER', download_url: 'https://www.digistore24.com/download/123' } },
@@ -27,6 +32,7 @@ describe('personal Digistore24 purchases', () => {
   });
   it('rejects arbitrary hosts, non-HTTPS links and URL credentials', () => {
     expect(safeOrderUrl('https://www.digistore24.com/receipt/123')).toBe('https://www.digistore24.com/receipt/123');
+    expect(safeOrderUrl('https://www.checkout-ds24.com/receipt/123')).toBe('https://www.checkout-ds24.com/receipt/123');
     for (const url of ['javascript:alert(1)', 'http://digistore24.com/x', 'https://digistore24.com.evil.test/x', 'https://user:password@digistore24.com/x']) expect(safeOrderUrl(url)).toBeNull();
   });
 });

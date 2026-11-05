@@ -46,7 +46,7 @@ export function MyPurchases() {
             <h3 className="font-semibold break-words">{p.name}</h3>
             <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-ts-muted">
               <span>{c.date}: {date(p.date)}</span>
-              {p.amount !== null && <span>{new Intl.NumberFormat(language, { style: 'currency', currency: p.currency }).format(p.amount)}</span>}
+              {p.amount !== null && <span>{c.total}: {new Intl.NumberFormat(language, { style: 'currency', currency: p.currency }).format(p.amount)}</span>}
               <span className="font-medium">{c[p.status]}</span>
             </div>
           </div>

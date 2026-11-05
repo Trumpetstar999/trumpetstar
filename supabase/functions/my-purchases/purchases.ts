@@ -15,7 +15,7 @@ export function safeOrderUrl(value: unknown): string | null {
   try {
     const url = new URL(text(value));
     return url.protocol === 'https:' && !url.username && !url.password &&
-      (url.hostname === 'digistore24.com' || url.hostname.endsWith('.digistore24.com')) ? url.href : null;
+      (url.hostname === 'digistore24.com' || url.hostname.endsWith('.digistore24.com') || url.hostname === 'www.checkout-ds24.com' || url.hostname === 'checkout-ds24.com') ? url.href : null;
   } catch { return null; }
 }
 export function summarizePurchases(rows: Raw[]): Purchase[] {
@@ -23,7 +23,7 @@ export function summarizePurchases(rows: Raw[]): Purchase[] {
   const expanded = rows.flatMap(row => {
     const items = row.items;
     const list = Array.isArray(items) ? items : items && typeof items === 'object' ? Object.values(items) : [];
-    return list.length ? list.map(item => ({ ...row, ...(item as Raw), id: row.id, amount: null })) : [row];
+    return list.length ? list.map(item => ({ ...row, ...(item as Raw), id: row.id, amount: row.amount })) : [row];
   });
   for (const row of expanded) {
     const raw = (row.raw_data && typeof row.raw_data === 'object' ? row.raw_data : row) as Raw;
