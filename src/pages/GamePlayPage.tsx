@@ -12,12 +12,16 @@ import { GameSettingsOverlay } from '@/components/game/GameSettingsOverlay';
 import { GameOverOverlay } from '@/components/game/GameOverOverlay';
 import { CONFIDENCE_THRESHOLDS } from '@/components/game/constants';
 import { Loader2, Mic, MicOff, Activity, Bug } from 'lucide-react';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 
 const IS_IOS = isIOSDevice();
 
 export default function GamePlayPage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { recordGameStart } = useDailyUsage();
+  const [limitOpen, setLimitOpen] = useState(false);
   const { settings, updateSettings } = useGameSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [micActivated, setMicActivated] = useState(false);
@@ -74,10 +78,11 @@ export default function GamePlayPage() {
   // Mic activation handler
   // -----------------------------------------------------------------------
   const handleActivateMic = useCallback(async () => {
+    if (!await recordGameStart()) { setLimitOpen(true); handledRef.current = false; return; }
     await startListening();
     setMicActivated(true);
     startGame();
-  }, [startListening, startGame]);
+  }, [startListening, startGame, recordGameStart]);
 
   // -----------------------------------------------------------------------
   // Dual touchend + click listeners for iOS compatibility
@@ -96,8 +101,8 @@ export default function GamePlayPage() {
       await handleActivateMic();
     };
 
-    btn.addEventListener('touchend', handler, { once: true });
-    btn.addEventListener('click', handler, { once: true });
+    btn.addEventListener('touchend', handler);
+    btn.addEventListener('click', handler);
 
     return () => {
       btn.removeEventListener('touchend', handler);
@@ -105,9 +110,10 @@ export default function GamePlayPage() {
     };
   }, [micActivated, handleActivateMic]);
 
-  const handleRestart = useCallback(() => {
+  const handleRestart = useCallback(async () => {
+    if (!await recordGameStart()) { setLimitOpen(true); return; }
     startGame();
-  }, [startGame]);
+  }, [startGame, recordGameStart]);
 
   const handleBack = useCallback(() => {
     stopListening();
@@ -209,6 +215,7 @@ export default function GamePlayPage() {
       />
 
       <GameOverOverlay gameState={gameState} onRestart={handleRestart} onBack={handleBack} onSaveScore={handleSaveScore} />
+      <DailyLimitOverlay open={limitOpen} type="game" onClose={() => setLimitOpen(false)} />
     </div>
   );
 }

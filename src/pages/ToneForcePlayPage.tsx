@@ -23,6 +23,8 @@ import { StabilityBar } from '@/components/game/toneforce/StabilityBar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useTfT } from '@/i18n/toneforce';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
 
 type Phase = 'ready' | 'playing' | 'level_complete' | 'game_over' | 'won';
 
@@ -30,6 +32,8 @@ export default function ToneForcePlayPage() {
   const t = useTfT();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { recordGameStart } = useDailyUsage();
+  const [limitOpen, setLimitOpen] = useState(false);
   const { chord } = useChordSettings();
   const { status, start, analyserRef, ctxRef } = useAudioInput();
   const { settings } = useAppSettings();
@@ -150,7 +154,8 @@ export default function ToneForcePlayPage() {
     setLevelIdx(toLevel);
   }
 
-  function startPlaying() {
+  async function startPlaying() {
+    if (!await recordGameStart()) { setLimitOpen(true); return; }
     resetGame(0);
     setPhase('playing');
   }
@@ -625,6 +630,7 @@ export default function ToneForcePlayPage() {
           <StabilityBar value={pitch.stable} />
         </div>
       </div>
+      <DailyLimitOverlay open={limitOpen} type="game" onClose={() => setLimitOpen(false)} />
     </div>
   );
 }

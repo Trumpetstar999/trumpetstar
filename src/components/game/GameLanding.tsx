@@ -15,7 +15,7 @@ export function GameLanding() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [limitOpen, setLimitOpen] = useState(false);
   const { settings, updateSettings } = useGameSettings();
-  const { canStartGame, recordGameStart } = useDailyUsage();
+  const { canStartGame } = useDailyUsage();
   const navigate = useNavigate();
 
   const handleStartGame = async () => {
@@ -23,12 +23,7 @@ export function GameLanding() {
       setLimitOpen(true);
       return;
     }
-    const allowed = await recordGameStart();
-    if (allowed) {
-      navigate('/app/game/play');
-    } else {
-      setLimitOpen(true);
-    }
+    navigate('/app/game/play');
   };
 
   if (view === 'highscores') {

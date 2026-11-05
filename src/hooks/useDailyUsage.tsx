@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useMembership } from './useMembership';
+import { useLanguage } from './useLanguage';
+import { accessCopy } from '@/i18n/access';
 
 const DAILY_VIDEO_LIMIT = 3;
 const DAILY_GAME_LIMIT = 3;
-const DEBOUNCE_MS = 800;
 
 function getDateKey(): string {
   return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Vienna',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -18,18 +20,24 @@ function getDateKey(): string {
 export function useDailyUsage() {
   const { user } = useAuth();
   const { planKey, isLoading: membershipLoading } = useMembership();
+  const { language } = useLanguage();
   const [videosUsed, setVideosUsed] = useState(0);
   const [gamesUsed, setGamesUsed] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const lastActionRef = useRef(0);
+  const pendingRef = useRef({ video: false, game: false });
 
   const isFreeUser = planKey === 'FREE';
-  const dateKey = getDateKey();
+  const [dateKey, setDateKey] = useState(getDateKey);
+  useEffect(() => {
+    const timer = window.setInterval(() => setDateKey(getDateKey()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   // Fetch current usage
   useEffect(() => {
-    if (!user || membershipLoading) return;
+    if (!user) { setVideosUsed(0); setGamesUsed(0); setError(null); setIsLoading(false); return; }
+    if (membershipLoading) return;
     if (!isFreeUser) {
       setIsLoading(false);
       setVideosUsed(0);
@@ -54,7 +62,7 @@ export function useDailyUsage() {
         setError(null);
       } catch (e) {
         console.error('Failed to fetch daily usage:', e);
-        setError('Nutzungsdaten konnten nicht geladen werden.');
+        setError(accessCopy[language].error);
       } finally {
         setIsLoading(false);
       }
@@ -64,22 +72,24 @@ export function useDailyUsage() {
   }, [user?.id, dateKey, isFreeUser, membershipLoading]);
 
   const canStartVideo = useCallback((): boolean => {
+    if (!user || membershipLoading) return false;
     if (!isFreeUser) return true;
     if (error || isLoading) return false;
     return videosUsed < DAILY_VIDEO_LIMIT;
-  }, [isFreeUser, videosUsed, error, isLoading]);
+  }, [user?.id, membershipLoading, isFreeUser, videosUsed, error, isLoading]);
 
   const canStartGame = useCallback((): boolean => {
+    if (!user || membershipLoading) return false;
     if (!isFreeUser) return true;
     if (error || isLoading) return false;
     return gamesUsed < DAILY_GAME_LIMIT;
-  }, [isFreeUser, gamesUsed, error, isLoading]);
+  }, [user?.id, membershipLoading, isFreeUser, gamesUsed, error, isLoading]);
 
   const recordVideoStart = useCallback(async (): Promise<boolean> => {
-    if (!user || !isFreeUser) return true;
-    const now = Date.now();
-    if (now - lastActionRef.current < DEBOUNCE_MS) return false;
-    lastActionRef.current = now;
+    if (!user || membershipLoading) return false;
+    if (!isFreeUser) return true;
+    if (pendingRef.current.video) return false;
+    pendingRef.current.video = true;
 
     try {
       const { data, error: rpcError } = await supabase.rpc('increment_daily_usage', {
@@ -90,20 +100,22 @@ export function useDailyUsage() {
 
       if (rpcError) throw rpcError;
       const newValue = data as number;
-      setVideosUsed(newValue);
-      return newValue <= DAILY_VIDEO_LIMIT;
+      setVideosUsed(Math.min(newValue, DAILY_VIDEO_LIMIT));
+      return Number.isInteger(newValue) && newValue >= 0 && newValue <= DAILY_VIDEO_LIMIT;
     } catch (e) {
       console.error('Failed to record video start:', e);
-      setError('Bitte Seite neu laden.');
+      setError(accessCopy[language].error);
       return false;
+    } finally {
+      pendingRef.current.video = false;
     }
-  }, [user?.id, dateKey, isFreeUser]);
+  }, [user?.id, dateKey, isFreeUser, membershipLoading, language]);
 
   const recordGameStart = useCallback(async (): Promise<boolean> => {
-    if (!user || !isFreeUser) return true;
-    const now = Date.now();
-    if (now - lastActionRef.current < DEBOUNCE_MS) return false;
-    lastActionRef.current = now;
+    if (!user || membershipLoading) return false;
+    if (!isFreeUser) return true;
+    if (pendingRef.current.game) return false;
+    pendingRef.current.game = true;
 
     try {
       const { data, error: rpcError } = await supabase.rpc('increment_daily_usage', {
@@ -114,14 +126,16 @@ export function useDailyUsage() {
 
       if (rpcError) throw rpcError;
       const newValue = data as number;
-      setGamesUsed(newValue);
-      return newValue <= DAILY_GAME_LIMIT;
+      setGamesUsed(Math.min(newValue, DAILY_GAME_LIMIT));
+      return Number.isInteger(newValue) && newValue >= 0 && newValue <= DAILY_GAME_LIMIT;
     } catch (e) {
       console.error('Failed to record game start:', e);
-      setError('Bitte Seite neu laden.');
+      setError(accessCopy[language].error);
       return false;
+    } finally {
+      pendingRef.current.game = false;
     }
-  }, [user?.id, dateKey, isFreeUser]);
+  }, [user?.id, dateKey, isFreeUser, membershipLoading, language]);
 
   return {
     videosUsed,

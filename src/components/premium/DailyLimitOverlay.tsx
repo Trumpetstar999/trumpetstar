@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Music, Gamepad2, Sparkles } from 'lucide-react';
+import { Music, Gamepad2 } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { accessCopy } from '@/i18n/access';
 
 interface DailyLimitOverlayProps {
   open: boolean;
@@ -11,6 +13,8 @@ interface DailyLimitOverlayProps {
 
 export function DailyLimitOverlay({ open, type, onClose }: DailyLimitOverlayProps) {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const copy = accessCopy[language];
 
   const isVideo = type === 'video';
 
@@ -28,21 +32,12 @@ export function DailyLimitOverlay({ open, type, onClose }: DailyLimitOverlayProp
             </div>
           </div>
           <DialogTitle className="text-center text-lg">
-            Für heute ist dein Free-Kontingent aufgebraucht 🎺
+            {copy.limit}
           </DialogTitle>
           <DialogDescription className="text-center pt-2">
-            {isVideo
-              ? 'Du hast heute schon drei Videos gesehen! Morgen wartet ein neues Highlight auf dich – oder upgrade jetzt, um ohne Unterbrechung weiterzulernen.'
-              : 'Du hast heute schon drei Game-Runs gespielt! Morgen geht dein Streak weiter – oder upgrade jetzt für unbegrenztes Spielen.'}
+            {isVideo ? copy.video : copy.game}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="flex items-center gap-2 mt-2 p-3 rounded-xl bg-[hsl(var(--reward-gold))]/10 border border-[hsl(var(--reward-gold))]/20">
-          <Sparkles className="w-5 h-5 text-[hsl(var(--reward-gold))] flex-shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            Mit dem Upgrade sicherst du dir ununterbrochenen Fortschritt: unbegrenzte Videos & unbegrenztes Game.
-          </p>
-        </div>
 
         <div className="flex flex-col gap-2 mt-4">
           <Button
@@ -52,10 +47,10 @@ export function DailyLimitOverlay({ open, type, onClose }: DailyLimitOverlayProp
             }}
             className="w-full bg-[hsl(var(--reward-gold))] hover:bg-[hsl(var(--reward-gold))]/90 text-[hsl(var(--gold-foreground))] font-bold"
           >
-            Jetzt upgraden
+            {copy.upgrade}
           </Button>
           <Button variant="ghost" onClick={onClose} className="w-full">
-            Morgen weitermachen
+            {copy.later}
           </Button>
         </div>
       </DialogContent>
