@@ -120,7 +120,7 @@ export function AudioPlayer() {
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card shrink-0">
         <Search className="h-5 w-5 text-muted-foreground shrink-0" aria-hidden="true" />
         <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} aria-label={t('common.search')} placeholder={copy.searchPlaceholder} className="bg-card flex-1 min-w-0" />
-        {searchQuery && <Button variant="ghost" size="icon" aria-label={t('common.clear')} title={t('common.clear')} onClick={() => setSearchQuery('')}><X className="h-4 w-4" /></Button>}
+        {searchQuery && <Button variant="ghost" size="icon" aria-label={copy.clearSearch} title={copy.clearSearch} onClick={() => setSearchQuery('')}><X className="h-4 w-4" /></Button>}
       </div>
       <div className="flex flex-1 min-h-0 flex-col md:flex-row overflow-hidden">
       <aside className="shrink-0 border-b md:border-b-0 md:border-r border-border bg-card md:w-56 md:flex md:flex-col md:min-h-0">
