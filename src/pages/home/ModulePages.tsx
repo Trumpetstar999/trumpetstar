@@ -1,4 +1,5 @@
 import { lazy, ReactNode, Suspense, useState } from 'react';
+import { ShopCatalog } from '@/components/home/ShopCatalog';
 import { Link, Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
