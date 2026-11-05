@@ -25,21 +25,14 @@ import { useNavigate } from 'react-router-dom';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 import { DashboardWidget } from '@/components/dashboard/DashboardWidget';
 import { ProfileWidget } from '@/components/dashboard/widgets/ProfileWidget';
-import { StarsProgressWidget } from '@/components/dashboard/widgets/StarsProgressWidget';
 import { WeeklyStarsWidget } from '@/components/dashboard/widgets/WeeklyStarsWidget';
 import { RecordingsWidget } from '@/components/dashboard/widgets/RecordingsWidget';
-import { NotesTodosWidget } from '@/components/dashboard/widgets/NotesTodosWidget';
-import { FeedbackChatWidget } from '@/components/dashboard/widgets/FeedbackChatWidget';
 import { ClassroomWidget } from '@/components/dashboard/widgets/ClassroomWidget';
-import { StatisticsWidget } from '@/components/dashboard/widgets/StatisticsWidget';
-import { GameHighscoreWidget } from '@/components/dashboard/widgets/GameHighscoreWidget';
-import { PracticeSessionsWidget } from '@/components/dashboard/widgets/PracticeSessionsWidget';
 import { ReviewCard } from '@/components/review/ReviewCard';
 import { LanguageSelector } from '@/components/settings/LanguageSelector';
 
 const KNOWN_WIDGET_IDS: WidgetId[] = [
-  'profile', 'calendar', 'recordings', 'notes-todo', 'feedback-chat',
-  'classroom', 'game-highscore', 'practice-sessions', 'review',
+  'profile', 'calendar', 'recordings', 'classroom', 'review',
 ];
 
 function WidgetContent({ id }: { id: WidgetId }) {
@@ -47,11 +40,7 @@ function WidgetContent({ id }: { id: WidgetId }) {
     case 'profile':        return <ProfileWidget />;
     case 'calendar':       return <WeeklyStarsWidget />;
     case 'recordings':     return <RecordingsWidget />;
-    case 'notes-todo':     return <NotesTodosWidget />;
-    case 'feedback-chat':  return <FeedbackChatWidget />;
     case 'classroom':      return <ClassroomWidget />;
-    case 'game-highscore': return <GameHighscoreWidget />;
-    case 'practice-sessions': return <PracticeSessionsWidget />;
     case 'review':         return <ReviewCard />;
     default:               return null;
   }
