@@ -40,7 +40,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNext = () => {
-    if (step < 4) {
+    if (step < 3) {
       setStep(step + 1);
     }
   };
@@ -68,7 +68,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (authUser?.email) {
           await supabase.from('leads').upsert(
-            { email: authUser.email, segment, auth_user_id: user.id },
+            { email: authUser.email, auth_user_id: user.id },
             { onConflict: 'email' }
           );
         }
@@ -91,7 +91,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
 
   const renderStepIndicator = () => (
     <div className="flex justify-center gap-2 mb-6">
-      {[1, 2, 3, 4].map((s) => (
+      {[1, 2, 3].map((s) => (
         <div
           key={s}
           className={cn(
@@ -258,7 +258,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
-          {step === 4 && renderStep4()}
+          
         </div>
 
         {/* Fixed footer */}
@@ -268,7 +268,7 @@ export function LanguageSelectionDialog({ open }: LanguageSelectionDialogProps) 
               {t('common.back')}
             </Button>
           )}
-          {step < 4 ? (
+          {step < 3 ? (
             <Button onClick={handleNext} disabled={!canProceed()} className="flex-1 h-12 text-lg font-semibold">
               {t('common.next')}
               <ArrowRight className="w-5 h-5 ml-2" />
