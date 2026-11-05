@@ -200,6 +200,7 @@
 <script>
 'use strict';
 const tr = window.snowtoneTranslate;
+const copy = window.snowtoneDynamic;
 window.snowtoneTranslateDom();
 // ================= Helpers =================
 const TAU = Math.PI * 2;
@@ -817,7 +818,9 @@ function params() {
   const L = G.level;
   return { fire: Math.max(3.2, 9.5 - (L - 1) * 0.55), spawn: Math.max(0.9, 4.2 - (L - 1) * 0.32), max: Math.min(SLOTS.length, 1 + Math.floor(L / 2)) };
 }
+let scoreSubmitted = false;
 function newGame() {
+  scoreSubmitted = false;
   Object.assign(G, { state: 'playing', score: 0, lives: 5, level: 1, melted: 0, spawnT: 0.8, snowmen: [], balls: [], splats: [], parts: [], debris: [], puddles: [], banner: { text: tr("Los geht's!"), t: 0 }, lastNote: null,
     melody: [], stats: {}, rescues: 0, firstDone: false, silentT: 0, sinceHit: 9, frost: 0 });
   ear.lock = null; gun.target = null;
@@ -929,14 +932,14 @@ function nearMiss(m, cents) {
   if (!alive.length) return;
   const exact = alive.find(s => s.midi === m);
   if (exact) {
-    if (Math.abs(cents) > 45) { showHint(tr(`Fast! Dein ${helm(m)} ist etwas zu ${cents > 0 ? 'hoch' : 'tief'}.`)); }
+    if (Math.abs(cents) > 45) { showHint(copy ? copy.tuning(helm(m),cents > 0 ? copy.high : copy.low) : tr(`Fast! Dein ${helm(m)} ist etwas zu ${cents > 0 ? 'hoch' : 'tief'}.`)); }
     return;
   }
   const t = alive.slice().sort((a, b) => Math.abs(a.midi - m) - Math.abs(b.midi - m))[0];
   const d = m - t.midi;
   let msg = null;
-  if (d % 12 === 0) msg = tr(`Richtiger Ton, aber eine Oktave zu ${d > 0 ? 'hoch' : 'tief'}: gesucht ist ${helm(t.midi)}.`);
-  else if (Math.abs(d) <= 2) msg = tr(`Knapp! Du spielst ${helm(m)}, gesucht ist ${helm(t.midi)}.`);
+  if (d % 12 === 0) msg = copy ? copy.octave(helm(t.midi),d > 0 ? copy.high : copy.low) : tr(`Richtiger Ton, aber eine Oktave zu ${d > 0 ? 'hoch' : 'tief'}: gesucht ist ${helm(t.midi)}.`);
+  else if (Math.abs(d) <= 2) msg = copy ? copy.near(helm(m),helm(t.midi)) : tr(`Knapp! Du spielst ${helm(m)}, gesucht ist ${helm(t.midi)}.`);
   if (msg) {
     if (msg !== lastHint || performance.now() - lastHintAt > 2500) statFor(t.midi).near++;
     showHint(msg);
@@ -1193,7 +1196,7 @@ function drawSnowman(sm, t) {
 }
 function drawBubble(sm) {
   const silent = G.silentT > 8;
-  const lines = silent ? [tr('Ich höre dich noch nicht.'), tr('Mikrofon erlaubt? Etwas lauter?')] : [tr(`Spiel mein ${helm(sm.midi)}!`), tr('Ich warte auf dich.')];
+  const lines = silent ? [tr('Ich höre dich noch nicht.'), tr('Mikrofon erlaubt? Etwas lauter?')] : [copy ? copy.play(helm(sm.midi)) : `Spiel mein ${helm(sm.midi)}!`, tr('Ich warte auf dich.')];
   ctx.font = '600 19px Fredoka, sans-serif';
   const w = Math.max(...lines.map(l => ctx.measureText(l).width)) + 28, h = 58;
   const bx = clamp(sm.x + 40 * sm.s, 20 + w / 2, VW - 20 - w / 2), by = sm.y - 375 * sm.s;
@@ -1535,8 +1538,9 @@ function renderWelcome() {
   const list = Object.entries(tricky).map(([m, w]) => [+m, w]).filter(([m, w]) => w >= 1 && pool.includes(m)).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([m]) => helm(m));
   const el = $('welcome');
   if (!name && !list.length) { el.classList.add('hidden'); return; }
-  let html = name ? tr(`Willkommen zurück, <b>${esc(name)}</b>!`) : tr('Schön, dass du wieder da bist!');
-  if (list.length) html += ` <b>${list.join('</b> und <b>')}</b> ${list.length > 1 ? 'kommen' : 'kommt'} heute etwas öfter, ${list.length > 1 ? 'die waren' : 'der war'} letztes Mal knifflig.`;
+  let html = name ? (copy ? copy.welcome(esc(name)) : `Willkommen zurück, <b>${esc(name)}</b>!`) : tr('Schön, dass du wieder da bist!');
+  if (list.length && copy) html += copy.tricky(list.join(', '));
+  else if (list.length) html += ` <b>${list.join('</b> und <b>')}</b> ${list.length > 1 ? 'kommen' : 'kommt'} heute etwas öfter, ${list.length > 1 ? 'die waren' : 'der war'} letztes Mal knifflig.`;
   el.innerHTML = html; el.classList.remove('hidden');
 }
 
@@ -1549,7 +1553,7 @@ function loadHs() {
 function qualifies(score) { const hs = loadHs(); return score > 0 && (hs.length < 10 || score > hs[hs.length - 1].score); }
 function renderHs(el, highlight) {
   const hs = loadHs();
-  if (!hs.length) { el.innerHTML = '<li class="empty" style="list-style:none;margin-left:-26px">Noch keine Einträge. Sei der Erste!</li>'; return; }
+  if (!hs.length) { el.replaceChildren(); const li = document.createElement('li'); li.className = 'empty'; li.textContent = tr('Noch keine Einträge. Sei der Erste!'); el.append(li); return; }
   el.innerHTML = hs.map(h => `<li class="${highlight && h.ts === highlight.ts ? 'me' : ''}"><span class="pts">${h.score.toLocaleString(window.snowtoneLocale)}</span> · ${esc(h.name)} <span class="meta">${esc((INST[h.inst] || {}).name || '')}, ${DIFFN[h.diff] || ''}, Level ${h.level}</span></li>`).join('');
 }
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -1564,6 +1568,13 @@ function summary() {
 const sec = v => v.toFixed(1).replace('.', ',') + ' s';
 function renderPraise() {
   const { fast, tough } = summary(), li = [];
+  if (copy) {
+    if (fast.length) li.push(copy.fast(fast.map(r => `${helm(r.m)} (Ø ${sec(r.avg)})`).join(', ')));
+    if (G.rescues) li.push(copy.rescue(G.rescues));
+    if (tough.length) li.push(copy.tough(tough.map(r => helm(r.m)).join(', ')));
+    if (!li.length) li.push(copy.none);
+    $('praise').innerHTML = li.map(text => '<li>'+text+'</li>').join(''); return;
+  }
   if (fast.length) li.push(`<li>Am schnellsten warst du bei <b>${fast.map(r => `${helm(r.m)}</b> (Ø ${sec(r.avg)})`).join(' und <b>')}.</li>`);
   if (G.rescues) li.push(`<li>Du hast <b>${G.rescues} ${G.rescues === 1 ? 'Schneeball' : 'Schneebälle'}</b> in der Luft verdampft. Starke Reaktion!</li>`);
   if (tough.length) li.push(`<li>Zum Üben fürs nächste Mal: <b>${tough.map(r => helm(r.m)).join('</b> und <b>')}</b>. Die kommen beim nächsten Spiel etwas öfter.</li>`);
@@ -1618,12 +1629,12 @@ function reportText() {
   const lines = [
     tr('Snowtone – Ergebnis'),
     `${name} · ${INST[cfg.inst].name} · ${DIFFN[cfg.diff]}`,
-    tr(`Punkte: ${G.score.toLocaleString(window.snowtoneLocale)} · Level ${G.level} · ${G.melted} Schneemänner geschmolzen`),
+    copy ? copy.points(G.score.toLocaleString(window.snowtoneLocale),G.level,G.melted) : `Punkte: ${G.score.toLocaleString(window.snowtoneLocale)} · Level ${G.level} · ${G.melted} Schneemänner geschmolzen`,
   ];
   if (fast.length) lines.push(tr('Sicher: ') + fast.map(r => `${helm(r.m)} (Ø ${sec(r.avg)})`).join(', '));
   if (tough.length) lines.push(tr('Üben: ') + tough.map(r => `${helm(r.m)} (${r.throws} ${r.throws === 1 ? 'Schneeball' : 'Schneebälle'}, ${r.near}× knapp daneben)`).join(', '));
   if (G.melody.length) lines.push(tr('Melodie: ') + G.melody.slice(-16).map(helm).join(' '));
-  lines.push(tr(`Gespielt am ${d.toLocaleDateString(window.snowtoneLocale)} mit Snowtone`));
+  lines.push(copy ? copy.date(d.toLocaleDateString(window.snowtoneLocale)) : `Gespielt am ${d.toLocaleDateString(window.snowtoneLocale)} mit Snowtone`);
   return lines.join('\n');
 }
 
@@ -1639,7 +1650,7 @@ function gameOver() {
   saveTricky();
   $('finalScore').textContent = G.score.toLocaleString(window.snowtoneLocale);
   $('overTitle').textContent = G.melted >= 10 ? tr('Stark gespielt!') : tr('Eingeschneit!');
-  $('overSub').textContent = `${G.melted} ${G.melted === 1 ? 'Schneemann' : 'Schneemänner'} geschmolzen · Level ${G.level}`;
+  $('overSub').textContent = copy ? copy.over(G.melted,G.level) : `${G.melted} ${G.melted === 1 ? 'Schneemann' : 'Schneemänner'} geschmolzen · Level ${G.level}`;
   const q = qualifies(G.score);
   $('hsEntry').classList.toggle('hidden', !q);
   $('nameIn').value = store.get('snowtone_name', '');
@@ -1652,6 +1663,8 @@ function gameOver() {
   if (q) setTimeout(() => $('nameIn').focus(), 50);
 }
 function saveScore() {
+  if (scoreSubmitted || G.state !== 'over' || !qualifies(G.score)) return;
+  scoreSubmitted = true;
   const name = ($('nameIn').value.trim() || tr('Anonym')).slice(0, 16);
   store.set('snowtone_name', name);
   const entry = { name, score: G.score, inst: cfg.inst, diff: cfg.diff, level: G.level, ts: Date.now() };
@@ -1673,7 +1686,7 @@ function readCfg() {
   cfg.inst = $('inst').value; cfg.diff = $('diff').value; cfg.names = $('names').checked;
   store.set('snowtone_cfg', { inst: cfg.inst, diff: cfg.diff, names: cfg.names, sfx: $('sfx').checked, sens: $('sens').value });
   const pool = INST[cfg.inst].pools[cfg.diff];
-  $('rangeNote').textContent = tr(`Töne ${helm(pool[0])} bis ${helm(pool[pool.length - 1])} (${pool.length} Töne, notiert${curClef() === 'f' ? ', Bassschlüssel' : ''})`);
+  $('rangeNote').textContent = copy ? copy.range(helm(pool[0]),helm(pool[pool.length-1]),pool.length,curClef()==='f') : tr(`Töne ${helm(pool[0])} bis ${helm(pool[pool.length - 1])} (${pool.length} Töne, notiert${curClef() === 'f' ? ', Bassschlüssel' : ''})`);
   renderWelcome();
 }
 (function initCfg() {
