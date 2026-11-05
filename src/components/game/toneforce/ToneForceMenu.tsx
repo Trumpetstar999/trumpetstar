@@ -26,16 +26,14 @@ export function ToneForceMenu({ onBack, initialView = 'menu' }: Props) {
   const [view, setView] = useState<ToneForceView>(initialView);
   const [limitOpen, setLimitOpen] = useState(false);
   const { chord } = useChordSettings();
-  const { canStartGame, recordGameStart } = useDailyUsage();
+  const { canStartGame } = useDailyUsage();
 
   const startGame = async () => {
     if (!canStartGame()) {
       setLimitOpen(true);
       return;
     }
-    const allowed = await recordGameStart();
-    if (allowed) navigate('/app/game/toneforce/play');
-    else setLimitOpen(true);
+    navigate('/app/game/toneforce/play');
   };
 
   const content = () => {

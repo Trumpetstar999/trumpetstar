@@ -2,6 +2,11 @@ import { ExternalMediaGate } from '@/components/legal/ExternalMediaGate';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Play, Pause, Maximize2, Minimize2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { useDailyUsage } from '@/hooks/useDailyUsage';
+import { DailyLimitOverlay } from '@/components/premium/DailyLimitOverlay';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
+import { accessCopy } from '@/i18n/access';
 
 interface SessionVideoPlayerProps {
   vimeoVideoId: string;
@@ -292,5 +297,16 @@ function SessionVideoPlayerContent({ vimeoVideoId, title, onEnded, startFullscre
 }
 
 export function SessionVideoPlayer(props: SessionVideoPlayerProps) {
-  return <ExternalMediaGate><SessionVideoPlayerContent {...props} /></ExternalMediaGate>;
+  const { recordVideoStart } = useDailyUsage();
+  const { language } = useLanguage();
+  const [allowed, setAllowed] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const start = async () => {
+    if (checking) return;
+    setChecking(true);
+    const ok = await recordVideoStart();
+    setAllowed(ok); setLimitOpen(!ok); setChecking(false);
+  };
+  return <><ExternalMediaGate>{allowed ? <SessionVideoPlayerContent {...props} /> : <Button disabled={checking} onClick={start} aria-label={props.title ?? 'Video'}><Play />{props.title}</Button>}</ExternalMediaGate><DailyLimitOverlay open={limitOpen} type="video" onClose={() => setLimitOpen(false)} /></>;
 }
