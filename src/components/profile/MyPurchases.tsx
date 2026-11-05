@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Download, ExternalLink, Loader2, Package, RefreshCw } from 'lucide-react';
+import { ChevronDown, Download, ExternalLink, Loader2, Package, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +16,7 @@ export function MyPurchases() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -34,10 +36,12 @@ export function MyPurchases() {
     return parsed && Number.isFinite(parsed.getTime()) ? parsed.toLocaleDateString(language) : '–';
   };
   return <section aria-label={c.title} className="mt-8 border-t border-ts-ink/15 pt-6 text-ts-ink">
+    <Collapsible open={open} onOpenChange={setOpen}>
     <div className="mb-4 flex items-center justify-between gap-3">
-      <h2 className="flex items-center gap-2 text-xl font-bold"><Package className="h-5 w-5" />{c.title}</h2>
-      <Button variant="ghost" size="icon" aria-label={c.refresh} title={c.refresh} disabled={loading} onClick={() => setRetry(n => n + 1)} className="shrink-0 text-ts-deep hover:bg-ts-card"><RefreshCw className={loading ? 'animate-spin' : ''} /></Button>
+      <h2 className="min-w-0 flex-1"><CollapsibleTrigger asChild><Button variant="ghost" className="w-full justify-between px-0 text-xl font-bold text-ts-ink hover:bg-transparent"><span className="flex items-center gap-2"><Package className="h-5 w-5" />{c.title}</span><ChevronDown className={`h-5 w-5 transition-transform ${open ? 'rotate-180' : ''}`} /></Button></CollapsibleTrigger></h2>
+      {open && <Button variant="ghost" size="icon" aria-label={c.refresh} title={c.refresh} disabled={loading} onClick={() => setRetry(n => n + 1)} className="shrink-0 text-ts-deep hover:bg-ts-card"><RefreshCw className={loading ? 'animate-spin' : ''} /></Button>}
     </div>
+    <CollapsibleContent>
     {loading ? <div className="flex justify-center py-8" role="status"><Loader2 className="h-6 w-6 animate-spin" /></div> : error ? <p role="alert" className="py-4 text-ts-muted">{c.error}</p> : <>
       {result?.source === 'saved' && <p className="mb-3 text-sm text-ts-muted">{c.cached}</p>}
       {!purchases.length ? <p className="py-4 text-ts-muted">{c.empty}</p> : <ul className="divide-y divide-ts-ink/15">
@@ -57,5 +61,7 @@ export function MyPurchases() {
         </li>)}
       </ul>}
     </>}
+    </CollapsibleContent>
+    </Collapsible>
   </section>;
 }
