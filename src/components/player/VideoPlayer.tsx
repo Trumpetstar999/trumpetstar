@@ -400,6 +400,27 @@ function VideoPlayerContent({ video, levelId, levelTitle, onClose, onComplete, h
     onClose();
   }, [onClose, saveProgress]);
 
+  // Browser/device "back" closes the fullscreen video and stays on the current level view
+  const handleCloseRef = useRef(handleClose);
+  handleCloseRef.current = handleClose;
+  useEffect(() => {
+    if (inline) return;
+    const marker = { trumpetstarVideo: Date.now() };
+    window.history.pushState({ ...(window.history.state || {}), ...marker }, '');
+    let closedByPop = false;
+    const onPop = () => {
+      closedByPop = true;
+      handleCloseRef.current();
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      if (!closedByPop && window.history.state?.trumpetstarVideo === marker.trumpetstarVideo) {
+        window.history.back();
+      }
+    };
+  }, [inline]);
+
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
