@@ -7,7 +7,6 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { supabase } from '@/integrations/supabase/client';
 import { HOME_APPS, HomeApp, PROFILE_ROUTE } from '@/config/apps';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
-import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { setZoomOrigin } from './zoomOrigin';
 import { LoginSheet } from './LoginSheet';
 import { LanguageSheet, HOME_LANGUAGES } from './LanguageSheet';
@@ -186,7 +185,6 @@ export function HomeScreen({ lockedNext = null }: HomeScreenProps) {
       {user && (
         <>
           <LanguageSelectionDialog open={!languageLoading && !hasCompletedLanguageSetup} />
-          <WelcomeSlideshow open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome} onComplete={completeWelcome} />
         </>
       )}
     </div>
