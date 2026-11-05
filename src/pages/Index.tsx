@@ -9,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { TabNavigationProvider } from '@/hooks/useTabNavigation';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
-import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { cn } from '@/lib/utils';
 
 // Lazy-loaded tab pages — only the active tab's bundle is fetched
@@ -187,11 +186,6 @@ const Index = () => {
         open={!languageLoading && !hasCompletedLanguageSetup} 
       />
 
-      {/* Welcome Slideshow after onboarding is complete */}
-      <WelcomeSlideshow
-        open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
-        onComplete={completeWelcome}
-      />
     </>
   );
 };

@@ -11,7 +11,6 @@ import { Monitor, Copy, Send, Info, Check, Loader2, Headphones, ChevronDown, Che
 import { toast } from 'sonner';
 import { PLAN_DISPLAY_NAMES } from '@/types/plans';
 import { LanguageSelectionDialog } from '@/components/onboarding/LanguageSelectionDialog';
-import { WelcomeSlideshow } from '@/components/onboarding/WelcomeSlideshow';
 import { MobileAudioPlayer } from '@/components/audio/MobileAudioPlayer';
 import { MobileVideoPlayer } from '@/components/levels/MobileVideoPlayer';
 import { TunerPopup } from '@/components/tuner/TunerPopup';
@@ -393,10 +392,6 @@ export default function MobileHomePage() {
 
       <TunerPopup isOpen={tunerOpen} onClose={() => setTunerOpen(false)} />
       <LanguageSelectionDialog open={!languageLoading && !hasCompletedLanguageSetup} />
-      <WelcomeSlideshow
-        open={!languageLoading && hasCompletedLanguageSetup && !hasSeenWelcome}
-        onComplete={completeWelcome}
-      />
     </>
   );
 }
