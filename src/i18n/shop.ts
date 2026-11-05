@@ -1,5 +1,12 @@
 import type { Language } from '@/hooks/useLanguage';
 
+export const adminShopCopy = {
+  de: { title: 'Shop-Produkte', visible: 'Sichtbar', hidden: 'Ausgeblendet', hide: 'Produkt ausblenden', show: 'Produkt einblenden', savedHidden: 'Produkt ausgeblendet', savedVisible: 'Produkt eingeblendet', error: 'Änderung konnte nicht gespeichert werden.', loadError: 'Produkte konnten nicht geladen werden.', price: 'Preis', position: 'Reihenfolge', new: 'NEU', cover: 'Cover' },
+  en: { title: 'Shop products', visible: 'Visible', hidden: 'Hidden', hide: 'Hide product', show: 'Show product', savedHidden: 'Product hidden', savedVisible: 'Product visible', error: 'Could not save the change.', loadError: 'Could not load products.', price: 'Price', position: 'Order', new: 'NEW', cover: 'Cover' },
+  es: { title: 'Productos de la tienda', visible: 'Visible', hidden: 'Oculto', hide: 'Ocultar producto', show: 'Mostrar producto', savedHidden: 'Producto oculto', savedVisible: 'Producto visible', error: 'No se pudo guardar el cambio.', loadError: 'No se pudieron cargar los productos.', price: 'Precio', position: 'Orden', new: 'NUEVO', cover: 'Portada' },
+  sl: { title: 'Izdelki trgovine', visible: 'Vidno', hidden: 'Skrito', hide: 'Skrij izdelek', show: 'Prikaži izdelek', savedHidden: 'Izdelek je skrit', savedVisible: 'Izdelek je viden', error: 'Spremembe ni bilo mogoče shraniti.', loadError: 'Izdelkov ni bilo mogoče naložiti.', price: 'Cena', position: 'Vrstni red', new: 'NOVO', cover: 'Naslovnica' },
+} satisfies Record<Language, Record<string, string>>;
+
 type ShopCopy = {
   pricing: string; search: string; sort: string; results: string; none: string;
   cats: Record<'all' | 'membership' | 'courses' | 'books' | 'christmas', string>;

@@ -5,9 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Trash2, Upload } from 'lucide-react';
+import { Eye, EyeOff, Trash2, Upload } from 'lucide-react';
 import type { AppUpdate } from '@/lib/news';
 import { sortShopProducts, type ShopProduct } from '@/lib/shop';
+import { useLanguage } from '@/hooks/useLanguage';
+import { adminShopCopy } from '@/i18n/shop';
 
 const LANGS = ['de', 'en', 'es', 'sl'] as const;
 const empty = () => ({ title: { de: '', en: '', es: '', sl: '' } as Record<string, string>, body: { de: '', en: '', es: '', sl: '' } as Record<string, string>, link: '' });
@@ -70,10 +72,14 @@ function UpdatesSection() {
   );
 }
 
-function ShopSection() {
+export function ShopSection() {
+  const { language } = useLanguage();
+  const copy = adminShopCopy[language];
   const [items, setItems] = useState<ShopProduct[]>([]);
+  const [saving, setSaving] = useState<Set<string>>(new Set());
   const load = async () => {
-    const { data } = await supabase.from('shop_products').select('*');
+    const { data, error } = await supabase.from('shop_products').select('*');
+    if (error) { toast.error(copy.loadError); return; }
     setItems(sortShopProducts((data as ShopProduct[]) ?? []));
   };
   useEffect(() => { load(); }, []);
@@ -81,6 +87,22 @@ function ShopSection() {
   const patch = async (id: string, values: Partial<ShopProduct>) => {
     const { error } = await supabase.from('shop_products').update(values).eq('id', id);
     if (error) toast.error(error.message); else load();
+  };
+
+  const setVisibility = async (id: string, visible: boolean) => {
+    if (saving.has(id)) return;
+    setSaving((previous) => new Set(previous).add(id));
+    try {
+      const { data, error } = await supabase.from('shop_products')
+        .update({ visible }).eq('id', id).select('id, visible').single();
+      if (error || !data || data.visible !== visible) throw new Error(copy.error);
+      setItems((previous) => previous.map((product) => product.id === id ? { ...product, visible: data.visible } : product));
+      toast.success(visible ? copy.savedVisible : copy.savedHidden);
+    } catch {
+      toast.error(copy.error);
+    } finally {
+      setSaving((previous) => { const next = new Set(previous); next.delete(id); return next; });
+    }
   };
 
   const upload = async (id: string, file: File) => {
@@ -93,8 +115,7 @@ function ShopSection() {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-xl font-bold">Shop-Produkte (Karussell & /shop)</h2>
-      <p className="text-sm opacity-70">Produkte werden stündlich aus Digistore24 ergänzt. Neue Produkte sind zunächst ausgeblendet. Reihenfolge: kleinere Zahl zuerst, sonst neueste zuerst.</p>
+      <h2 className="text-xl font-bold">{copy.title}</h2>
       <div className="space-y-2">
         {items.map((p) => (
           <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
@@ -103,12 +124,16 @@ function ShopSection() {
               <p className="font-medium">{p.name}</p>
               <p className="text-xs opacity-70">#{p.id} · {new Date(p.created_at).toLocaleDateString('de')}</p>
             </div>
-            <Input className="w-24" type="number" step="0.01" placeholder="Preis" defaultValue={p.price ?? ''} onBlur={(e) => patch(p.id, { price: e.target.value === '' ? null : Number(e.target.value) })} />
-            <Input className="w-20" type="number" placeholder="Pos." defaultValue={p.sort_override ?? ''} onBlur={(e) => patch(p.id, { sort_override: e.target.value === '' ? null : Number(e.target.value) })} />
-            <label className="flex items-center gap-1 text-sm">NEU <Switch checked={p.is_new} onCheckedChange={(v) => patch(p.id, { is_new: v })} /></label>
-            <label className="flex items-center gap-1 text-sm">Sichtbar <Switch checked={p.visible} onCheckedChange={(v) => patch(p.id, { visible: v })} /></label>
+            <Input className="w-24" type="number" step="0.01" placeholder={copy.price} aria-label={`${copy.price}: ${p.name}`} defaultValue={p.price ?? ''} onBlur={(e) => patch(p.id, { price: e.target.value === '' ? null : Number(e.target.value) })} />
+            <Input className="w-20" type="number" placeholder={copy.position} aria-label={`${copy.position}: ${p.name}`} defaultValue={p.sort_override ?? ''} onBlur={(e) => patch(p.id, { sort_override: e.target.value === '' ? null : Number(e.target.value) })} />
+            <label className="flex items-center gap-1 text-sm">{copy.new} <Switch checked={p.is_new} onCheckedChange={(v) => patch(p.id, { is_new: v })} /></label>
+            <label className="flex min-w-40 items-center gap-2 text-sm">
+              {p.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              <span className="flex-1">{p.visible ? copy.visible : copy.hidden}</span>
+              <Switch checked={p.visible} disabled={saving.has(p.id)} aria-label={`${p.visible ? copy.hide : copy.show}: ${p.name}`} onCheckedChange={(v) => void setVisibility(p.id, v)} />
+            </label>
             <label className="inline-flex items-center gap-1 text-sm cursor-pointer border rounded px-2 py-1">
-              <Upload className="w-4 h-4" /> Cover
+              <Upload className="w-4 h-4" /> {copy.cover}
               <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(p.id, e.target.files[0])} />
             </label>
           </div>
