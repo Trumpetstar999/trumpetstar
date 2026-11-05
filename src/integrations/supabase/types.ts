@@ -4281,9 +4281,21 @@ export type Database = {
       feedback_access_allowed: { Args: never; Returns: boolean }
       feedback_inbox: { Args: never; Returns: Json }
       feedback_pair_allowed: { Args: { p_chat: string }; Returns: boolean }
+      feedback_send_video: {
+        Args: { p_content?: string; p_path: string; p_student: string }
+        Returns: Json
+      }
       feedback_thread: {
         Args: { p_before?: string; p_content?: string; p_student: string }
         Returns: Json
+      }
+      feedback_video_read_allowed: {
+        Args: { p_path: string }
+        Returns: boolean
+      }
+      feedback_video_upload_allowed: {
+        Args: { p_path: string }
+        Returns: boolean
       }
       finalize_invoice: { Args: { p_invoice_id: string }; Returns: undefined }
       get_friends_star_ranking: {
