@@ -26,7 +26,7 @@ it.each(['/admin', '/admin/users', '/app/legacy', '/games', '/app/game/play', '/
   await waitFor(() => expect(currentPath).toBe(path));
 });
 
-it.each([['/mobile/home', '/'], ['/mobile/plan', '/pricing'], ['/mobile/profile', '/profile'], ['/mobile/help', '/help'], ['/mobile/locked', '/']])('replaces old link %s with %s', async (oldPath, destination) => {
+it.each([['/mobile/home', '/'], ['/mobile/plan', '/pricing'], ['/mobile/profile', '/profil'], ['/mobile/help', '/hilfe'], ['/mobile/locked', '/']])('replaces old link %s with %s', async (oldPath, destination) => {
   let currentPath = '';
   function Capture() { currentPath = useLocation().pathname; return null; }
   render(<MemoryRouter initialEntries={[oldPath]}><MobileRouteGuard><Capture /></MobileRouteGuard></MemoryRouter>);
