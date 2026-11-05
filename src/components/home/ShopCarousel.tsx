@@ -7,6 +7,7 @@ import { formatPrice, isNewProduct, shopCheckoutUrl, ShopProduct } from '@/lib/s
 import { Button } from '@/components/ui/button';
 import { PLAN_INFO } from '@/types/plans';
 import { ShopPurchaseDialog } from './ShopPurchaseDialog';
+import { shopCopy } from '@/i18n/shop';
 
 export function ShopProductCard({ p, className = '', compact = false }: { p: ShopProduct; className?: string; compact?: boolean }) {
   const { t, language } = useLanguage();
@@ -53,7 +54,7 @@ export function ShopProductCard({ p, className = '', compact = false }: { p: Sho
 }
 
 export function ShopCarousel() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { products } = useShopProducts();
   const reduced = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
@@ -93,6 +94,7 @@ export function ShopCarousel() {
       <div className="flex justify-center gap-1.5 mt-3" aria-hidden>
         {products.map((p, i) => <span key={p.id} className={`h-1.5 rounded-full transition-all ${i === index ? 'w-4 bg-ts-deep' : 'w-1.5 bg-ts-muted/40'}`} />)}
       </div>
+      <Button asChild variant="link" className="mt-2 text-ts-deep"><Link to="/pricing">{shopCopy[language].pricing}</Link></Button>
     </section>
   );
 }
