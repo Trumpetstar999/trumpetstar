@@ -1,0 +1,11 @@
+GRANT SELECT ON public.audio_levels, public.audio_files, public.audio_level_items TO anon, authenticated;
+REVOKE INSERT, UPDATE, DELETE ON public.audio_levels, public.audio_files, public.audio_level_items FROM anon;
+ALTER TABLE public.audio_levels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audio_files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audio_level_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Signed-in users can read audio levels" ON public.audio_levels;
+DROP POLICY IF EXISTS "Signed-in users can read audio metadata" ON public.audio_files;
+DROP POLICY IF EXISTS "Signed-in users can read audio level items" ON public.audio_level_items;
+CREATE POLICY "Anyone can read audio levels" ON public.audio_levels FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Anyone can read audio metadata" ON public.audio_files FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Anyone can read audio level items" ON public.audio_level_items FOR SELECT TO anon, authenticated USING (true);
