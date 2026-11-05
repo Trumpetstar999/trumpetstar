@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, Settings2, ChevronDown, ChevronUp, RotateCcw, Check, Music2 } from 'lucide-react';
+import { Loader2, SkipBack, SkipForward, Play, Pause, Square, Search, X, Settings2, ChevronDown, ChevronUp, RotateCcw, Check, Music2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { formatTime } from '@/lib/formatTime';
@@ -29,7 +29,6 @@ export function AudioPlayer() {
   const [isLoadingTracks, setIsLoadingTracks] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showLoop, setShowLoop] = useState(false);
 
@@ -43,20 +42,30 @@ export function AudioPlayer() {
 
   // Search
   useEffect(() => {
-    if (!searchQuery.trim()) { setSearchResults([]); return; }
+    let cancelled = false;
+    const query = searchQuery.trim();
+    if (!query) { setSearchResults([]); setIsSearching(false); return; }
+    setIsSearching(true);
     const searchSongs = async () => {
-      setIsSearching(true);
-      const { data } = await supabase
+      const results: Track[] = [];
+      const pageSize = 1000;
+      for (let offset = 0; ; offset += pageSize) {
+        const { data, error } = await supabase
         .from('audio_files')
         .select('id, display_name, storage_url, duration_seconds')
-        .ilike('display_name', `%${searchQuery}%`)
+        .ilike('display_name', `%${query.replace(/[\\%_]/g, '\\$&')}%`)
         .order('display_name', { ascending: true })
-        .limit(50);
-      setSearchResults(data || []);
-      setIsSearching(false);
+        .order('id', { ascending: true })
+        .range(offset, offset + pageSize - 1);
+        if (cancelled) return;
+        if (error) break;
+        results.push(...(data || []));
+        if (!data || data.length < pageSize) break;
+      }
+      if (!cancelled) { setSearchResults(results); setIsSearching(false); }
     };
     const id = setTimeout(searchSongs, 300);
-    return () => clearTimeout(id);
+    return () => { cancelled = true; clearTimeout(id); };
   }, [searchQuery]);
 
   // Load levels
@@ -98,8 +107,8 @@ export function AudioPlayer() {
 
   const currentTrackIndex = useMemo(() => {
     if (!player.currentTrack) return -1;
-    return tracks.findIndex((t) => t.id === player.currentTrack?.id);
-  }, [tracks, player.currentTrack]);
+    return displayTracks.findIndex((t) => t.id === player.currentTrack?.id);
+  }, [displayTracks, player.currentTrack]);
 
   const loopStartPercent = player.duration > 0 ? (player.loop.start / player.duration) * 100 : 0;
   const loopEndPercent = player.duration > 0 ? (player.loop.end / player.duration) * 100 : 100;
@@ -107,7 +116,13 @@ export function AudioPlayer() {
   const selectedLevel = levels.find(l => l.id === selectedLevelId);
 
   return (
-    <div className="ts-light-module ts-audio-player flex h-full min-h-0 flex-col md:flex-row overflow-hidden">
+    <div className="ts-light-module ts-audio-player flex h-full min-h-0 flex-col overflow-hidden">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card shrink-0">
+        <Search className="h-5 w-5 text-muted-foreground shrink-0" aria-hidden="true" />
+        <Input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} aria-label={t('common.search')} placeholder={copy.searchPlaceholder} className="bg-card flex-1 min-w-0" />
+        {searchQuery && <Button variant="ghost" size="icon" aria-label={t('common.clear')} title={t('common.clear')} onClick={() => setSearchQuery('')}><X className="h-4 w-4" /></Button>}
+      </div>
+      <div className="flex flex-1 min-h-0 flex-col md:flex-row overflow-hidden">
       <aside className="shrink-0 border-b md:border-b-0 md:border-r border-border bg-card md:w-56 md:flex md:flex-col md:min-h-0">
         <div className="flex items-center gap-2 px-4 pt-4 pb-2 text-muted-foreground">
           <Music2 className="w-4 h-4 text-primary" /><h2 className="text-sm font-bold uppercase">{t('levels.title')}</h2>
@@ -125,15 +140,12 @@ export function AudioPlayer() {
       <div className="flex flex-1 flex-col min-w-0 min-h-0 overflow-hidden">
         <div className="flex items-center gap-2 px-4 pt-4 pb-3 shrink-0">
           <div className="flex-1 min-w-0">
-            <h2 className="font-semibold text-base break-words">{selectedLevel?.name ?? copy.chooseLevel}</h2>
+            <h2 className="font-semibold text-base break-words">{isSearchMode ? t('common.search') : selectedLevel?.name ?? copy.chooseLevel}</h2>
             {!isSearchMode && <p className="text-sm text-muted-foreground">{tracks.length} {copy.tracks}</p>}
           </div>
-          <Button variant="secondary" size="icon" aria-label={t('common.search')} title={t('common.search')} aria-pressed={showSearch}
-            onClick={() => { setShowSearch(!showSearch); setShowSettings(false); }}><Search /></Button>
           <Button variant="secondary" size="icon" aria-label={copy.settings} title={copy.settings} aria-pressed={showSettings}
-            onClick={() => { setShowSettings(!showSettings); setShowSearch(false); }}><Settings2 /></Button>
+            onClick={() => setShowSettings(!showSettings)}><Settings2 /></Button>
         </div>
-        {showSearch && <div className="px-4 pb-2 shrink-0"><Input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} aria-label={t('common.search')} placeholder={copy.searchPlaceholder} className="bg-card" /></div>}
         {showSettings && <section className="mx-4 mb-2 border-b border-border pb-3 shrink-0">
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">{copy.transposition}</h3>
           <div className="flex flex-wrap gap-1.5">{TRANSPOSITION_OPTIONS.map(opt => (
@@ -173,10 +185,10 @@ export function AudioPlayer() {
             <div className="flex justify-between text-sm text-muted-foreground tabular-nums"><span>{formatTime(player.currentTime)}</span><span>{formatTime(player.duration)}</span></div>
           </div>
           <div className="flex items-center justify-center gap-3 md:gap-5">
-            <Button variant="secondary" size="icon" title={copy.previous} aria-label={copy.previous} disabled={currentTrackIndex <= 0} onClick={() => currentTrackIndex > 0 && player.loadTrack(tracks[currentTrackIndex - 1])} className="rounded-full"><SkipBack /></Button>
+            <Button variant="secondary" size="icon" title={copy.previous} aria-label={copy.previous} disabled={currentTrackIndex <= 0} onClick={() => currentTrackIndex > 0 && player.loadTrack(displayTracks[currentTrackIndex - 1])} className="rounded-full"><SkipBack /></Button>
             <Button variant="secondary" size="icon" title={t('player.stop')} aria-label={t('player.stop')} disabled={!player.currentTrack} onClick={player.stop} className="rounded-full"><Square /></Button>
             <Button size="icon" title={t(player.isPlaying ? 'player.pause' : 'player.play')} aria-label={t(player.isPlaying ? 'player.pause' : 'player.play')} disabled={!player.currentTrack || player.isLoading} onClick={player.togglePlay} className="w-14 h-14 rounded-full bg-gold hover:bg-gold/90 text-gold-foreground shadow-sm [&_svg]:size-6">{player.isPlaying ? <Pause /> : <Play />}</Button>
-            <Button variant="secondary" size="icon" title={copy.next} aria-label={copy.next} disabled={currentTrackIndex < 0 || currentTrackIndex >= tracks.length - 1} onClick={() => currentTrackIndex >= 0 && currentTrackIndex < tracks.length - 1 && player.loadTrack(tracks[currentTrackIndex + 1])} className="rounded-full"><SkipForward /></Button>
+            <Button variant="secondary" size="icon" title={copy.next} aria-label={copy.next} disabled={currentTrackIndex < 0 || currentTrackIndex >= displayTracks.length - 1} onClick={() => currentTrackIndex >= 0 && currentTrackIndex < displayTracks.length - 1 && player.loadTrack(displayTracks[currentTrackIndex + 1])} className="rounded-full"><SkipForward /></Button>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex-1 space-y-2"><div className="flex justify-between text-sm"><span className="text-muted-foreground">{t('player.tempo')}</span><span className="font-bold text-primary tabular-nums">{player.tempo}%</span></div>
@@ -195,6 +207,7 @@ export function AudioPlayer() {
             </div>
           </div>}
         </section>
+      </div>
       </div>
     </div>
   );
