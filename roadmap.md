@@ -1,4 +1,5 @@
 # Tasks
+- [ ] Integrate uploaded Snowtone under Games, preserve original winter gameplay, local progress and instrument modes; add four languages, shared per-start quota, mobile microphone fallback and teardown; verify signed-in desktop/mobile flow and regression tests.
 - [x] Move audio title search above all level browsing on desktop/mobile, remove 50-result truncation and ignore stale responses. Regression test confirms 61 cross-level results, track selection and clearing; live guest search finds six Happy titles across the library, desktop/390px screenshots verified without overflow; build OK.
 - [x] Add private videos to teacher Feedback with optional captions, localized selection/removal, on-demand authenticated Blob playback and assignment/PRO-bound idempotent persistence. Private 50 MB bucket and policies applied and verified; 19 tests pass, including live anonymous upload/RPC denial; build OK.
 - [ ] Verify actual Feedback video upload/send/read in an authorized PRO/admin session: preview is signed out and self-session mint has no matching account; requires preview sign-in. No real video messages were sent.

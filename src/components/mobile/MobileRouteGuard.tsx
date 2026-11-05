@@ -20,6 +20,7 @@ const MOBILE_ALLOWED_PREFIXES = [
   '/mobile/profile',
   '/mobile/locked',
   '/pricing',
+  '/snowtone',
   '/qr/',
 ];
 
