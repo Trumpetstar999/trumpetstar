@@ -1,4 +1,5 @@
 import { useRef, useCallback, useState } from 'react';
+import { createDrumLoop } from '@/lib/drum-loop';
 
 interface DrumBeat {
   id: string;
@@ -9,7 +10,7 @@ interface DrumBeat {
 
 export function useDrumMachineEngine() {
   const ctxRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const sourceRef = useRef<ReturnType<typeof createDrumLoop> | null>(null);
   const gainRef = useRef<GainNode | null>(null);
   const bufferCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
   const currentBeatIdRef = useRef<string | null>(null);
@@ -47,16 +48,8 @@ export function useDrumMachineEngine() {
     gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.1);
     gain.connect(ctx.destination);
 
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-    
-    if (nativeBpm && nativeBpm > 0) {
-      source.playbackRate.value = bpm / nativeBpm;
-    }
-    
+    const source = createDrumLoop(ctx, buffer, bpm, nativeBpm);
     source.connect(gain);
-    source.start(0);
 
     sourceRef.current = source;
     gainRef.current = gain;
@@ -123,14 +116,8 @@ export function useDrumMachineEngine() {
       newGain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.2);
       newGain.connect(ctx.destination);
 
-      const newSource = ctx.createBufferSource();
-      newSource.buffer = buffer;
-      newSource.loop = true;
-      if (beat.native_bpm && beat.native_bpm > 0) {
-        newSource.playbackRate.value = bpm / beat.native_bpm;
-      }
+      const newSource = createDrumLoop(ctx, buffer, bpm, beat.native_bpm);
       newSource.connect(newGain);
-      newSource.start(0);
 
       // Fade out old
       if (oldGain && ctx) {
@@ -152,8 +139,7 @@ export function useDrumMachineEngine() {
 
   const updateBpm = useCallback((bpm: number, nativeBpm: number | null) => {
     if (sourceRef.current && ctxRef.current && nativeBpm && nativeBpm > 0) {
-      const newRate = bpm / nativeBpm;
-      sourceRef.current.playbackRate.linearRampToValueAtTime(newRate, ctxRef.current.currentTime + 0.05);
+      sourceRef.current.updateBpm(bpm, nativeBpm);
     }
   }, []);
 
