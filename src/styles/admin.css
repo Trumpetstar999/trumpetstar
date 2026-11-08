@@ -181,7 +181,7 @@
 .admin-card {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 12px;
+  border-radius: 8px;
   box-shadow: var(--admin-shadow-sm);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -465,4 +465,37 @@
   .admin-grid-stats {
     grid-template-columns: repeat(4, 1fr);
   }
+}
+
+/* Shared desktop and mobile administration chrome. */
+.admin-sidebar { background: var(--admin-sidebar-bg); color: var(--admin-sidebar-text-active); }
+.admin-sidebar-brand { border-bottom: 1px solid var(--admin-sidebar-border); }
+.admin-sidebar-muted { color: var(--admin-sidebar-text) !important; }
+.admin-sidebar .admin-nav-item { color: var(--admin-sidebar-text); border-radius: 6px; font-weight: 500; }
+.admin-sidebar .admin-nav-item:hover { background: var(--admin-sidebar-hover); color: var(--admin-sidebar-text-active); }
+.admin-sidebar .admin-nav-active { background: var(--admin-sidebar-active); color: var(--admin-sidebar-text-active); box-shadow: inset 3px 0 var(--admin-accent); }
+.admin-sidebar .admin-nav-badge { background: var(--admin-error); color: var(--admin-sidebar-text-active); }
+.admin-mobile-menu { height: 100dvh; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: var(--admin-sidebar-bg) !important; }
+.admin-mobile-menu > button { color: var(--admin-sidebar-text-active); }
+.admin-page-header { padding-top: env(safe-area-inset-top); }
+.admin-main { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+.admin-dashboard { letter-spacing: 0; }
+.admin-dashboard .admin-card { box-shadow: var(--admin-shadow-sm); }
+.admin-kpi { border-top-width: 3px; }
+.admin-tone-accent { border-top-color: var(--admin-accent); }
+.admin-tone-success { border-top-color: var(--admin-success); }
+.admin-tone-warning { border-top-color: var(--admin-warning); }
+.admin-tone-accent .admin-tone-icon { color: var(--admin-accent); }
+.admin-tone-success .admin-tone-icon { color: var(--admin-success); }
+.admin-tone-warning .admin-tone-icon { color: var(--admin-warning); }
+.admin-legend-accent::before, .admin-legend-success::before, .admin-plan-0::before, .admin-plan-1::before, .admin-plan-2::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--admin-accent); }
+.admin-legend-success::before { background: var(--admin-success); }
+.admin-plan-0::before { background: var(--admin-text-muted); }
+.admin-plan-1::before { background: var(--admin-warning); }
+@media (max-width: 1023px) {
+  .admin-main .admin-tabs { display: flex; max-width: 100%; overflow-x: auto; }
+  .admin-main .admin-tab { flex-shrink: 0; }
+  .admin-main .admin-card { min-width: 0; }
+  .admin-main table { white-space: nowrap; }
+  .admin-main [class*="overflow-x-auto"] { max-width: 100%; }
 }

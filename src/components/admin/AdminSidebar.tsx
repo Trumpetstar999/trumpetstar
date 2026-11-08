@@ -29,9 +29,13 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
+import { adminDashboardCopy, adminMenuCopy } from '@/i18n/admin-dashboard';
 import trumpetstarLogo from '@/assets/trumpetstar-logo.png';
 
 interface AdminSidebarProps {
+  mobile?: boolean;
   activeTab: string;
   onTabChange: (tab: string) => void;
 }
@@ -64,148 +68,32 @@ const menuItems = [
   { id: 'system', label: 'Einstellungen', icon: Settings },
 ];
 
-export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, mobile = false }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const { language } = useLanguage();
+  const t = adminDashboardCopy[language];
   const [unreadEmails, setUnreadEmails] = useState(0);
   const [pendingShipments, setPendingShipments] = useState(0);
-
   useEffect(() => {
+    let live = true;
     async function fetchCounts() {
-      const [emailRes, shipRes] = await Promise.all([
+      const [email, shipping] = await Promise.all([
         supabase.from('mailbox_emails').select('id', { count: 'exact', head: true }).eq('is_read', false).eq('folder', 'inbox'),
         supabase.from('digistore24_shipments').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
       ]);
-      setUnreadEmails(emailRes.count ?? 0);
-      setPendingShipments(shipRes.count ?? 0);
+      if (!live) return;
+      if (!email.error) setUnreadEmails(email.count ?? 0);
+      if (!shipping.error) setPendingShipments(shipping.count ?? 0);
     }
     fetchCounts();
-
-    const channel = supabase.channel('sidebar_counts')
-      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'mailbox_emails' }, fetchCounts)
-      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'digistore24_shipments' }, fetchCounts)
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    const interval = window.setInterval(fetchCounts, 60000);
+    return () => { live = false; window.clearInterval(interval); };
   }, []);
-
-  const badges: Record<string, number> = {
-    mailbox: unreadEmails,
-    shipping: pendingShipments,
-  };
-
-  return (
-    <aside 
-      className={cn(
-        "h-screen sticky top-0 flex flex-col transition-all duration-300 ease-out",
-        collapsed ? "w-[72px]" : "w-64"
-      )}
-      style={{
-        background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)',
-      }}
-    >
-      {/* Logo & Brand */}
-      <div className={cn(
-        "flex items-center gap-3 border-b border-white/[0.08] transition-all duration-300",
-        collapsed ? "h-16 px-4 justify-center" : "h-16 px-5"
-      )}>
-        <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
-          <img 
-            src={trumpetstarLogo} 
-            alt="Trumpetstar" 
-            className="w-7 h-7 object-contain"
-          />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col">
-            <span className="text-white font-semibold text-sm tracking-tight">
-              Trumpetstar
-            </span>
-            <span className="text-white/40 text-[10px] font-medium uppercase tracking-wider">
-              Admin
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
-              className={cn(
-                "w-full flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 relative group",
-                collapsed ? "px-3 py-3 justify-center" : "px-3 py-2.5",
-                isActive 
-                  ? "bg-blue-500/15 text-white" 
-                  : "text-white/60 hover:bg-white/[0.06] hover:text-white/90"
-              )}
-            >
-              {/* Active indicator */}
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-blue-500 rounded-r-full" />
-              )}
-              
-              <Icon className={cn(
-                "w-5 h-5 flex-shrink-0 transition-colors",
-                isActive ? "text-blue-400" : "text-white/50 group-hover:text-white/70"
-              )} />
-              
-              {!collapsed && (
-                <>
-                  <span className="truncate flex-1">{item.label}</span>
-                  {badges[item.id] > 0 && (
-                    <span className="ml-auto text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none flex-shrink-0">
-                      {badges[item.id]}
-                    </span>
-                  )}
-                </>
-              )}
-              
-              {/* Tooltip for collapsed state */}
-              {collapsed && (
-                <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-lg">
-                  {item.label}
-                  {badges[item.id] > 0 && (
-                    <span className="ml-1.5 text-[10px] font-bold bg-red-500 text-white px-1 py-0.5 rounded-full">
-                      {badges[item.id]}
-                    </span>
-                  )}
-                </div>
-              )}
-              
-              {/* Collapsed badge dot */}
-              {collapsed && badges[item.id] > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-              )}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Collapse Toggle */}
-      <div className="p-3 border-t border-white/[0.08]">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn(
-            "w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all",
-            collapsed && "justify-center"
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <>
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-xs font-medium">Einklappen</span>
-            </>
-          )}
-        </button>
-      </div>
-    </aside>
-  );
+  const compact = collapsed && !mobile;
+  const badges: Record<string, number> = { mailbox: unreadEmails, shipping: pendingShipments };
+  return <aside className={cn('admin-sidebar flex flex-col shrink-0', mobile ? 'h-full w-full' : 'h-dvh sticky top-0', compact ? 'w-[72px]' : 'w-64')}>
+    <div className="flex items-center gap-3 h-16 px-5 shrink-0 admin-sidebar-brand"><img src={trumpetstarLogo} alt="Trumpetstar" className="w-8 h-8 object-contain"/>{!compact && <div><p className="font-semibold text-sm">Trumpetstar</p><p className="text-xs admin-sidebar-muted">Admin</p></div>}</div>
+    <nav aria-label="Admin" className="flex-1 min-h-0 overflow-y-auto py-4 px-3 space-y-1">{menuItems.map((item,i) => { const Icon = item.icon; const label = adminMenuCopy[language][i]; return <Button variant="ghost" key={item.id} title={compact ? label : undefined} aria-current={activeTab === item.id ? 'page' : undefined} onClick={() => onTabChange(item.id)} className={cn('admin-nav-item w-full h-auto min-h-11 justify-start gap-3 text-left', activeTab === item.id && 'admin-nav-active',compact && 'justify-center px-2')}><Icon className="w-5 h-5 shrink-0"/>{!compact && <><span className="flex-1 min-w-0 truncate">{label}</span>{badges[item.id] > 0 && <span className="admin-nav-badge text-xs px-1.5 rounded-full">{badges[item.id]}</span>}</>}</Button>; })}</nav>
+    {!mobile && <div className="p-3 admin-sidebar-brand"><Button variant="ghost" className="admin-nav-item w-full" title={compact ? t.expand : t.collapse} onClick={() => setCollapsed(v => !v)}>{compact ? <ChevronRight className="w-4 h-4"/> : <><ChevronLeft className="w-4 h-4 mr-2"/>{t.collapse}</>}</Button></div>}
+  </aside>;
 }
