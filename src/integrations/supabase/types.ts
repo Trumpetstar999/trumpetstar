@@ -2008,6 +2008,24 @@ export type Database = {
         }
         Relationships: []
       }
+      landing_page_view_counts: {
+        Row: {
+          created_at: string
+          views: number
+          visited_at: string
+        }
+        Insert: {
+          created_at?: string
+          views?: number
+          visited_at: string
+        }
+        Update: {
+          created_at?: string
+          views?: number
+          visited_at?: string
+        }
+        Relationships: []
+      }
       landing_page_views: {
         Row: {
           id: string
@@ -4275,6 +4293,7 @@ export type Database = {
       admin_dashboard_snapshot: { Args: { p_days?: number }; Returns: Json }
       can_access_plan: { Args: { _plan: string }; Returns: boolean }
       can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
+      capture_landing_view: { Args: never; Returns: undefined }
       consume_welcome_reminder_token: {
         Args: { p_token: string }
         Returns: boolean
