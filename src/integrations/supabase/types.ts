@@ -4272,6 +4272,7 @@ export type Database = {
         Args: { p_product_id: string; p_quantity: number; p_reason?: string }
         Returns: undefined
       }
+      admin_dashboard_snapshot: { Args: { p_days?: number }; Returns: Json }
       can_access_plan: { Args: { _plan: string }; Returns: boolean }
       can_view_chat_recording: { Args: { file_path: string }; Returns: boolean }
       consume_welcome_reminder_token: {
