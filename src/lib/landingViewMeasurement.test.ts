@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { landingViewMeasurement } from './landingViewMeasurement';
+import { isMeasuredLandingPath, landingViewMeasurement } from './landingViewMeasurement';
 
-describe('disabled landing-page measurement', () => {
-  it('reports unavailable totals rather than zero visitors when capture is disabled', () => {
-    expect(landingViewMeasurement.status).toBe('disabled');
-    expect(landingViewMeasurement.currentTotals).toBeNull();
+describe('live landing-page measurement', () => {
+  it('enables capture and refreshes every fifteen seconds', () => {
+    expect(landingViewMeasurement.status).toBe('active');
+    expect(landingViewMeasurement.refreshInterval).toBe(15000);
+  });
+  it('counts only the marketing landing page, not home or app traffic', () => {
+    expect(isMeasuredLandingPath('/trompete-lernen-app')).toBe(true);
+    for (const path of ['/', '/app', '/app/admin', '/pricing', '/auth']) expect(isMeasuredLandingPath(path)).toBe(false);
   });
 });

@@ -1,6 +1,8 @@
-// Automatic marketing-page visitor logging was removed during privacy hardening.
-// Historical rows remain useful, but cannot establish current visitor totals.
 export const landingViewMeasurement = {
-  status: 'disabled',
-  currentTotals: null,
+  status: 'active',
+  refreshInterval: 15000,
 } as const;
+
+export function isMeasuredLandingPath(path: string): boolean {
+  return path === '/trompete-lernen-app';
+}

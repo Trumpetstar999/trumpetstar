@@ -28,6 +28,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { CinematicHero } from '@/components/landing/CinematicHero';
 import { hasRecoveryCallback } from '@/lib/recovery';
 import { PricingTable } from '@/components/pricing/PricingTable';
+import { isMeasuredLandingPath } from '@/lib/landingViewMeasurement';
 
 /* ─── Nur Safari auf Desktop (kein Chrome/Edge/Firefox, kein iPad/iPhone/Android) ─── */
 function isSafariDesktop(): boolean {
@@ -219,6 +220,15 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (!isMeasuredLandingPath(window.location.pathname) || hasRecoveryCallback(new URL(window.location.href))) return;
+    // Delay avoids duplicate development StrictMode mounts; no visitor storage.
+    const timer = window.setTimeout(() => {
+      void supabase.functions.invoke('landing-page-view', { body: { path: '/trompete-lernen-app' } });
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   // Auto-rotate hero slideshow
   useEffect(() => {
