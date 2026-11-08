@@ -1,3 +1,7 @@
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { useLanguage } from '@/hooks/useLanguage';
+import { adminDashboardCopy, adminMenuCopy } from '@/i18n/admin-dashboard';
 import { AdminHomeContentManager } from '@/components/admin/AdminHomeContentManager';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +38,7 @@ import { MailboxPanel } from '@/components/admin/MailboxPanel';
 import { ShippingPanel } from '@/components/admin/ShippingPanel';
 import { InvoicesPanel } from '@/components/admin/invoices/InvoicesPanel';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones, HandHeart } from 'lucide-react';
+import { Menu, ArrowLeft, RefreshCw, Loader2, Download, Settings, Server, Package, Users, Zap, Database, Cloud, FileText, Music, Headphones, HandHeart } from 'lucide-react';
 import { WelcomeVideoManager } from '@/components/admin/WelcomeVideoManager';
 import { QRCodeManager } from '@/components/admin/QRCodeManager';
 import { AudioPlayerManager } from '@/components/admin/AudioPlayerManager';
@@ -68,6 +72,9 @@ export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { language } = useLanguage();
+  const adminCopy = adminDashboardCopy[language];
 
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
   const [levelsView, setLevelsView] = useState<View>('levels');
@@ -207,28 +214,29 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="admin-layout min-h-screen flex" style={{ background: '#F8FAFC' }}>
+    <div className="admin-layout min-h-dvh flex">
       {/* Sidebar */}
-      <AdminSidebar activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as AdminTab)} />
+      <div className="hidden lg:block"><AdminSidebar activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab as AdminTab)} /></div>
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="left" className="admin-layout admin-mobile-menu p-0 w-[min(320px,88vw)] border-0" aria-describedby={undefined}>
+          <SheetTitle className="sr-only">Admin</SheetTitle>
+          <AdminSidebar mobile activeTab={activeTab} onTabChange={(tab) => { setActiveTab(tab as AdminTab); setMenuOpen(false); }} />
+        </SheetContent>
+      </Sheet>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col min-h-dvh overflow-hidden">
         {/* Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80">
-          <div className="px-8 py-5 flex items-center justify-between">
-            <div className="flex items-center gap-5">
-              <button 
-                onClick={() => navigate('/app')}
-                className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
-                title="Zurück zur App"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
+        <header className="admin-page-header sticky top-0 z-20 bg-card border-b border-border">
+          <div className="px-4 lg:px-8 py-4 flex flex-wrap gap-3 items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <Button variant="ghost" size="icon" className="lg:hidden shrink-0" onClick={() => setMenuOpen(true)} aria-label={adminCopy.menu} title={adminCopy.menu}><Menu className="w-5 h-5" /></Button>
+              <Button variant="ghost" size="icon" className="hidden lg:inline-flex shrink-0" onClick={() => navigate('/')} title={adminCopy.back} aria-label={adminCopy.back}><ArrowLeft className="w-5 h-5" /></Button>
               <div>
-                <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
-                  {getPageTitle()}
+                <h1 className="text-lg lg:text-xl font-semibold text-foreground">
+                  {adminMenuCopy[language][['dashboard','users','leads','marketing','seo','mailbox','knowledge','shipping','invoices','levels','pdfs','musicxml','products','digistore24','beats','audioplayer','qrcodes','assistant','classrooms','feedback','emails','reviews','homecontent','features','system'].indexOf(activeTab)] || getPageTitle()}
                 </h1>
-                <p className="text-sm text-slate-500 mt-0.5">
+                <p className="hidden lg:block text-sm text-muted-foreground mt-0.5">
                   {getPageDescription()}
                 </p>
               </div>
@@ -252,7 +260,7 @@ export default function AdminPage() {
         </header>
 
         {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="admin-main flex-1 min-w-0 overflow-x-hidden p-4 lg:p-8">
           {activeTab === 'dashboard' && <AdminDashboard />}
 
           {activeTab === 'users' && <UserList />}
