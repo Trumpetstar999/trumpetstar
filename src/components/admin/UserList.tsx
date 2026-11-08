@@ -624,15 +624,15 @@ export function UserList() {
         {/* Card Container */}
         <div className="bg-white border border-[#E5E7EB] rounded-lg">
           {/* Card Header */}
-          <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-border flex flex-col xl:flex-row xl:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-[#6B7280]" />
               <span className="font-medium text-[#111827]">
                 Nutzerliste ({filteredUsers.length})
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="relative w-64">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
                 <Input
                   placeholder="Nutzer suchen..."
