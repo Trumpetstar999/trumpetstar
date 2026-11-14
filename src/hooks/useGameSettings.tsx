@@ -25,8 +25,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   accidentalMode: 'key_signature',
   startSpeed: 3,
   confidenceThreshold: 'medium',
-  // SFX default: OFF on iOS (interferes with mic), ON on desktop
-  sfxEnabled: !isIOSDevice(),
+  // SFX default: OFF (can interfere with pitch detection)
+  sfxEnabled: false,
   calibrationCents: 0,
 };
 

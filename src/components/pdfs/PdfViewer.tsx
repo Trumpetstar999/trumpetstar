@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 import { TransformWrapper, TransformComponent, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useAuth } from '@/hooks/useAuth';
@@ -283,5 +284,5 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
         <span className="text-xs tabular-nums">{tempo}%</span><Slider aria-label={copy.tempo} value={[tempo]} min={50} max={150} step={5} onValueChange={([n]) => { setTempo(n); if (audioRef.current) audioRef.current.playbackRate = n / 100; }} className="w-20" />
       </div>}
     </footer>
-  </div>;
+  </div>, document.body);
 }

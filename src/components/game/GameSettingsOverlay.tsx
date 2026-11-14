@@ -27,7 +27,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
       <div className="w-full max-w-md mx-4 max-h-[85vh] overflow-y-auto rounded-2xl bg-[hsl(222,86%,22%)] border border-white/15 shadow-2xl p-5">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-white">Einstellungen</h2>
-          <button onClick={onClose} className="p-1 text-white/60 hover:text-white">
+          <button onClick={onClose} className="p-1 text-white/90 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -35,7 +35,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
         <div className="space-y-5">
           {/* Key */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">Tonart</Label>
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">Tonart</Label>
             <Select value={settings.key} onValueChange={v => onUpdate({ key: v })}>
               <SelectTrigger className="bg-white/10 border-white/15 text-white">
                 <SelectValue />
@@ -48,7 +48,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Scale */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">Skala</Label>
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">Skala</Label>
             <Select value={settings.scaleType} onValueChange={v => onUpdate({ scaleType: v })}>
               <SelectTrigger className="bg-white/10 border-white/15 text-white">
                 <SelectValue />
@@ -63,7 +63,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Range presets */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">
               Tonumfang: {settings.rangeMin} – {settings.rangeMax}
             </Label>
             <div className="flex gap-2 mb-2">
@@ -81,7 +81,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
             </div>
             {/* Min slider */}
             <div className="space-y-2">
-              <div className="flex justify-between text-[10px] text-white/50">
+              <div className="flex justify-between text-[10px] text-white/75">
                 <span>Min: {midiToNoteName(settings.rangeMinMidi)}</span>
                 <span>Max: {midiToNoteName(settings.rangeMaxMidi)}</span>
               </div>
@@ -99,7 +99,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Accidental mode */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">Vorzeichen</Label>
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">Vorzeichen</Label>
             <Select value={settings.accidentalMode} onValueChange={(v: 'key_signature' | 'note_accidentals') => onUpdate({ accidentalMode: v })}>
               <SelectTrigger className="bg-white/10 border-white/15 text-white">
                 <SelectValue />
@@ -113,7 +113,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Speed */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">
               Start-Speed: {settings.startSpeed}
             </Label>
             <Slider
@@ -125,7 +125,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Confidence */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">Confidence Threshold</Label>
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">Confidence Threshold</Label>
             <Select value={settings.confidenceThreshold} onValueChange={(v: 'low' | 'medium' | 'high') => onUpdate({ confidenceThreshold: v })}>
               <SelectTrigger className="bg-white/10 border-white/15 text-white">
                 <SelectValue />
@@ -140,7 +140,7 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
 
           {/* Calibration */}
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider mb-1.5 block">
+            <Label className="text-white/90 text-xs uppercase tracking-wider mb-1.5 block">
               Kalibrierung: {settings.calibrationCents > 0 ? '+' : ''}{settings.calibrationCents} cents
             </Label>
             <Slider
@@ -153,8 +153,8 @@ export function GameSettingsOverlay({ open, settings, onUpdate, onClose }: GameS
           {/* SFX */}
           <div className="flex items-center justify-between">
             <div>
-              <Label className="text-white/80 text-xs">SFX</Label>
-              <p className="text-[10px] text-white/40">Kann die Pitch-Erkennung stören</p>
+              <Label className="text-white/90 text-xs">SFX</Label>
+              <p className="text-[10px] text-white/75">Kann die Pitch-Erkennung stören</p>
             </div>
             <Switch
               checked={settings.sfxEnabled}

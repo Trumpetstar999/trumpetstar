@@ -54,7 +54,7 @@ export function GameLanding() {
             <h1 className="text-3xl font-bold text-white mb-2">
               <span className="text-gold-gradient">Note</span>Runner
             </h1>
-            <p className="text-white/60 text-sm">
+            <p className="text-white/90 text-sm">
               Notenlesen für Trompete – spielerisch mit Mikrofon in Echtzeit
             </p>
           </div>
@@ -83,14 +83,14 @@ export function GameLanding() {
               <Mic className="w-5 h-5 text-[hsl(var(--reward-gold))] shrink-0 mt-0.5" />
               <div>
                 <p className="text-white text-xs font-medium">Mikrofonzugriff erforderlich</p>
-                <p className="text-white/50 text-[11px]">Das Spiel erkennt deine Trompetentöne in Echtzeit.</p>
+                <p className="text-white/75 text-[11px]">Das Spiel erkennt deine Trompetentöne in Echtzeit.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Volume2 className="w-5 h-5 text-[hsl(var(--reward-gold))] shrink-0 mt-0.5" />
               <div>
                 <p className="text-white text-xs font-medium">SFX standardmäßig aus</p>
-                <p className="text-white/50 text-[11px]">Sound-Effekte können die Pitch-Erkennung stören.</p>
+                <p className="text-white/75 text-[11px]">Sound-Effekte können die Pitch-Erkennung stören.</p>
               </div>
             </div>
           </div>
@@ -98,7 +98,7 @@ export function GameLanding() {
           {/* How it works */}
           <div className="w-full text-left">
             <h3 className="text-white/70 text-xs font-bold uppercase tracking-wider mb-2">So funktioniert's</h3>
-            <ul className="space-y-1.5 text-white/50 text-xs">
+            <ul className="space-y-1.5 text-white/75 text-xs">
               <li className="flex items-start gap-2">
                 <span className="text-[hsl(var(--reward-gold))] font-bold">1.</span>
                 Noten wandern von rechts über das Notensystem
@@ -117,7 +117,7 @@ export function GameLanding() {
           {/* Mobile settings toggle */}
           <button
             onClick={() => setSettingsOpen(v => !v)}
-            className="lg:hidden w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-white/60 text-sm"
+            className="lg:hidden w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-white/90 text-sm"
             style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <span>Einstellungen</span>

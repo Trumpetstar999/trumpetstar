@@ -63,8 +63,8 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
         className="flex items-center gap-2 px-4 py-3"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
       >
-        <Settings2 className="w-4 h-4 text-white/40" />
-        <span className="text-xs font-bold uppercase tracking-widest text-white/50">Einstellungen</span>
+        <Settings2 className="w-4 h-4 text-white/75" />
+        <span className="text-xs font-bold uppercase tracking-widest text-white/75">Einstellungen</span>
       </div>
 
       <div className="p-4 space-y-5">
@@ -87,7 +87,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
         {/* Row 1: Key + Scale */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">Tonart</label>
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">Tonart</label>
             <Select value={settings.key} onValueChange={handleKeyChange}>
               <SelectTrigger
                 className="h-9 text-sm border-0"
@@ -101,7 +101,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
             </Select>
           </div>
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">Skala</label>
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">Skala</label>
             <Select value={settings.scaleType} onValueChange={v => onUpdate({ scaleType: v })}>
               <SelectTrigger
                 className="h-9 text-sm border-0"
@@ -123,7 +123,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
 
         {/* Staff Range Selector */}
         <div>
-          <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-3">Tonumfang</label>
+          <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-3">Tonumfang</label>
           <StaffRangeSelector
             minMidi={settings.rangeMinMidi}
             maxMidi={settings.rangeMaxMidi}
@@ -138,7 +138,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
         {/* Row: Speed + Confidence */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">
               Speed
               <span className="ml-1 text-white/70 font-bold">{settings.startSpeed}</span>
             </label>
@@ -157,7 +157,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
             />
           </div>
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">Genauigkeit</label>
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">Genauigkeit</label>
             <Select value={settings.confidenceThreshold} onValueChange={(v: 'low' | 'medium' | 'high') => onUpdate({ confidenceThreshold: v })}>
               <SelectTrigger
                 className="h-9 text-sm border-0"
@@ -177,7 +177,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
         {/* Row: Accidentals + Calibration */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">Vorzeichen</label>
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">Vorzeichen</label>
             <Select value={settings.accidentalMode} onValueChange={(v: 'key_signature' | 'note_accidentals') => onUpdate({ accidentalMode: v })}>
               <SelectTrigger
                 className="h-9 text-sm border-0"
@@ -192,7 +192,7 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
             </Select>
           </div>
           <div>
-            <label className="block text-[11px] uppercase tracking-wider text-white/40 mb-1.5">
+            <label className="block text-[11px] uppercase tracking-wider text-white/75 mb-1.5">
               Kalibrierung
               <span className="ml-1 text-white/70 font-bold">
                 {settings.calibrationCents > 0 ? '+' : ''}{settings.calibrationCents}¢
@@ -220,8 +220,8 @@ export function GameSettingsInline({ settings, onUpdate }: GameSettingsInlinePro
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
         >
           <div>
-            <p className="text-xs font-medium text-white/80">Soundeffekte (SFX)</p>
-            <p className="text-[10px] text-white/35">Kann die Pitch-Erkennung stören</p>
+            <p className="text-xs font-medium text-white/90">Soundeffekte (SFX)</p>
+            <p className="text-[10px] text-white/75">Kann die Pitch-Erkennung stören</p>
           </div>
           <Switch
             checked={settings.sfxEnabled}
