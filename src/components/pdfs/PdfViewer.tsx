@@ -212,7 +212,7 @@ export function PdfViewer({ pdf, pdfBlobUrl, pdfBlob, currentPage, onPageChange,
 
   const fit = Math.max(0.1, Math.min((area.width - 40) / size.width, (area.height - 40) / size.height));
   const icon = (label: string, glyph: React.ReactNode, action: () => void, disabled = false, selected = false) => <Button size="icon" variant="ghost" aria-label={label} title={label} disabled={disabled} onClick={action} aria-pressed={selected || undefined} className={cn('shrink-0 text-muted-foreground', selected && 'bg-secondary text-primary')}>{glyph}</Button>;
-  return <div className="pdf-workspace ts-light-module ts-system-font fixed inset-0 z-[100] flex flex-col" role="dialog" aria-modal="true" aria-label={pdf.title}>
+  return createPortal(<div className="pdf-workspace ts-light-module ts-system-font fixed inset-0 z-[100] flex flex-col" role="dialog" aria-modal="true" aria-label={pdf.title}>
     <header className="pdf-topbar flex shrink-0 items-center gap-2 border-b border-border bg-card px-3">
       {icon(copy.pages, <PanelLeft />, () => setSidebar(s => !s), false, sidebar)}
       <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">{pdf.title}</h2>
