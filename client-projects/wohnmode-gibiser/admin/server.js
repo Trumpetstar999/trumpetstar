@@ -95,7 +95,14 @@ app.get('/api/images', (req, res) => {
 });
 
 // POST upload image
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => {
+    if (/^image\/(jpeg|png|webp|gif)$/.test(file.mimetype)) cb(null, true);
+    else cb(new Error('Nur Bilddateien erlaubt'));
+  }
+});
 
 app.post('/api/upload/:filename', upload.single('image'), (req, res) => {
   try {
@@ -107,7 +114,7 @@ app.post('/api/upload/:filename', upload.single('image'), (req, res) => {
     const filepath = path.join(IMAGES_DIR, filename);
     
     // Security check
-    if (filename.includes('..') || filename.includes('/')) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.(jpe?g|png|webp|gif)$/i.test(filename)) {
       return res.status(400).json({ ok: false, error: 'Ungültiger Dateiname' });
     }
     
