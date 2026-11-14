@@ -194,13 +194,13 @@ export const mockTodos: Todo[] = [
 ];
 
 export const mockStats: UserStats = {
-  todayStars: 5,
-  weekStars: 23,
-  monthStars: 87,
-  totalStars: 342,
-  streak: 7,
-  todayMinutes: 45,
-  weekMinutes: 210,
+  todayStars: 0,
+  weekStars: 0,
+  monthStars: 0,
+  totalStars: 0,
+  streak: 0,
+  todayMinutes: 0,
+  weekMinutes: 0,
 };
 
 // Example data removed: only real user entries are shown.
