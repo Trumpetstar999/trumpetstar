@@ -10,6 +10,8 @@ const corsHeaders = {
  * push-sync: Internal edge function called by App A to forward events to App B.
  * Reads SYNC_SECRET and SYNC_TARGET_URL from env, forwards the payload with the shared secret header.
  */
+import { getCaller, isServiceCaller } from "../_shared/requireAuth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -36,6 +38,16 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Only trusted server functions may forward arbitrary events; signed-in users may
+  // only report their own LOGIN, with identity taken from the verified session.
+  if (!isServiceCaller(req)) {
+    const user = await getCaller(req);
+    if (!user) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    payload = { event: "LOGIN", user_id: user.id, user_email: user.email ?? null };
+  }
+
   // Enrich with server timestamp
   payload.synced_at = new Date().toISOString();
 
@@ -54,7 +66,7 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       console.error(`[push-sync] App B returned ${response.status}: ${responseText}`);
       return new Response(
-        JSON.stringify({ error: "app_b_error", status: response.status, detail: responseText }),
+        JSON.stringify({ error: "app_b_error" }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -67,7 +79,7 @@ Deno.serve(async (req) => {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("[push-sync] Fetch to App B failed:", msg);
-    return new Response(JSON.stringify({ error: "fetch_failed", detail: msg }), {
+    return new Response(JSON.stringify({ error: "fetch_failed" }), {
       status: 502,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

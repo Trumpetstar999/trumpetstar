@@ -352,7 +352,7 @@ async function processIpnEvent(
         const pushSyncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push-sync`;
         await fetch(pushSyncUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` },
           body: JSON.stringify({
             event: `PURCHASE_${normalized.event_type}`,
             user_email: normalized.email,
