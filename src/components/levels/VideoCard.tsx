@@ -1,3 +1,4 @@
+import { displayTitle as formatTitle } from '@/lib/displayTitle';
 import { Play, Star, Clock } from 'lucide-react';
 import { Video } from '@/types';
 import { cn } from '@/lib/utils';
@@ -32,7 +33,7 @@ export function VideoCard({ video, onClick, index = 0 }: VideoCardProps) {
     return video.title;
   };
 
-  const displayTitle = getLocalizedTitle();
+  const displayTitle = formatTitle(getLocalizedTitle());
 
   return (
     <button
