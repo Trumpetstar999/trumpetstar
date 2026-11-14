@@ -1,4 +1,7 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDailyUsage } from "@/hooks/useDailyUsage";
+import { DailyLimitOverlay } from "@/components/premium/DailyLimitOverlay";
 
 /* Happy Beginners laeuft als eigenstaendige Anwendung unter
  * /public/trompete/. Sie bringt ihr eigenes HTML, ihre eigenen Skripte
@@ -7,15 +10,27 @@ import { useNavigate } from "react-router-dom";
  * (data/toene.json, img/…) richtig und das Spiel bleibt in einem Stueck. */
 export default function HappyBeginnersPlayPage() {
   const navigate = useNavigate();
+  const { recordGameStart, isLoading } = useDailyUsage();
+  const [allowed, setAllowed] = useState(false);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const claimed = useRef(false);
+
+  // Opening the game counts as one game start (shared free daily quota).
+  useEffect(() => {
+    if (isLoading || claimed.current) return;
+    claimed.current = true;
+    void recordGameStart().then(ok => ok ? setAllowed(true) : setLimitOpen(true));
+  }, [isLoading, recordGameStart]);
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "#FDF8EE" }}>
-      <iframe
+      {allowed && <iframe
         src="/trompete/index.html"
         title="Happy Beginners"
         allow="microphone; autoplay; fullscreen"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-      />
+      />}
+      <DailyLimitOverlay open={limitOpen} type="game" onClose={() => { setLimitOpen(false); navigate("/games"); }} />
       <button
         onClick={() => navigate("/games")}
         style={{
