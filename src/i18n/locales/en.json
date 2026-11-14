@@ -84,7 +84,8 @@
     "footerLinkFirstNote": "First Note",
     "footerLinkNoSound": "No Sound? Help!",
     "footerLinkPricing": "Pricing",
-    "footerCopyright": "All rights reserved."
+    "footerCopyright": "All rights reserved.",
+    "parentHint": "For children: a parent creates the account with their email. Free includes 3 videos and 3 games per day – no credit card."
   },
   "lead": {
     "firstName": "First name",
