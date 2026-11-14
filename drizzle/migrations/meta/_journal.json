@@ -148,6 +148,13 @@
       "when": 1794123122502,
       "tag": "0020_enable_anonymous_landing_view_counters",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794649707455,
+      "tag": "0021_harden_usage_and_videos",
+      "breakpoints": true
     }
   ]
 }
