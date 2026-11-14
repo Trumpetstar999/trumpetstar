@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const docId = url.searchParams.get('docId');
-    const debug = url.searchParams.get('debug') === '1';
+    const debug = false;
 
     if (!docId) {
       return new Response(
@@ -28,7 +28,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('PDF Proxy: Fetching document:', docId);
+    // Require a signed-in caller and verify plan entitlement through RLS
+    // (pdf_documents SELECT policy uses can_access_plan(plan_required)).
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const userClient = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: claims } = await userClient.auth.getUser(authHeader.slice(7));
+    if (!claims?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const { data: allowed } = await userClient.from('pdf_documents').select('id').eq('id', docId).maybeSingle();
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     // Create Supabase client with service role for server-side access
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -46,7 +63,7 @@ Deno.serve(async (req) => {
     if (docError || !pdfDoc) {
       console.error('PDF Proxy: Document not found:', docError);
       return new Response(
-        JSON.stringify({ error: 'Document not found', details: docError?.message }),
+        JSON.stringify({ error: 'Document not found' }),
         { 
           status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -165,7 +182,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('PDF Proxy: Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: String(error) }),
+      JSON.stringify({ error: 'Internal server error' }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

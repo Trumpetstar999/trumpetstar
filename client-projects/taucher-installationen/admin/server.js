@@ -88,7 +88,10 @@ app.post('/api/content', (req, res) => {
 
 // POST /api/upload/:target
 app.post('/api/upload/:target', (req, res) => {
-  const target = req.params.target;
+  const target = path.basename(String(req.params.target || ''));
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,99}\.(jpe?g|png|webp|gif|svg)$/i.test(target) || target !== req.params.target) {
+    return res.status(400).json({ ok: false, error: 'Ungültiger Dateiname' });
+  }
 
   const uploadSingle = multer({
     storage: multer.diskStorage({

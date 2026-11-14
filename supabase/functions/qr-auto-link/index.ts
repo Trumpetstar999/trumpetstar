@@ -1,3 +1,4 @@
+import { getAdmin, isServiceCaller } from "../_shared/requireAuth.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -137,6 +138,10 @@ async function aiSuggest(
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  if (!isServiceCaller(req) && !(await getAdmin(req))) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  }
 
   try {
     const { mode = 'suggest', applyIds = [] } = await req.json().catch(() => ({}));

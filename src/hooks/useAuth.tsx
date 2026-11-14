@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   const syncUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/push-sync`;
                   await fetch(syncUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
                     body: JSON.stringify({
                       event: 'LOGIN',
                       user_id: session.user.id,
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   const enrollUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/enroll-lead`;
                   await fetch(enrollUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}`, apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
                     body: JSON.stringify({
                       user_id: session.user.id,
                       email: session.user.email,

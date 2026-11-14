@@ -14,6 +14,8 @@ const SEGMENT_TO_PREFIX: Record<string, string> = {
   teacher: "lehrer_",
 };
 
+import { getCaller } from "../_shared/requireAuth.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -27,8 +29,21 @@ Deno.serve(async (req) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const body = await req.json();
-    const { user_id, email, display_name, segment, language, source } = body;
+    // Identity comes from the verified session, never from the request body.
+    const caller = await getCaller(req);
+    if (!caller?.email) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const body = await req.json().catch(() => ({}));
+    const user_id = caller.id;
+    const email = caller.email;
+    const display_name = typeof body.display_name === "string" ? body.display_name.slice(0, 100) : "";
+    const segment = ["adult", "parent", "teacher", "kid"].includes(body.segment) ? body.segment : "adult";
+    const language = body.language;
+    const source = typeof body.source === "string" ? body.source.slice(0, 40) : "signup";
 
     if (!user_id || !email) {
       return new Response(JSON.stringify({ error: "user_id and email are required" }), {

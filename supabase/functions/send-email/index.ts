@@ -1,3 +1,4 @@
+import { getAdmin } from "../_shared/requireAuth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -62,7 +63,7 @@ Deno.serve(async (req) => {
   const { data: authData, error: authError } = await _supabaseCheck.auth.getUser(callerToken);
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const isServiceRole = serviceRoleKey && callerToken === serviceRoleKey;
-  if (!isServiceRole && (authError || !authData?.user)) {
+  if (!isServiceRole && (authError || !authData?.user || !(await getAdmin(req)))) {
     console.warn("[send-email] Unauthorized caller, token invalid");
     return new Response(JSON.stringify({ error: "Unauthorized: invalid token" }), {
       status: 401,
