@@ -207,7 +207,7 @@ export default function TrompeteTonumfangPage() {
           </p>
           <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
             <Link to="/kurse/fortgeschritten">
-              Range-Kurs entdecken <ArrowRight className="ml-2 h-4 w-4" />
+              Kostenlos registrieren <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </section>

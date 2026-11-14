@@ -89,7 +89,7 @@ export function GameLanding() {
             <div className="flex items-start gap-3">
               <Volume2 className="w-5 h-5 text-[hsl(var(--reward-gold))] shrink-0 mt-0.5" />
               <div>
-                <p className="text-white text-xs font-medium">SFX standardmäßig aus</p>
+                <p className="text-white text-xs font-medium">Soundeffekte standardmäßig aus</p>
                 <p className="text-white/75 text-[11px]">Sound-Effekte können die Pitch-Erkennung stören.</p>
               </div>
             </div>
