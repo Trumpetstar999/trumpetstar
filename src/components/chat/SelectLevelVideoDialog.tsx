@@ -1,3 +1,4 @@
+import { displayTitle } from '@/lib/displayTitle';
 import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -169,7 +170,7 @@ export function SelectLevelVideoDialog({ open, onOpenChange, onSelect }: SelectL
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{video.title}</p>
+                      <p className="font-medium text-sm truncate">{displayTitle(video.title)}</p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                         <span className="truncate max-w-[150px]">{video.level_title}</span>
                         {video.duration_seconds && (

@@ -1,3 +1,4 @@
+import { displayTitle } from '@/lib/displayTitle';
 import { useState, useEffect, useMemo } from 'react';
 import { X, Plus, Check, Search, ListMusic, Sparkles, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -302,7 +303,7 @@ export function CreatePlaylistPage({ open, onClose, levels, defaultLevelId, onCr
                                   className="w-20 h-11 rounded-md object-cover flex-shrink-0"
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-card-foreground truncate">{video.title}</p>
+                                  <p className="text-sm font-medium text-card-foreground truncate">{displayTitle(video.title)}</p>
                                   <p className="text-xs text-muted-foreground">{formatDuration(video.duration_seconds)}</p>
                                 </div>
                                 <button
