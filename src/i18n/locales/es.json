@@ -84,7 +84,8 @@
     "footerLinkFirstNote": "Primera nota",
     "footerLinkNoSound": "¿Sin sonido? ¡Ayuda!",
     "footerLinkPricing": "Precios",
-    "footerCopyright": "Todos los derechos reservados."
+    "footerCopyright": "Todos los derechos reservados.",
+    "parentHint": "Para niños: un adulto crea la cuenta con su email. Gratis: 3 vídeos y 3 juegos al día, sin tarjeta."
   },
   "lead": {
     "firstName": "Nombre",
@@ -311,7 +312,7 @@
     "done": "Listo",
     "reset": "Restablecer",
     "dragHint": "Mantén presionado y arrastra una tarjeta para cambiar el orden",
-    "premiumHint": "Puedes cambiar a Premium en cualquier momento – tu progreso se guarda.",
+    "premiumHint": "Puedes cambiar entre FREE, BASIC y PRO en cualquier momento: tu progreso se conserva.",
     "impressumTitle": "Aviso Legal",
     "disputeResolution": "Resolución de disputas en línea",
     "liabilityNote": "Aviso de responsabilidad",
@@ -575,12 +576,12 @@
     "hero": {
       "title": "Aprender Trompeta: La Guía Completa para Principiantes",
       "subtitle": "Con el método correcto es posible en 3–6 meses – ya sea como niño, adulto o quien retoma el instrumento.",
-      "cta": "Descubrir el curso"
+      "cta": "Regístrate gratis"
     },
     "cta": {
       "title": "¿Listo para empezar?",
       "subtitle": "Comienza ahora con la lección Star gratuita – sin registro, disponible de inmediato.",
-      "button": "Descubrir el curso"
+      "button": "Regístrate gratis"
     }
   },
   "seo_ansatzAtmung": {
@@ -611,7 +612,7 @@
     "hero": {
       "title": "Trompeta para Niños",
       "subtitle": "Aprendizaje estructurado para niños desde 6 años – de forma lúdica y con alegría.",
-      "cta": "Descubrir el curso"
+      "cta": "Regístrate gratis"
     },
     "cta": {
       "title": "Empezar juntos",
@@ -667,8 +668,8 @@
     "guaranteeDescription": "Prueba Trumpetstar con una garantía de devolución de 30 días.",
     "planCopy": {
       "FREE": {
-        "short": "Descubre lecciones seleccionadas.",
-        "description": "Acceso gratuito a videos seleccionados, partituras y herramientas básicas.",
+        "short": "3 vídeos y 3 juegos gratis cada día.",
+        "description": "Gratis con cuenta: 3 vídeos y 3 juegos al día, además del reproductor de audio y herramientas. El feedback del profesor es solo PRO.",
         "cta": "Empezar gratis"
       },
       "BASIC": {

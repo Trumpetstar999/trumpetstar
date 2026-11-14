@@ -1,3 +1,4 @@
+import { displayTitle } from '@/lib/displayTitle';
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -334,7 +335,7 @@ export default function PlaylistBuilderPage() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm truncate block text-foreground">{video.title}</span>
+                    <span className="text-sm truncate block text-foreground">{displayTitle(video.title)}</span>
                     {!selectedLevelId && (
                       <span className="text-[10px] text-muted-foreground">
                         {levels.find((l: any) => l.id === video.level_id)?.title}
@@ -441,7 +442,7 @@ function SortablePlaylistItem({ id, item, index, onRemove }: {
       )}
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+        <p className="text-sm font-medium text-foreground truncate">{displayTitle(item.title)}</p>
         {item.duration && (
           <p className="text-[11px] text-muted-foreground">
             {Math.floor(item.duration / 60)}:{((item.duration % 60) || 0).toString().padStart(2, '0')}

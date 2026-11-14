@@ -1,3 +1,4 @@
+import { micErrorMessage } from '@/lib/micError';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 // ---------------------------------------------------------------------------
@@ -306,7 +307,7 @@ export function useGamePitchDetection(
       setIsListening(true);
     } catch (err: unknown) {
       console.error('[PitchDetect] Error:', err);
-      setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff.');
+      setError(micErrorMessage(err));
       startedRef.current = false;
     }
   }, [analyze]);

@@ -84,7 +84,8 @@
     "footerLinkFirstNote": "Erster Ton",
     "footerLinkNoSound": "Kein Ton? Hilfe!",
     "footerLinkPricing": "Preise",
-    "footerCopyright": "Alle Rechte vorbehalten."
+    "footerCopyright": "Alle Rechte vorbehalten.",
+    "parentHint": "Für Kinder: Eltern legen das Konto mit ihrer E-Mail an. Kostenlos gibt es täglich 3 Videos und 3 Spiele – ohne Kreditkarte."
   },
   "lead": {
     "firstName": "Vorname",
@@ -311,7 +312,7 @@
     "done": "Fertig",
     "reset": "Zurücksetzen",
     "dragHint": "Halte eine Kachel gedrückt und ziehe sie, um die Reihenfolge zu ändern",
-    "premiumHint": "Du kannst jederzeit zu Premium wechseln – dein Fortschritt bleibt erhalten.",
+    "premiumHint": "Du kannst jederzeit zwischen FREE, BASIC und PRO wechseln – dein Fortschritt bleibt erhalten.",
     "impressumTitle": "Impressum",
     "disputeResolution": "Online-Streitbeilegung",
     "liabilityNote": "Haftungshinweis",
@@ -575,12 +576,12 @@
     "hero": {
       "title": "Trompete lernen: Der komplette Guide für Anfänger",
       "subtitle": "Mit der richtigen Methode in 3–6 Monaten möglich – egal ob als Kind, Erwachsener oder Wiedereinsteiger.",
-      "cta": "Kurs entdecken"
+      "cta": "Kostenlos registrieren"
     },
     "cta": {
       "title": "Bereit durchzustarten?",
       "subtitle": "Starte jetzt mit der kostenlosen Star-Lektion – ohne Anmeldung, sofort verfügbar.",
-      "button": "Kurs entdecken"
+      "button": "Kostenlos registrieren"
     }
   },
   "seo_ansatzAtmung": {
@@ -611,7 +612,7 @@
     "hero": {
       "title": "Trompete für Kinder",
       "subtitle": "Strukturiertes Lernen für Kinder ab 6 Jahren – spielerisch und mit Freude.",
-      "cta": "Kurs entdecken"
+      "cta": "Kostenlos registrieren"
     },
     "cta": {
       "title": "Gemeinsam starten",
@@ -667,8 +668,8 @@
     "guaranteeDescription": "Teste Trumpetstar mit 30 Tagen Geld-zurück-Garantie.",
     "planCopy": {
       "FREE": {
-        "short": "Ausgewählte Lerninhalte entdecken.",
-        "description": "Kostenloser Zugang zu ausgewählten Videos, Noten und Basistools.",
+        "short": "Täglich 3 Videos und 3 Spiele kostenlos.",
+        "description": "Kostenlos mit Konto: jeden Tag 3 Videostarts und 3 Spielstarts, dazu Audioplayer und Übetools. Lehrerfeedback gibt es nur in PRO.",
         "cta": "Kostenlos starten"
       },
       "BASIC": {

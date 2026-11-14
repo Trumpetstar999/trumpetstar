@@ -185,75 +185,24 @@ export const mockLevels: Level[] = [
   },
 ];
 
+// Example data removed: only real user entries are shown.
 export const mockJournalEntries: JournalEntry[] = [
-  {
-    id: 'journal-1',
-    date: '2025-01-15',
-    minutes: 45,
-    mood: 'great',
-    notes: 'Heute lief es richtig gut! Die C-Dur Tonleiter sitzt jetzt perfekt.',
-    tags: ['Tonleitern', 'Fortschritt'],
-    linkedVideos: ['video-7'],
-  },
-  {
-    id: 'journal-2',
-    date: '2025-01-14',
-    minutes: 30,
-    mood: 'good',
-    notes: 'Warm-up Routine abgeschlossen. Muss noch an der Atmung arbeiten.',
-    tags: ['Warm-up', 'Atmung'],
-    linkedVideos: ['video-5', 'video-3'],
-  },
-  {
-    id: 'journal-3',
-    date: '2025-01-13',
-    minutes: 20,
-    mood: 'tired',
-    notes: 'Nur kurz geübt heute, war etwas müde.',
-    tags: ['Kurzsession'],
-    linkedVideos: [],
-  },
 ];
 
+// Example data removed: only real user entries are shown.
 export const mockTodos: Todo[] = [
-  {
-    id: 'todo-1',
-    title: 'G-Dur Tonleiter 10x durchspielen',
-    notes: 'Langsam starten, Tempo steigern',
-    dueDate: '2025-01-16',
-    priority: 'high',
-    completed: false,
-  },
-  {
-    id: 'todo-2',
-    title: 'Atemübung morgens und abends',
-    priority: 'medium',
-    completed: false,
-  },
-  {
-    id: 'todo-3',
-    title: 'Level 1 Videos nochmal anschauen',
-    priority: 'low',
-    completed: true,
-  },
 ];
 
 export const mockStats: UserStats = {
-  todayStars: 5,
-  weekStars: 23,
-  monthStars: 87,
-  totalStars: 342,
-  streak: 7,
-  todayMinutes: 45,
-  weekMinutes: 210,
+  todayStars: 0,
+  weekStars: 0,
+  monthStars: 0,
+  totalStars: 0,
+  streak: 0,
+  todayMinutes: 0,
+  weekMinutes: 0,
 };
 
+// Example data removed: only real user entries are shown.
 export const mockActivities: DayActivity[] = [
-  { date: '2025-01-15', stars: 5, videosWatched: ['video-1', 'video-7'], minutesPracticed: 45 },
-  { date: '2025-01-14', stars: 3, videosWatched: ['video-5'], minutesPracticed: 30 },
-  { date: '2025-01-13', stars: 2, videosWatched: ['video-2'], minutesPracticed: 20 },
-  { date: '2025-01-12', stars: 4, videosWatched: ['video-8', 'video-9'], minutesPracticed: 40 },
-  { date: '2025-01-11', stars: 3, videosWatched: ['video-3'], minutesPracticed: 35 },
-  { date: '2025-01-10', stars: 2, videosWatched: ['video-6'], minutesPracticed: 25 },
-  { date: '2025-01-09', stars: 4, videosWatched: ['video-1', 'video-2'], minutesPracticed: 50 },
 ];

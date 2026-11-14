@@ -84,7 +84,8 @@
     "footerLinkFirstNote": "Prva nota",
     "footerLinkNoSound": "Brez tona? Pomoč!",
     "footerLinkPricing": "Cene",
-    "footerCopyright": "Vse pravice pridržane."
+    "footerCopyright": "Vse pravice pridržane.",
+    "parentHint": "Za otroke: starši ustvarijo račun s svojim e-naslovom. Brezplačno: 3 videi in 3 igre na dan – brez kartice."
   },
   "lead": {
     "firstName": "Ime",
@@ -311,7 +312,7 @@
     "done": "Končano",
     "reset": "Ponastavi",
     "dragHint": "Pridržite in povlecite ploščico, da spremenite vrstni red",
-    "premiumHint": "Kadarkoli se lahko preklopite na Premium – vaš napredek se ohrani.",
+    "premiumHint": "Kadarkoli lahko preklopite med FREE, BASIC in PRO – vaš napredek se ohrani.",
     "impressumTitle": "Pravne informacije",
     "disputeResolution": "Spletno reševanje sporov",
     "liabilityNote": "Omejitev odgovornosti",
@@ -575,12 +576,12 @@
     "hero": {
       "title": "Naučite se trobente: Popoln vodič za začetnike",
       "subtitle": "Z pravo metodo se je mogoče naučiti trobente v 3–6 mesecih – ne glede na starost.",
-      "cta": "Odkrij tečaj"
+      "cta": "Brezplačna registracija"
     },
     "cta": {
       "title": "Pripravljeni začeti?",
       "subtitle": "Začnite zdaj z brezplačno Star lekcijo – brez registracije, takoj na voljo.",
-      "button": "Odkrij tečaj"
+      "button": "Brezplačna registracija"
     }
   },
   "seo_ansatzAtmung": {
@@ -611,7 +612,7 @@
     "hero": {
       "title": "Trobenta za otroke",
       "subtitle": "Strukturirano učenje za otroke od 6. leta naprej – skozi igro in z veseljem.",
-      "cta": "Odkrij tečaj"
+      "cta": "Brezplačna registracija"
     },
     "cta": {
       "title": "Začnite skupaj",
@@ -667,8 +668,8 @@
     "guaranteeDescription": "Preizkusi Trumpetstar s 30-dnevno garancijo vračila denarja.",
     "planCopy": {
       "FREE": {
-        "short": "Odkrij izbrane učne vsebine.",
-        "description": "Brezplačen dostop do izbranih videov, not in osnovnih orodij.",
+        "short": "Vsak dan 3 videi in 3 igre brezplačno.",
+        "description": "Brezplačno z računom: vsak dan 3 videi in 3 igre ter predvajalnik zvoka in orodja. Povratne informacije učitelja samo v PRO.",
         "cta": "Začni brezplačno"
       },
       "BASIC": {

@@ -1,3 +1,4 @@
+import { displayTitle } from '@/lib/displayTitle';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Loader2, Play, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +39,7 @@ function Showcase({ course, playingId, onPlay, disabled }: { course: Course; pla
         <div ref={strip} className="flex min-w-0 flex-1 snap-x gap-3 overflow-x-auto pb-2">
           {course.videos.map((video, index) => <Button key={video.id} variant="ghost" aria-pressed={active.id === video.id} onClick={() => { setSelectedId(video.id); onPlay(video); }} disabled={disabled} className={`h-auto w-40 shrink-0 snap-start flex-col items-stretch gap-0 overflow-hidden whitespace-normal rounded-lg border-2 p-0 text-left sm:w-48 ${active.id === video.id ? 'border-primary bg-secondary hover:bg-secondary' : 'border-border bg-card hover:bg-accent'}`}>
             <div className="aspect-video w-full bg-muted">{video.thumbnail && <img src={video.thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />}</div>
-            <span className="flex min-h-14 items-start gap-2 p-2 text-sm"><span className="shrink-0 text-muted-foreground">{index + 1}.</span><span className="line-clamp-2 break-words">{video.title}</span></span>
+            <span className="flex min-h-14 items-start gap-2 p-2 text-sm"><span className="shrink-0 text-muted-foreground">{index + 1}.</span><span className="line-clamp-2 break-words">{displayTitle(video.title)}</span></span>
           </Button>)}
         </div>
         <Button size="icon" variant="ghost" className="shrink-0" aria-label={c.next} title={c.next} onClick={() => strip.current?.scrollBy({ left: 400, behavior: 'smooth' })}><ChevronRight /></Button>

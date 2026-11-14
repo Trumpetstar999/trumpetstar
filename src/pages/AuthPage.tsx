@@ -279,6 +279,7 @@ export default function AuthPage() {
               </div>
               <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-md">{t('auth.welcome')}</h1>
               <p className="text-white/70 text-lg">{t('auth.tagline')}</p>
+              <p className="mx-auto mt-2 max-w-sm text-sm text-white/80">{t('auth.parentHint')}</p>
             </div>
 
             {/* Auth Card - glass on dark */}

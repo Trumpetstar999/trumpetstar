@@ -1,3 +1,4 @@
+import { micErrorMessage } from '@/lib/micError';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface PitchData {
@@ -212,7 +213,7 @@ export function usePitchDetection(referenceA4: number = 440): UsePitchDetectionR
       setIsListening(true);
       analyze();
     } catch (err) {
-      setError('Mikrofonzugriff nicht möglich. Bitte erlaube den Zugriff auf dein Mikrofon.');
+      setError(micErrorMessage(err));
       console.error('Pitch detection error:', err);
       startedRef.current = false;
     }

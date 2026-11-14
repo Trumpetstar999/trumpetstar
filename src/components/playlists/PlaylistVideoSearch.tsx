@@ -1,3 +1,4 @@
+import { displayTitle } from '@/lib/displayTitle';
 import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -137,7 +138,7 @@ export function PlaylistVideoSearch({ open, onOpenChange, existingVideoIds, onAd
                     className="w-16 h-9 rounded object-cover flex-shrink-0"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-card-foreground truncate">{video.title}</p>
+                    <p className="text-sm font-medium text-card-foreground truncate">{displayTitle(video.title)}</p>
                     <p className="text-xs text-muted-foreground">{video.level_title}</p>
                   </div>
                   <Button
